@@ -30,10 +30,10 @@
 
 ### 5rganization
 
-<img src="https://github.com/user-attachments/assets/62b319b2-6718-496a-9c60-1ca3563e4a0b" width="160"> | <img src="https://github.com/user-attachments/assets/701f9995-1a85-444a-97c0-05b5ce8e9a8f" width="160"> | <img src="https://github.com/user-attachments/assets/882dcce8-a4f9-4a71-b6a7-06ddcfa50d4f" width="160"> | <img src="https://github.com/user-attachments/assets/182646ff-97cd-4c25-96c8-7edc91c39450" width="160"> | <img src="https://github.com/user-attachments/assets/a448d21a-ce4c-41cf-b63f-5cb8c3fd321d" width="160"> | <img src="https://github.com/user-attachments/assets/4378d8fb-c022-4a89-9b06-eb187f743ac7" width="160"> 
+<img src="https://github.com/user-attachments/assets/62b319b2-6718-496a-9c60-1ca3563e4a0b" width="160"> | <img src="https://github.com/user-attachments/assets/701f9995-1a85-444a-97c0-05b5ce8e9a8f" width="160"> | <img src="https://github.com/user-attachments/assets/882dcce8-a4f9-4a71-b6a7-06ddcfa50d4f" width="160"> | <img src="https://github.com/user-attachments/assets/182646ff-97cd-4c25-96c8-7edc91c39450" width="160"> | <img src="https://avatars.githubusercontent.com/u/50211003?v=4" width="160"> | <img src="https://github.com/user-attachments/assets/4378d8fb-c022-4a89-9b06-eb187f743ac7" width="160"> 
 |:----------:|:----------:|:----------:|:----------:|:----------:|:----------:|
-| 서동환 | 양원식 | 김신영 | 송규섭 | 신재욱 | 조유빈 |
-[GitHub](https://github.com/SNMac) | [GitHub](https://github.com/Sheep1sik) | [GitHub](https://github.com/ksyq12) | [GitHub](https://github.com/SongKyuSeob) | [GitHub](https://github.com/tls427wodnr) |  |
+| 서동환 | 양원식 | 김신영 | 송규섭 | 권대현 | 조유빈 |
+[GitHub](https://github.com/SNMac) | [GitHub](https://github.com/Sheep1sik) | [GitHub](https://github.com/ksyq12) | [GitHub](https://github.com/SongKyuSeob) | [GitHub](https://github.com/neoskyclad) |  |
 
 <br>
 
@@ -45,7 +45,7 @@
 | 양원식 | `부리더` | 파이어베이스 세팅, Data 레이어, Domain 레이어, Google 로그인 |
 | 김신영 | `팀원` | 마이페이지, 근무지 등록 Modal, 초대코드를 통한 근무지 등록 |
 | 송규섭 | `팀원` | 홈, 급여 계산, 루틴 관리 |
-| 신재욱 | `팀원` | 근무지 등록/수정, 근무 등록/수정, 루틴 등록/수정 |
+| 권대현 | `팀원` | 백엔드 구현 |
 | 조유빈 | `디자이너` | 와이어프레임, UI/UX 디자인 |
 
 <br><br>
