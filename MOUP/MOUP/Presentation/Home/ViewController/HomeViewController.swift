@@ -7,13 +7,11 @@
 
 import UIKit
 
-class HomeViewController: UIViewController {
-
+final class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("HomeViewController")
+        view.backgroundColor = .systemRed
+        title = "홈"
     }
-
-
 }
 
