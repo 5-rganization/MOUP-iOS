@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		3358E2BCBB25C3FF60F4E1E7 /* libPods-MOUP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E985550E85203EB5EFE5D142 /* libPods-MOUP.a */; };
 		5B3753CF2E24FBC900B13805 /* ReactorKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5B3753CE2E24FBC900B13805 /* ReactorKit */; };
+		5B3754642E2540C200B13805 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 5B3754632E2540C200B13805 /* GoogleSignIn */; };
 		5B5304D22E2251610083F7CA /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304D12E2251610083F7CA /* Then */; };
 		5B5304D52E22516A0083F7CA /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304D42E22516A0083F7CA /* SnapKit */; };
 		5B5304DA2E2251B00083F7CA /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304D92E2251B00083F7CA /* FirebaseAnalytics */; };
@@ -58,6 +59,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B5304E82E2251DD0083F7CA /* RxRelay in Frameworks */,
+				5B3754642E2540C200B13805 /* GoogleSignIn in Frameworks */,
 				5B5304D22E2251610083F7CA /* Then in Frameworks */,
 				5B5304ED2E2251FD0083F7CA /* Differentiator in Frameworks */,
 				5B5304EA2E2251DD0083F7CA /* RxSwift in Frameworks */,
@@ -148,6 +150,7 @@
 				5B5304EE2E2251FD0083F7CA /* RxDataSources */,
 				5B95F7032E22525900C29F0D /* Alamofire */,
 				5B3753CE2E24FBC900B13805 /* ReactorKit */,
+				5B3754632E2540C200B13805 /* GoogleSignIn */,
 			);
 			productName = MOUP;
 			productReference = 5B53045F2E224D210083F7CA /* MOUP.app */;
@@ -186,6 +189,7 @@
 				5B5304EB2E2251FD0083F7CA /* XCRemoteSwiftPackageReference "RxDataSources" */,
 				5B95F7022E22525900C29F0D /* XCRemoteSwiftPackageReference "Alamofire" */,
 				5B3753CD2E24FBC900B13805 /* XCRemoteSwiftPackageReference "ReactorKit" */,
+				5B3754622E2540C200B13805 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5B5304602E224D210083F7CA /* Products */;
@@ -480,6 +484,14 @@
 				minimumVersion = 3.2.0;
 			};
 		};
+		5B3754622E2540C200B13805 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
 		5B5304D02E2251610083F7CA /* XCRemoteSwiftPackageReference "Then" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/devxoul/Then";
@@ -543,6 +555,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B3753CD2E24FBC900B13805 /* XCRemoteSwiftPackageReference "ReactorKit" */;
 			productName = ReactorKit;
+		};
+		5B3754632E2540C200B13805 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B3754622E2540C200B13805 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
 		};
 		5B5304D12E2251610083F7CA /* Then */ = {
 			isa = XCSwiftPackageProductDependency;
