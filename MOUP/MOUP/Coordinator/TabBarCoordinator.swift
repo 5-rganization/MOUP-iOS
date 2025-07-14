@@ -16,28 +16,55 @@ final class TabBarCoordinator: Coordinator {
     }
 
     func start() {
-        // 각 탭의 네비게이션 컨트롤러와 코디네이터 생성
+        // Home
         let homeNav = UINavigationController()
         let homeCoordinator = HomeCoordinator(navigationController: homeNav)
         childCoordinators.append(homeCoordinator)
         homeCoordinator.start()
 
+        if let homeVC = homeNav.viewControllers.first {
+            homeVC.tabBarItem = UITabBarItem(
+                title: "홈",
+                image: .homeUnselected,
+                selectedImage: .homeSelected.withRenderingMode(.alwaysOriginal)
+            )
+        }
+
+        // Calendar
         let calendarNav = UINavigationController()
         let calendarCoordinator = CalendarCoordinator(navigationController: calendarNav)
         childCoordinators.append(calendarCoordinator)
         calendarCoordinator.start()
 
+        if let calendarVC = calendarNav.viewControllers.first {
+            calendarVC.tabBarItem = UITabBarItem(
+                title: "캘린더",
+                image: .calendarUnselected,
+                selectedImage: .calendarSelected.withRenderingMode(.alwaysOriginal)
+            )
+        }
+
+        // MyPage
         let myPageNav = UINavigationController()
         let myPageCoordinator = MyPageCoordinator(navigationController: myPageNav)
         childCoordinators.append(myPageCoordinator)
         myPageCoordinator.start()
 
-        // 탭바에 네비게이션 컨트롤러 추가
+        if let myPageVC = myPageNav.viewControllers.first {
+            myPageVC.tabBarItem = UITabBarItem(
+                title: "마이페이지",
+                image: .myPageUnselected,
+                selectedImage: .myPageSelected.withRenderingMode(.alwaysOriginal)
+            )
+        }
+
+        // 탭바 연결
         tabBarController.setViewControllers([homeNav, calendarNav, myPageNav], animated: false)
 
-        // window의 rootViewController로 설정
+        // 루트 설정
         window.rootViewController = tabBarController
         window.makeKeyAndVisible()
     }
 }
+
 
