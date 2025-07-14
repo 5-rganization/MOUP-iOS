@@ -8,6 +8,8 @@
 import UIKit
 
 final class CalendarViewController: UIViewController {
+    weak var coordinator: CalendarCoordinator?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGreen
