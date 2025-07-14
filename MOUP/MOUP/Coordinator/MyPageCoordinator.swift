@@ -16,7 +16,7 @@ final class MyPageCoordinator: Coordinator {
     }
 
     func start() {
-        let homeVC = HomeViewController()
-        navigationController.pushViewController(homeVC, animated: false)
+        let myPageVC = MyPageViewController()
+        navigationController.pushViewController(myPageVC, animated: false)
     }
 }
