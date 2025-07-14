@@ -38,11 +38,13 @@ final class SignInViewController: UIViewController {
     
     @objc
     private func didTapAppleLoginButton() {
+        // TODO: 추후 버튼 액션 연결
         print("Apple 로그인 버튼 클릭됨")
     }
 
     @objc
     private func didTapGoogleLoginButton() {
+        // TODO: 추후 버튼 액션 연결
         print("Google 로그인 버튼 클릭됨")
     }
 }
