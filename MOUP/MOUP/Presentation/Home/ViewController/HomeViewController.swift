@@ -7,13 +7,13 @@
 
 import UIKit
 
-class HomeViewController: UIViewController {
-
+final class HomeViewController: UIViewController {
+    weak var coordinator: HomeCoordinator?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("HomeViewController")
+        view.backgroundColor = .systemRed
+        title = "홈"
     }
-
-
 }
 

@@ -5,4 +5,14 @@
 //  Created by 서동환 on 7/12/25.
 //
 
-import Foundation
+import UIKit
+
+final class CalendarViewController: UIViewController {
+    weak var coordinator: CalendarCoordinator?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemGreen
+        title = "캘린더"
+    }
+}
