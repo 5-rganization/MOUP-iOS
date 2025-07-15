@@ -30,8 +30,9 @@ final class WorkplaceRegisterViewController: UIViewController {
     }
     
     @objc
-    func didTapSomeButton(_ sender: UIButton) {
-        
+    private func didTapBack() {
+        print("Back 버튼 클릭")
+        navigationController?.popViewController(animated: true)
     }
 }
 
@@ -45,11 +46,12 @@ private extension WorkplaceRegisterViewController {
         setActions()
         setBinding()
     }
-    // ...
     
     // MARK: - setBinding
     func setHierarchy() { }
-    func setStyles() { }
+    func setStyles() {
+        setNavigationBar(title: "근무지 등록", backAction: #selector(didTapBack))
+    }
     func setConstraints() { }
     func setActions() { }
     func setBinding() { }
