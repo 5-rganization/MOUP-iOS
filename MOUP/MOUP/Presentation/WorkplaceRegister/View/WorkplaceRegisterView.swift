@@ -10,7 +10,11 @@ import SnapKit
 import Then
 
 final class WorkplaceRegisterView: UIView {
+    
     // MARK: - Properties
+    
+    // 근무지 컨테이너
+    private let workplaceContainerView = WorkplaceContainerView()
     
     // MARK: - UI Components
     
@@ -39,17 +43,21 @@ private extension WorkplaceRegisterView {
     
     // MARK: - setHierarchy
     func setHierarchy() {
-        
+        addSubviews(
+            workplaceContainerView
+        )
     }
     
     // MARK: - setStyles
     func setStyles() {
-        
+        backgroundColor = .white
     }
     
     // MARK: - setConstraints
     func setConstraints() {
-        
+        workplaceContainerView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
 }
 
