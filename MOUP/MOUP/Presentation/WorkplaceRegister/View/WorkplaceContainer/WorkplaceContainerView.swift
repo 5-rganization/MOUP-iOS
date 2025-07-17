@@ -120,7 +120,7 @@ private extension WorkplaceContainerView {
     // MARK: - setConstraints
     func setConstraints() {
         workplaceTitle.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(32)
+            $0.top.equalToSuperview()
             $0.leading.equalToSuperview().offset(16)
         }
         

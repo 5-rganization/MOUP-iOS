@@ -56,7 +56,8 @@ private extension WorkplaceRegisterView {
     // MARK: - setConstraints
     func setConstraints() {
         workplaceContainerView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.equalTo(safeAreaLayoutGuide).offset(32)
+            $0.horizontalEdges.equalToSuperview()
         }
     }
 }
