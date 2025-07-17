@@ -127,7 +127,7 @@ private extension WorkplaceContainerView {
         container.snp.makeConstraints {
             $0.top.equalTo(workplaceTitle.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.bottom.equalTo(categoryChevron.snp.bottom).offset(16)
+            $0.bottom.equalTo(categoryLabel.snp.bottom).offset(12)
         }
         
         nameLabel.snp.makeConstraints {
@@ -164,6 +164,10 @@ private extension WorkplaceContainerView {
         categoryChevron.snp.makeConstraints {
             $0.centerY.equalTo(categoryLabel)
             $0.trailing.equalToSuperview().inset(16)
+        }
+        
+        self.snp.makeConstraints {
+            $0.bottom.equalTo(container.snp.bottom).offset(0)
         }
     }
 }
