@@ -126,7 +126,7 @@ private extension WorkplaceContainerView {
         
         container.snp.makeConstraints {
             $0.top.equalTo(workplaceTitle.snp.bottom).offset(12)
-            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.horizontalEdges.equalToSuperview().inset(16)
             $0.bottom.equalTo(categoryChevron.snp.bottom).offset(16)
         }
         
