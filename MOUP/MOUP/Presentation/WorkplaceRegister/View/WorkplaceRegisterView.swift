@@ -12,9 +12,18 @@ import Then
 final class WorkplaceRegisterView: UIView {
     
     // MARK: - Properties
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
+    private let stackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = 12
+        $0.alignment = .fill
+        $0.distribution = .fill
+    }
     
     // 근무지 컨테이너
     private let workplaceContainerView = WorkplaceContainerView()
+    private let payContainerView = PayContainerView()
     
     // MARK: - UI Components
     
@@ -44,7 +53,20 @@ private extension WorkplaceRegisterView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
-            workplaceContainerView
+            scrollView
+        )
+        
+        scrollView.addSubviews(
+            contentView
+        )
+        
+        contentView.addSubviews(
+            stackView
+        )
+        
+        stackView.addArrangedSubviews(
+            workplaceContainerView,
+            payContainerView
         )
     }
     
@@ -55,9 +77,18 @@ private extension WorkplaceRegisterView {
     
     // MARK: - setConstraints
     func setConstraints() {
-        workplaceContainerView.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(32)
-            $0.horizontalEdges.equalToSuperview()
+        scrollView.snp.makeConstraints {
+            $0.edges.equalTo(safeAreaLayoutGuide)
+        }
+        
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalToSuperview()
+        }
+        
+        stackView.snp.makeConstraints {
+            $0.top.leading.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(16)
         }
     }
 }
