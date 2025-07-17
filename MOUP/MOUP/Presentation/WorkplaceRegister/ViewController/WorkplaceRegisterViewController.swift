@@ -10,10 +10,14 @@ import UIKit
 final class WorkplaceRegisterViewController: UIViewController {
     
     // MARK: - Properties
-    
+    private let workplaceRegisterView = WorkplaceRegisterView()
     // private let viewModel: <#ViewModel#>
     
     // MARK: - Lifecycle
+    
+    override func loadView() {
+        self.view = workplaceRegisterView
+    }
     
     // VC일 때
     override func viewDidLoad() {
@@ -23,6 +27,10 @@ final class WorkplaceRegisterViewController: UIViewController {
     
     // MARK: - Initializer
     
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+
     
     @available(*, unavailable, message: "compile error")
     required init?(coder: NSCoder) {
