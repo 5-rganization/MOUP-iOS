@@ -21,11 +21,28 @@ final class WorkplaceRegisterView: UIView {
         $0.distribution = .fill
     }
     
-    // 근무지 컨테이너
+    // MARK: - 컨테이너
     private let workplaceContainerView = WorkplaceContainerView()
     private let payContainerView = PayContainerView()
     
     // MARK: - UI Components
+    private let registerButton = UIButton().then {
+        var config = UIButton.Configuration.filled()
+        config.title = "등록하기"
+        config.baseBackgroundColor = .gray300
+        config.baseForegroundColor = .gray500
+        config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 0, bottom: 12, trailing: 0)
+        
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var updated = incoming
+            updated.font = .buttonSemibold(18)
+            return updated
+        }
+        
+        $0.configuration = config
+        $0.layer.cornerRadius = 12
+        $0.clipsToBounds = true
+    }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -66,7 +83,8 @@ private extension WorkplaceRegisterView {
         
         stackView.addArrangedSubviews(
             workplaceContainerView,
-            payContainerView
+            payContainerView,
+            registerButton
         )
     }
     
