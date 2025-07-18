@@ -8,11 +8,37 @@
 import UIKit
 
 final class CalendarViewController: UIViewController {
+    
+    // MARK: - Properties
+    
     weak var coordinator: CalendarCoordinator?
+    
+    // MARK: - UI Components
+    
+    private let calendarView = CalendarView()
+    
+    // MARK: - Lifecycle
+    
+    override func loadView() {
+        self.view = calendarView
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemGreen
-        title = "캘린더"
+        configure()
+    }
+}
+
+// MARK: - UI Methods
+
+private extension CalendarViewController {
+    func configure() {
+        setStyles()
+    }
+    
+    func setStyles() {
+        self.view.backgroundColor = .primaryBackground
+        
+        self.navigationController?.navigationBar.isHidden = true
     }
 }

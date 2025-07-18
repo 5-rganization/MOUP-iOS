@@ -1,23 +1,20 @@
 //
-//  CalendarView.swift
+//  CalendarHeaderView.swift
 //  MOUP
 //
-//  Created by 서동환 on 7/12/25.
+//  Created by 서동환 on 7/18/25.
 //
 
 import UIKit
 
-import JTAppleCalendar
-import RxCocoa
-import RxSwift
+import BetterSegmentedControl
 import SnapKit
 import Then
 
-final class CalendarView: UIView {
+final class CalendarHeaderView: UIView {
     
     // MARK: - UI Components
     
-    private let monthCalendarView = JTACMonthView()
     
     // MARK: - Initializer
     
@@ -32,12 +29,11 @@ final class CalendarView: UIView {
     }
 }
 
-// MARK: - UI Methods
-
-private extension CalendarView {
+private extension CalendarHeaderView {
     func configure() {
         setHierarchy()
         setStyles()
+        setConstraints()
     }
     
     func setHierarchy() {
@@ -45,6 +41,10 @@ private extension CalendarView {
     }
     
     func setStyles() {
+        
+    }
+    
+    func setConstraints() {
         
     }
 }
