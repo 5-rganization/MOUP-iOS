@@ -38,7 +38,5 @@ private extension CalendarViewController {
     
     func setStyles() {
         self.view.backgroundColor = .primaryBackground
-        
-        self.navigationController?.navigationBar.isHidden = true
     }
 }
