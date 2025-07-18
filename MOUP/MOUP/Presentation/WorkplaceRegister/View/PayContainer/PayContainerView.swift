@@ -13,6 +13,18 @@ final class PayContainerView: UIView {
     // MARK: - Properties
     private let container = ContainerView()
     
+    // MARK: - 급여 유형 레이블
+    private let payTypeInfoRow = InfoRowView(title: "급여 유형", type: .labelWithChevron(value: "선택"), frame: .zero)
+    
+    // MARK: - 급여 계산 레이블
+    private let payCalculationInfoRow = InfoRowView(title: "급여 계산", type: .labelWithChevron(value: "선택"), frame: .zero)
+    
+    // MARK: - 급여 형태 레이블
+    private let salaryTypeInfoRow = InfoRowView(title: "급여 형태", type: .labelWithChevron(value: "선택"), frame: .zero)
+    
+    // MARK: - 급여일 레이블
+    private let payDayInfoRow = InfoRowView(title: "급여일", type: .labelWithButton(title: "선택"), frame: .zero)
+    
     // MARK: - UI Components
     
     // 디바이더
@@ -157,17 +169,10 @@ private extension PayContainerView {
             divider1,
             divider2,
             divider3,
-            payTypeLabel,
-            payTypeValueLabel,
-            payTypeChevron,
-            payCalculationLabel,
-            payCalculationValueLabel,
-            payCalculationChevron,
-            salaryTypeLabel,
-            salaryTypeValueLabel,
-            salaryTypeChevron,
-            payDayLabel,
-            payDayValueButton
+            payTypeInfoRow,
+            payCalculationInfoRow,
+            salaryTypeInfoRow,
+            payDayInfoRow
         )
     }
     
@@ -189,84 +194,49 @@ private extension PayContainerView {
         container.snp.makeConstraints {
             $0.top.equalTo(payTitle.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.bottom.equalTo(payDayLabel.snp.bottom).offset(12)
+            $0.bottom.equalTo(payDayInfoRow.snp.bottom)
         }
         
         // MARK: - 급여 유형
-        payTypeLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(12)
-            $0.leading.equalToSuperview().offset(16)
-        }
-        
-        payTypeValueLabel.snp.makeConstraints {
-            $0.centerY.equalTo(payTypeLabel)
-            $0.trailing.equalTo(payTypeChevron.snp.leading).offset(-12)
-        }
-        
-        payTypeChevron.snp.makeConstraints {
-            $0.centerY.equalTo(payTypeLabel)
-            $0.trailing.equalToSuperview().inset(16)
+        payTypeInfoRow.snp.makeConstraints {
+            $0.top.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview()
         }
         
         divider1.snp.makeConstraints {
-            $0.top.equalTo(payTypeLabel.snp.bottom).offset(12)
+            $0.top.equalTo(payTypeInfoRow.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(1)
         }
         
         // MARK: - 급여 계산
-        payCalculationLabel.snp.makeConstraints {
-            $0.top.equalTo(divider1.snp.bottom).offset(12)
-            $0.leading.equalToSuperview().offset(16)
-        }
-        
-        payCalculationValueLabel.snp.makeConstraints {
-            $0.centerY.equalTo(payCalculationLabel)
-            $0.trailing.equalTo(payCalculationChevron.snp.leading).offset(-12)
-        }
-        
-        payCalculationChevron.snp.makeConstraints {
-            $0.centerY.equalTo(payCalculationLabel)
-            $0.trailing.equalToSuperview().inset(16)
+        payCalculationInfoRow.snp.makeConstraints {
+            $0.top.equalTo(divider1.snp.bottom)
+            $0.horizontalEdges.equalToSuperview()
         }
         
         divider2.snp.makeConstraints {
-            $0.top.equalTo(payCalculationLabel.snp.bottom).offset(12)
+            $0.top.equalTo(payCalculationInfoRow.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(1)
         }
         
         // MARK: - 급여형태
-        salaryTypeLabel.snp.makeConstraints {
-            $0.top.equalTo(divider2.snp.bottom).offset(12)
-            $0.leading.equalToSuperview().offset(16)
-        }
-        
-        salaryTypeValueLabel.snp.makeConstraints {
-            $0.centerY.equalTo(salaryTypeLabel)
-            $0.trailing.equalTo(salaryTypeChevron.snp.leading).offset(-12)
-        }
-        
-        salaryTypeChevron.snp.makeConstraints {
-            $0.centerY.equalTo(salaryTypeLabel)
-            $0.trailing.equalToSuperview().inset(16)
+        salaryTypeInfoRow.snp.makeConstraints {
+            $0.top.equalTo(divider2.snp.bottom)
+            $0.horizontalEdges.equalToSuperview()
         }
         
         divider3.snp.makeConstraints {
-            $0.top.equalTo(salaryTypeLabel.snp.bottom).offset(12)
+            $0.top.equalTo(salaryTypeInfoRow.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(1)
         }
         
         // MARK: - 급여일
-        payDayLabel.snp.makeConstraints {
-            $0.top.equalTo(divider3.snp.bottom).offset(12)
-            $0.leading.equalToSuperview().offset(16)
-        }
-        
-        payDayValueButton.snp.makeConstraints {
-            $0.centerY.equalTo(payDayLabel)
-            $0.trailing.equalToSuperview().inset(16)
+        payDayInfoRow.snp.makeConstraints {
+            $0.top.equalTo(divider3.snp.bottom)
+            $0.horizontalEdges.equalToSuperview()
         }
         
         self.snp.makeConstraints {

@@ -13,6 +13,12 @@ final class WorkplaceContainerView: UIView {
     // MARK: - Properties
     private let container = ContainerView()
     
+    // MARK: - 이름 레이블
+    private let nameRow = InfoRowView(title: "이름", type: .labelWithChevron(value: "근무지 이름"), frame: .zero)
+    
+    // MARK: - 카테고리 레이블
+    private let categoryRow = InfoRowView(title: "카테고리", type: .labelWithChevron(value: "선택"), frame: .zero)
+    
     // MARK: - UI Components
     // 디바이더
     private let divider = UIView().then {
@@ -33,42 +39,6 @@ final class WorkplaceContainerView: UIView {
         }
 
         $0.attributedText = attributed
-    }
-    
-    // MARK: - 이름 레이블
-    private let nameLabel = UILabel().then {
-        $0.text = "이름"
-        $0.textColor = .gray900
-        $0.font = .bodyMedium(16)
-    }
-    
-    private let nameValueLabel = UILabel().then {
-        $0.text = "근무지 이름"
-        $0.textColor = .gray700
-        $0.font = .bodyMedium(16)
-    }
-    
-    private let nameChevron = UIButton().then {
-        $0.setImage(UIImage(systemName: "chevron.right"), for: .normal)
-        $0.tintColor = .gray400
-    }
-    
-    // MARK: - 카테고리 레이블
-    private let categoryLabel = UILabel().then {
-        $0.text = "카테고리"
-        $0.textColor = .gray900
-        $0.font = .bodyMedium(16)
-    }
-    
-    private let categoryValueLabel = UILabel().then {
-        $0.text = "선택"
-        $0.textColor = .gray700
-        $0.font = .bodyMedium(16)
-    }
-    
-    private let categoryChevron = UIButton().then {
-        $0.setImage(UIImage(systemName: "chevron.right"), for: .normal)
-        $0.tintColor = .gray400
     }
     
     // MARK: - Initializer
@@ -102,13 +72,9 @@ private extension WorkplaceContainerView {
         )
         
         container.addSubviews(
-            nameLabel,
-            nameValueLabel,
-            nameChevron,
+            nameRow,
             divider,
-            categoryLabel,
-            categoryValueLabel,
-            categoryChevron
+            categoryRow
         )
     }
     
@@ -130,45 +96,25 @@ private extension WorkplaceContainerView {
         container.snp.makeConstraints {
             $0.top.equalTo(workplaceTitle.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.bottom.equalTo(categoryLabel.snp.bottom).offset(12)
+            $0.bottom.equalTo(categoryRow.snp.bottom)
         }
         
         // MARK: - 이름
-        nameLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(12)
-            $0.leading.equalToSuperview().offset(16)
-        }
-        
-        nameValueLabel.snp.makeConstraints {
-            $0.centerY.equalTo(nameLabel)
-            $0.trailing.equalTo(nameChevron.snp.leading).offset(-12)
-        }
-        
-        nameChevron.snp.makeConstraints {
-            $0.centerY.equalTo(nameLabel)
-            $0.trailing.equalToSuperview().inset(16)
+        nameRow.snp.makeConstraints {
+            $0.top.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview()
         }
         
         divider.snp.makeConstraints {
-            $0.top.equalTo(nameLabel.snp.bottom).offset(12)
+            $0.top.equalTo(nameRow.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(1)
         }
         
         // MARK: - 카테고리
-        categoryLabel.snp.makeConstraints {
-            $0.top.equalTo(divider.snp.bottom).offset(12)
-            $0.leading.equalToSuperview().offset(16)
-        }
-        
-        categoryValueLabel.snp.makeConstraints {
-            $0.centerY.equalTo(categoryLabel)
-            $0.trailing.equalTo(categoryChevron.snp.leading).offset(-12)
-        }
-        
-        categoryChevron.snp.makeConstraints {
-            $0.centerY.equalTo(categoryLabel)
-            $0.trailing.equalToSuperview().inset(16)
+        categoryRow.snp.makeConstraints {
+            $0.top.equalTo(divider.snp.bottom)
+            $0.horizontalEdges.equalToSuperview()
         }
         
         self.snp.makeConstraints {
