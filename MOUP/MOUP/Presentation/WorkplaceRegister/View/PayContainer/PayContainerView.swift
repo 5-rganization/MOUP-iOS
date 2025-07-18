@@ -112,6 +112,12 @@ final class PayContainerView: UIView {
         config.baseForegroundColor = .gray700
         config.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12)
         
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var updated = incoming
+            updated.font = .bodyMedium(16)
+            return updated
+        }
+        
         $0.configuration = config
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 8
