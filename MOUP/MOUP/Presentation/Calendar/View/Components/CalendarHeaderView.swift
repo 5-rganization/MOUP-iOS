@@ -44,6 +44,7 @@ final class CalendarHeaderView: UIView {
                        .indicatorViewBackgroundColor(.gray700),
                        .backgroundColor(.gray100)])
         $0.indicatorViewInset = 1
+        
         $0.layer.borderColor = UIColor.gray400.cgColor
         $0.layer.borderWidth = 1
     }
