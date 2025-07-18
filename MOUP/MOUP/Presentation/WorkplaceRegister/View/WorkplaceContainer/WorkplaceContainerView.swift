@@ -19,7 +19,7 @@ final class WorkplaceContainerView: UIView {
         $0.backgroundColor = .gray400
     }
     
-    // 근무지 타이틀
+    // MARK: - 근무지 타이틀
     private let workplaceTitle = UILabel().then {
         let fullText = "근무지 *"
         let attributed = NSMutableAttributedString(string: fullText)
@@ -35,7 +35,7 @@ final class WorkplaceContainerView: UIView {
         $0.attributedText = attributed
     }
     
-    // 이름 레이블
+    // MARK: - 이름 레이블
     private let nameLabel = UILabel().then {
         $0.text = "이름"
         $0.textColor = .gray900
@@ -53,7 +53,7 @@ final class WorkplaceContainerView: UIView {
         $0.tintColor = .gray400
     }
     
-    // 카테고리 레이블
+    // MARK: - 카테고리 레이블
     private let categoryLabel = UILabel().then {
         $0.text = "카테고리"
         $0.textColor = .gray900
@@ -119,17 +119,21 @@ private extension WorkplaceContainerView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        
+        // MARK: - 근무지 타이틀
         workplaceTitle.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.leading.equalToSuperview().offset(16)
         }
         
+        // MARK: - 컨테이너
         container.snp.makeConstraints {
             $0.top.equalTo(workplaceTitle.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.bottom.equalTo(categoryLabel.snp.bottom).offset(12)
         }
         
+        // MARK: - 이름
         nameLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(12)
             $0.leading.equalToSuperview().offset(16)
@@ -151,6 +155,7 @@ private extension WorkplaceContainerView {
             $0.height.equalTo(1)
         }
         
+        // MARK: - 카테고리
         categoryLabel.snp.makeConstraints {
             $0.top.equalTo(divider.snp.bottom).offset(12)
             $0.leading.equalToSuperview().offset(16)
