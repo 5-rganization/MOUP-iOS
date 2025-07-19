@@ -38,7 +38,7 @@ final class InfoRowView: UIView {
     private let checkBox = UIButton().then {
         $0.setImage(UIImage(systemName: "square"), for: .normal)
         $0.setImage(UIImage(systemName: "checkmark.square.fill"), for: .selected)
-        $0.tintColor = .systemBlue
+        $0.tintColor = .gray400
     }
     
     private let actionButton = UIButton(configuration: .filled()).then {
@@ -120,9 +120,9 @@ private extension InfoRowView {
         switch type {
         case .checkBox:
             checkBox.snp.makeConstraints {
-                $0.trailing.equalToSuperview()
                 $0.centerY.equalToSuperview()
-                $0.width.height.equalTo(24)
+                $0.trailing.equalToSuperview().inset(16)
+                $0.bottom.equalToSuperview().inset(12)
             }
             
         case .labelWithChevron:
