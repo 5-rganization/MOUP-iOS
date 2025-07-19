@@ -24,6 +24,7 @@ final class WorkplaceRegisterView: UIView {
     // MARK: - 컨테이너
     private let workplaceContainerView = WorkplaceContainerView()
     private let payContainerView = PayContainerView()
+    private let workingConditionsContainerView = WorkingConditionsContainerView()
     
     // MARK: - UI Components
     private let registerButton = UIButton().then {
@@ -84,6 +85,7 @@ private extension WorkplaceRegisterView {
         stackView.addArrangedSubviews(
             workplaceContainerView,
             payContainerView,
+            workingConditionsContainerView,
             registerButton
         )
     }
