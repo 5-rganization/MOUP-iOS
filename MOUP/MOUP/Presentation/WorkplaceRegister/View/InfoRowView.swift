@@ -12,6 +12,7 @@ enum InfoRowType {
     case checkBox(isChecked: Bool)
     case labelWithChevron(value: String)
     case labelWithButton(title: String)
+    case colorWithChevron(color: UIColor, title: String)
 }
 
 
@@ -49,6 +50,12 @@ final class InfoRowView: UIView {
         $0.layer.cornerRadius = 8
     }
     
+    private let colorDotView = UIView().then {
+        $0.backgroundColor = .labelRed
+        $0.layer.cornerRadius = 6
+        $0.clipsToBounds = true
+    }
+    
     private var rowType: InfoRowType?
     
     // MARK: - Initializer
@@ -77,24 +84,18 @@ private extension InfoRowView {
     
     // MARK: - setHierarchy
     func setHierarchy(type: InfoRowType) {
-        addSubviews(
-            titleLabel
-        )
-        
         switch type {
         case .checkBox:
-            addSubviews(
-                checkBox
-            )
+            addSubviews(titleLabel, checkBox)
+            
         case .labelWithChevron:
-            addSubviews(
-                valueLabel,
-                chevronButton
-            )
+            addSubviews(titleLabel, valueLabel, chevronButton)
+            
         case .labelWithButton:
-            addSubviews(
-                actionButton
-            )
+            addSubviews(titleLabel, actionButton)
+            
+        case .colorWithChevron:
+            addSubviews(colorDotView, titleLabel, chevronButton)
         }
     }
     
@@ -107,25 +108,35 @@ private extension InfoRowView {
             valueLabel.text = value
         case .labelWithButton(let title):
             actionButton.setTitle(title, for: .normal)
+        case .colorWithChevron(let color, let title):
+            colorDotView.backgroundColor = color
+            titleLabel.text = title
+            
         }
     }
     
     // MARK: - setConstraints
     func setConstraints(type: InfoRowType) {
-        titleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(12)
-            $0.leading.equalToSuperview().offset(12)
-        }
-        
         switch type {
         case .checkBox:
-            checkBox.snp.makeConstraints {
-                $0.centerY.equalToSuperview()
-                $0.trailing.equalToSuperview().inset(16)
+            titleLabel.snp.makeConstraints {
+                $0.top.equalToSuperview().offset(12)
+                $0.leading.equalToSuperview().offset(12)
                 $0.bottom.equalToSuperview().inset(12)
             }
             
+            checkBox.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.trailing.equalToSuperview().inset(16)
+            }
+            
         case .labelWithChevron:
+            titleLabel.snp.makeConstraints {
+                $0.top.equalToSuperview().offset(12)
+                $0.leading.equalToSuperview().offset(12)
+                $0.bottom.equalToSuperview().inset(12)
+            }
+            
             valueLabel.snp.makeConstraints {
                 $0.centerY.equalTo(titleLabel)
                 $0.trailing.equalTo(chevronButton.snp.leading).offset(-12)
@@ -134,14 +145,36 @@ private extension InfoRowView {
             chevronButton.snp.makeConstraints {
                 $0.centerY.equalTo(titleLabel)
                 $0.trailing.equalToSuperview().inset(16)
-                $0.bottom.equalToSuperview().inset(12)
             }
             
         case .labelWithButton:
+            titleLabel.snp.makeConstraints {
+                $0.top.equalToSuperview().offset(12)
+                $0.leading.equalToSuperview().offset(12)
+                $0.bottom.equalToSuperview().inset(12)
+            }
+            
             actionButton.snp.makeConstraints {
                 $0.trailing.equalToSuperview().inset(16)
                 $0.centerY.equalToSuperview()
+            }
+            
+        case .colorWithChevron:
+            colorDotView.snp.makeConstraints {
+                $0.width.height.equalTo(12)
+                $0.centerY.equalToSuperview()
+                $0.leading.equalToSuperview().offset(16)
+            }
+            
+            titleLabel.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.leading.equalTo(colorDotView.snp.trailing).offset(6)
                 $0.bottom.equalToSuperview().inset(12)
+            }
+            
+            chevronButton.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.trailing.equalToSuperview().inset(16)
             }
         }
     }
