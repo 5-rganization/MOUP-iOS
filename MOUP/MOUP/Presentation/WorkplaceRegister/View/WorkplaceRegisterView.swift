@@ -25,6 +25,7 @@ final class WorkplaceRegisterView: UIView {
     private let workplaceContainerView = WorkplaceContainerView()
     private let payContainerView = PayContainerView()
     private let workingConditionsContainerView = WorkingConditionsContainerView()
+    private let colorLabelContainerView = ColorLabelContainerView()
     
     // MARK: - UI Components
     private let registerButton = UIButton().then {
@@ -86,6 +87,7 @@ private extension WorkplaceRegisterView {
             workplaceContainerView,
             payContainerView,
             workingConditionsContainerView,
+            colorLabelContainerView,
             registerButton
         )
     }
