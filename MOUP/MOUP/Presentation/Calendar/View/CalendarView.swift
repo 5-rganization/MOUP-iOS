@@ -18,24 +18,31 @@ final class CalendarView: UIView {
     // MARK: - UI Components
     
     /// 캘린더 상단 헤더
-    private let calendarHeaderView = CalendarHeaderView()
+    private let _calendarHeaderView = CalendarHeaderView()
     /// 캘린더
-    private let monthCalendarView = JTACMonthView().then {
+    private let _monthCalendarView = JTACMonthView().then {
         $0.minimumLineSpacing = 0
         $0.minimumInteritemSpacing = 0
         $0.scrollDirection = .horizontal
+        $0.scrollingMode = .stopAtEachCalendarFrame
         $0.isPagingEnabled = true
         $0.showsHorizontalScrollIndicator = false
         $0.showsVerticalScrollIndicator = false
     }
     /// 캘린더 요일 표시
-    private let dayOfTheWeekHStackView = DayOfTheWeekHStackView()
+    private let _dayOfTheWeekHStackView = DaysOfTheWeekHStackView()
+    
+    // MARK: - Getter
+    
+    var calendarHeaderView: CalendarHeaderView { _calendarHeaderView }
+    var monthCalendarView: JTACMonthView { _monthCalendarView }
     
     // MARK: - Initializer
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
+        setCalendarView()
     }
     
     @available(*, unavailable, message: "storyboard is not supported.")
@@ -54,9 +61,9 @@ private extension CalendarView {
     }
     
     func setHierarchy() {
-        self.addSubviews(calendarHeaderView,
-                         dayOfTheWeekHStackView,
-                         monthCalendarView)
+        self.addSubviews(_calendarHeaderView,
+                         _dayOfTheWeekHStackView,
+                         _monthCalendarView)
     }
     
     func setStyles() {
@@ -64,22 +71,37 @@ private extension CalendarView {
     }
     
     func setConstraints() {
-        calendarHeaderView.snp.makeConstraints {
+        _calendarHeaderView.snp.makeConstraints {
             $0.top.equalTo(self.safeAreaLayoutGuide)
             $0.leading.trailing.equalTo(self.safeAreaLayoutGuide)
             $0.height.equalTo(50)
         }
         
-        dayOfTheWeekHStackView.snp.makeConstraints {
-            $0.top.equalTo(calendarHeaderView.snp.bottom)
+        _dayOfTheWeekHStackView.snp.makeConstraints {
+            $0.top.equalTo(_calendarHeaderView.snp.bottom)
             $0.leading.trailing.equalTo(self.safeAreaLayoutGuide)
             $0.height.equalTo(20)
         }
         
-        monthCalendarView.snp.makeConstraints {
-            $0.top.equalTo(dayOfTheWeekHStackView.snp.bottom)
+        _monthCalendarView.snp.makeConstraints {
+            $0.top.equalTo(_dayOfTheWeekHStackView.snp.bottom)
             $0.leading.trailing.equalTo(self.safeAreaLayoutGuide)
             $0.bottom.equalTo(self.safeAreaLayoutGuide)
+        }
+    }
+}
+
+// MARK: - Calendar Methods
+
+private extension CalendarView {
+    func setCalendarView() {
+        _monthCalendarView.register(CalendarDayCell.self, forCellWithReuseIdentifier: CalendarDayCell.identifier)
+        
+        _monthCalendarView.scrollToDate(.now, animateScroll: false)
+        
+        _monthCalendarView.visibleDates { [weak self] visibleDates in
+            guard let self, let date = visibleDates.monthDates.first?.date else { return }
+            _calendarHeaderView.update(date: date)
         }
     }
 }

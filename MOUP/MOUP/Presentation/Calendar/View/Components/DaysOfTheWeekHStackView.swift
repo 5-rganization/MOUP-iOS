@@ -1,5 +1,5 @@
 //
-//  DayOfTheWeekHStackView.swift
+//  DaysOfTheWeekHStackView.swift
 //  MOUP
 //
 //  Created by 서동환 on 7/18/25.
@@ -8,11 +8,11 @@
 import UIKit
 
 /// 캘린더 상단 요일 표시 UI
-final class DayOfTheWeekHStackView: UIStackView {
+final class DaysOfTheWeekHStackView: UIStackView {
     
     // MARK: - Properties
     
-    private let dayOfTheWeekList = ["일", "월", "화", "수", "목", "금", "토"]
+    private let daysOfTheWeekList = ["일", "월", "화", "수", "목", "금", "토"]
     
     // MARK: - Initializer
     
@@ -27,19 +27,14 @@ final class DayOfTheWeekHStackView: UIStackView {
     }
 }
 
-private extension DayOfTheWeekHStackView {
+private extension DaysOfTheWeekHStackView {
     func configure() {
         setHierarchy()
         setStyles()
     }
     
-    func setStyles() {
-        self.axis = .horizontal
-        self.distribution = .fillEqually
-    }
-    
     func setHierarchy() {
-        for (index, day) in dayOfTheWeekList.enumerated() {
+        for (index, day) in daysOfTheWeekList.enumerated() {
             let dayLabel = UILabel().then {
                 $0.text = day
                 if index == 0 {
@@ -55,5 +50,10 @@ private extension DayOfTheWeekHStackView {
             
             self.addArrangedSubview(dayLabel)
         }
+    }
+    
+    func setStyles() {
+        self.axis = .horizontal
+        self.distribution = .fillEqually
     }
 }

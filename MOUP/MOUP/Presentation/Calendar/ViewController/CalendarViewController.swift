@@ -7,11 +7,18 @@
 
 import UIKit
 
+import JTAppleCalendar
+import RxCocoa
+import RxSwift
+
 final class CalendarViewController: UIViewController {
     
     // MARK: - Properties
     
     weak var coordinator: CalendarCoordinator?
+    
+    private lazy var calendarController = CalendarController(calendarHeaderView: calendarView.calendarHeaderView,
+                                                             monthCalendarView: calendarView.monthCalendarView)
     
     // MARK: - UI Components
     
@@ -34,9 +41,17 @@ final class CalendarViewController: UIViewController {
 private extension CalendarViewController {
     func configure() {
         setStyles()
+        setDelegates()
     }
     
     func setStyles() {
+        self.title = "캘린더"
+        
         self.view.backgroundColor = .primaryBackground
+    }
+    
+    func setDelegates() {
+        calendarView.monthCalendarView.calendarDataSource = calendarController
+        calendarView.monthCalendarView.calendarDelegate = calendarController
     }
 }
