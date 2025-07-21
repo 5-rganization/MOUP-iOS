@@ -27,6 +27,8 @@ final class DaysOfTheWeekHStackView: UIStackView {
     }
 }
 
+// MARK: - UI Methods
+
 private extension DaysOfTheWeekHStackView {
     func configure() {
         setHierarchy()

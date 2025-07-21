@@ -76,6 +76,8 @@ final class CalendarHeaderView: UIView {
     }
 }
 
+// MARK: - UI Methods
+
 private extension CalendarHeaderView {
     func configure() {
         setHierarchy()
