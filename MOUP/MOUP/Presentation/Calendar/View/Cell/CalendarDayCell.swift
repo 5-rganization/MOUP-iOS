@@ -11,6 +11,7 @@ import JTAppleCalendar
 import SnapKit
 import Then
 
+/// 캘린더 내부 날짜 셀
 final class CalendarDayCell: JTACDayCell {
     
     // MARK: - Properties

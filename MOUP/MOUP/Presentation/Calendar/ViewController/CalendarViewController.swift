@@ -11,6 +11,7 @@ import JTAppleCalendar
 import RxCocoa
 import RxSwift
 
+/// 캘린더 탭 VC
 final class CalendarViewController: UIViewController {
     
     // MARK: - Properties

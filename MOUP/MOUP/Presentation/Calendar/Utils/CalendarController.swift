@@ -8,7 +8,7 @@
 import Foundation
 import JTAppleCalendar
 
-/// `JTACMonthView`의 동작을 제어하는 클래스
+/// 캘린더의 동작을 제어하는 컨트롤러
 final class CalendarController {
     
     // MARK: - Properties
