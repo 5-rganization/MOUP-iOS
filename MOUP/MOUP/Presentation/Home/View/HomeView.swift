@@ -12,6 +12,7 @@ final class HomeView: UIView {
 
     // MARK: - UI Components
     private let topBar = UIView()
+    private let gradient: CAGradientLayer = CAGradientLayer()
 
     private let logoImageView = UIImageView().then {
         $0.image = .homeAppTitle
@@ -27,6 +28,12 @@ final class HomeView: UIView {
         config.contentInsets = NSDirectionalEdgeInsets(top: 13.75, leading: 12.98, bottom: 13.75, trailing: 12.98)
         config.image = UIImage.refreshButton
         $0.configuration = config
+    }
+
+    private let totalSalaryCardView = TotalSalaryCardView()
+    private let cardLogoImageView = UIImageView().then {
+        $0.image = .logoIcon
+        $0.alpha = 0.14
     }
 
     // MARK: - Initializer
@@ -54,7 +61,8 @@ private extension HomeView {
 
     // MARK: - setHierarchy
     func setHierarchy() {
-        addSubviews(topBar)
+        addSubviews(topBar, totalSalaryCardView)
+        totalSalaryCardView.addSubviews(cardLogoImageView)
         topBar.addSubviews(logoImageView, refreshButton)
     }
 
@@ -82,6 +90,12 @@ private extension HomeView {
             $0.trailing.equalToSuperview().inset(8)
             $0.centerY.equalToSuperview()
             $0.size.equalTo(44)
+        }
+
+        totalSalaryCardView.snp.makeConstraints {
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
+            $0.top.equalTo(topBar.snp.bottom).offset(12)
+            $0.height.equalTo(150)
         }
     }
 }
