@@ -13,9 +13,7 @@ import Then
 
 /// 캘린더 헤더 UI
 final class CalendarHeaderView: UIView {
-    
     // MARK: - UI Components
-    
     /// 연/월 이동 버튼
     private let _yearMonthButton = UIButton().then {
         var config = UIButton.Configuration.plain()
@@ -53,11 +51,9 @@ final class CalendarHeaderView: UIView {
     }
     
     // MARK: - Getter
-    
     var yearMonthButton: UIButton { _yearMonthButton }
     
     // MARK: - Initializer
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -69,25 +65,25 @@ final class CalendarHeaderView: UIView {
     }
     
     // MARK: - Methods
-    
     func update(date: Date) {
         let dateStr = DateFormatter.yearMonthDateFormatter.string(from: date)
         _yearMonthButton.configuration?.attributedTitle?.characters = .init(dateStr)
     }
 }
 
-// MARK: - UI Methods
-
 private extension CalendarHeaderView {
+    // MARK: - configure
     func configure() {
         setHierarchy()
         setConstraints()
     }
-    
+
+    // MARK: - setHierarchy
     func setHierarchy() {
         self.addSubviews(_yearMonthButton, _toggleSwitch, _filterButton)
     }
     
+    // MARK: - setConstraints
     func setConstraints() {
         _yearMonthButton.snp.makeConstraints {
             $0.leading.equalToSuperview()

@@ -9,13 +9,10 @@ import UIKit
 
 /// 캘린더 상단 요일 표시 UI
 final class DaysOfTheWeekHStackView: UIStackView {
-    
     // MARK: - Properties
-    
     private let daysOfTheWeekList = ["일", "월", "화", "수", "목", "금", "토"]
     
     // MARK: - Initializer
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -27,14 +24,14 @@ final class DaysOfTheWeekHStackView: UIStackView {
     }
 }
 
-// MARK: - UI Methods
-
 private extension DaysOfTheWeekHStackView {
+    // MARK: - configure
     func configure() {
         setHierarchy()
         setStyles()
     }
     
+    // MARK: - setHierarchy
     func setHierarchy() {
         for (index, day) in daysOfTheWeekList.enumerated() {
             let dayLabel = UILabel().then {
@@ -54,6 +51,7 @@ private extension DaysOfTheWeekHStackView {
         }
     }
     
+    // MARK: - setStyles
     func setStyles() {
         self.axis = .horizontal
         self.distribution = .fillEqually

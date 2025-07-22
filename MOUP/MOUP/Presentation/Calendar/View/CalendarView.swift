@@ -15,9 +15,7 @@ import Then
 
 /// 캘린더 UI
 final class CalendarView: UIView {
-    
     // MARK: - UI Components
-    
     /// 캘린더 상단 헤더
     private let _calendarHeaderView = CalendarHeaderView()
     /// 캘린더
@@ -34,12 +32,10 @@ final class CalendarView: UIView {
     private let _dayOfTheWeekHStackView = DaysOfTheWeekHStackView()
     
     // MARK: - Getter
-    
     var calendarHeaderView: CalendarHeaderView { _calendarHeaderView }
     var monthCalendarView: JTACMonthView { _monthCalendarView }
     
     // MARK: - Initializer
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -52,25 +48,27 @@ final class CalendarView: UIView {
     }
 }
 
-// MARK: - UI Methods
-
 private extension CalendarView {
+    // MARK: - configure
     func configure() {
         setHierarchy()
         setStyles()
         setConstraints()
     }
     
+    // MARK: - setHierarchy
     func setHierarchy() {
         self.addSubviews(_calendarHeaderView,
                          _dayOfTheWeekHStackView,
                          _monthCalendarView)
     }
     
+    // MARK: - setStyles
     func setStyles() {
         self.backgroundColor = .primaryBackground
     }
     
+    // MARK: - setConstraints
     func setConstraints() {
         _calendarHeaderView.snp.makeConstraints {
             $0.top.equalTo(self.safeAreaLayoutGuide)

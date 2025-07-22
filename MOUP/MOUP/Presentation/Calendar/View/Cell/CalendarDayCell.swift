@@ -13,22 +13,20 @@ import Then
 
 /// 캘린더 내부 날짜 셀
 final class CalendarDayCell: JTACDayCell {
-    
     // MARK: - Properties
-    
     static let identifier = String(describing: CalendarDayCell.self)
     
     // MARK: - UI Components
-    
+    /// 구분선
     private let _seperatorView = UIView().then {
         $0.backgroundColor = .gray300
     }
-    
+    /// 선택됐을 때 표시되는 UI
     private let _selectedView = UIView().then {
         $0.backgroundColor = .primary50
         $0.isHidden = true
     }
-    
+    /// 날짜(일) 라벨
     private let _dayLabel = UILabel().then {
         $0.textColor = .gray900
         $0.font = .bodyMedium(14)
@@ -39,12 +37,10 @@ final class CalendarDayCell: JTACDayCell {
     }
     
     // MARK: - Getter
-    
     var selectedView: UIView { _selectedView }
     var dayLabel: UILabel { _dayLabel }
     
     // MARK: - Initializer
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -56,14 +52,12 @@ final class CalendarDayCell: JTACDayCell {
     }
     
     // MARK: - Lifecycle
-    
     override func prepareForReuse() {
         super.prepareForReuse()
         _dayLabel.backgroundColor = .clear
     }
     
     // MARK: - Methods
-    
     func update(dateStr: String, daysOfWeek: DaysOfWeek, isToday: Bool) {
         _dayLabel.text = dateStr
         
@@ -83,25 +77,27 @@ final class CalendarDayCell: JTACDayCell {
     }
 }
 
-// MARK: - UI Methods
-
 private extension CalendarDayCell {
+    // MARK: - configure
     func configure() {
         setHierarchy()
         setStyles()
         setConstraints()
     }
     
+    // MARK: - setHierarchy
     func setHierarchy() {
         self.contentView.addSubviews(_seperatorView,
                                      _selectedView,
                                      _dayLabel)
     }
     
+    // MARK: - setStyles
     func setStyles() {
         self.contentView.backgroundColor = .primaryBackground
     }
     
+    // MARK: - setConstraints
     func setConstraints() {
         _seperatorView.snp.makeConstraints {
             $0.top.equalToSuperview()

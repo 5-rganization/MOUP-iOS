@@ -5,14 +5,11 @@
 //  Created by 서동환 on 7/21/25.
 //
 
-import Foundation
 import JTAppleCalendar
 
 /// 캘린더의 동작을 제어하는 컨트롤러
 final class CalendarController {
-    
     // MARK: - Properties
-    
     /// `JTACMonthView`의 날짜 생성 범위를 설정하는 `enum`
     private enum CalendarRange: Int {
         /// 캘린더 생성 시작 연도
@@ -41,7 +38,6 @@ final class CalendarController {
     private let monthCalendarView: JTACMonthView
     
     // MARK: - Initializer
-    
     init(calendarHeaderView: CalendarHeaderView, monthCalendarView: JTACMonthView) {
         self.calendarHeaderView = calendarHeaderView
         self.monthCalendarView = monthCalendarView
