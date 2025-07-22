@@ -11,7 +11,6 @@ import UIKit
 final class GrabberView: UIView {
     
     // MARK: - Initializer
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -24,10 +23,12 @@ final class GrabberView: UIView {
 }
 
 private extension GrabberView {
+    // MARK: - configure
     func configure() {
         setStyles()
     }
     
+    // MARK: - setStyles
     func setStyles() {
         self.backgroundColor = .gray400
         

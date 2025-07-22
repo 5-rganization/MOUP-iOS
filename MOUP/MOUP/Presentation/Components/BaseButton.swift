@@ -11,7 +11,6 @@ import UIKit
 final class BaseButton: UIButton {
     
     // MARK: - Initializer
-    
     init(title: String = "적용하기", isSecondary: Bool = false) {
         super.init(frame: .zero)
         configure(title: title, isSecondary: isSecondary)
@@ -23,19 +22,18 @@ final class BaseButton: UIButton {
     }
     
     // MARK: - Methods
-    
     func update(title: String, isSecondary: Bool = false) {
         setConfiguration(title: title, isSecondary: isSecondary)
     }
 }
 
-// MARK: - UI Methods
-
 private extension BaseButton {
+    // MARK: - configure
     func configure(title: String, isSecondary: Bool) {
         setStyles(title: title, isSecondary: isSecondary)
     }
     
+    // MARK: - setStyles
     func setStyles(title: String, isSecondary: Bool) {
         setConfiguration(title: title, isSecondary: isSecondary)
         
@@ -43,6 +41,7 @@ private extension BaseButton {
         self.layer.cornerRadius = 12
     }
     
+    // MARK: - setConfiguration
     func setConfiguration(title: String, isSecondary: Bool) {
         var config = UIButton.Configuration.filled()
         
