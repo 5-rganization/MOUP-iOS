@@ -31,21 +31,19 @@ final class InfoRowView: UIView {
     }
     
     private let chevronButton = UIButton().then {
-        $0.setImage(UIImage(systemName: "chevron.right"), for: .normal)
-        $0.tintColor = .gray400
+        $0.setImage(UIImage(named: "ChevronRight"), for: .normal)
         $0.isUserInteractionEnabled = false
     }
     
     private let checkBox = UIButton().then {
-        $0.setImage(UIImage(systemName: "square"), for: .normal)
-        $0.setImage(UIImage(systemName: "checkmark.square.fill"), for: .selected)
-        $0.tintColor = .gray400
+        $0.setImage(UIImage(named: "CheckboxUnselected"), for: .normal)
+        $0.setImage(UIImage(named: "CheckboxSelected"), for: .selected)
     }
     
     private let actionButton = UIButton(configuration: .filled()).then {
         $0.configuration?.baseBackgroundColor = .primary100
         $0.configuration?.baseForegroundColor = .gray700
-        $0.configuration?.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12)
+        $0.configuration?.contentInsets = NSDirectionalEdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 8
     }
