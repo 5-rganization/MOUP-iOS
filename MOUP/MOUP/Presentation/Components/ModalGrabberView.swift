@@ -1,5 +1,5 @@
 //
-//  GrabberView.swift
+//  ModalGrabberView.swift
 //  MOUP
 //
 //  Created by 서동환 on 7/23/25.
@@ -8,7 +8,7 @@
 import UIKit
 
 /// 모달 상단 Grabber 핸들
-final class GrabberView: UIView {
+final class ModalGrabberView: UIView {
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -22,7 +22,7 @@ final class GrabberView: UIView {
     }
 }
 
-private extension GrabberView {
+private extension ModalGrabberView {
     // MARK: - configure
     func configure() {
         setStyles()
