@@ -17,9 +17,9 @@ import Then
 final class CalendarView: UIView {
     // MARK: - UI Components
     /// 캘린더 상단 헤더
-    private let _calendarHeaderView = CalendarHeaderView()
+    private let calendarHeaderView = CalendarHeaderView()
     /// 캘린더
-    private let _monthCalendarView = JTACMonthView().then {
+    private let monthCalendarView = JTACMonthView().then {
         $0.minimumLineSpacing = 0
         $0.minimumInteritemSpacing = 0
         $0.scrollDirection = .horizontal
@@ -29,11 +29,11 @@ final class CalendarView: UIView {
         $0.showsVerticalScrollIndicator = false
     }
     /// 캘린더 요일 표시
-    private let _dayOfTheWeekHStackView = DaysOfTheWeekHStackView()
+    private let dayOfTheWeekHStackView = DaysOfTheWeekHStackView()
     
     // MARK: - Getter
-    var calendarHeaderView: CalendarHeaderView { _calendarHeaderView }
-    var monthCalendarView: JTACMonthView { _monthCalendarView }
+    var getCalendarHeaderView: CalendarHeaderView { calendarHeaderView }
+    var getMonthCalendarView: JTACMonthView { monthCalendarView }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -58,9 +58,9 @@ private extension CalendarView {
     
     // MARK: - setHierarchy
     func setHierarchy() {
-        self.addSubviews(_calendarHeaderView,
-                         _dayOfTheWeekHStackView,
-                         _monthCalendarView)
+        self.addSubviews(calendarHeaderView,
+                         dayOfTheWeekHStackView,
+                         monthCalendarView)
     }
     
     // MARK: - setStyles
@@ -70,20 +70,20 @@ private extension CalendarView {
     
     // MARK: - setConstraints
     func setConstraints() {
-        _calendarHeaderView.snp.makeConstraints {
+        calendarHeaderView.snp.makeConstraints {
             $0.top.equalTo(self.safeAreaLayoutGuide)
             $0.leading.trailing.equalTo(self.safeAreaLayoutGuide)
             $0.height.equalTo(50)
         }
         
-        _dayOfTheWeekHStackView.snp.makeConstraints {
-            $0.top.equalTo(_calendarHeaderView.snp.bottom)
+        dayOfTheWeekHStackView.snp.makeConstraints {
+            $0.top.equalTo(calendarHeaderView.snp.bottom)
             $0.leading.trailing.equalTo(self.safeAreaLayoutGuide)
             $0.height.equalTo(20)
         }
         
-        _monthCalendarView.snp.makeConstraints {
-            $0.top.equalTo(_dayOfTheWeekHStackView.snp.bottom)
+        monthCalendarView.snp.makeConstraints {
+            $0.top.equalTo(dayOfTheWeekHStackView.snp.bottom)
             $0.leading.trailing.equalTo(self.safeAreaLayoutGuide)
             $0.bottom.equalTo(self.safeAreaLayoutGuide)
         }
@@ -94,13 +94,13 @@ private extension CalendarView {
 
 private extension CalendarView {
     func setCalendarView() {
-        _monthCalendarView.register(CalendarDayCell.self, forCellWithReuseIdentifier: CalendarDayCell.identifier)
+        monthCalendarView.register(CalendarDayCell.self, forCellWithReuseIdentifier: CalendarDayCell.identifier)
         
-        _monthCalendarView.scrollToDate(.now, animateScroll: false)
+        monthCalendarView.scrollToDate(.now, animateScroll: false)
         
-        _monthCalendarView.visibleDates { [weak self] visibleDates in
+        monthCalendarView.visibleDates { [weak self] visibleDates in
             guard let self, let date = visibleDates.monthDates.first?.date else { return }
-            _calendarHeaderView.update(date: date)
+            calendarHeaderView.update(date: date)
         }
     }
 }

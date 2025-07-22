@@ -16,8 +16,8 @@ final class CalendarViewController: UIViewController {
     // MARK: - Properties
     weak var coordinator: CalendarCoordinator?
     
-    private lazy var calendarController = CalendarController(calendarHeaderView: calendarView.calendarHeaderView,
-                                                             monthCalendarView: calendarView.monthCalendarView)
+    private lazy var calendarController = CalendarController(calendarHeaderView: calendarView.getCalendarHeaderView,
+                                                             monthCalendarView: calendarView.getMonthCalendarView)
     
     // MARK: - UI Components
     private let calendarView = CalendarView()
@@ -49,7 +49,7 @@ private extension CalendarViewController {
     
     // MARK: - setDelegates
     func setDelegates() {
-        calendarView.monthCalendarView.calendarDataSource = calendarController
-        calendarView.monthCalendarView.calendarDelegate = calendarController
+        calendarView.getMonthCalendarView.calendarDataSource = calendarController
+        calendarView.getMonthCalendarView.calendarDelegate = calendarController
     }
 }
