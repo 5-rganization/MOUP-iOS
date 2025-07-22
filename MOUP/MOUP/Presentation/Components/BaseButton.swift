@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// 메인 버튼
 final class BaseButton: UIButton {
     
     // MARK: - Initializer
