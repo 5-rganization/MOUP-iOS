@@ -10,6 +10,9 @@ import UIKit
 /// 모달 상단 Grabber 핸들
 final class ModalGrabberView: UIView {
     
+    /// 고정 크기 - 너비 45, 높이 4
+    override var intrinsicContentSize: CGSize { CGSize(width: 45, height: 4) }
+    
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)
