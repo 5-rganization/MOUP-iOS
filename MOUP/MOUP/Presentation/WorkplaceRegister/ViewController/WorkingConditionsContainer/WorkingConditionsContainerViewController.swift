@@ -16,6 +16,9 @@ final class WorkingConditionsContainerViewController: UIViewController {
     private let disposeBag = DisposeBag()
     
     // MARK: - Lifecycle
+    override func loadView() {
+        self.view = workingConditionsContainerView
+    }
     
     // VC일 때
     override func viewDidLoad() {
@@ -48,9 +51,7 @@ private extension WorkingConditionsContainerViewController {
     }
     
     // MARK: - setBinding
-    func setHierarchy() {
-        view.addSubview(workingConditionsContainerView)
-    }
+    func setHierarchy() { }
     func setStyles() {
         view.backgroundColor = .white
     }
@@ -61,71 +62,68 @@ private extension WorkingConditionsContainerViewController {
     }
     func setActions() { }
     func setBinding() {
-        let view = workingConditionsContainerView
-        
-        view.getFourMajorSocialInsurancesInfoRow.rx.tap
+        workingConditionsContainerView.getFourMajorSocialInsurancesInfoRow.rx.tap
             .bind(to: viewModel.toggleFourMajorInsurance)
             .disposed(by: disposeBag)
         
-        view.getNationalPensionInfoRow.rx.tap
+        workingConditionsContainerView.getNationalPensionInfoRow.rx.tap
             .bind(to: viewModel.toggleNationalPension)
             .disposed(by: disposeBag)
         
-        view.getNationalHealthInsuranceInfoRow.rx.tap
+        workingConditionsContainerView.getNationalHealthInsuranceInfoRow.rx.tap
             .bind(to: viewModel.toggleHealthInsurance)
             .disposed(by: disposeBag)
         
-        view.getEmploymentInsuranceInfoRow.rx.tap
+        workingConditionsContainerView.getEmploymentInsuranceInfoRow.rx.tap
             .bind(to: viewModel.toggleEmploymentInsurance)
             .disposed(by: disposeBag)
         
-        view.getIndustrialAccidentCompensationInsuranceInfoRow.rx.tap
+        workingConditionsContainerView.getIndustrialAccidentCompensationInsuranceInfoRow.rx.tap
             .bind(to: viewModel.toggleIndustrialAccidentInsurance)
             .disposed(by: disposeBag)
         
-        view.getIncomeTaxInfoRow.rx.tap
+        workingConditionsContainerView.getIncomeTaxInfoRow.rx.tap
             .bind(to: viewModel.toggleIncomeTaxInsurance)
             .disposed(by: disposeBag)
         
-        view.getWeeklyHolidayAllowanceInfoRow.rx.tap
+        workingConditionsContainerView.getWeeklyHolidayAllowanceInfoRow.rx.tap
             .bind(to: viewModel.toggleWeeklyHolidayAllowanceInsurance)
             .disposed(by: disposeBag)
         
-        view.getNightShiftAllowanceInfoRow.rx.tap
+        workingConditionsContainerView.getNightShiftAllowanceInfoRow.rx.tap
             .bind(to: viewModel.toggleNightShiftAllowanceInsurance)
             .disposed(by: disposeBag)
         
         viewModel.isFourMajorInsuranceChecked
-            .bind(to: view.getFourMajorSocialInsurancesInfoRow.rx.isChecked)
+            .bind(to: workingConditionsContainerView.getFourMajorSocialInsurancesInfoRow.rx.isChecked)
             .disposed(by: disposeBag)
         
         viewModel.isNationalPensionChecked
-            .bind(to: view.getNationalPensionInfoRow.rx.isChecked)
+            .bind(to: workingConditionsContainerView.getNationalPensionInfoRow.rx.isChecked)
             .disposed(by: disposeBag)
         
         viewModel.isHealthInsuranceChecked
-            .bind(to: view.getNationalHealthInsuranceInfoRow.rx.isChecked)
+            .bind(to: workingConditionsContainerView.getNationalHealthInsuranceInfoRow.rx.isChecked)
             .disposed(by: disposeBag)
         
         viewModel.isEmploymentInsuranceChecked
-            .bind(to: view.getEmploymentInsuranceInfoRow.rx.isChecked)
+            .bind(to: workingConditionsContainerView.getEmploymentInsuranceInfoRow.rx.isChecked)
             .disposed(by: disposeBag)
         
         viewModel.isIndustrialAccidentInsuranceChecked
-            .bind(to: view.getIndustrialAccidentCompensationInsuranceInfoRow.rx.isChecked)
+            .bind(to: workingConditionsContainerView.getIndustrialAccidentCompensationInsuranceInfoRow.rx.isChecked)
             .disposed(by: disposeBag)
         
         viewModel.isIncomeTaxInsuranceChecked
-            .bind(to: view.getIncomeTaxInfoRow.rx.isChecked)
+            .bind(to: workingConditionsContainerView.getIncomeTaxInfoRow.rx.isChecked)
             .disposed(by: disposeBag)
         
         viewModel.isWeeklyHolidayAllowanceInsuranceChecked
-            .bind(to: view.getWeeklyHolidayAllowanceInfoRow.rx.isChecked)
+            .bind(to: workingConditionsContainerView.getWeeklyHolidayAllowanceInfoRow.rx.isChecked)
             .disposed(by: disposeBag)
         
         viewModel.isNightShiftAllowanceInsuranceChecked
-            .bind(to: view.getNightShiftAllowanceInfoRow.rx.isChecked)
+            .bind(to: workingConditionsContainerView.getNightShiftAllowanceInfoRow.rx.isChecked)
             .disposed(by: disposeBag)
     }
-    
 }
