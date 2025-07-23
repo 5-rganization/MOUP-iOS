@@ -75,6 +75,16 @@ final class WorkingConditionsContainerView: UIView {
         $0.attributedText = attributed
     }
     
+    // MARK: - Getter
+    var getFourMajorSocialInsurancesInfoRow: InfoRowView { fourMajorSocialInsurancesInfoRow }
+    var getNationalPensionInfoRow: InfoRowView { nationalPensionInfoRow }
+    var getNationalHealthInsuranceInfoRow: InfoRowView { nationalHealthInsuranceInfoRow }
+    var getEmploymentInsuranceInfoRow: InfoRowView { employmentInsuranceInfoRow }
+    var getIndustrialAccidentCompensationInsuranceInfoRow: InfoRowView { industrialAccidentCompensationInsuranceInfoRow }
+    var getIncomeTaxInfoRow: InfoRowView { incomeTaxInfoRow }
+    var getWeeklyHolidayAllowanceInfoRow: InfoRowView { weeklyHolidayAllowanceInfoRow }
+    var getNightShiftAllowanceInfoRow: InfoRowView { nightShiftAllowanceInfoRow }
+    
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)

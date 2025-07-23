@@ -46,6 +46,11 @@ final class WorkplaceRegisterView: UIView {
         $0.clipsToBounds = true
     }
     
+    // MARK: - Getter
+    var getWorkingConditionsContainerView: WorkingConditionsContainerView {
+        workingConditionsContainerView
+    }
+
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)

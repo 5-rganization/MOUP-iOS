@@ -11,6 +11,7 @@ final class WorkplaceRegisterViewController: UIViewController {
     
     // MARK: - Properties
     private let workplaceRegisterView = WorkplaceRegisterView()
+    private let workingConditionsContainerVC: WorkingConditionsContainerViewController
     // private let viewModel: <#ViewModel#>
     
     // MARK: - Lifecycle
@@ -22,12 +23,14 @@ final class WorkplaceRegisterViewController: UIViewController {
     // VC일 때
     override func viewDidLoad() {
         super.viewDidLoad()
+        add(child: workingConditionsContainerVC, to: workplaceRegisterView.getWorkingConditionsContainerView)
         configure()
     }
     
     // MARK: - Initializer
     
-    init() {
+    init(workingConditionsContainerViewModel: WorkingConditionsContainerViewModel) {
+        self.workingConditionsContainerVC = WorkingConditionsContainerViewController(viewModel: workingConditionsContainerViewModel)
         super.init(nibName: nil, bundle: nil)
     }
 
