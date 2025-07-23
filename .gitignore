@@ -148,3 +148,7 @@ GoogleService-Info-Debug.plist
 GoogleService-Info-Release.plist
 Secrets-Debug.xcconfig
 Secrets-Release.xcconfig
+
+
+# Google Login custom gitignore
+credentials.plist
