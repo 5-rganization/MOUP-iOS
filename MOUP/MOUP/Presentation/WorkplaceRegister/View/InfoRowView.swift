@@ -7,6 +7,8 @@
 import UIKit
 import SnapKit
 import Then
+import RxSwift
+import RxCocoa
 
 enum InfoRowType {
     case checkBox(isChecked: Bool)
@@ -18,6 +20,7 @@ enum InfoRowType {
 
 final class InfoRowView: UIView {
     // MARK: - Properties
+    private let checkTappedRelay = PublishRelay<Void>()
     
     // MARK: - UI Components
     private let titleLabel = UILabel().then {
@@ -69,7 +72,24 @@ final class InfoRowView: UIView {
         fatalError("init(coder:) has not been implemented.")
     }
     
+    // MARK: - Getter
+    var getCheckBox: UIButton { checkBox }
+    var checkTap: Observable<Void> {
+        checkTappedRelay.asObservable()
+    }
+    
     // MARK: - Public Methods
+    func setChecked(_ isChecked: Bool) {
+        checkBox.isSelected = isChecked
+    }
+    
+    func isChecked() -> Bool {
+        return checkBox.isSelected
+    }
+    
+    @objc private func didTapCheckBox() {
+        checkTappedRelay.accept(())
+    }
 }
 
 private extension InfoRowView {
@@ -102,6 +122,7 @@ private extension InfoRowView {
         switch type {
         case .checkBox(let isChecked):
             checkBox.isSelected = isChecked
+            checkBox.addTarget(self, action: #selector(didTapCheckBox), for: .touchUpInside)
         case .labelWithChevron(let value):
             valueLabel.text = value
         case .labelWithButton(let title):
@@ -174,6 +195,19 @@ private extension InfoRowView {
                 $0.centerY.equalToSuperview()
                 $0.trailing.equalToSuperview().inset(16)
             }
+        }
+    }
+}
+extension Reactive where Base: InfoRowView {
+    /// 체크박스 버튼 탭 이벤트
+    var tap: ControlEvent<Void> {
+        return ControlEvent(events: base.checkTap)
+    }
+
+    /// 체크박스 선택 상태 바인딩
+    var isChecked: Binder<Bool> {
+        return Binder(base) { view, isChecked in
+            view.setChecked(isChecked)
         }
     }
 }
