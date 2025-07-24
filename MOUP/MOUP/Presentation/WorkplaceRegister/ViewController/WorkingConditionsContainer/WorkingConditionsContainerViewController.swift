@@ -55,11 +55,7 @@ private extension WorkingConditionsContainerViewController {
     func setStyles() {
         view.backgroundColor = .white
     }
-    func setConstraints() {
-        workingConditionsContainerView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-    }
+    func setConstraints() { }
     func setActions() { }
     func setBinding() {
         workingConditionsContainerView.getFourMajorSocialInsurancesInfoRow.rx.tap

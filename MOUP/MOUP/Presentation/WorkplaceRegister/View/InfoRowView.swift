@@ -20,7 +20,7 @@ enum InfoRowType {
 
 final class InfoRowView: UIView {
     // MARK: - Properties
-    private let checkTappedRelay = PublishRelay<Void>()
+    private let tapRelay = PublishRelay<Void>()
     
     // MARK: - UI Components
     private let titleLabel = UILabel().then {
@@ -35,7 +35,7 @@ final class InfoRowView: UIView {
     
     private let chevronButton = UIButton().then {
         $0.setImage(UIImage(named: "ChevronRight"), for: .normal)
-        $0.isUserInteractionEnabled = false
+        $0.isUserInteractionEnabled = true
     }
     
     private let checkBox = UIButton().then {
@@ -74,8 +74,8 @@ final class InfoRowView: UIView {
     
     // MARK: - Getter
     var getCheckBox: UIButton { checkBox }
-    var checkTap: Observable<Void> {
-        checkTappedRelay.asObservable()
+    var tap: Observable<Void> {
+        tapRelay.asObservable()
     }
     
     // MARK: - Public Methods
@@ -88,7 +88,15 @@ final class InfoRowView: UIView {
     }
     
     @objc private func didTapCheckBox() {
-        checkTappedRelay.accept(())
+        tapRelay.accept(())
+    }
+    
+    @objc private func didTapChevron() {
+        tapRelay.accept(())
+    }
+    
+    @objc private func didTapActionButton() {
+        tapRelay.accept(())
     }
 }
 
@@ -125,8 +133,10 @@ private extension InfoRowView {
             checkBox.addTarget(self, action: #selector(didTapCheckBox), for: .touchUpInside)
         case .labelWithChevron(let value):
             valueLabel.text = value
+            chevronButton.addTarget(self, action: #selector(didTapChevron), for: .touchUpInside)
         case .labelWithButton(let title):
             actionButton.setTitle(title, for: .normal)
+            actionButton.addTarget(self, action: #selector(didTapActionButton), for: .touchUpInside)
         case .colorWithChevron(let color, let title):
             colorDotView.backgroundColor = color
             titleLabel.text = title
@@ -199,9 +209,9 @@ private extension InfoRowView {
     }
 }
 extension Reactive where Base: InfoRowView {
-    /// 체크박스 버튼 탭 이벤트
+    /// 버튼 탭 이벤트
     var tap: ControlEvent<Void> {
-        return ControlEvent(events: base.checkTap)
+        return ControlEvent(events: base.tap)
     }
 
     /// 체크박스 선택 상태 바인딩
