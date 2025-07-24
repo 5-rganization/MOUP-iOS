@@ -47,6 +47,9 @@ final class WorkplaceRegisterView: UIView {
     }
     
     // MARK: - Getter
+    var getWorkplaceContainerView: WorkplaceContainerView {
+        workplaceContainerView
+    }
     var getWorkingConditionsContainerView: WorkingConditionsContainerView {
         workingConditionsContainerView
     }
@@ -114,7 +117,8 @@ private extension WorkplaceRegisterView {
         }
         
         stackView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
+            $0.top.equalToSuperview().offset(32)
+            $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview().inset(16)
         }
         

@@ -41,6 +41,10 @@ final class WorkplaceContainerView: UIView {
         $0.attributedText = attributed
     }
     
+    // MARK: - Getter
+    var getNameRow: InfoRowView { nameRow }
+    var getCategoryRow: InfoRowView { categoryRow }
+    
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)
