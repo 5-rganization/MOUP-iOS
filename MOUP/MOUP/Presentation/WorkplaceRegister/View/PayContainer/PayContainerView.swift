@@ -56,6 +56,13 @@ final class PayContainerView: UIView {
         $0.attributedText = attributed
     }
     
+    // MARK: - Getter
+    
+    var getPayTypeInfoRow: InfoRowView { payTypeInfoRow }
+    var getPayCalculationInfoRow: InfoRowView { payCalculationInfoRow }
+    var getSalaryTypeInfoRow: InfoRowView { salaryTypeInfoRow }
+    var getPayDayInfoRow: InfoRowView { payDayInfoRow }
+    
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)

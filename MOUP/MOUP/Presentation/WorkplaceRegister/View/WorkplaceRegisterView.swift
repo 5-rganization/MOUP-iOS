@@ -53,6 +53,12 @@ final class WorkplaceRegisterView: UIView {
     var getWorkingConditionsContainerView: WorkingConditionsContainerView {
         workingConditionsContainerView
     }
+    var getPayContainerView: PayContainerView {
+        payContainerView
+    }
+    var getColorLabelContainerView: ColorLabelContainerView {
+        colorLabelContainerView
+    }
 
     // MARK: - Initializer
     override init(frame: CGRect) {

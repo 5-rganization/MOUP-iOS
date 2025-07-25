@@ -12,9 +12,8 @@ final class ColorLabelContainerView: UIView {
     // MARK: - Properties
     private let container = ContainerView()
     
-    private let colorLabelInfoRow = InfoRowView(title: "", type: .colorWithChevron(color: .labelRed, title: "빨간색"), frame: .zero)
-    
     // MARK: - UI Components
+    private let colorLabelInfoRow = InfoRowView(title: "", type: .colorWithChevron(color: .labelRed, title: "빨간색"), frame: .zero)
     
     // MARK: - 라벨 타이틀
     private let colorLabelTitle = UILabel().then {
@@ -31,6 +30,9 @@ final class ColorLabelContainerView: UIView {
 
         $0.attributedText = attributed
     }
+    
+    // MARK: - Getter
+    var getColorLabelInfoRow: InfoRowView { colorLabelInfoRow }
     
     // MARK: - Initializer
     override init(frame: CGRect) {

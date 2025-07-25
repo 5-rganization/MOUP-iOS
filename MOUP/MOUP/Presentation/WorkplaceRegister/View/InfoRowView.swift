@@ -140,6 +140,7 @@ private extension InfoRowView {
         case .colorWithChevron(let color, let title):
             colorDotView.backgroundColor = color
             titleLabel.text = title
+            chevronButton.addTarget(self, action: #selector(didTapChevron), for: .touchUpInside)
             
         }
     }

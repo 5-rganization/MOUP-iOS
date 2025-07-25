@@ -1,25 +1,25 @@
 //
-//  WorkplaceContainerViewController.swift
+//  ColorLabelContainerViewController.swift
 //  MOUP
 //
-//  Created by 양원식 on 7/24/25.
+//  Created by 양원식 on 7/25/25.
 //
 
 import UIKit
 import RxSwift
 
-final class WorkplaceContainerViewController: UIViewController {
+final class ColorLabelContainerViewController: UIViewController {
     
     // MARK: - Properties
-    private let workplaceContainerView = WorkplaceContainerView()
-    private let viewModel: WorkplaceContainerViewModel
+    private let colorLabelContainerView = ColorLabelContainerView()
+    private let viewModel: ColorLabelContainerViewModel
     private let disposeBag = DisposeBag()
     
     weak var coordinator: WorkplaceRegisterCoordinatorProtocol?
     
     // MARK: - Lifecycle
     override func loadView() {
-        self.view = workplaceContainerView
+        self.view = colorLabelContainerView
     }
     
     // VC일 때
@@ -29,13 +29,12 @@ final class WorkplaceContainerViewController: UIViewController {
     }
     
     // MARK: - Initializer
-    
     init(
-        viewModel: WorkplaceContainerViewModel,
+        viewModel: ColorLabelContainerViewModel,
         coordinator: WorkplaceRegisterCoordinatorProtocol?
     ) {
-        self.coordinator = coordinator
         self.viewModel = viewModel
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -47,7 +46,7 @@ final class WorkplaceContainerViewController: UIViewController {
 
 // MARK: - UI Methods
 
-private extension WorkplaceContainerViewController {
+private extension ColorLabelContainerViewController {
     func configure() {
         setHierarchy()
         setStyles()
@@ -62,23 +61,14 @@ private extension WorkplaceContainerViewController {
     func setConstraints() { }
     func setActions() { }
     func setBinding() {
-        workplaceContainerView.getCategoryRow.rx.tap
-            .bind(to: viewModel.didTapCategory)
-            .disposed(by: disposeBag)
-        workplaceContainerView.getNameRow.rx.tap
-            .bind(to: viewModel.didTapName)
+        colorLabelContainerView.getColorLabelInfoRow.rx.tap
+            .bind(to: viewModel.didTapColorLabel)
             .disposed(by: disposeBag)
 
-        viewModel.showCategory
+        viewModel.showColorLabel
             .subscribe(onNext: { [weak self] in
-                self?.coordinator?.showSelectCategory()
-            })
-            .disposed(by: disposeBag)
-        viewModel.showName
-            .subscribe(onNext: { [weak self] in
-                self?.coordinator?.showInputName()
+                self?.coordinator?.showSelectColorLabel()
             })
             .disposed(by: disposeBag)
     }
-    
 }
