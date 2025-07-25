@@ -17,6 +17,19 @@ final class MyPageCoordinator: Coordinator {
 
     func start() {
         let myPageVC = MyPageViewController()
+        myPageVC.coordinator = self
         navigationController.pushViewController(myPageVC, animated: false)
+    }
+    
+    func showAccountViewController() {
+        let accountVC = AccountViewController()
+        accountVC.coordinator = self
+        navigationController.pushViewController(accountVC, animated: true)
+    }
+    
+    func showDeleteAccountModal() {
+        let deleteAccountModalVC = DeleteAccountModalViewController()
+        deleteAccountModalVC.modalPresentationStyle = .overFullScreen
+        navigationController.present(deleteAccountModalVC, animated: false)
     }
 }
