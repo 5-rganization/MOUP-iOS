@@ -7,4 +7,5 @@
 
 protocol WorkplaceRegisterCoordinatorProtocol: Coordinator {
     func showSelectCategory()
+    func showInputName()
 }
