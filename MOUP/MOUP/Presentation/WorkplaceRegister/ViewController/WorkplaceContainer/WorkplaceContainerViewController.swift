@@ -67,10 +67,18 @@ private extension WorkplaceContainerViewController {
         workplaceContainerView.getCategoryRow.rx.tap
             .bind(to: viewModel.didTapCategory)
             .disposed(by: disposeBag)
+        workplaceContainerView.getNameRow.rx.tap
+            .bind(to: viewModel.didTapName)
+            .disposed(by: disposeBag)
 
         viewModel.showCategory
             .subscribe(onNext: { [weak self] in
                 self?.coordinator?.showSelectCategory()
+            })
+            .disposed(by: disposeBag)
+        viewModel.showName
+            .subscribe(onNext: { [weak self] in
+                self?.coordinator?.showInputName()
             })
             .disposed(by: disposeBag)
     }

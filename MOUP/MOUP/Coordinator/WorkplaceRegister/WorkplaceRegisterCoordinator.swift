@@ -30,4 +30,9 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
         let vc = SelectCategoryViewController()
         navigationController.pushViewController(vc, animated: true)
     }
+    
+    func showInputName() {
+        let vc = InputNameViewController()
+        navigationController.pushViewController(vc, animated: true)
+    }
 }
