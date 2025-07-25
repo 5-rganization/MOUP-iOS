@@ -11,8 +11,10 @@ final class WorkplaceRegisterViewController: UIViewController {
     
     // MARK: - Properties
     private let workplaceRegisterView = WorkplaceRegisterView()
-    private let workingConditionsContainerVC: WorkingConditionsContainerViewController
     private let workplaceContainerVC: WorkplaceContainerViewController
+    private let payContainerVC: PayContainerViewController
+    private let workingConditionsContainerVC: WorkingConditionsContainerViewController
+    private let colorLabelContainerVC: ColorLabelContainerViewController
     // private let viewModel: <#ViewModel#>
     
     // MARK: - Lifecycle
@@ -25,23 +27,35 @@ final class WorkplaceRegisterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         add(child: workplaceContainerVC, to: workplaceRegisterView.getWorkplaceContainerView)
+        add(child: payContainerVC, to: workplaceRegisterView.getPayContainerView)
         add(child: workingConditionsContainerVC, to: workplaceRegisterView.getWorkingConditionsContainerView)
+        add(child: colorLabelContainerVC, to: workplaceRegisterView.getColorLabelContainerView)
         configure()
     }
     
     // MARK: - Initializer
     
     init(
-        workplaceViewModel: WorkplaceContainerViewModel,
+        workplaceContainerViewModel: WorkplaceContainerViewModel,
+        payContainerViewModel: PayContainerViewModel,
         workingConditionsContainerViewModel: WorkingConditionsContainerViewModel,
+        colorLabelContainerViewModel: ColorLabelContainerViewModel,
         coordinator: WorkplaceRegisterCoordinatorProtocol
     ) {
         self.workplaceContainerVC = WorkplaceContainerViewController(
-                viewModel: workplaceViewModel,
+                viewModel: workplaceContainerViewModel,
+                coordinator: coordinator
+            )
+        self.payContainerVC = PayContainerViewController(
+                viewModel: payContainerViewModel,
                 coordinator: coordinator
             )
         self.workingConditionsContainerVC = WorkingConditionsContainerViewController(
             viewModel: workingConditionsContainerViewModel
+        )
+        self.colorLabelContainerVC = ColorLabelContainerViewController(
+            viewModel: colorLabelContainerViewModel,
+            coordinator: coordinator
         )
         super.init(nibName: nil, bundle: nil)
     }

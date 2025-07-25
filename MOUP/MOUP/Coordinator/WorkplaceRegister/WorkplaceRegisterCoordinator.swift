@@ -13,10 +13,14 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
     
     func start() {
         let workplaceContainerviewModel = WorkplaceContainerViewModel()
+        let payContainerViewModel = PayContainerViewModel()
         let workingConditionsContainerViewModel = WorkingConditionsContainerViewModel()
+        let colorLabelContainerViewModel = ColorLabelContainerViewModel()
         let vc = WorkplaceRegisterViewController(
-            workplaceViewModel: workplaceContainerviewModel,
+            workplaceContainerViewModel: workplaceContainerviewModel,
+            payContainerViewModel: payContainerViewModel,
             workingConditionsContainerViewModel: workingConditionsContainerViewModel,
+            colorLabelContainerViewModel: colorLabelContainerViewModel,
             coordinator: self
         )
         navigationController.pushViewController(vc, animated: false)
@@ -33,6 +37,26 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
     
     func showInputName() {
         let vc = InputNameViewController()
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showSelectPayType() {
+        let vc = SelectPayTypeViewController()
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showSelectPayCalculation() {
+        let vc = SelectPayCalculationViewController()
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showInputSalaryType() {
+        let vc = InputSalaryTypeViewController()
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showSelectColorLabel() {
+        let vc = SelectColorLabelViewController()
         navigationController.pushViewController(vc, animated: true)
     }
 }

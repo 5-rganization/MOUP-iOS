@@ -1,25 +1,25 @@
 //
-//  WorkplaceContainerViewController.swift
+//  PayContainerViewController.swift
 //  MOUP
 //
-//  Created by 양원식 on 7/24/25.
+//  Created by 양원식 on 7/25/25.
 //
 
 import UIKit
 import RxSwift
 
-final class WorkplaceContainerViewController: UIViewController {
+final class PayContainerViewController: UIViewController {
     
     // MARK: - Properties
-    private let workplaceContainerView = WorkplaceContainerView()
-    private let viewModel: WorkplaceContainerViewModel
+    private let payContainerView = PayContainerView()
+    private let viewModel: PayContainerViewModel
     private let disposeBag = DisposeBag()
     
     weak var coordinator: WorkplaceRegisterCoordinatorProtocol?
     
     // MARK: - Lifecycle
     override func loadView() {
-        self.view = workplaceContainerView
+        self.view = payContainerView
     }
     
     // VC일 때
@@ -31,7 +31,7 @@ final class WorkplaceContainerViewController: UIViewController {
     // MARK: - Initializer
     
     init(
-        viewModel: WorkplaceContainerViewModel,
+        viewModel: PayContainerViewModel,
         coordinator: WorkplaceRegisterCoordinatorProtocol?
     ) {
         self.coordinator = coordinator
@@ -47,7 +47,7 @@ final class WorkplaceContainerViewController: UIViewController {
 
 // MARK: - UI Methods
 
-private extension WorkplaceContainerViewController {
+private extension PayContainerViewController {
     func configure() {
         setHierarchy()
         setStyles()
@@ -62,21 +62,29 @@ private extension WorkplaceContainerViewController {
     func setConstraints() { }
     func setActions() { }
     func setBinding() {
-        workplaceContainerView.getCategoryRow.rx.tap
-            .bind(to: viewModel.didTapCategory)
+        payContainerView.getPayTypeInfoRow.rx.tap
+            .bind(to: viewModel.didTapPayType)
             .disposed(by: disposeBag)
-        workplaceContainerView.getNameRow.rx.tap
-            .bind(to: viewModel.didTapName)
+        payContainerView.getPayCalculationInfoRow.rx.tap
+            .bind(to: viewModel.didTapPayCalculation)
+            .disposed(by: disposeBag)
+        payContainerView.getSalaryTypeInfoRow.rx.tap
+            .bind(to: viewModel.didTapSalaryType)
             .disposed(by: disposeBag)
 
-        viewModel.showCategory
+        viewModel.showPayType
             .subscribe(onNext: { [weak self] in
-                self?.coordinator?.showSelectCategory()
+                self?.coordinator?.showSelectPayType()
             })
             .disposed(by: disposeBag)
-        viewModel.showName
+        viewModel.showPayCalculation
             .subscribe(onNext: { [weak self] in
-                self?.coordinator?.showInputName()
+                self?.coordinator?.showSelectPayCalculation()
+            })
+            .disposed(by: disposeBag)
+        viewModel.showSalaryType
+            .subscribe(onNext: { [weak self] in
+                self?.coordinator?.showInputSalaryType()
             })
             .disposed(by: disposeBag)
     }

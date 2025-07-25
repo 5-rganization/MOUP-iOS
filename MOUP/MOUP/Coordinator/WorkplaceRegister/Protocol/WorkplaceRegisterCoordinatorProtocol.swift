@@ -8,4 +8,9 @@
 protocol WorkplaceRegisterCoordinatorProtocol: Coordinator {
     func showSelectCategory()
     func showInputName()
+    func showSelectPayType()
+    func showSelectPayCalculation()
+    func showInputSalaryType()
+    
+    func showSelectColorLabel()
 }
