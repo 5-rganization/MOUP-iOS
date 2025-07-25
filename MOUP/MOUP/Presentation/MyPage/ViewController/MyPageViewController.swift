@@ -58,10 +58,11 @@ private extension MyPageViewController {
             .disposed(by: disposeBag)
         
         mypageView.rx.menuTapped
-            .subscribe(onNext: { menu in
+            .withUnretained(self)
+            .subscribe(onNext: { owner, menu in
                 switch menu {
                 case .account:
-                    print("account tapped")
+                    owner.coordinator?.showAccountViewController()
                 case .contact:
                     print("contact tapped")
                 case .info:
