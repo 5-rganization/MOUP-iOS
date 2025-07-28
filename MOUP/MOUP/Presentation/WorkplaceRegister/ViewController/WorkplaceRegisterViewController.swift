@@ -87,7 +87,7 @@ private extension WorkplaceRegisterViewController {
     // MARK: - setBinding
     func setHierarchy() { }
     func setStyles() {
-        setNavigationBar(title: "근무지 등록", backAction: #selector(didTapBack))
+        setNavigationBar(title: "새 근무지 등록", backAction: #selector(didTapBack))
     }
     func setConstraints() { }
     func setActions() { }
