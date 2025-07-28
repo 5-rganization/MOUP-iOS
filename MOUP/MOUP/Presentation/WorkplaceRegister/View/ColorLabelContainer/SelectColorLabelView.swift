@@ -13,6 +13,13 @@ final class SelectColorLabelView: UIView {
     // MARK: - Properties
     
     // MARK: - UI Components
+    private let title = UILabel().then {
+        $0.text = "라벨 색상을 선택해주세요."
+        $0.textColor = .gray900
+        $0.font = .headBold(18)
+    }
+    
+    private let registerButton = BaseButton(title: "완료", isSecondary: true)
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -39,6 +46,10 @@ private extension SelectColorLabelView {
     
     // MARK: - setHierarchy
     func setHierarchy() {
+        addSubviews(
+            title,
+            registerButton
+        )
     }
     
     // MARK: - setStyles
@@ -48,5 +59,15 @@ private extension SelectColorLabelView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        title.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide).offset(32)
+            $0.leading.equalToSuperview().offset(16)
+        }
+        
+        registerButton.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(45)
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(12)
+        }
     }
 }

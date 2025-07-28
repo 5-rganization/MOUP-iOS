@@ -19,6 +19,8 @@ final class InputSalaryTypeView: UIView {
         $0.font = .headBold(18)
     }
     
+    private let registerButton = BaseButton(title: "완료", isSecondary: true)
+    
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -45,7 +47,8 @@ private extension InputSalaryTypeView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
-            title
+            title,
+            registerButton
         )
     }
     
@@ -59,6 +62,12 @@ private extension InputSalaryTypeView {
         title.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).offset(32)
             $0.leading.equalToSuperview().offset(16)
+        }
+        
+        registerButton.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(45)
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(12)
         }
     }
 }

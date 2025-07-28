@@ -28,23 +28,7 @@ final class WorkplaceRegisterView: UIView {
     private let colorLabelContainerView = ColorLabelContainerView()
     
     // MARK: - UI Components
-    private let registerButton = UIButton().then {
-        var config = UIButton.Configuration.filled()
-        config.title = "등록하기"
-        config.baseBackgroundColor = .gray300
-        config.baseForegroundColor = .gray500
-        config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 0, bottom: 12, trailing: 0)
-        
-        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-            var updated = incoming
-            updated.font = .buttonSemibold(18)
-            return updated
-        }
-        
-        $0.configuration = config
-        $0.layer.cornerRadius = 12
-        $0.clipsToBounds = true
-    }
+    private let registerButton = BaseButton(title: "등록하기", isSecondary: true)
     
     // MARK: - Getter
     var getWorkplaceContainerView: WorkplaceContainerView {
@@ -125,11 +109,12 @@ private extension WorkplaceRegisterView {
         stackView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(32)
             $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(16)
+            $0.bottom.equalToSuperview().inset(12)
         }
         
         registerButton.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(45)
         }
     }
 }
