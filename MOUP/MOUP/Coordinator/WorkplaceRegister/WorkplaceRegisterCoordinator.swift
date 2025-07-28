@@ -10,12 +10,13 @@ import UIKit
 final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
     var childCoordinators = [Coordinator]()
     private let navigationController: UINavigationController
+    private lazy var inputNameViewModel = InputNameViewModel()
+    private lazy var workplaceContainerviewModel = WorkplaceContainerViewModel(inputNameViewModel: inputNameViewModel)
+    private let payContainerViewModel = PayContainerViewModel()
+    private let workingConditionsContainerViewModel = WorkingConditionsContainerViewModel()
+    private let colorLabelContainerViewModel = ColorLabelContainerViewModel()
     
     func start() {
-        let workplaceContainerviewModel = WorkplaceContainerViewModel()
-        let payContainerViewModel = PayContainerViewModel()
-        let workingConditionsContainerViewModel = WorkingConditionsContainerViewModel()
-        let colorLabelContainerViewModel = ColorLabelContainerViewModel()
         let vc = WorkplaceRegisterViewController(
             workplaceContainerViewModel: workplaceContainerviewModel,
             payContainerViewModel: payContainerViewModel,
@@ -36,7 +37,7 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
     }
     
     func showInputName() {
-        let vc = InputNameViewController()
+        let vc = InputNameViewController(viewModel: inputNameViewModel)
         navigationController.pushViewController(vc, animated: true)
     }
     

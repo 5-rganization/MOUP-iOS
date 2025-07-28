@@ -7,6 +7,7 @@
 import UIKit
 import SnapKit
 import Then
+import RxCocoa
 
 final class InputNameView: UIView {
     // MARK: - Properties
@@ -18,7 +19,16 @@ final class InputNameView: UIView {
         $0.font = .headBold(18)
     }
     
+    private let textField = CustomTextField().then {
+        $0.placeholder = "근무지 명"
+        $0.returnKeyType = .done
+    }
+    
     private let registerButton = BaseButton(title: "완료", isSecondary: true)
+    
+    // MARK: - Getter
+    var getTextField: CustomTextField { textField }
+    var getRegisterButton: BaseButton { registerButton }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -47,6 +57,7 @@ private extension InputNameView {
     func setHierarchy() {
         addSubviews(
             title,
+            textField,
             registerButton
         )
     }
@@ -61,6 +72,10 @@ private extension InputNameView {
         title.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).offset(32)
             $0.leading.equalToSuperview().offset(16)
+        }
+        textField.snp.makeConstraints {
+            $0.top.equalTo(title.snp.bottom).offset(18)
+            $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
         registerButton.snp.makeConstraints {

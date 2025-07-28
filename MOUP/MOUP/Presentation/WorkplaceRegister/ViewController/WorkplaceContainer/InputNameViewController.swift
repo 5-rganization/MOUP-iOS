@@ -7,12 +7,16 @@
 
 import UIKit
 import SnapKit
+import RxSwift
 
 final class InputNameViewController: UIViewController {
     
     // MARK: - Properties
     private let inputNameView = InputNameView()
-    // private let viewModel: <#ViewModel#>
+    private let viewModel: InputNameViewModel
+    private let disposeBag = DisposeBag()
+    
+    
     
     // MARK: - Lifecycle
     override func loadView() {
@@ -27,7 +31,8 @@ final class InputNameViewController: UIViewController {
     
     // MARK: - Initializer
     
-    init() {
+    init(viewModel: InputNameViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -61,6 +66,23 @@ private extension InputNameViewController {
     }
     func setConstraints() { }
     func setActions() { }
-    func setBinding() { }
+    func setBinding() {
+        inputNameView.getTextField.rx.text.orEmpty
+            .bind(to: viewModel.nameText)
+            .disposed(by: disposeBag)
+        
+        inputNameView.getRegisterButton.rx.tap
+            .bind(onNext: { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.isValidName
+            .drive(onNext: { [weak self] isValid in
+                self?.inputNameView.getRegisterButton.isEnabled = isValid
+                self?.inputNameView.getRegisterButton.update(title: "완료", isSecondary: false)
+            })
+            .disposed(by: disposeBag)
+    }
     
 }

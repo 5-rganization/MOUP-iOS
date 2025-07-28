@@ -35,6 +35,10 @@ final class WorkplaceContainerViewModel: WorkplaceContainerViewModelInput, Workp
     var showName: Observable<Void> {
         didTapNameSubject.asObserver()
     }
+    
+    let nameTextOutput: Driver<String>
 
-    init() { }
+    init(inputNameViewModel: InputNameViewModel) {
+        self.nameTextOutput = inputNameViewModel.nameTextOutput
+    }
 }

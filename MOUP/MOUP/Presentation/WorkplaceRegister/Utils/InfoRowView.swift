@@ -87,6 +87,11 @@ final class InfoRowView: UIView {
         return checkBox.isSelected
     }
     
+    func updateLabelValue(_ newValue: String) {
+        guard case .labelWithChevron = rowType else { return }
+        valueLabel.text = newValue
+    }
+    
     @objc private func didTapCheckBox() {
         tapRelay.accept(())
     }
@@ -214,11 +219,17 @@ extension Reactive where Base: InfoRowView {
     var tap: ControlEvent<Void> {
         return ControlEvent(events: base.tap)
     }
-
+    
     /// 체크박스 선택 상태 바인딩
     var isChecked: Binder<Bool> {
         return Binder(base) { view, isChecked in
             view.setChecked(isChecked)
+        }
+    }
+    
+    var labelValue: Binder<String> {
+        return Binder(base) { view, value in
+            view.updateLabelValue(value)
         }
     }
 }

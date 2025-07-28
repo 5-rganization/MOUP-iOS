@@ -79,6 +79,10 @@ private extension WorkplaceContainerViewController {
                 self?.coordinator?.showInputName()
             })
             .disposed(by: disposeBag)
+        
+        viewModel.nameTextOutput
+            .drive(workplaceContainerView.getNameRow.rx.labelValue)
+            .disposed(by: disposeBag)
     }
     
 }
