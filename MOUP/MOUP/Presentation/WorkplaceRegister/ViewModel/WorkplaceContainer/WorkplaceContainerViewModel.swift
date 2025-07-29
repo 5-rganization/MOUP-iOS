@@ -39,6 +39,7 @@ final class WorkplaceContainerViewModel: WorkplaceContainerViewModelInput, Workp
     let nameTextOutput: Driver<String>
 
     init(inputNameViewModel: InputNameViewModel) {
-        self.nameTextOutput = inputNameViewModel.nameTextOutput
+        self.nameTextOutput = inputNameViewModel.confirmedName
+                .asDriver(onErrorJustReturn: "")
     }
 }

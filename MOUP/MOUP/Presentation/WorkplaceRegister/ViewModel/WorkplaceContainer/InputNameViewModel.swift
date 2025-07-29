@@ -10,36 +10,54 @@ import RxCocoa
 
 protocol InputNameViewModelInput {
     var nameText: AnyObserver<String> { get }
+    func confirmName()
 }
 
 protocol InputNameViewModelOutput {
     var isValidName: Driver<Bool> { get }
-    var nameTextOutput: Driver<String> { get }
+    var currentNameText: Driver<String> { get }
+    var confirmedName: Observable<String> { get }
 }
 
 final class InputNameViewModel: InputNameViewModelInput, InputNameViewModelOutput {
 
-    // MARK: Input
-    private let nameTextSubject = PublishSubject<String>()
-    var nameText: AnyObserver<String> { nameTextSubject.asObserver() }
+    // MARK: - Input Relays
+    private let nameTextRelay = BehaviorRelay<String>(value: "")
+    private let confirmedNameRelay = BehaviorRelay<String>(value: "입력")
+    
+    // MARK: - Input
+    var nameText: AnyObserver<String> {
+        AnyObserver { [weak self] event in
+            guard let value = event.element else { return }
+            self?.nameTextRelay.accept(value)
+        }
+    }
 
-    // MARK: Output
-    let isValidName: Driver<Bool>
-    let nameTextOutput: Driver<String>
+    func confirmName() {
+        confirmedNameRelay.accept(nameTextRelay.value)
+    }
 
-    private let disposeBag = DisposeBag()
+    // MARK: - Output
+    var isValidName: Driver<Bool>
+    var currentNameText: Driver<String>
+    var confirmedName: Observable<String> {
+        confirmedNameRelay.asObservable()
+    }
 
+    // MARK: - Init
     init() {
-        let nameTextStream = nameTextSubject
+        let trimmedText = nameTextRelay
             .map { $0.trimmingCharacters(in: .whitespaces) }
 
-        isValidName = nameTextStream
+        isValidName = trimmedText
             .map { !$0.isEmpty }
             .distinctUntilChanged()
             .asDriver(onErrorJustReturn: false)
 
-        nameTextOutput = nameTextStream
+        currentNameText = trimmedText
             .distinctUntilChanged()
             .asDriver(onErrorJustReturn: "")
     }
 }
+
+

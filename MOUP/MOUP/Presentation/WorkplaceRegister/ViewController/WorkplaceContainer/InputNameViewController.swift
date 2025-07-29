@@ -73,6 +73,7 @@ private extension InputNameViewController {
         
         inputNameView.getRegisterButton.rx.tap
             .bind(onNext: { [weak self] in
+                self?.viewModel.confirmName()
                 self?.navigationController?.popViewController(animated: true)
             })
             .disposed(by: disposeBag)
@@ -84,5 +85,4 @@ private extension InputNameViewController {
             })
             .disposed(by: disposeBag)
     }
-    
 }
