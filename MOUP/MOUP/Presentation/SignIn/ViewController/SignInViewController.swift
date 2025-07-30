@@ -6,13 +6,22 @@
 //
 
 import UIKit
+import RxSwift
+import GoogleSignIn
+
+protocol SignInViewControllerDelegate: AnyObject {
+    func moveToRegistration()
+    func moveToTabBar()
+}
 
 final class SignInViewController: UIViewController {
     
     // MARK: - Properties
-    
+    private let signInVM = SignInViewModel()
     private let signInView = SignInView()
-    
+    private let disposeBag = DisposeBag()
+    weak var delegate: SignInViewControllerDelegate?
+
     // MARK: - Lifecycle
     
     override func loadView() {
@@ -24,7 +33,6 @@ final class SignInViewController: UIViewController {
         super.viewDidLoad()
         configure()
     }
-    
     
     // MARK: - Initializer
     init() {
@@ -64,10 +72,31 @@ private extension SignInViewController {
     func setHierarchy() { }
     func setStyles() { }
     func setConstraints() { }
-    func setActions() {
-        signInView.appleLoginButton.addTarget(self, action: #selector(didTapAppleLoginButton), for: .touchUpInside)
-        signInView.googleLoginButton.addTarget(self, action: #selector(didTapGoogleLoginButton), for: .touchUpInside)
+    func setActions() { }
+    func setBinding() {
+        signInView.rx.googleLoginTap.bind(to: signInVM.googleLoginTapped).disposed(by: disposeBag)
+        signInVM.googleLoginTriggered.subscribe(onNext: { [weak self] _ in
+            guard let self else { return }
+            print("VC - 구글로그인 시도됨")
+            self.signInGoogle()
+        }).disposed(by: disposeBag)
     }
-    func setBinding() { }
-    
+
+    // MARK: - signInGoogle
+    func signInGoogle() {
+        GIDSignIn.sharedInstance.signIn(withPresenting: self) { result, error in
+            if let error {
+                print(error.localizedDescription)
+                return
+            }
+
+            guard let user = result?.user,
+                  let userIdentifier = user.userID,
+                  let identityToken = user.idToken?.tokenString else {
+                return
+            }
+
+            print("user: \(user)\nidToken: \(identityToken)")
+        }
+    }
 }
