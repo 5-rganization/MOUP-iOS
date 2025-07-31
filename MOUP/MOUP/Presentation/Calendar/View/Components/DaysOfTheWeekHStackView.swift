@@ -9,6 +9,7 @@ import UIKit
 
 /// 캘린더 상단 요일 표시 UI
 final class DaysOfTheWeekHStackView: UIStackView {
+    
     // MARK: - Properties
     private let daysOfTheWeekList = ["일", "월", "화", "수", "목", "금", "토"]
     
