@@ -20,6 +20,8 @@ final class CalendarView: UIView {
     private let calendarHeaderView = CalendarHeaderView()
     /// 캘린더
     private let monthCalendarView = JTACMonthView().then {
+        $0.register(CalendarDayCell.self, forCellWithReuseIdentifier: CalendarDayCell.identifier)
+        
         $0.minimumLineSpacing = 0
         $0.minimumInteritemSpacing = 0
         $0.scrollDirection = .horizontal

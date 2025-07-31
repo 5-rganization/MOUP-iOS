@@ -18,6 +18,7 @@ protocol YearMonthPickerVCDelegate: AnyObject {
     func gotoButtonTapped(focusedYear: Int, focusedMonth: Int)
 }
 
+/// 연/월 Picker VC
 final class YearMonthPickerViewController: UIViewController {
     
     // MARK: - Properties
