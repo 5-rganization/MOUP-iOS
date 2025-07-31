@@ -8,6 +8,8 @@
 import UIKit
 
 import JTAppleCalendar
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 
@@ -23,7 +25,7 @@ final class CalendarDayCell: JTACDayCell {
         $0.backgroundColor = .gray300
     }
     /// 선택됐을 때 표시되는 UI
-    private let selectedView = UIView().then {
+    fileprivate let selectedView = UIView().then {
         $0.backgroundColor = .primary50
         $0.isHidden = true
     }
@@ -119,4 +121,10 @@ private extension CalendarDayCell {
             $0.centerX.equalToSuperview()
         }
     }
+}
+
+// MARK: - Extension Reactive
+extension Reactive where Base: CalendarDayCell {
+    var dayLabelHidden: Binder<Bool> { base.dayLabel.rx.isHidden }
+    var selectedViewHidden: Binder<Bool> { base.selectedView.rx.isHidden }
 }

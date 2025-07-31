@@ -44,6 +44,10 @@ private extension FilterViewController {
     
     // MARK: - setBinding
     func setBinding() {
-        
+        filterView.rx.applyButtonTap
+            .subscribe(with: self) { owner, _ in
+                
+                owner.dismiss(animated: true)
+            }.disposed(by: disposeBag)
     }
 }

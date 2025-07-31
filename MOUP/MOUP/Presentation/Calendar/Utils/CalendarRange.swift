@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// `JTACMonthView`의 날짜 생성 범위를 설정하는 `enum`
+/// `JTACMonthView`의 날짜 생성 범위 설정용
 enum CalendarRange {
     /// 캘린더 생성 시작 연도
     static let startYear = 2001
