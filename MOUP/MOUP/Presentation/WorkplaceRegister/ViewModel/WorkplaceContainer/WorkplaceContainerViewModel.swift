@@ -19,14 +19,14 @@ protocol WorkplaceContainerViewModelOutput {
 }
 
 final class WorkplaceContainerViewModel: WorkplaceContainerViewModelInput, WorkplaceContainerViewModelOutput {
-
+    
     // Input
     private let didTapCategorySubject = PublishSubject<Void>()
     private let didTapNameSubject = PublishSubject<Void>()
     
     var didTapCategory: AnyObserver<Void> { didTapCategorySubject.asObserver() }
     var didTapName: AnyObserver<Void> { didTapNameSubject.asObserver() }
-
+    
     // Output
     var showCategory: Observable<Void> {
         didTapCategorySubject.asObservable()
@@ -37,9 +37,13 @@ final class WorkplaceContainerViewModel: WorkplaceContainerViewModelInput, Workp
     }
     
     let nameTextOutput: Driver<String>
-
-    init(inputNameViewModel: InputNameViewModel) {
+    let categoryTextOutput: Driver<String>
+    
+    init(inputNameViewModel: InputNameViewModel, selectCategoryViewModel: SelectCategoryViewModel) {
         self.nameTextOutput = inputNameViewModel.confirmedName
-                .asDriver(onErrorJustReturn: "")
+            .asDriver(onErrorJustReturn: "")
+        
+        self.categoryTextOutput = selectCategoryViewModel.confirmedCategory
+            .asDriver(onErrorJustReturn: "")
     }
 }

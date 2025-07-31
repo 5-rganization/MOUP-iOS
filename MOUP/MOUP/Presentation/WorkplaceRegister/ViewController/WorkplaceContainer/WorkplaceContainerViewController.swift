@@ -83,6 +83,10 @@ private extension WorkplaceContainerViewController {
         viewModel.nameTextOutput
             .drive(workplaceContainerView.getNameRow.rx.labelValue)
             .disposed(by: disposeBag)
+        
+        viewModel.categoryTextOutput
+            .drive(workplaceContainerView.getCategoryRow.rx.labelValue)
+            .disposed(by: disposeBag)
     }
     
 }

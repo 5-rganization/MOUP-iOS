@@ -11,7 +11,8 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
     var childCoordinators = [Coordinator]()
     private let navigationController: UINavigationController
     private lazy var inputNameViewModel = InputNameViewModel()
-    private lazy var workplaceContainerviewModel = WorkplaceContainerViewModel(inputNameViewModel: inputNameViewModel)
+    private lazy var selectCategoryViewModel = SelectCategoryViewModel()
+    private lazy var workplaceContainerviewModel = WorkplaceContainerViewModel(inputNameViewModel: inputNameViewModel, selectCategoryViewModel: selectCategoryViewModel)
     private let payContainerViewModel = PayContainerViewModel()
     private let workingConditionsContainerViewModel = WorkingConditionsContainerViewModel()
     private let colorLabelContainerViewModel = ColorLabelContainerViewModel()
@@ -32,7 +33,7 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
     }
     
     func showSelectCategory() {
-        let vc = SelectCategoryViewController()
+        let vc = SelectCategoryViewController(viewModel: selectCategoryViewModel)
         navigationController.pushViewController(vc, animated: true)
     }
     
