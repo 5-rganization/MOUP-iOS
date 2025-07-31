@@ -71,8 +71,7 @@ private extension CalendarViewController {
     func setBindings() {
         calendarView.getCalendarHeaderView.rx.yearMonthButtonTap
             .subscribe(with: self) { owner, _ in
-                guard let config = owner.calendarView.getCalendarHeaderView.getYearMonthButtonConfiguration,
-                      let title = config.title,
+                guard let title = owner.calendarView.getCalendarHeaderView.getYearMonthButtonTitle,
                       let currYear = Int(title.prefix(4)),
                       let currMonth = Int(title.suffix(2)) else { return }
                 
@@ -81,6 +80,7 @@ private extension CalendarViewController {
     }
 }
 
+// MARK: - YearMonthPickerVCDelegate
 extension CalendarViewController: YearMonthPickerVCDelegate {
     func gotoButtonTapped(focusedYear: Int, focusedMonth: Int) {
         let formattedMonth = String(format: "%.2d", focusedMonth)

@@ -114,5 +114,5 @@ extension Reactive where Base: CalendarHeaderView {
 
 // MARK: - Getter
 extension CalendarHeaderView {
-    var getYearMonthButtonConfiguration: UIButton.Configuration? { yearMonthButton.configuration }
+    var getYearMonthButtonTitle: String? { yearMonthButton.configuration?.title }
 }
