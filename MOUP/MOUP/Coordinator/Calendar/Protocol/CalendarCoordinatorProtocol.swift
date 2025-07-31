@@ -6,5 +6,5 @@
 //
 
 protocol CalendarCoordinatorProtocol: Coordinator {
-    func showYearMonthPicker(currYear: Int, currMonth: Int)
+    func showYearMonthPicker(currYear: Int, currMonth: Int, delegate: YearMonthPickerVCDelegate?)
 }

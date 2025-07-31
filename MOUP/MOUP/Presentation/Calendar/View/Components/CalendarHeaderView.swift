@@ -64,8 +64,7 @@ final class CalendarHeaderView: UIView {
     }
     
     // MARK: - Methods
-    func update(date: Date) {
-        let dateStr = DateFormatter.yearMonthDateFormatter.string(from: date)
+    func update(dateStr: String) {
         yearMonthButton.configuration?.attributedTitle?.characters = .init(dateStr)
     }
 }

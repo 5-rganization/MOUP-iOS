@@ -14,10 +14,12 @@ import Then
 final class YearMonthPickerViewController: UIViewController {
     
     // MARK: - Properties
+    weak var delegate: YearMonthPickerVCDelegate?
+    
     private let disposeBag = DisposeBag()
     
-    /// `JTACMonthView`가 표시하는 연/월 범위(2차원 배열)
-    private let yearMonthList = [Array(CalendarRange.startYear...CalendarRange.endYear), Array(1...12)]
+    /// `JTACMonthView`가 표시하는 연/월 범위(2차원 `String` 배열)
+    private let yearMonthList = [(CalendarRange.startYear...CalendarRange.endYear).map { String($0) }, (1...12).map { String($0) }]
     
     /// `pickerView`에서 didSelect된 연도
     private var focusedYear: Int
@@ -28,9 +30,10 @@ final class YearMonthPickerViewController: UIViewController {
     private let yearMonthPickerView = YearMonthPickerView()
     
     // MARK: - Initializer
-    init(currYear: Int, currMonth: Int) {
+    init(currYear: Int, currMonth: Int, delegate: YearMonthPickerVCDelegate? = nil) {
         self.focusedYear = currYear
         self.focusedMonth = currMonth
+        self.delegate = delegate
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -79,7 +82,7 @@ private extension YearMonthPickerViewController {
         
         yearMonthPickerView.rx.gotoButtonTap
             .subscribe(with: self, onNext: { owner, _ in
-//                let (year, month) = owner.yearMonthPickerView.getSelectedYearMonth
+                owner.delegate?.gotoButtonTapped(focusedYear: owner.focusedYear, focusedMonth: owner.focusedMonth)
                 owner.dismiss(animated: true)
             }).disposed(by: disposeBag)
     }
@@ -93,10 +96,6 @@ extension YearMonthPickerViewController: UIPickerViewDataSource {
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return yearMonthList[component].count
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return String(yearMonthList[component][row])
     }
 }
 
@@ -112,7 +111,7 @@ extension YearMonthPickerViewController: UIPickerViewDelegate {
     
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
         let label = (view as? UILabel) ?? UILabel()
-        label.text = String(yearMonthList[component][row])
+        label.text = yearMonthList[component][row]
         label.font = .headBold(20)
         label.textColor = .gray900
         label.textAlignment = .center

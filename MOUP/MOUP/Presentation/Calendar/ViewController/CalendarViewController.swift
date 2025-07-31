@@ -75,8 +75,16 @@ private extension CalendarViewController {
                       let title = config.title,
                       let currYear = Int(title.prefix(4)),
                       let currMonth = Int(title.suffix(2)) else { return }
-
-                owner.coordinator?.showYearMonthPicker(currYear: currYear, currMonth: currMonth)
+                
+                owner.coordinator?.showYearMonthPicker(currYear: currYear, currMonth: currMonth, delegate: self)
             }.disposed(by: disposeBag)
+    }
+}
+
+extension CalendarViewController: YearMonthPickerVCDelegate {
+    func gotoButtonTapped(focusedYear: Int, focusedMonth: Int) {
+        let formattedMonth = String(format: "%.2d", focusedMonth)
+        guard let date = DateFormatter.dataSourceDateFormatter.date(from: "\(focusedYear).\(formattedMonth).01") else { return }
+        calendarController.scrollToDate(date: date)
     }
 }

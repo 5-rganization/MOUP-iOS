@@ -27,7 +27,14 @@ final class CalendarController {
     }
 }
 
-// MARK: - Calendar Methods
+// MARK: - Internal Calendar Methods
+extension CalendarController {
+    func scrollToDate(date: Date) {
+        monthCalendarView.scrollToDate(date, animateScroll: true)
+    }
+}
+
+// MARK: - Private Calendar Methods
 private extension CalendarController {
     func setCalendarView() {
         monthCalendarView.register(CalendarDayCell.self, forCellWithReuseIdentifier: CalendarDayCell.identifier)
@@ -36,7 +43,8 @@ private extension CalendarController {
         
         monthCalendarView.visibleDates { [weak self] visibleDates in
             guard let self, let date = visibleDates.monthDates.first?.date else { return }
-            calendarHeaderView.update(date: date)
+            let dateStr = DateFormatter.yearMonthDateFormatter.string(from: date)
+            calendarHeaderView.update(dateStr: dateStr)
         }
     }
     
@@ -98,7 +106,8 @@ extension CalendarController: JTACMonthViewDelegate {
     
     func calendar(_ calendar: JTACMonthView, didScrollToDateSegmentWith visibleDates: DateSegmentInfo) {
         guard let date = visibleDates.monthDates.first?.date else { return }
-        calendarHeaderView.update(date: date)
+        let dateStr = DateFormatter.yearMonthDateFormatter.string(from: date)
+        calendarHeaderView.update(dateStr: dateStr)
     }
     
     func calendar(_ calendar: JTACMonthView, shouldSelectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) -> Bool {
