@@ -8,8 +8,6 @@
 import UIKit
 
 import JTAppleCalendar
-import RxCocoa
-import RxSwift
 import SnapKit
 import Then
 
