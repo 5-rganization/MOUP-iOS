@@ -122,9 +122,3 @@ private extension CalendarDayCell {
         }
     }
 }
-
-// MARK: - Extension Reactive
-extension Reactive where Base: CalendarDayCell {
-    var dayLabelHidden: Binder<Bool> { base.dayLabel.rx.isHidden }
-    var selectedViewHidden: Binder<Bool> { base.selectedView.rx.isHidden }
-}
