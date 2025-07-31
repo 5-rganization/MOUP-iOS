@@ -7,7 +7,7 @@
 
 import UIKit
 
-class TotalSalaryCardView: CardView {
+class TotalSalaryCardView: CardButton {
     // MARK: - UI Components
     private let containerView = UIView().then {
         $0.clipsToBounds = true
