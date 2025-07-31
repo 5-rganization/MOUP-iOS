@@ -14,16 +14,6 @@ import Then
 
 final class YearMonthPickerView: UIView {
     
-    // MARK: - Properties
-    private let disposeBag = DisposeBag()
-    
-    /// `JTACMonthView`가 표시하는 연/월 범위(2차원 배열)
-    private let yearMonthList = Observable.just([Array(CalendarRange.startYear.rawValue...CalendarRange.endYear.rawValue), Array(1...12)])
-    /// `pickerView`에서 didSelect된 연도
-    private var focusedYear: Int
-    /// `pickerView`에서 didSelect된 월
-    private var focusedMonth: Int
-    
     // MARK: - UI Components
     /// 모달 핸들 UI
     private let grabberView = ModalGrabberView()
@@ -43,12 +33,9 @@ final class YearMonthPickerView: UIView {
     }
     
     // MARK: - Initializer
-    init(currYear: Int, currMonth: Int) {
-        self.focusedYear = currYear
-        self.focusedMonth = currMonth
-        super.init(frame: .zero)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         configure()
-        setDefaultSelect(currYear: currYear, currMonth: currMonth)
     }
     
     @available(*, unavailable, message: "storyboard is not supported.")
@@ -63,7 +50,6 @@ private extension YearMonthPickerView {
         setHierarchy()
         setStyles()
         setConstraints()
-        setBindings()
     }
     
     // MARK: - setHierarchy
@@ -101,29 +87,15 @@ private extension YearMonthPickerView {
             $0.height.equalTo(44)
         }
     }
-    
-    // MARK: - setBindings
-    func setBindings() {
-        yearMonthList.asDriver(onErrorJustReturn: [])
-            .drive(pickerView.rx.itemAttributedTitles) { _, item in
-                return NSAttributedString(string: "\(item)",
-                                          attributes: [.font: UIFont.headBold(20), .foregroundColor: UIColor.gray900])
-            }.disposed(by: disposeBag)
-    }
-}
-
-// MARK: - Private Methods
-private extension YearMonthPickerView {
-    func setDefaultSelect(currYear: Int, currMonth: Int) {
-        let yearRow = currYear - CalendarRange.startYear.rawValue
-        let monthRow = currMonth - 1
-        pickerView.selectRow(yearRow, inComponent: PickerViewComponents.year, animated: false)
-        pickerView.selectRow(monthRow, inComponent: PickerViewComponents.month, animated: false)
-    }
 }
 
 // MARK: - Extension Reactive
 extension Reactive where Base: YearMonthPickerView {
     var cancelButtonTap: ControlEvent<Void> { base.cancelButton.rx.tap }
     var gotoButtonTap: ControlEvent<Void> { base.gotoButton.rx.tap }
+}
+
+// MARK: - Getter
+extension YearMonthPickerView {
+    var getPickerView: UIPickerView { pickerView }
 }

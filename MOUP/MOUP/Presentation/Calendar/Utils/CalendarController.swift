@@ -7,10 +7,12 @@
 
 import JTAppleCalendar
 
+import RxSwift
+import RxCocoa
+
 /// 캘린더의 동작을 제어하는 컨트롤러
 final class CalendarController {
     // MARK: - Properties
-    
     /// 캘린더 헤더
     private let calendarHeaderView: CalendarHeaderView
     /// 캘린더
@@ -20,12 +22,24 @@ final class CalendarController {
     init(calendarHeaderView: CalendarHeaderView, monthCalendarView: JTACMonthView) {
         self.calendarHeaderView = calendarHeaderView
         self.monthCalendarView = monthCalendarView
+        
+        setCalendarView()
     }
 }
 
 // MARK: - Calendar Methods
-
 private extension CalendarController {
+    func setCalendarView() {
+        monthCalendarView.register(CalendarDayCell.self, forCellWithReuseIdentifier: CalendarDayCell.identifier)
+        
+        monthCalendarView.scrollToDate(.now, animateScroll: false)
+        
+        monthCalendarView.visibleDates { [weak self] visibleDates in
+            guard let self, let date = visibleDates.monthDates.first?.date else { return }
+            calendarHeaderView.update(date: date)
+        }
+    }
+    
     func configureCell(cell: JTACDayCell?, cellState: CellState) {
         guard let cell = cell as? CalendarDayCell else { return }
         handleCellColor(cell: cell, cellState: cellState)
@@ -54,11 +68,10 @@ private extension CalendarController {
 }
 
 // MARK: - JTACMonthViewDataSource
-
 extension CalendarController: JTACMonthViewDataSource {
     func configureCalendar(_ calendar: JTACMonthView) -> ConfigurationParameters {
-        let startDate = DateFormatter.dataSourceDateFormatter.date(from: "\(CalendarRange.startYear.rawValue).01.01")
-        let endDate = DateFormatter.dataSourceDateFormatter.date(from: "\(CalendarRange.endYear.rawValue).12.31")
+        let startDate = DateFormatter.dataSourceDateFormatter.date(from: "\(CalendarRange.startYear).01.01")
+        let endDate = DateFormatter.dataSourceDateFormatter.date(from: "\(CalendarRange.endYear).12.31")
         
         return ConfigurationParameters(startDate: startDate ?? .distantPast,
                                        endDate: endDate ?? .distantFuture,
@@ -68,7 +81,6 @@ extension CalendarController: JTACMonthViewDataSource {
 }
 
 // MARK: - JTACMonthViewDelegate
-
 extension CalendarController: JTACMonthViewDelegate {
     func calendar(_ calendar: JTACMonthView, cellForItemAt date: Date, cellState: CellState, indexPath: IndexPath) -> JTACDayCell {
         guard let cell = calendar.dequeueReusableJTAppleCell(withReuseIdentifier: CalendarDayCell.identifier, for: indexPath) as? CalendarDayCell else {

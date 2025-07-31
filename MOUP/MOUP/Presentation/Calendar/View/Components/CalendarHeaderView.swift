@@ -8,6 +8,8 @@
 import UIKit
 
 import BetterSegmentedControl
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 
@@ -15,7 +17,7 @@ import Then
 final class CalendarHeaderView: UIView {
     // MARK: - UI Components
     /// 연/월 이동 버튼
-    private let yearMonthButton = UIButton().then {
+    fileprivate let yearMonthButton = UIButton().then {
         var config = UIButton.Configuration.plain()
         config.attributedTitle = AttributedString("2001.01", attributes: .init([.font: UIFont.headBold(20), .foregroundColor: UIColor.gray900]))
         config.titleAlignment = .leading
@@ -27,7 +29,7 @@ final class CalendarHeaderView: UIView {
         $0.configuration = config
     }
     /// 개인 ↔️ 공유 토글 버튼
-    private let toggleSwitch = BetterSegmentedControl().then {
+    fileprivate let toggleSwitch = BetterSegmentedControl().then {
         $0.segments = LabelSegment.segments(withTitles: ["개인", "공유"],
                                             normalFont: .buttonSemibold(16),
                                             normalTextColor: .gray400,
@@ -42,16 +44,13 @@ final class CalendarHeaderView: UIView {
         $0.layer.borderWidth = 1
     }
     /// 필터 버튼
-    private let filterButton = UIButton().then {
+    fileprivate let filterButton = UIButton().then {
         var config = UIButton.Configuration.plain()
         config.image = .filterButton.withTintColor(.gray700, renderingMode: .alwaysOriginal)
         config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 10, bottom: 12, trailing: 10)
         
         $0.configuration = config
     }
-    
-    // MARK: - Getter
-    var getYearMonthButton: UIButton { yearMonthButton }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -105,4 +104,16 @@ private extension CalendarHeaderView {
             $0.height.equalTo(44)
         }
     }
+}
+
+// MARK: - Extension Reactive
+extension Reactive where Base: CalendarHeaderView {
+    var yearMonthButtonTap: ControlEvent<Void> { base.yearMonthButton.rx.tap }
+//    var toggleButtonTap:
+    var filterButtonTap: ControlEvent<Void> { base.filterButton.rx.tap }
+}
+
+// MARK: - Getter
+extension CalendarHeaderView {
+    var getYearMonthButtonConfiguration: UIButton.Configuration? { yearMonthButton.configuration }
 }
