@@ -13,8 +13,9 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
     private lazy var inputNameViewModel = InputNameViewModel()
     private lazy var selectCategoryViewModel = SelectCategoryViewModel()
     private lazy var selectPayTypeViewModel = SelectPayTypeViewModel()
+    private lazy var selectPayCalculationViewModel = SelectPayCalculationViewModel()
     private lazy var workplaceContainerviewModel = WorkplaceContainerViewModel(inputNameViewModel: inputNameViewModel, selectCategoryViewModel: selectCategoryViewModel)
-    private lazy var payContainerViewModel = PayContainerViewModel(selectPayTypeViewModel: selectPayTypeViewModel)
+    private lazy var payContainerViewModel = PayContainerViewModel(selectPayTypeViewModel: selectPayTypeViewModel, selectPayCalculationViewModel: selectPayCalculationViewModel)
     private let workingConditionsContainerViewModel = WorkingConditionsContainerViewModel()
     private let colorLabelContainerViewModel = ColorLabelContainerViewModel()
     
@@ -49,7 +50,7 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
     }
     
     func showSelectPayCalculation() {
-        let vc = SelectPayCalculationViewController()
+        let vc = SelectPayCalculationViewController(viewModel: selectPayCalculationViewModel)
         navigationController.pushViewController(vc, animated: true)
     }
     

@@ -92,6 +92,10 @@ final class InfoRowView: UIView {
         valueLabel.text = newValue
     }
     
+    func updateTitle(to newTitle: String) {
+        titleLabel.text = newTitle
+    }
+    
     @objc private func didTapCheckBox() {
         tapRelay.accept(())
     }

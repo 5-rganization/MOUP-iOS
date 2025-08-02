@@ -65,9 +65,11 @@ private extension PayContainerViewController {
         payContainerView.getPayTypeInfoRow.rx.tap
             .bind(to: viewModel.didTapPayType)
             .disposed(by: disposeBag)
+        
         payContainerView.getPayCalculationInfoRow.rx.tap
             .bind(to: viewModel.didTapPayCalculation)
             .disposed(by: disposeBag)
+        
         payContainerView.getSalaryTypeInfoRow.rx.tap
             .bind(to: viewModel.didTapSalaryType)
             .disposed(by: disposeBag)
@@ -77,20 +79,35 @@ private extension PayContainerViewController {
                 self?.coordinator?.showSelectPayType()
             })
             .disposed(by: disposeBag)
+        
         viewModel.showPayCalculation
             .subscribe(onNext: { [weak self] in
                 self?.coordinator?.showSelectPayCalculation()
             })
             .disposed(by: disposeBag)
+        
         viewModel.showSalaryType
             .subscribe(onNext: { [weak self] in
                 self?.coordinator?.showInputSalaryType()
             })
             .disposed(by: disposeBag)
         
+        viewModel.salaryTypeTitleOutput
+            .drive(onNext: { [weak self] title in
+                self?.payContainerView.getSalaryTypeInfoRow.updateTitle(to: title)
+            })
+            .disposed(by: disposeBag)
+
+        
         viewModel.payTypeOutput
             .drive(payContainerView.getPayTypeInfoRow.rx.labelValue)
             .disposed(by: disposeBag)
+        
+        viewModel.payCalculationOutput
+            .drive(payContainerView.getPayCalculationInfoRow.rx.labelValue)
+            .disposed(by: disposeBag)
+        
+
     }
     
 }
