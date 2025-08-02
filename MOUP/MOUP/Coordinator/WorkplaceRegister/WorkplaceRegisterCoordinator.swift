@@ -16,7 +16,7 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
     private lazy var selectPayCalculationViewModel = SelectPayCalculationViewModel()
     private lazy var inputSalaryTypeViewModel = InputSalaryTypeViewModel(confirmedPayCalculation: selectPayCalculationViewModel.confirmedPayCalculation)
     private lazy var workplaceContainerviewModel = WorkplaceContainerViewModel(inputNameViewModel: inputNameViewModel, selectCategoryViewModel: selectCategoryViewModel)
-    private lazy var payContainerViewModel = PayContainerViewModel(selectPayTypeViewModel: selectPayTypeViewModel, selectPayCalculationViewModel: selectPayCalculationViewModel)
+    private lazy var payContainerViewModel = PayContainerViewModel(selectPayTypeViewModel: selectPayTypeViewModel, selectPayCalculationViewModel: selectPayCalculationViewModel, inputSalaryTypeViewModel: inputSalaryTypeViewModel)
     private let workingConditionsContainerViewModel = WorkingConditionsContainerViewModel()
     private let colorLabelContainerViewModel = ColorLabelContainerViewModel()
     

@@ -21,6 +21,13 @@ final class InputSalaryTypeViewController: UIViewController {
         self.view = inputSalaryTypeView
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        inputSalaryTypeView.getTextField.text = viewModel.currentFormattedSalaryText()
+    }
+
+    
     // VC일 때
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,13 +72,39 @@ private extension InputSalaryTypeViewController {
     func setConstraints() { }
     func setActions() { }
     func setBinding() {
+        inputSalaryTypeView.getTextField.rx.controlEvent(.editingChanged)
+            .withLatestFrom(inputSalaryTypeView.getTextField.rx.text.orEmpty)
+            .map { $0.replacingOccurrences(of: ",", with: "") }
+            .do(onNext: { [weak self] raw in
+                guard let number = Int(raw) else { return }
+                let formatted = NumberFormatter.formattedDecimal(from: raw)
+                
+                // 커서 위치 보존 없이 setText만 수행
+                self?.inputSalaryTypeView.getTextField.text = formatted
+            })
+            .bind(to: viewModel.salaryText)
+            .disposed(by: disposeBag)
+
+        inputSalaryTypeView.getRegisterButton.rx.tap
+            .bind { [weak self] in
+                self?.viewModel.confirmSalary()
+                self?.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+
+        viewModel.isValidSalary
+            .drive(onNext: { [weak self] isValid in
+                self?.inputSalaryTypeView.getRegisterButton.isEnabled = isValid
+                self?.inputSalaryTypeView.getRegisterButton.update(title: "완료", isSecondary: false)
+            })
+            .disposed(by: disposeBag)
+
         viewModel.salaryTypeTitleOutput
             .drive(inputSalaryTypeView.rx.titleText)
             .disposed(by: disposeBag)
-        
+
         viewModel.placeholderText
             .drive(inputSalaryTypeView.rx.placeholderText)
             .disposed(by: disposeBag)
     }
-    
 }

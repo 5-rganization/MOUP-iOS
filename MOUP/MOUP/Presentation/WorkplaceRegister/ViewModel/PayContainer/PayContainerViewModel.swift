@@ -47,11 +47,18 @@ final class PayContainerViewModel: PayContainerViewModelInput, PayContainerViewM
     let payTypeOutput: Driver<String>
     let payCalculationOutput: Driver<String>
     let salaryTypeTitleOutput: Driver<String>
+    let salaryOutput: Driver<String>
     
-    init(selectPayTypeViewModel: SelectPayTypeViewModel, selectPayCalculationViewModel: SelectPayCalculationViewModel) {
+    init(
+        selectPayTypeViewModel: SelectPayTypeViewModel,
+        selectPayCalculationViewModel: SelectPayCalculationViewModel,
+        inputSalaryTypeViewModel: InputSalaryTypeViewModel
+    ) {
         self.payTypeOutput = selectPayTypeViewModel.confirmedPayType.asDriver(onErrorJustReturn: "")
         self.payCalculationOutput = selectPayCalculationViewModel.confirmedPayCalculation.asDriver(onErrorJustReturn: "")
         self.salaryTypeTitleOutput = selectPayCalculationViewModel.confirmedPayCalculation
+            .asDriver(onErrorJustReturn: "")
+        self.salaryOutput = inputSalaryTypeViewModel.confirmedSalary
             .asDriver(onErrorJustReturn: "")
     }
 }

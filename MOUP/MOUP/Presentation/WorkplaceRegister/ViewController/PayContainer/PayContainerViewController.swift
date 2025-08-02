@@ -107,7 +107,9 @@ private extension PayContainerViewController {
             .drive(payContainerView.getPayCalculationInfoRow.rx.labelValue)
             .disposed(by: disposeBag)
         
-
+        viewModel.salaryOutput
+            .drive(payContainerView.getSalaryTypeInfoRow.rx.labelValue)
+            .disposed(by: disposeBag)
     }
     
 }
