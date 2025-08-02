@@ -34,6 +34,18 @@ final class CalendarCoordinator: Coordinator {
         yearMonthCoordinator.start()
         childCoordinators.append(yearMonthCoordinator)
     }
+    
+    func showFilterTable() {
+        let filterVC = FilterViewController()
+        
+        if let sheet = filterVC.sheetPresentationController {
+            sheet.detents = [.medium()]
+            sheet.prefersGrabberVisible = false
+            sheet.preferredCornerRadius = 12
+        }
+        
+        navigationController.present(filterVC, animated: true)
+    }
 }
 
 // MARK: - YearMonthCoordinatorDelegate

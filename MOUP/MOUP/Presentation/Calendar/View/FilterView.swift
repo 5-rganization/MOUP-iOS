@@ -61,6 +61,11 @@ final class FilterView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented.")
     }
+    
+    // MARK: - Internal Methods
+    func update(headerStr: String) {
+        headerLabel.text = headerStr
+    }
 }
 
 private extension FilterView {

@@ -102,6 +102,11 @@ private extension CalendarViewController {
                 owner.selectedCalendarModeRelay.accept(CalendarMode.allCases[selectedIndex])
             }.disposed(by: disposeBag)
         
+        calendarView.getCalendarHeaderView.rx.filterButtonTap
+            .subscribe(with: self) { owner, _ in
+                owner.coordinator?.showFilterTable()
+            }.disposed(by: disposeBag)
+        
         // ViewModel 바인딩
         let input = CalendarViewModel.Input(currMonth: visibleYearMonth.asObservable(), selectedCalendarMode: selectedCalendarModeRelay.asObservable())
         let output = viewModel.transform(input: input)

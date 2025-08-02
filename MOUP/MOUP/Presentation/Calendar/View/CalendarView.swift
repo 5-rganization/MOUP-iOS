@@ -34,10 +34,6 @@ final class CalendarView: UIView {
     /// 캘린더 요일 표시
     private let dayOfTheWeekHStackView = DaysOfTheWeekHStackView()
     
-    // MARK: - Getter
-    var getCalendarHeaderView: CalendarHeaderView { calendarHeaderView }
-    var getMonthCalendarView: JTACMonthView { monthCalendarView }
-    
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -90,4 +86,10 @@ private extension CalendarView {
             $0.bottom.equalTo(self.safeAreaLayoutGuide)
         }
     }
+}
+
+// MARK: - Getter
+extension CalendarView {
+    var getCalendarHeaderView: CalendarHeaderView { calendarHeaderView }
+    var getMonthCalendarView: JTACMonthView { monthCalendarView }
 }
