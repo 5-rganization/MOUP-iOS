@@ -44,5 +44,9 @@ final class PayContainerViewModel: PayContainerViewModelInput, PayContainerViewM
         didTapSalaryTypeSubject.asObserver()
     }
 
-    init() { }
+    let payTypeOutput: Driver<String>
+    
+    init(selectPayTypeViewModel: SelectPayTypeViewModel) {
+        self.payTypeOutput = selectPayTypeViewModel.confirmedPayType.asDriver(onErrorJustReturn: "")
+    }
 }

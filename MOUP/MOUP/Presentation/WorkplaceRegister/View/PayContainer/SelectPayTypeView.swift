@@ -20,6 +20,15 @@ final class SelectPayTypeView: UIView {
     }
     
     private let registerButton = BaseButton(title: "완료", isSecondary: true)
+    private let monthlyRadioButton = RadioButtonView(title: "매월", type: .none(selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
+    private let weeklyRadioButton = RadioButtonView(title: "매주", type: .none(selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
+    private let dailyRadioButton = RadioButtonView(title: "매일", type: .none(selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
+    
+    // MARK: - Getter
+    var getMonthlyRadioButton: RadioButtonView { monthlyRadioButton }
+    var getWeeklyRadioButton: RadioButtonView { weeklyRadioButton }
+    var getDailyRadioButton: RadioButtonView { dailyRadioButton }
+    var getRegisterButton: BaseButton { registerButton }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -48,6 +57,9 @@ private extension SelectPayTypeView {
     func setHierarchy() {
         addSubviews(
             title,
+            monthlyRadioButton,
+            weeklyRadioButton,
+            dailyRadioButton,
             registerButton
         )
     }
@@ -62,6 +74,21 @@ private extension SelectPayTypeView {
         title.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).offset(32)
             $0.leading.equalToSuperview().offset(16)
+        }
+        
+        monthlyRadioButton.snp.makeConstraints {
+            $0.top.equalTo(title.snp.bottom).offset(24)
+            $0.horizontalEdges.equalToSuperview().inset(16)
+        }
+        
+        weeklyRadioButton.snp.makeConstraints {
+            $0.top.equalTo(monthlyRadioButton.snp.bottom).offset(12)
+            $0.horizontalEdges.equalToSuperview().inset(16)
+        }
+        
+        dailyRadioButton.snp.makeConstraints {
+            $0.top.equalTo(weeklyRadioButton.snp.bottom).offset(12)
+            $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
         registerButton.snp.makeConstraints {

@@ -7,16 +7,23 @@
 
 import UIKit
 import SnapKit
+import RxSwift
 
 final class SelectPayTypeViewController: UIViewController {
     
     // MARK: - Properties
     private let selectPayTypeView = SelectPayTypeView()
-    // private let viewModel: <#ViewModel#>
+    private let viewModel: SelectPayTypeViewModel
+    private let disposeBag = DisposeBag()
     
     // MARK: - Lifecycle
     override func loadView() {
         self.view = selectPayTypeView
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.resetToConfirmedPayTypeIfNeeded()
     }
     
     // VC일 때
@@ -27,7 +34,8 @@ final class SelectPayTypeViewController: UIViewController {
     
     // MARK: - Initializer
     
-    init() {
+    init(viewModel: SelectPayTypeViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -39,6 +47,7 @@ final class SelectPayTypeViewController: UIViewController {
     @objc
     private func didTapBack() {
         print("Back 버튼 클릭")
+        viewModel.resetSelectedPayType()
         navigationController?.popViewController(animated: true)
     }
 }
@@ -60,7 +69,60 @@ private extension SelectPayTypeViewController {
         setNavigationBar(title: "급여 유형", backAction: #selector(didTapBack))
     }
     func setConstraints() { }
-    func setActions() { }
-    func setBinding() { }
-    
+    func setActions() {
+        let radioButtons: [(RadioButtonView, String)] = [
+            (selectPayTypeView.getMonthlyRadioButton, "매월"),
+            (selectPayTypeView.getWeeklyRadioButton, "매주"),
+            (selectPayTypeView.getDailyRadioButton, "매일")
+        ]
+
+        radioButtons.forEach { (button, type) in
+            button.rx.tap
+                .bind { [weak self] in
+                    self?.viewModel.didSelectPayType.onNext(type)
+                }
+                .disposed(by: disposeBag)
+        }
+
+        selectPayTypeView.getRegisterButton.rx.tap
+            .bind { [weak self] in
+                self?.viewModel.didTapConfirm.onNext(())
+                self?.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+    }
+    func setBinding() {
+        let radioButtons: [(RadioButtonView, String)] = [
+            (selectPayTypeView.getMonthlyRadioButton, "매월"),
+            (selectPayTypeView.getWeeklyRadioButton, "매주"),
+            (selectPayTypeView.getDailyRadioButton, "매일")
+        ]
+
+        viewModel.isPayTypeSelected
+            .drive(onNext: { [weak self] isSelected in
+                self?.selectPayTypeView.getRegisterButton.isEnabled = isSelected
+                self?.selectPayTypeView.getRegisterButton.update(title: "완료", isSecondary: false)
+            })
+            .disposed(by: disposeBag)
+
+        viewModel.selectedPayType
+            .observe(on: MainScheduler.instance)
+            .compactMap { $0 }
+            .bind { selected in
+                radioButtons.forEach { (button, type) in
+                    button.setSelected(type == selected)
+                }
+            }
+            .disposed(by: disposeBag)
+
+        viewModel.confirmedPayType
+            .take(1)
+            .observe(on: MainScheduler.instance)
+            .bind { confirmed in
+                radioButtons.forEach { (button, type) in
+                    button.setSelected(type == confirmed)
+                }
+            }
+            .disposed(by: disposeBag)
+    }
 }

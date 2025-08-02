@@ -87,6 +87,10 @@ private extension PayContainerViewController {
                 self?.coordinator?.showInputSalaryType()
             })
             .disposed(by: disposeBag)
+        
+        viewModel.payTypeOutput
+            .drive(payContainerView.getPayTypeInfoRow.rx.labelValue)
+            .disposed(by: disposeBag)
     }
     
 }
