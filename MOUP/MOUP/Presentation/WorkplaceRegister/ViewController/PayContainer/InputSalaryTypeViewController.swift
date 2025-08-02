@@ -7,12 +7,14 @@
 
 import UIKit
 import SnapKit
+import RxSwift
 
 final class InputSalaryTypeViewController: UIViewController {
     
     // MARK: - Properties
     private let inputSalaryTypeView = InputSalaryTypeView()
-    // private let viewModel: <#ViewModel#>
+    private let viewModel: InputSalaryTypeViewModel
+    private let disposeBag = DisposeBag()
     
     // MARK: - Lifecycle
     override func loadView() {
@@ -27,8 +29,9 @@ final class InputSalaryTypeViewController: UIViewController {
     
     // MARK: - Initializer
     
-    init() {
-        super.init(nibName: nil, bundle: nil)
+    init(viewModel: InputSalaryTypeViewModel) {
+            self.viewModel = viewModel
+            super.init(nibName: nil, bundle: nil)
     }
     
     @available(*, unavailable, message: "compile error")
@@ -61,6 +64,14 @@ private extension InputSalaryTypeViewController {
     }
     func setConstraints() { }
     func setActions() { }
-    func setBinding() { }
+    func setBinding() {
+        viewModel.salaryTypeTitleOutput
+            .drive(inputSalaryTypeView.rx.titleText)
+            .disposed(by: disposeBag)
+        
+        viewModel.placeholderText
+            .drive(inputSalaryTypeView.rx.placeholderText)
+            .disposed(by: disposeBag)
+    }
     
 }

@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import Then
+import RxSwift
 
 final class InputSalaryTypeView: UIView {
     // MARK: - Properties
@@ -19,7 +20,17 @@ final class InputSalaryTypeView: UIView {
         $0.font = .headBold(18)
     }
     
+    private let textField = CustomTextField().then {
+        $0.placeholder = "10,030원"
+        $0.returnKeyType = .done
+    }
+    
     private let registerButton = BaseButton(title: "완료", isSecondary: true)
+    
+    // MARK: - Getter
+    var getTitle: UILabel { title }
+    var getTextField: CustomTextField { textField }
+    var getRegisterButton: BaseButton { registerButton }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -34,6 +45,14 @@ final class InputSalaryTypeView: UIView {
     }
     
     // MARK: - Public Methods
+    func updateTitle(_ text: String) {
+        title.text = text
+    }
+    
+    func updatePlaceholder(_ placeholder: String) {
+        textField.placeholder = placeholder
+    }
+
 }
 
 private extension InputSalaryTypeView {
@@ -48,6 +67,7 @@ private extension InputSalaryTypeView {
     func setHierarchy() {
         addSubviews(
             title,
+            textField,
             registerButton
         )
     }
@@ -64,10 +84,29 @@ private extension InputSalaryTypeView {
             $0.leading.equalToSuperview().offset(16)
         }
         
+        textField.snp.makeConstraints {
+            $0.top.equalTo(title.snp.bottom).offset(18)
+            $0.horizontalEdges.equalToSuperview().inset(16)
+        }
+        
         registerButton.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(45)
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(12)
+        }
+    }
+}
+extension Reactive where Base: InputSalaryTypeView {
+    /// 타이틀 텍스트를 바인딩하는 Binder
+    var titleText: Binder<String> {
+        return Binder(base) { view, text in
+            view.updateTitle(text)
+        }
+    }
+    
+    var placeholderText: Binder<String> {
+        Binder(base) { view, text in
+            view.updatePlaceholder(text)
         }
     }
 }
