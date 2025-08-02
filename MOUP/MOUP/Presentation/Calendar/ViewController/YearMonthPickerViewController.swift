@@ -30,7 +30,7 @@ final class YearMonthPickerViewController: UIViewController {
     private let yearMonthPickerView = YearMonthPickerView()
     
     // MARK: - Initializer
-    init(currYear: Int, currMonth: Int, delegate: YearMonthPickerVCDelegate? = nil) {
+    init(currYear: Int, currMonth: Int, delegate: YearMonthPickerVCDelegate) {
         self.focusedYear = currYear
         self.focusedMonth = currMonth
         self.delegate = delegate

@@ -13,8 +13,9 @@ import RxSwift
 
 /// 캘린더 탭 VC
 final class CalendarViewController: UIViewController {
+    
     // MARK: - Properties
-    weak var coordinator: CalendarCoordinator?
+    weak var coordinator: CalendarCoordinatorProtocol?
     
     private let disposeBag = DisposeBag()
     
@@ -25,7 +26,7 @@ final class CalendarViewController: UIViewController {
     private let calendarView = CalendarView()
     
     // MARK: - Initializer
-    init(coordinator: CalendarCoordinator?) {
+    init(coordinator: CalendarCoordinatorProtocol) {
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }

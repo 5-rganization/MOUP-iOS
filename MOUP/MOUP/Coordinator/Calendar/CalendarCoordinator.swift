@@ -20,7 +20,7 @@ final class CalendarCoordinator: CalendarCoordinatorProtocol {
         navigationController.pushViewController(calendarVC, animated: false)
     }
     
-    func showYearMonthPicker(currYear: Int, currMonth: Int, delegate: YearMonthPickerVCDelegate? = nil) {
+    func showYearMonthPicker(currYear: Int, currMonth: Int, delegate: YearMonthPickerVCDelegate) {
         let yearMonthPickerVC = YearMonthPickerViewController(currYear: currYear, currMonth: currMonth, delegate: delegate)
         
         if let sheet = yearMonthPickerVC.sheetPresentationController {
