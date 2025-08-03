@@ -17,7 +17,7 @@ final class FilterCell: UITableViewCell {
     static let identifier = String(describing: FilterCell.self)
     
     // MARK: - UI Components
-    private let workplaceLabel = UILabel().then {
+    private let workplaceNameLabel = UILabel().then {
         $0.text = "전체 보기"
         $0.textColor = .gray500
         $0.font = .headBold(14)
@@ -53,9 +53,14 @@ final class FilterCell: UITableViewCell {
         self.contentView.layer.borderWidth = selected ? 2.0 : 1.0
         self.contentView.layer.borderColor = selected ? UIColor.primary500.cgColor : UIColor.gray400.cgColor
         
-        workplaceLabel.font = selected ? .headBold(14) : .bodyMedium(14)
-        workplaceLabel.textColor = selected ? .primary600 : .gray500
+        workplaceNameLabel.font = selected ? .headBold(14) : .bodyMedium(14)
+        workplaceNameLabel.textColor = selected ? .primary600 : .gray500
         checkImageView.isHidden = !selected
+    }
+    
+    // MARK: - Internal Methods
+    func update(workplaceName: String) {
+        workplaceNameLabel.text = workplaceName
     }
 }
 
@@ -69,7 +74,7 @@ private extension FilterCell {
     
     // MARK: - setHierarchy
     func setHierarchy() {
-        self.contentView.addSubviews(workplaceLabel,
+        self.contentView.addSubviews(workplaceNameLabel,
                                      checkImageView)
     }
     
@@ -86,7 +91,7 @@ private extension FilterCell {
     
     // MARK: - setConstraints
     func setConstraints() {
-        workplaceLabel.snp.makeConstraints {
+        workplaceNameLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
         }

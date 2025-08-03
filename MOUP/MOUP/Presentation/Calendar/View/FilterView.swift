@@ -15,6 +15,9 @@ import Then
 /// 필터 UI
 final class FilterView: UIView {
     
+    // MARK: - Properties
+    fileprivate let disposeBag = DisposeBag()
+    
     // MARK: - UI Components
     /// 모달 핸들 UI
     private let grabberView = ModalGrabberView()
@@ -34,7 +37,7 @@ final class FilterView: UIView {
         $0.font = .headBold(16)
     }
     /// 필터 목록 UI
-    private let filterTableView = UITableView().then {
+    fileprivate let filterTableView = UITableView().then {
         $0.register(FilterCell.self, forCellReuseIdentifier: FilterCell.identifier)
         
         $0.separatorStyle = .none
@@ -137,5 +140,17 @@ private extension FilterView {
 
 // MARK: - Extension Reactive
 extension Reactive where Base: FilterView {
+    var filterTableViewDataSource: Binder<([FilterModel])> {
+        return Binder(base) { view, filterModel in
+            Observable.just(filterModel)
+                .bind(to: view.filterTableView.rx.items(
+                    cellIdentifier: FilterCell.identifier,
+                    cellType: FilterCell.self
+                )) { _, model, cell in
+                    cell.update(workplaceName: model.workplaceName)
+                }.disposed(by: base.disposeBag)
+            
+        }
+    }
     var applyButtonTap: ControlEvent<Void> { base.applyButton.rx.tap }
 }
