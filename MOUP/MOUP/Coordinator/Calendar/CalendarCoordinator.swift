@@ -21,7 +21,8 @@ final class CalendarCoordinator: CalendarCoordinatorProtocol {
     }
     
     func showYearMonthPicker(currYear: Int, currMonth: Int, delegate: YearMonthPickerVCDelegate) {
-        let yearMonthPickerVC = YearMonthPickerViewController(currYear: currYear, currMonth: currMonth, delegate: delegate)
+        let yearMonthPickerVC = YearMonthPickerViewController(currYear: currYear, currMonth: currMonth)
+        yearMonthPickerVC.delegate = delegate
         
         if let sheet = yearMonthPickerVC.sheetPresentationController {
             sheet.detents = [.medium()]
