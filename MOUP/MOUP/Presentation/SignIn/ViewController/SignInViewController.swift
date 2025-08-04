@@ -17,7 +17,7 @@ protocol SignInViewControllerDelegate: AnyObject {
 final class SignInViewController: UIViewController {
     
     // MARK: - Properties
-    private let signInVM = SignInViewModel()
+    private let signInVM: SignInViewModel
     private let signInView = SignInView()
     private let disposeBag = DisposeBag()
     weak var delegate: SignInViewControllerDelegate?
@@ -35,7 +35,8 @@ final class SignInViewController: UIViewController {
     }
     
     // MARK: - Initializer
-    init() {
+    init(signInViewModel: SignInViewModel) {
+        self.signInVM = signInViewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -74,17 +75,19 @@ private extension SignInViewController {
     func setConstraints() { }
     func setActions() { }
     func setBinding() {
-        signInView.rx.googleLoginTap.bind(to: signInVM.googleLoginTapped).disposed(by: disposeBag)
-        signInVM.googleLoginTriggered.subscribe(onNext: { [weak self] _ in
+        signInView.rx.googleLoginTap.subscribe(onNext: { [weak self] _ in
             guard let self else { return }
-            print("VC - 구글로그인 시도됨")
+            print("VC - 구글 로그인 시도됨")
             self.signInGoogle()
-        }).disposed(by: disposeBag)
+        })
+        .disposed(by: disposeBag)
     }
 
     // MARK: - signInGoogle
     func signInGoogle() {
-        GIDSignIn.sharedInstance.signIn(withPresenting: self) { result, error in
+        GIDSignIn.sharedInstance.signIn(withPresenting: self) { [weak self] result, error in
+            guard let self else { return }
+
             if let error {
                 print(error.localizedDescription)
                 return
@@ -96,6 +99,7 @@ private extension SignInViewController {
                 return
             }
 
+            signInVM.googleLoginTriggered.accept(SignInRequestDTO(provider: "LOGIN_GOOGLE", providerId: identityToken))
             print("user: \(user)\nidToken: \(identityToken)")
         }
     }
