@@ -15,7 +15,7 @@ final class GoogleAuthRepository: GoogleAuthRepositoryProtocol {
     }
 
     // MARK: - Methods
-    func signInWithGoogle(provider: String, providerId: String) async -> loginResponseEnum {
-        return await googleAuthService.signInWithGoogle(provider: provider, providerId: providerId)
+    func signInWithGoogle(requestDTO: SignInRequestDTO) async -> LoginResponseEnum {
+        return await googleAuthService.signInWithGoogle(requestDTO: requestDTO)
     }
 }

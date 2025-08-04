@@ -9,7 +9,7 @@ import Foundation
 import Alamofire
 
 enum GoogleAuthRouter {
-    case signIn(provider: String, providerId: String)
+    case signIn(SignInRequestDTO)
 }
 
 extension GoogleAuthRouter: URLRequestConvertible {
@@ -36,10 +36,10 @@ extension GoogleAuthRouter: URLRequestConvertible {
 
     var parameters: Parameters? {
         switch self {
-        case .signIn(let provider, let providerId):
+        case .signIn(let signInRequestDTO):
             return [
-                "provider": provider,
-                "providerId": providerId
+                "provider": signInRequestDTO.provider,
+                "providerId": signInRequestDTO.providerId
             ]
         }
     }
@@ -53,6 +53,7 @@ extension GoogleAuthRouter: URLRequestConvertible {
 
     func asURLRequest() throws -> URLRequest {
         let url = baseURL.appendingPathComponent(path)
+        print("최종 url: \(url)")
         var request = try URLRequest(url: url, method: method)
         request = try encoding.encode(request, with: parameters)
         return request

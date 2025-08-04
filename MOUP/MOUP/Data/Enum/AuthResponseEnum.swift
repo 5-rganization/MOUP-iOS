@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum loginResponseEnum {
+enum LoginResponseEnum {
     case success // 성공, 200
     case notMember // 회원이 아닐 시, 404
     case failure(Error)

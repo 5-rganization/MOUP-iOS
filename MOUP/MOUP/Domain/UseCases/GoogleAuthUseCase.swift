@@ -15,7 +15,7 @@ final class GoogleAuthUseCase: GoogleAuthUseCaseProtocol {
     }
 
     // MARK: - Methods
-    func signInWithGoogle(provider: String, providerId: String) async -> loginResponseEnum {
-        return await googleAuthRepository.signInWithGoogle(provider: "LOGIN_GOOGLE", providerId: providerId)
+    func signInWithGoogle(requestDTO: SignInRequestDTO) async -> LoginResponseEnum {
+        return await googleAuthRepository.signInWithGoogle(requestDTO: requestDTO)
     }
 }

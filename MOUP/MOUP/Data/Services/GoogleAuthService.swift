@@ -9,13 +9,20 @@ import Foundation
 import Alamofire
 
 protocol GoogleAuthServiceProtocol {
-    func signInWithGoogle(provider: String, providerId: String) async -> loginResponseEnum
+    func signInWithGoogle(requestDTO: SignInRequestDTO) async -> LoginResponseEnum
 }
 
 final class GoogleAuthService: GoogleAuthServiceProtocol {
-    func signInWithGoogle(provider: String, providerId: String) async -> loginResponseEnum {
-        let response = await AF.request(GoogleAuthRouter.signIn(provider: provider, providerId: providerId))
-            .serializingResponse(using: .data).response
+    func signInWithGoogle(requestDTO: SignInRequestDTO) async -> LoginResponseEnum {
+        let request = AF.request(GoogleAuthRouter.signIn(requestDTO))
+        let response = await request.serializingResponse(using: .data).response
+
+        if let data = response.data,
+           let bodyString = String(data: data, encoding: .utf8) {
+            print("Response body: \(bodyString)")
+        } else {
+            print("Response body is nil or not utf8 decodable")
+        }
 
         if let error = response.error {
             return .failure(NetworkError.invalidResponse(error))

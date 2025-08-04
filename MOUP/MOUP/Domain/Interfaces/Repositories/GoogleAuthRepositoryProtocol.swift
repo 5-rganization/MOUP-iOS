@@ -8,5 +8,5 @@
 import Foundation
 
 protocol GoogleAuthRepositoryProtocol: AnyObject {
-    func signInWithGoogle(provider: String, providerId: String) async -> loginResponseEnum
+    func signInWithGoogle(requestDTO: SignInRequestDTO) async -> LoginResponseEnum
 }
