@@ -8,5 +8,5 @@
 import Foundation
 
 enum NetworkConstants {
-    static let baseURL = Bundle.main.infoDictionary?["Base URL"] as? String ?? ""
+    static let baseURL = Bundle.main.infoDictionary?["BaseURL"] as? String ?? ""
 }
