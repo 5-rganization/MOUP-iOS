@@ -13,7 +13,7 @@ final class ColorLabelContainerView: UIView {
     private let container = ContainerView()
     
     // MARK: - UI Components
-    private let colorLabelInfoRow = InfoRowView(title: "", type: .colorWithChevron(color: .labelRed, title: "빨간색"), frame: .zero)
+    private let colorLabelInfoRow = InfoRowView(title: "", type: .colorWithChevron(color: .labelRed, title: "빨강색"), frame: .zero)
     
     // MARK: - 라벨 타이틀
     private let colorLabelTitle = UILabel().then {

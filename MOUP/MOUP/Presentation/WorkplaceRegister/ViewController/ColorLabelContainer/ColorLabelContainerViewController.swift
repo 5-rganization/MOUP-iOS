@@ -70,5 +70,15 @@ private extension ColorLabelContainerViewController {
                 self?.coordinator?.showSelectColorLabel()
             })
             .disposed(by: disposeBag)
+        
+        viewModel.selectedColorLabel
+            .drive(colorLabelContainerView.getColorLabelInfoRow.rx.colorTitle)
+            .disposed(by: disposeBag)
+
+        viewModel.selectedColorLabel
+            .map { $0.toUIColor() }
+            .drive(colorLabelContainerView.getColorLabelInfoRow.rx.colorDot)
+            .disposed(by: disposeBag)
+
     }
 }
