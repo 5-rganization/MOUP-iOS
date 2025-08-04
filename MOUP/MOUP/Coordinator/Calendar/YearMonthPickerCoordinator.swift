@@ -51,6 +51,10 @@ final class YearMonthPickerCoordinator: Coordinator {
 
 // MARK: - YearMonthPickerVCDelegate
 extension YearMonthPickerCoordinator: YearMonthPickerVCDelegate {
+    func dismissGestureReceived() {
+        delegate?.cancelled(self)
+    }
+    
     func cancelButtonTapped() {
         delegate?.cancelled(self)
     }

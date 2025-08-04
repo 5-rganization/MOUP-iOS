@@ -11,8 +11,9 @@ import RxCocoa
 import RxSwift
 import Then
 
-/// `YearMonthPickerViewController`의 이벤트 및 데이터를 `CalendarViewController`로 넘겨주는 Delegate
+/// `YearMonthPickerViewController`의 이벤트를 `YearMonthPickerCoordinator`에 알리는 Delegate
 protocol YearMonthPickerVCDelegate: AnyObject {
+    func dismissGestureReceived()
     func cancelButtonTapped()
     func gotoButtonTapped(focusedYear: Int, focusedMonth: Int)
 }
@@ -59,6 +60,16 @@ final class YearMonthPickerViewController: UIViewController {
     }
 }
 
+// MARK: - Private Methods
+private extension YearMonthPickerViewController {
+    func setDefaultSelect(currYear: Int, currMonth: Int) {
+        let yearRow = currYear - CalendarRange.startYear
+        let monthRow = currMonth - 1
+        yearMonthPickerView.getPickerView.selectRow(yearRow, inComponent: PickerViewComponents.year, animated: false)
+        yearMonthPickerView.getPickerView.selectRow(monthRow, inComponent: PickerViewComponents.month, animated: false)
+    }
+}
+
 private extension YearMonthPickerViewController {
     // MARK: - configure
     func configure() {
@@ -74,6 +85,8 @@ private extension YearMonthPickerViewController {
     
     // MARK: - setDelegates
     func setDelegates() {
+        self.presentationController?.delegate = self
+        
         yearMonthPickerView.getPickerView.dataSource = self
         yearMonthPickerView.getPickerView.delegate = self
     }
@@ -135,12 +148,9 @@ extension YearMonthPickerViewController: UIPickerViewDelegate {
     }
 }
 
-// MARK: - Private Methods
-private extension YearMonthPickerViewController {
-    func setDefaultSelect(currYear: Int, currMonth: Int) {
-        let yearRow = currYear - CalendarRange.startYear
-        let monthRow = currMonth - 1
-        yearMonthPickerView.getPickerView.selectRow(yearRow, inComponent: PickerViewComponents.year, animated: false)
-        yearMonthPickerView.getPickerView.selectRow(monthRow, inComponent: PickerViewComponents.month, animated: false)
+// MARK: - UIAdaptivePresentationControllerDelegate
+extension YearMonthPickerViewController: UIAdaptivePresentationControllerDelegate {
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        delegate?.dismissGestureReceived()
     }
 }
