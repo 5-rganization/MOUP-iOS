@@ -11,6 +11,12 @@ import RxCocoa
 import RxSwift
 import Then
 
+/// `YearMonthPickerViewController`의 이벤트 및 데이터를 `CalendarViewController`로 넘겨주는 Delegate
+protocol YearMonthPickerVCDelegate: AnyObject {
+    func cancelButtonTapped()
+    func gotoButtonTapped(focusedYear: Int, focusedMonth: Int)
+}
+
 final class YearMonthPickerViewController: UIViewController {
     
     // MARK: - Properties
@@ -76,13 +82,12 @@ private extension YearMonthPickerViewController {
     func setBinding() {
         yearMonthPickerView.rx.cancelButtonTap
             .subscribe(with: self) { owner, _ in
-                owner.dismiss(animated: true)
+                owner.delegate?.cancelButtonTapped()
             }.disposed(by: disposeBag)
         
         yearMonthPickerView.rx.gotoButtonTap
             .subscribe(with: self, onNext: { owner, _ in
                 owner.delegate?.gotoButtonTapped(focusedYear: owner.focusedYear, focusedMonth: owner.focusedMonth)
-                owner.dismiss(animated: true)
             }).disposed(by: disposeBag)
     }
 }

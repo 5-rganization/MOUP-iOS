@@ -15,7 +15,7 @@ import RxSwift
 final class CalendarViewController: UIViewController {
     
     // MARK: - Properties
-    weak var coordinator: CalendarCoordinatorProtocol?
+    weak var coordinator: CalendarCoordinator?
     
     private let disposeBag = DisposeBag()
     
@@ -26,7 +26,7 @@ final class CalendarViewController: UIViewController {
     private let calendarView = CalendarView()
     
     // MARK: - Initializer
-    init(coordinator: CalendarCoordinatorProtocol) {
+    init(coordinator: CalendarCoordinator) {
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
@@ -44,6 +44,13 @@ final class CalendarViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
+    }
+    
+    // MARK: - Internal Methods
+    func updateYearMonth(focusedYear: Int, focusedMonth: Int) {
+        let formattedMonth = String(format: "%.2d", focusedMonth)
+        guard let date = DateFormatter.dataSourceDateFormatter.date(from: "\(focusedYear).\(formattedMonth).01") else { return }
+        calendarController.scrollToDate(date: date)
     }
 }
 
@@ -76,16 +83,7 @@ private extension CalendarViewController {
                       let currYear = Int(title.prefix(4)),
                       let currMonth = Int(title.suffix(2)) else { return }
                 
-                owner.coordinator?.showYearMonthPicker(currYear: currYear, currMonth: currMonth, delegate: self)
+                owner.coordinator?.showYearMonthPickerVC(currYear: currYear, currMonth: currMonth)
             }.disposed(by: disposeBag)
-    }
-}
-
-// MARK: - YearMonthPickerVCDelegate
-extension CalendarViewController: YearMonthPickerVCDelegate {
-    func gotoButtonTapped(focusedYear: Int, focusedMonth: Int) {
-        let formattedMonth = String(format: "%.2d", focusedMonth)
-        guard let date = DateFormatter.dataSourceDateFormatter.date(from: "\(focusedYear).\(formattedMonth).01") else { return }
-        calendarController.scrollToDate(date: date)
     }
 }
