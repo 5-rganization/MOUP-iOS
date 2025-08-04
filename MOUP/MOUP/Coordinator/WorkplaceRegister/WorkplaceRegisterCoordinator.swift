@@ -14,20 +14,27 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
     private lazy var selectCategoryViewModel = SelectCategoryViewModel()
     private lazy var selectPayTypeViewModel = SelectPayTypeViewModel()
     private lazy var selectPayCalculationViewModel = SelectPayCalculationViewModel()
+    private lazy var selectColorLabelViewModel = SelectColorLabelViewModel()
+    private lazy var payDayPickerViewModel = PayDayPickerViewModel()
     private lazy var inputSalaryTypeViewModel = InputSalaryTypeViewModel(confirmedPayCalculation: selectPayCalculationViewModel.confirmedPayCalculation)
     private lazy var workplaceContainerviewModel = WorkplaceContainerViewModel(inputNameViewModel: inputNameViewModel, selectCategoryViewModel: selectCategoryViewModel)
-    private lazy var payContainerViewModel = PayContainerViewModel(selectPayTypeViewModel: selectPayTypeViewModel, selectPayCalculationViewModel: selectPayCalculationViewModel, inputSalaryTypeViewModel: inputSalaryTypeViewModel)
+    private lazy var payContainerViewModel = PayContainerViewModel(selectPayTypeViewModel: selectPayTypeViewModel, selectPayCalculationViewModel: selectPayCalculationViewModel, inputSalaryTypeViewModel: inputSalaryTypeViewModel, payDayPickerViewModel: payDayPickerViewModel)
     private let workingConditionsContainerViewModel = WorkingConditionsContainerViewModel()
-    private let colorLabelContainerViewModel = ColorLabelContainerViewModel()
+    private lazy var colorLabelContainerViewModel = ColorLabelContainerViewModel(selectColorLabelViewModel: selectColorLabelViewModel)
     
     func start() {
+        let viewModel = WorkplaceRegisterViewModel(
+            workplaceVM: workplaceContainerviewModel,
+            payVM: payContainerViewModel,
+            workingConditionsVM: workingConditionsContainerViewModel,
+            colorLabelVM: colorLabelContainerViewModel
+        )
+        
         let vc = WorkplaceRegisterViewController(
-            workplaceContainerViewModel: workplaceContainerviewModel,
-            payContainerViewModel: payContainerViewModel,
-            workingConditionsContainerViewModel: workingConditionsContainerViewModel,
-            colorLabelContainerViewModel: colorLabelContainerViewModel,
+            viewModel: viewModel,
             coordinator: self
         )
+        
         navigationController.pushViewController(vc, animated: false)
     }
     
@@ -61,7 +68,13 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
     }
     
     func showSelectColorLabel() {
-        let vc = SelectColorLabelViewController()
+        let vc = SelectColorLabelViewController(viewModel: selectColorLabelViewModel)
         navigationController.pushViewController(vc, animated: true)
     }
+    
+    func showSelectPayDayPicker() {
+        let vc = PayDayPickerViewController(viewModel: payDayPickerViewModel)
+        navigationController.present(vc, animated: true, completion: nil)
+    }
+
 }

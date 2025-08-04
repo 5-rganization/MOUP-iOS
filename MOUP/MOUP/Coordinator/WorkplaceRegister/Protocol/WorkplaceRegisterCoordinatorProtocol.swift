@@ -11,6 +11,6 @@ protocol WorkplaceRegisterCoordinatorProtocol: Coordinator {
     func showSelectPayType()
     func showSelectPayCalculation()
     func showInputSalaryType()
-    
+    func showSelectPayDayPicker()
     func showSelectColorLabel()
 }

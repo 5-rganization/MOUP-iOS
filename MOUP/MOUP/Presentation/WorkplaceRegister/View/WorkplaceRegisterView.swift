@@ -43,6 +43,9 @@ final class WorkplaceRegisterView: UIView {
     var getColorLabelContainerView: ColorLabelContainerView {
         colorLabelContainerView
     }
+    var getRegisterButton: BaseButton {
+        registerButton
+    }
 
     // MARK: - Initializer
     override init(frame: CGRect) {

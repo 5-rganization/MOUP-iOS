@@ -96,6 +96,22 @@ final class InfoRowView: UIView {
         titleLabel.text = newTitle
     }
     
+    func updateColorTitle(to title: String) {
+        guard case .colorWithChevron = rowType else { return }
+        titleLabel.text = title
+    }
+    
+    func updateColorDot(with color: UIColor) {
+        guard case .colorWithChevron = rowType else { return }
+        colorDotView.backgroundColor = color
+    }
+    
+    func updateButtonTitle(to title: String) {
+        guard case .labelWithButton = rowType else { return }
+        actionButton.setTitle(title, for: .normal)
+    }
+
+    
     @objc private func didTapCheckBox() {
         tapRelay.accept(())
     }
@@ -234,6 +250,27 @@ extension Reactive where Base: InfoRowView {
     var labelValue: Binder<String> {
         return Binder(base) { view, value in
             view.updateLabelValue(value)
+        }
+    }
+    
+    /// color title 업데이트 바인딩
+    var colorTitle: Binder<String> {
+        return Binder(base) { view, title in
+            view.updateColorTitle(to: title)
+        }
+    }
+
+    /// color dot 색상 바인딩
+    var colorDot: Binder<UIColor> {
+        return Binder(base) { view, color in
+            view.updateColorDot(with: color)
+        }
+    }
+    
+    /// labelWithButton 타입의 버튼 타이틀 업데이트 바인딩
+    var labelButtonTitle: Binder<String> {
+        return Binder(base) { view, title in
+            view.updateButtonTitle(to: title)
         }
     }
 }
