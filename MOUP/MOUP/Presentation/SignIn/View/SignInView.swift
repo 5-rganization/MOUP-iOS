@@ -6,17 +6,19 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 import SnapKit
 import Then
 
 final class SignInView: UIView {
     // MARK: - Properties
-    
+    private let googleLoginTappedRelay = PublishRelay<Void>()
+
     // MARK: - UI Components
     private let logo = UIImageView().then {
         $0.contentMode = .scaleAspectFit
         $0.image = .logo
-        
     }
     
     private(set) var appleLoginButton = UIButton().then {
@@ -26,7 +28,12 @@ final class SignInView: UIView {
     private(set) var googleLoginButton = UIButton().then {
         $0.setImage(.googleSignInButton, for: .normal)
     }
-    
+
+    // MARK: - Getter
+    var googleLoginTap: Observable<Void> {
+        googleLoginTappedRelay.asObservable()
+    }
+
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -48,6 +55,7 @@ private extension SignInView {
         setHierarchy()
         setStyles()
         setConstraints()
+        setActions()
     }
     
     // MARK: - setHierarchy
@@ -79,5 +87,19 @@ private extension SignInView {
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
     }
+
+    func setActions() {
+        googleLoginButton.addTarget(self, action: #selector(didTapGoogleLogin), for: .touchUpInside)
+    }
+
+    @objc private func didTapGoogleLogin() {
+        googleLoginTappedRelay.accept(())
+    }
 }
 
+extension Reactive where Base: SignInView {
+    // TODO: - 로그인 버튼 tapEvent 구현 및 VC 측 관련 로직 수행
+    var googleLoginTap: ControlEvent<Void> {
+        return ControlEvent(events: base.googleLoginTap)
+    }
+}

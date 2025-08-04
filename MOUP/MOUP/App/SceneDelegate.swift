@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import GoogleSignIn
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -51,6 +52,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
 
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        if let url = URLContexts.first?.url {
 
+            if ((url.scheme?.contains("com.googleusercontent.apps")) != nil) {  //구글 링크인지
+                GIDSignIn.sharedInstance.handle(url)
+            }
+        }
+    }
 }
 
