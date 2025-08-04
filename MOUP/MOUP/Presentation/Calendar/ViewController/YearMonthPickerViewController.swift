@@ -60,16 +60,6 @@ final class YearMonthPickerViewController: UIViewController {
     }
 }
 
-// MARK: - Private Methods
-private extension YearMonthPickerViewController {
-    func setDefaultSelect(currYear: Int, currMonth: Int) {
-        let yearRow = currYear - CalendarRange.startYear
-        let monthRow = currMonth - 1
-        yearMonthPickerView.getPickerView.selectRow(yearRow, inComponent: PickerViewComponents.year, animated: false)
-        yearMonthPickerView.getPickerView.selectRow(monthRow, inComponent: PickerViewComponents.month, animated: false)
-    }
-}
-
 private extension YearMonthPickerViewController {
     // MARK: - configure
     func configure() {
@@ -102,6 +92,16 @@ private extension YearMonthPickerViewController {
             .subscribe(with: self, onNext: { owner, _ in
                 owner.delegate?.gotoButtonTapped(focusedYear: owner.focusedYear, focusedMonth: owner.focusedMonth)
             }).disposed(by: disposeBag)
+    }
+}
+
+// MARK: - Private Methods
+private extension YearMonthPickerViewController {
+    func setDefaultSelect(currYear: Int, currMonth: Int) {
+        let yearRow = currYear - CalendarRange.startYear
+        let monthRow = currMonth - 1
+        yearMonthPickerView.getPickerView.selectRow(yearRow, inComponent: PickerViewComponents.year, animated: false)
+        yearMonthPickerView.getPickerView.selectRow(monthRow, inComponent: PickerViewComponents.month, animated: false)
     }
 }
 
