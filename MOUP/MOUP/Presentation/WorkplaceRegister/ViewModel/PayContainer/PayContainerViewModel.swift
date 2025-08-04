@@ -12,12 +12,14 @@ protocol PayContainerViewModelInput {
     var didTapPayType: AnyObserver<Void> { get }
     var didTapPayCalculation: AnyObserver<Void> { get }
     var didTapSalaryType: AnyObserver<Void> { get }
+    var didTapPayDay: AnyObserver<Void> { get }
 }
 
 protocol PayContainerViewModelOutput {
     var showPayType: Observable<Void> { get }
     var showPayCalculation: Observable<Void> { get }
     var showSalaryType: Observable<Void> { get }
+    var showPayDayPicker: Observable<Void> { get }
 }
 
 final class PayContainerViewModel: PayContainerViewModelInput, PayContainerViewModelOutput {
@@ -26,10 +28,12 @@ final class PayContainerViewModel: PayContainerViewModelInput, PayContainerViewM
     private let didTapPayTypeSubject = PublishSubject<Void>()
     private let didTapPayCalculationSubject = PublishSubject<Void>()
     private let didTapSalaryTypeSubject = PublishSubject<Void>()
+    private let didTapPayDaySubject = PublishSubject<Void>()
     
     var didTapPayType: AnyObserver<Void> { didTapPayTypeSubject.asObserver() }
     var didTapPayCalculation: AnyObserver<Void> { didTapPayCalculationSubject.asObserver() }
     var didTapSalaryType: AnyObserver<Void> { didTapSalaryTypeSubject.asObserver() }
+    var didTapPayDay: AnyObserver<Void> { didTapPayDaySubject.asObserver() }
 
     // Output
     var showPayType: Observable<Void> {
@@ -43,7 +47,12 @@ final class PayContainerViewModel: PayContainerViewModelInput, PayContainerViewM
     var showSalaryType: Observable<Void> {
         didTapSalaryTypeSubject.asObserver()
     }
+    
+    var showPayDayPicker: Observable<Void> {
+        didTapPayDaySubject.asObservable()
+    }
 
+    let payDayOutput: Driver<String>
     let payTypeOutput: Driver<String>
     let payCalculationOutput: Driver<String>
     let salaryTypeTitleOutput: Driver<String>
@@ -52,13 +61,17 @@ final class PayContainerViewModel: PayContainerViewModelInput, PayContainerViewM
     init(
         selectPayTypeViewModel: SelectPayTypeViewModel,
         selectPayCalculationViewModel: SelectPayCalculationViewModel,
-        inputSalaryTypeViewModel: InputSalaryTypeViewModel
+        inputSalaryTypeViewModel: InputSalaryTypeViewModel,
+        payDayPickerViewModel: PayDayPickerViewModel
     ) {
         self.payTypeOutput = selectPayTypeViewModel.confirmedPayType.asDriver(onErrorJustReturn: "")
         self.payCalculationOutput = selectPayCalculationViewModel.confirmedPayCalculation.asDriver(onErrorJustReturn: "")
         self.salaryTypeTitleOutput = selectPayCalculationViewModel.confirmedPayCalculation
             .asDriver(onErrorJustReturn: "")
         self.salaryOutput = inputSalaryTypeViewModel.confirmedSalary
+            .asDriver(onErrorJustReturn: "")
+        self.payDayOutput = payDayPickerViewModel.confirmSelectedDay
+            .map { "\($0)일" }
             .asDriver(onErrorJustReturn: "")
     }
 }
