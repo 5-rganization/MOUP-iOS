@@ -114,12 +114,19 @@ extension PayDayPickerViewController: UIPickerViewDataSource, UIPickerViewDelega
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
+    func pickerView( _ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+        return 44
+    }
+    
+    func pickerView( _ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
+        return 150
+    }
 
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return 31
     }
 
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return "\(row + 1)일"
+        return "\(row + 1)"
     }
 }
