@@ -6,12 +6,15 @@
 //
 
 import UIKit
+import RxSwift
 
 final class DeleteAccountModalViewController: UIViewController {
     
     // MARK: - Properties
     
     private var hasAnimatedIn = false
+    
+    private let disposeBag = DisposeBag()
     
     // MARK: - UI Components
     
@@ -48,6 +51,8 @@ private extension DeleteAccountModalViewController {
         setHierarchy()
         setStyles()
         setConstraints()
+        setBindings()
+        setGestureRecognizers()
     }
     
     // MARK: - setHierarchy
@@ -66,6 +71,51 @@ private extension DeleteAccountModalViewController {
             $0.height.equalTo(348)
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalToSuperview()
+        }
+    }
+    
+    // MARK: - setBindings
+    func setBindings() {
+        deleteAccountModal.rx.cancelButtonTapped
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.animateModalOut {
+                    owner.dismiss(animated: false)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        deleteAccountModal.rx.draggedToDismiss
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.animateModalOut {
+                    owner.dismiss(animated: false)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        deleteAccountModal.rx.deleteAccountButtonTapped
+            .subscribe(onNext: {
+                print("deleteAccountButtonTapped")
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func setGestureRecognizers() {
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(backgroundDidTap(_:))
+        )
+        view.addGestureRecognizer(tapGesture)
+    }
+
+    @objc func backgroundDidTap(_ sender: UITapGestureRecognizer) {
+        let location = sender.location(in: view)
+        
+        if deleteAccountModal.frame.contains(location) == false {
+            animateModalOut {
+                self.dismiss(animated: false)
+            }
         }
     }
 }

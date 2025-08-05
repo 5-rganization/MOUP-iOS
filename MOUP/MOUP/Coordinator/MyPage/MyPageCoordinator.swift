@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class MyPageCoordinator: Coordinator {
+final class MyPageCoordinator: MyPageCoordinatorProtocol {
     var childCoordinators = [Coordinator]()
     let navigationController: UINavigationController
 

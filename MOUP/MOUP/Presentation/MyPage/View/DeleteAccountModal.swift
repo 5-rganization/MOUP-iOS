@@ -6,8 +6,16 @@
 //
 
 import UIKit
+import Then
+import SnapKit
+import RxSwift
+import RxCocoa
 
 final class DeleteAccountModal: UIView {
+    
+    // MARK: - Properties
+    
+    fileprivate let dragToDismissSubject = PublishSubject<Void>()
     
     // MARK: - UI Components
     
@@ -52,7 +60,7 @@ final class DeleteAccountModal: UIView {
         $0.alignment = .center
     }
     
-    private let cancelButton = UIButton().then {
+    fileprivate let cancelButton = UIButton().then {
         $0.titleLabel?.font = .buttonSemibold(18)
         $0.setTitleColor(.gray600, for: .normal)
         $0.setTitle("아뇨, 안할래요", for: .normal)
@@ -61,7 +69,7 @@ final class DeleteAccountModal: UIView {
         $0.clipsToBounds = true
     }
     
-    private let deleteAccountButton = UIButton().then {
+    fileprivate let deleteAccountButton = UIButton().then {
         $0.titleLabel?.font = .buttonSemibold(18)
         $0.setTitleColor(.white, for: .normal)
         $0.setTitle("탈퇴할게요", for: .normal)
@@ -89,6 +97,7 @@ private extension DeleteAccountModal {
         setHierarchy()
         setStyles()
         setConstraints()
+        setGestures()
     }
     
     // MARK: - setHierarchy
@@ -146,5 +155,49 @@ private extension DeleteAccountModal {
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(44)
         }
+    }
+    
+    // MARK: - setGestures()
+    func setGestures() {
+        let panGesture = UIPanGestureRecognizer(
+            target: self,
+            action: #selector(handleDrag(_:))
+        )
+        handleView.addGestureRecognizer(panGesture)
+    }
+    
+    @objc func handleDrag(_ gesture: UIPanGestureRecognizer) {
+        let translation = gesture.translation(in: self)
+
+        switch gesture.state {
+        case .changed:
+            if translation.y > 0 {
+                self.transform = CGAffineTransform(translationX: 0, y: translation.y)
+            }
+        case .ended, .cancelled:
+            if translation.y > 100 {
+                dragToDismissSubject.onNext(())
+            } else {
+                UIView.animate(withDuration: 0.3, animations: {
+                    self.transform = .identity
+                })
+            }
+        default:
+            break
+        }
+    }
+}
+
+extension Reactive where Base: DeleteAccountModal {
+    var cancelButtonTapped: ControlEvent<Void> {
+        base.cancelButton.rx.tap
+    }
+    
+    var draggedToDismiss: ControlEvent<Void> {
+        ControlEvent(events: base.dragToDismissSubject)
+    }
+    
+    var deleteAccountButtonTapped: ControlEvent<Void> {
+        base.deleteAccountButton.rx.tap
     }
 }
