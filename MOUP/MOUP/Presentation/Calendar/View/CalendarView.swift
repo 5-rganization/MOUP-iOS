@@ -39,7 +39,6 @@ final class CalendarView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
-        setCalendarView()
     }
     
     @available(*, unavailable, message: "storyboard is not supported.")
@@ -86,21 +85,6 @@ private extension CalendarView {
             $0.top.equalTo(dayOfTheWeekHStackView.snp.bottom)
             $0.leading.trailing.equalTo(self.safeAreaLayoutGuide)
             $0.bottom.equalTo(self.safeAreaLayoutGuide)
-        }
-    }
-}
-
-// MARK: - Calendar Methods
-
-private extension CalendarView {
-    func setCalendarView() {
-        monthCalendarView.register(CalendarDayCell.self, forCellWithReuseIdentifier: CalendarDayCell.identifier)
-        
-        monthCalendarView.scrollToDate(.now, animateScroll: false)
-        
-        monthCalendarView.visibleDates { [weak self] visibleDates in
-            guard let self, let date = visibleDates.monthDates.first?.date else { return }
-            calendarHeaderView.update(date: date)
         }
     }
 }

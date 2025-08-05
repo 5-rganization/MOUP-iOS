@@ -14,7 +14,6 @@ import RxSwift
 extension ASAuthorizationController: @retroactive HasDelegate {}
 
 final class RxASAuthorizationControllerDelegateProxy: DelegateProxy<ASAuthorizationController, ASAuthorizationControllerDelegate>, DelegateProxyType, ASAuthorizationControllerDelegate {
-    
     static func registerKnownImplementations() {
         self.register {
             RxASAuthorizationControllerDelegateProxy(parentObject: $0,
