@@ -39,7 +39,7 @@ extension GoogleAuthRouter: URLRequestConvertible {
         case .signIn(let signInRequestDTO):
             return [
                 "provider": signInRequestDTO.provider,
-                "providerId": signInRequestDTO.providerId
+                "idToken": signInRequestDTO.idToken
             ]
         }
     }
@@ -56,6 +56,11 @@ extension GoogleAuthRouter: URLRequestConvertible {
         print("최종 url: \(url)")
         var request = try URLRequest(url: url, method: method)
         request = try encoding.encode(request, with: parameters)
+
+        if let body = request.httpBody {
+            print(String(data: body, encoding: .utf8))
+        }
+
         return request
     }
 }

@@ -9,5 +9,5 @@ import Foundation
 
 struct SignInRequestDTO {
     let provider: String
-    let providerId: String
+    let idToken: String
 }

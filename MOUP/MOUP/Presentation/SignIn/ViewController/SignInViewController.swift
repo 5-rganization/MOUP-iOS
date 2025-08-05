@@ -99,7 +99,7 @@ private extension SignInViewController {
                 return
             }
 
-            signInVM.googleLoginTriggered.accept(SignInRequestDTO(provider: "LOGIN_GOOGLE", providerId: identityToken))
+            signInVM.googleLoginTriggered.accept(SignInRequestDTO(provider: "LOGIN_GOOGLE", idToken: identityToken))
             print("user: \(user)\nidToken: \(identityToken)")
         }
     }
