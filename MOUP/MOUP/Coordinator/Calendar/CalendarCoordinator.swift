@@ -26,7 +26,7 @@ final class CalendarCoordinator: Coordinator {
         navigationController.pushViewController(calendarVC, animated: false)
     }
     
-    func showYearMonthPickerVC(currYear: Int, currMonth: Int) {
+    func showYearMonthPicker(currYear: Int, currMonth: Int) {
         let yearMonthCoordinator = YearMonthPickerCoordinator(navigationController: self.navigationController,
                                                               currYear: currYear,
                                                               currMonth: currMonth)
@@ -35,16 +35,11 @@ final class CalendarCoordinator: Coordinator {
         childCoordinators.append(yearMonthCoordinator)
     }
     
-    func showFilterTable() {
-        let filterVC = FilterViewController()
-        
-        if let sheet = filterVC.sheetPresentationController {
-            sheet.detents = [.medium()]
-            sheet.prefersGrabberVisible = false
-            sheet.preferredCornerRadius = 12
-        }
-        
-        navigationController.present(filterVC, animated: true)
+    func showFilter() {
+        let filterCoordinator = FilterCoordinator(navigationController: self.navigationController)
+        filterCoordinator.delegate = self
+        filterCoordinator.start()
+        childCoordinators.append(filterCoordinator)
     }
 }
 
@@ -62,3 +57,16 @@ extension CalendarCoordinator: YearMonthPickerCoordinatorDelegate {
     }
 }
 
+// MARK: - FilterCoordinatorDelegate
+extension CalendarCoordinator: FilterCoordinatorDelegate {
+    func cancelled(_ coordinator: FilterCoordinator) {
+        childCoordinators = childCoordinators.filter { $0 !== coordinator }
+        navigationController.dismiss(animated: true)
+    }
+    
+    func applyFilter(_ coordinator: FilterCoordinator, model: FilterModel?) {
+        childCoordinators = childCoordinators.filter { $0 !== coordinator }
+        
+        navigationController.dismiss(animated: true)
+    }
+}

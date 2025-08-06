@@ -36,7 +36,7 @@ final class FilterView: UIView {
         $0.textColor = .gray900
         $0.font = .headBold(16)
     }
-    /// 필터 목록 UI
+    /// 필터 리스트 UI
     fileprivate let filterTableView = UITableView().then {
         $0.register(FilterCell.self, forCellReuseIdentifier: FilterCell.identifier)
         
@@ -44,7 +44,7 @@ final class FilterView: UIView {
         $0.rowHeight = 52  // 40 + 12(셀 간격)
         $0.sectionHeaderTopPadding = 0.0
     }
-    /// 필터 목록이 없을 때 표시되는 라벨
+    /// 필터 리스트에 아이템이 없을 때 표시되는 라벨
     private let emptyLabel = UILabel().then {
         $0.text = "등록된 공유 캘린더가 없어요"
         $0.textColor = .gray500

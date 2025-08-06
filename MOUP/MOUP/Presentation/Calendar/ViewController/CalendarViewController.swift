@@ -104,7 +104,7 @@ private extension CalendarViewController {
         
         calendarView.getCalendarHeaderView.rx.filterButtonTap
             .subscribe(with: self) { owner, _ in
-                owner.coordinator?.showFilterTable()
+                owner.coordinator?.showFilter()
             }.disposed(by: disposeBag)
         
         // ViewModel 바인딩
