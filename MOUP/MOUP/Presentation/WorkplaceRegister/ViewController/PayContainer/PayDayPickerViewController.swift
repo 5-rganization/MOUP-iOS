@@ -64,7 +64,7 @@ private extension PayDayPickerViewController {
             if #available(iOS 16.0, *) {
                 sheet.detents = [.custom { _ in return 300 }]
                 sheet.prefersGrabberVisible = false
-                sheet.preferredCornerRadius = 16
+                sheet.preferredCornerRadius = 12
             }
         }
     }

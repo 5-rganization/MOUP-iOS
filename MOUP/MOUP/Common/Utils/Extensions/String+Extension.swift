@@ -16,7 +16,7 @@ extension String {
         case "초록색": return .labelGreen
         case "파란색": return .labelBlue
         case "보라색": return .labelPurple
-        case "남색": return .indigoText
+        case "남색": return .labelIndigo
         default: return .clear
         }
     }
