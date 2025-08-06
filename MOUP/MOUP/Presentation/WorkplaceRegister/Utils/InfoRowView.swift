@@ -20,7 +20,7 @@ enum InfoRowType {
 
 final class InfoRowView: UIView {
     // MARK: - Properties
-    private let checkTappedRelay = PublishRelay<Void>()
+    private let tapRelay = PublishRelay<Void>()
     
     // MARK: - UI Components
     private let titleLabel = UILabel().then {
@@ -35,7 +35,7 @@ final class InfoRowView: UIView {
     
     private let chevronButton = UIButton().then {
         $0.setImage(UIImage(named: "ChevronRight"), for: .normal)
-        $0.isUserInteractionEnabled = false
+        $0.isUserInteractionEnabled = true
     }
     
     private let checkBox = UIButton().then {
@@ -74,8 +74,8 @@ final class InfoRowView: UIView {
     
     // MARK: - Getter
     var getCheckBox: UIButton { checkBox }
-    var checkTap: Observable<Void> {
-        checkTappedRelay.asObservable()
+    var tap: Observable<Void> {
+        tapRelay.asObservable()
     }
     
     // MARK: - Public Methods
@@ -87,8 +87,41 @@ final class InfoRowView: UIView {
         return checkBox.isSelected
     }
     
+    func updateLabelValue(_ newValue: String) {
+        guard case .labelWithChevron = rowType else { return }
+        valueLabel.text = newValue
+    }
+    
+    func updateTitle(to newTitle: String) {
+        titleLabel.text = newTitle
+    }
+    
+    func updateColorTitle(to title: String) {
+        guard case .colorWithChevron = rowType else { return }
+        titleLabel.text = title
+    }
+    
+    func updateColorDot(with color: UIColor) {
+        guard case .colorWithChevron = rowType else { return }
+        colorDotView.backgroundColor = color
+    }
+    
+    func updateButtonTitle(to title: String) {
+        guard case .labelWithButton = rowType else { return }
+        actionButton.setTitle(title, for: .normal)
+    }
+
+    
     @objc private func didTapCheckBox() {
-        checkTappedRelay.accept(())
+        tapRelay.accept(())
+    }
+    
+    @objc private func didTapChevron() {
+        tapRelay.accept(())
+    }
+    
+    @objc private func didTapActionButton() {
+        tapRelay.accept(())
     }
 }
 
@@ -125,11 +158,14 @@ private extension InfoRowView {
             checkBox.addTarget(self, action: #selector(didTapCheckBox), for: .touchUpInside)
         case .labelWithChevron(let value):
             valueLabel.text = value
+            chevronButton.addTarget(self, action: #selector(didTapChevron), for: .touchUpInside)
         case .labelWithButton(let title):
             actionButton.setTitle(title, for: .normal)
+            actionButton.addTarget(self, action: #selector(didTapActionButton), for: .touchUpInside)
         case .colorWithChevron(let color, let title):
             colorDotView.backgroundColor = color
             titleLabel.text = title
+            chevronButton.addTarget(self, action: #selector(didTapChevron), for: .touchUpInside)
             
         }
     }
@@ -199,15 +235,42 @@ private extension InfoRowView {
     }
 }
 extension Reactive where Base: InfoRowView {
-    /// 체크박스 버튼 탭 이벤트
+    /// 버튼 탭 이벤트
     var tap: ControlEvent<Void> {
-        return ControlEvent(events: base.checkTap)
+        return ControlEvent(events: base.tap)
     }
-
+    
     /// 체크박스 선택 상태 바인딩
     var isChecked: Binder<Bool> {
         return Binder(base) { view, isChecked in
             view.setChecked(isChecked)
+        }
+    }
+    
+    var labelValue: Binder<String> {
+        return Binder(base) { view, value in
+            view.updateLabelValue(value)
+        }
+    }
+    
+    /// color title 업데이트 바인딩
+    var colorTitle: Binder<String> {
+        return Binder(base) { view, title in
+            view.updateColorTitle(to: title)
+        }
+    }
+
+    /// color dot 색상 바인딩
+    var colorDot: Binder<UIColor> {
+        return Binder(base) { view, color in
+            view.updateColorDot(with: color)
+        }
+    }
+    
+    /// labelWithButton 타입의 버튼 타이틀 업데이트 바인딩
+    var labelButtonTitle: Binder<String> {
+        return Binder(base) { view, title in
+            view.updateButtonTitle(to: title)
         }
     }
 }

@@ -10,7 +10,7 @@ import Then
 
 final class WorkingConditionsContainerView: UIView {
     // MARK: - Properties
-    private let container = ContainerView()
+    private let fourMajorSocialInsuranceContainer = ContainerView()
     
     // MARK: - 4대보험
     private let fourMajorSocialInsurancesInfoRow = InfoRowView(title: "4대 보험", type: .checkBox(isChecked: false), frame: .zero)
@@ -24,6 +24,9 @@ final class WorkingConditionsContainerView: UIView {
     private let industrialAccidentCompensationInsuranceInfoRow = InfoRowView(title: "산재보험", type: .checkBox(isChecked: false), frame: .zero)
     // MARK: - 소득세
     private let incomeTaxInfoRow = InfoRowView(title: "소득세", type: .checkBox(isChecked: false), frame: .zero)
+    
+    private let AllowanceOptionsContainer = ContainerView()
+    
     // MARK: - 주휴수당
     private let weeklyHolidayAllowanceInfoRow = InfoRowView(title: "주휴수당", type: .checkBox(isChecked: false), frame: .zero)
     // MARK: - 야간수당
@@ -52,10 +55,6 @@ final class WorkingConditionsContainerView: UIView {
     }
     
     private let divider6 = UIView().then {
-        $0.backgroundColor = .gray400
-    }
-    
-    private let divider7 = UIView().then {
         $0.backgroundColor = .gray400
     }
     
@@ -112,23 +111,27 @@ private extension WorkingConditionsContainerView {
     func setHierarchy() {
         addSubviews(
             workplaceTitle,
-            container
+            fourMajorSocialInsuranceContainer,
+            AllowanceOptionsContainer
+            
         )
         
-        container.addSubviews(
+        fourMajorSocialInsuranceContainer.addSubviews(
             divider1,
             divider2,
             divider3,
             divider4,
             divider5,
-            divider6,
-            divider7,
             fourMajorSocialInsurancesInfoRow,
             nationalPensionInfoRow,
             nationalHealthInsuranceInfoRow,
             employmentInsuranceInfoRow,
             industrialAccidentCompensationInsuranceInfoRow,
-            incomeTaxInfoRow,
+            incomeTaxInfoRow
+        )
+        
+        AllowanceOptionsContainer.addSubviews(
+            divider6,
             weeklyHolidayAllowanceInfoRow,
             nightShiftAllowanceInfoRow
         )
@@ -149,10 +152,10 @@ private extension WorkingConditionsContainerView {
         }
         
         // MARK: - 컨테이너
-        container.snp.makeConstraints {
+        fourMajorSocialInsuranceContainer.snp.makeConstraints {
             $0.top.equalTo(workplaceTitle.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.bottom.equalTo(nightShiftAllowanceInfoRow.snp.bottom)
+            $0.bottom.equalTo(incomeTaxInfoRow.snp.bottom)
         }
 
         // MARK: - 4대 보험
@@ -220,20 +223,21 @@ private extension WorkingConditionsContainerView {
             $0.top.equalTo(divider5.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
         }
-
-        divider6.snp.makeConstraints {
-            $0.top.equalTo(incomeTaxInfoRow.snp.bottom)
-            $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(1)
+        
+        // MARK: - 컨테이너
+        AllowanceOptionsContainer.snp.makeConstraints {
+            $0.top.equalTo(fourMajorSocialInsuranceContainer.snp.bottom).offset(12)
+            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.bottom.equalTo(nightShiftAllowanceInfoRow.snp.bottom)
         }
 
         // MARK: - 주휴수당
         weeklyHolidayAllowanceInfoRow.snp.makeConstraints {
-            $0.top.equalTo(divider6.snp.bottom)
+            $0.top.equalToSuperview()
             $0.horizontalEdges.equalToSuperview()
         }
 
-        divider7.snp.makeConstraints {
+        divider6.snp.makeConstraints {
             $0.top.equalTo(weeklyHolidayAllowanceInfoRow.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(1)
@@ -241,12 +245,12 @@ private extension WorkingConditionsContainerView {
 
         // MARK: - 야간수당
         nightShiftAllowanceInfoRow.snp.makeConstraints {
-            $0.top.equalTo(divider7.snp.bottom)
+            $0.top.equalTo(divider6.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
         }
 
         self.snp.makeConstraints {
-            $0.bottom.equalTo(container.snp.bottom).offset(0)
+            $0.bottom.equalTo(AllowanceOptionsContainer.snp.bottom).offset(0)
         }
     }
 
