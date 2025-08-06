@@ -10,6 +10,7 @@ import UIKit
 import RxCocoa
 import RxSwift
 
+/// `FilterViewController`의 이벤트를 `FilterCoordinator`에 알리는 Delegate
 protocol FilterVCDelegate: AnyObject {
     func dismissGestureReceived()
     func applyButtonTapped(model: FilterModel?)

@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// `FilterCoordinator`의 화면 전환 이벤트를 `CalendarCoordinator`에 알리는 Delegate
 protocol FilterCoordinatorDelegate: AnyObject {
     func cancelled(_ coordinator: FilterCoordinator)
     func applyFilter(_ coordinator: FilterCoordinator, model: FilterModel?)
