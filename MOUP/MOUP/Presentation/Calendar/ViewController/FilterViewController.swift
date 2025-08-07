@@ -47,6 +47,8 @@ final class FilterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
+        
+        viewModel.viewDidLoad.onNext(())
     }
 }
 
@@ -54,10 +56,43 @@ private extension FilterViewController {
     // MARK: - configure
     func configure() {
         setStyles()
+        setDelegates()
+        setBinding()
     }
     
     // MARK: - setStyles
     func setStyles() {
         self.view.backgroundColor = .primaryBackground
+    }
+    
+    // MARK: - setDelegates
+    func setDelegates() {
+        self.presentationController?.delegate = self
+    }
+    
+    // MARK: - setBinding
+    func setBinding() {
+        // Child View Binding
+        filterView.rx.applyButtonTap.asDriver()
+            .drive(with: self, onNext: { owner, _ in
+                owner.delegate?.applyButtonTapped(model: nil)
+            }).disposed(by: disposeBag)
+        
+        // Inputs
+        filterView.rx.applyButtonTap
+            .bind(to: viewModel.applyButtonTapped)
+            .disposed(by: disposeBag)
+        
+        // Outputs
+        viewModel.filterList.asDriver(onErrorJustReturn: [])
+            .drive(filterView.rx.filterTableViewDataSource)
+            .disposed(by: disposeBag)
+    }
+}
+
+// MARK: - UIAdaptivePresentationControllerDelegate
+extension FilterViewController: UIAdaptivePresentationControllerDelegate {
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        delegate?.dismissGestureReceived()
     }
 }

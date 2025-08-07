@@ -142,6 +142,9 @@ private extension FilterView {
 extension Reactive where Base: FilterView {
     var filterTableViewDataSource: Binder<([FilterModel])> {
         return Binder(base) { view, filterModel in
+            view.filterTableView.dataSource = nil
+            view.filterTableView.delegate = nil
+            
             Observable.just(filterModel)
                 .bind(to: view.filterTableView.rx.items(
                     cellIdentifier: FilterCell.identifier,
@@ -149,7 +152,6 @@ extension Reactive where Base: FilterView {
                 )) { _, model, cell in
                     cell.update(workplaceName: model.workplaceName)
                 }.disposed(by: base.disposeBag)
-            
         }
     }
     var applyButtonTap: ControlEvent<Void> { base.applyButton.rx.tap }

@@ -70,7 +70,7 @@ private extension CalendarViewController {
     func configure() {
         setStyles()
         setDelegates()
-        setBindings()
+        setBinding()
     }
     
     // MARK: - setStyles
