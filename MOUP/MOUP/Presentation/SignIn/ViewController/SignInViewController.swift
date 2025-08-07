@@ -9,18 +9,13 @@ import UIKit
 import RxSwift
 import GoogleSignIn
 
-protocol SignInViewControllerDelegate: AnyObject {
-    func moveToRegistration()
-    func moveToTabBar()
-}
-
 final class SignInViewController: UIViewController {
     
     // MARK: - Properties
     private let signInVM: SignInViewModel
     private let signInView = SignInView()
     private let disposeBag = DisposeBag()
-    weak var delegate: SignInViewControllerDelegate?
+    weak var coordinator: SignInCoordinator?
 
     // MARK: - Lifecycle
     
@@ -79,6 +74,13 @@ private extension SignInViewController {
             guard let self else { return }
             print("VC - 구글 로그인 시도됨")
             self.signInGoogle()
+        })
+        .disposed(by: disposeBag)
+
+        signInVM.signInOutputEventRelay.subscribe(onNext: { [weak self] event in
+            guard let self else { return }
+
+
         })
         .disposed(by: disposeBag)
     }

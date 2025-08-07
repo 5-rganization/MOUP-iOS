@@ -8,5 +8,5 @@
 import Foundation
 
 protocol GoogleAuthUseCaseProtocol: AnyObject {
-    func signInWithGoogle(requestDTO: SignInRequestDTO) async -> LoginResponseEnum
+    func signInWithGoogle(requestDTO: SignInRequestDTO) async throws
 }

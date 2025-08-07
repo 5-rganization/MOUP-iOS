@@ -26,9 +26,13 @@ final class SignInCoordinator: Coordinator {
 
     func start() {
         let signInViewController = SignInViewController(signInViewModel: signInViewModel)
+        signInViewController.coordinator = self
 
         let nav = UINavigationController(rootViewController: signInViewController)
         window.rootViewController = signInViewController
         window.makeKeyAndVisible()
     }
+
+    func moveToRegistration() {}
+    func moveToTabBar() {}
 }
