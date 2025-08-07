@@ -28,8 +28,8 @@ final class FilterViewModel: FilterViewModelInput, FilterViewModelOutput {
     private let disposeBag = DisposeBag()
     
     // MARK: - Inputs
-    private let applyButtonTappedSubject = PublishSubject<Void>()
     private let viewDidLoadSubject = PublishSubject<Void>()
+    private let applyButtonTappedSubject = PublishSubject<Void>()
     
     var viewDidLoad: AnyObserver<Void> { viewDidLoadSubject.asObserver() }
     var applyButtonTapped: AnyObserver<Void> { applyButtonTappedSubject.asObserver() }
