@@ -35,11 +35,19 @@ public extension Reactive where Base: ASAuthorizationController {
         RxASAuthorizationControllerDelegateProxy.proxy(for: base)
     }
     
-    var didCompleteWithAuthorization: Observable<ASAuthorizationCredential> {
+    var didCompleteWithAuthorization: Observable<ASAuthorization> {
         return delegate
             .methodInvoked(#selector(ASAuthorizationControllerDelegate.authorizationController(controller:didCompleteWithAuthorization:)))
             .map { parameters in
-                return (parameters[1] as! ASAuthorization).credential
+                return parameters[1] as! ASAuthorization
+            }
+    }
+    
+    var didCompleteWithError: Observable<Error> {
+        return delegate
+            .methodInvoked(#selector(ASAuthorizationControllerDelegate.authorizationController(controller:didCompleteWithError:)))
+            .map { parameters in
+                return parameters[1] as! Error
             }
     }
 }
