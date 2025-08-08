@@ -13,6 +13,7 @@ import Then
 
 final class SignInView: UIView {
     // MARK: - Properties
+    private let appleLoginTappedRelay = PublishRelay<Void>()
     private let googleLoginTappedRelay = PublishRelay<Void>()
 
     // MARK: - UI Components
@@ -30,7 +31,10 @@ final class SignInView: UIView {
     }
 
     // MARK: - Getter
-    var googleLoginTap: Observable<Void> {
+    fileprivate var appleLoginTap: Observable<Void> {
+        appleLoginTappedRelay.asObservable()
+    }
+    fileprivate var googleLoginTap: Observable<Void> {
         googleLoginTappedRelay.asObservable()
     }
 
@@ -69,7 +73,7 @@ private extension SignInView {
     
     // MARK: - setStyles
     func setStyles() {
-        backgroundColor = .white
+        backgroundColor = .primaryBackground
     }
     
     // MARK: - setConstraints
@@ -88,11 +92,20 @@ private extension SignInView {
         }
     }
 
+    // MARK: - setActions
     func setActions() {
+        appleLoginButton.addTarget(self, action: #selector(didTapAppleLogin), for: .touchUpInside)
         googleLoginButton.addTarget(self, action: #selector(didTapGoogleLogin), for: .touchUpInside)
     }
+}
 
-    @objc private func didTapGoogleLogin() {
+// MARK: - @objc Methods
+@objc private extension SignInView {
+    func didTapAppleLogin() {
+        appleLoginTappedRelay.accept(())
+    }
+    
+    func didTapGoogleLogin() {
         googleLoginTappedRelay.accept(())
     }
 }
@@ -101,5 +114,8 @@ extension Reactive where Base: SignInView {
     // TODO: - 로그인 버튼 tapEvent 구현 및 VC 측 관련 로직 수행
     var googleLoginTap: ControlEvent<Void> {
         return ControlEvent(events: base.googleLoginTap)
+    }
+    var appleLoginTap: ControlEvent<Void> {
+        return ControlEvent(events: base.appleLoginTap)
     }
 }
