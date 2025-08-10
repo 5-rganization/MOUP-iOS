@@ -14,9 +14,23 @@ final class WorkRegisterView: UIView {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     fileprivate let selectWorkplaceSubject = PublishSubject<Void>()
+    fileprivate let workDateTapSubject = PublishSubject<Void>()
+    fileprivate let repetitionTapSubject = PublishSubject<Void>()
     
     // MARK: - UI Components
-    private let selectWorkplace = InfoRowView(title: "근무지 선택 *", type: .labelWithChevron(value: ""), frame: .zero)
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
+    private let stackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = 12
+        $0.alignment = .fill
+        $0.distribution = .fill
+    }
+    
+    private let selectWorkplace = InfoRowView(title: "근무지 선택", type: .labelWithChevron(value: ""), frame: .zero)
+    private let workDateContainerView = WorkDateContainerView()
+    
+    private let registerButton = BaseButton(title: "등록하기", isSecondary: true)
     
     
     
@@ -47,7 +61,21 @@ private extension WorkRegisterView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
-            selectWorkplace
+            scrollView
+        )
+        
+        scrollView.addSubviews(
+            contentView
+        )
+        
+        contentView.addSubviews(
+            stackView
+        )
+        
+        stackView.addArrangedSubviews(
+            selectWorkplace,
+            workDateContainerView,
+            registerButton
         )
     }
     
@@ -58,10 +86,24 @@ private extension WorkRegisterView {
     
     // MARK: - setConstraints
     func setConstraints() {
-        selectWorkplace.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(20)
-            $0.leading.equalToSuperview().offset(4)
-            $0.trailing.equalToSuperview()
+        scrollView.snp.makeConstraints {
+            $0.edges.equalTo(safeAreaLayoutGuide)
+        }
+        
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalToSuperview()
+        }
+        
+        stackView.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(32)
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(12)
+        }
+        
+        registerButton.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(45)
         }
     }
     
@@ -70,11 +112,28 @@ private extension WorkRegisterView {
         selectWorkplace.rx.tap
             .bind(to: selectWorkplaceSubject)
             .disposed(by: disposeBag)
+        
+        workDateContainerView.rx.dateTap
+            .bind(to: workDateTapSubject)
+            .disposed(by: disposeBag)
+        
+        workDateContainerView.rx.repetitionTap
+            .bind(to: repetitionTapSubject)
+            .disposed(by: disposeBag)
+        
     }
 }
 
 extension Reactive where Base: WorkRegisterView {
     var selectWorkplaceTap: ControlEvent<Void> {
         return ControlEvent(events: base.selectWorkplaceSubject.asObservable())
+    }
+    
+    var workDateTap: ControlEvent<Void> {
+        return ControlEvent(events: base.workDateTapSubject.asObservable())
+    }
+    
+    var repetitionTap: ControlEvent<Void> {
+        return ControlEvent(events: base.repetitionTapSubject.asObservable())
     }
 }

@@ -199,7 +199,7 @@ private extension InfoRowView {
             
             chevronButton.snp.makeConstraints {
                 $0.centerY.equalTo(titleLabel)
-                $0.trailing.equalToSuperview().inset(16)
+                $0.trailing.equalToSuperview().inset(16)	
             }
             
         case .labelWithButton:

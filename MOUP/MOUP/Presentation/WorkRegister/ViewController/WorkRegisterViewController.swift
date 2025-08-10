@@ -76,6 +76,18 @@ private extension WorkRegisterViewController {
                 print("근무지 선택 버튼 클릭")
             })
             .disposed(by: disposeBag)
+        
+        workRegisterView.rx.workDateTap
+            .bind(onNext: {
+                print("날짜 버튼 클릭")
+            })
+            .disposed(by: disposeBag)
+        
+        workRegisterView.rx.repetitionTap
+            .bind(onNext: {
+                print("반복 버튼 클릭")
+            })
+            .disposed(by: disposeBag)
     }
     
 }
