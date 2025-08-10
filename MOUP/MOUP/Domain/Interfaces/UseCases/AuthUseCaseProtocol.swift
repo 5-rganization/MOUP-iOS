@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol GoogleAuthUseCaseProtocol: AnyObject {
+protocol AuthUseCaseProtocol: AnyObject {
     func signInWithGoogle(requestDTO: SignInRequestDTO) async throws
 }

@@ -8,11 +8,11 @@
 import Foundation
 import Alamofire
 
-enum GoogleAuthRouter {
+enum AuthRouter {
     case signIn(SignInRequestDTO)
 }
 
-extension GoogleAuthRouter: URLRequestConvertible {
+extension AuthRouter: URLRequestConvertible {
     var baseURL: URL {
         guard let url = URL(string: NetworkConstants.baseURL) else {
             fatalError("Invalid base URL")

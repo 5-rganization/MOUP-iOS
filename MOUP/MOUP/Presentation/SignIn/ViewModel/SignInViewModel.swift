@@ -18,13 +18,13 @@ enum SignInOutputEvent {
 final class SignInViewModel {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    private let googleAuthUseCase: GoogleAuthUseCaseProtocol
+    private let authUseCase: AuthUseCaseProtocol
 
     let googleLoginTriggered = PublishRelay<SignInRequestDTO>()
     let signInOutputEventRelay = PublishRelay<SignInOutputEvent>()
 
-    init(googleAuthUseCase: GoogleAuthUseCaseProtocol) {
-        self.googleAuthUseCase = googleAuthUseCase
+    init(authUseCase: AuthUseCaseProtocol) {
+        self.authUseCase = authUseCase
         configure()
     }
 }
@@ -41,7 +41,7 @@ private extension SignInViewModel {
             guard let self else { return }
             Task {
                 do {
-                    try await self.googleAuthUseCase.signInWithGoogle(requestDTO: request)
+                    try await self.authUseCase.signInWithGoogle(requestDTO: request)
                 } catch let error as NetworkError {
                     switch error {
                     case .serverError, .noResponse, .invalidResponse(_):

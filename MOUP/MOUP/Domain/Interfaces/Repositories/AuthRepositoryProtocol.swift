@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol GoogleAuthRepositoryProtocol: AnyObject {
+protocol AuthRepositoryProtocol: AnyObject {
     func signInWithGoogle(requestDTO: SignInRequestDTO) async throws -> UserIdentifier
 }

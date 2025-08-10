@@ -8,13 +8,13 @@
 import Foundation
 import Alamofire
 
-protocol GoogleAuthServiceProtocol {
+protocol AuthServiceProtocol {
     func signInWithGoogle(requestDTO: SignInRequestDTO) async throws -> SignInResponseDTO
 }
 
-final class GoogleAuthService: GoogleAuthServiceProtocol {
+final class AuthService: AuthServiceProtocol {
     func signInWithGoogle(requestDTO: SignInRequestDTO) async throws -> SignInResponseDTO {
-        let request = AF.request(GoogleAuthRouter.signIn(requestDTO))
+        let request = AF.request(AuthRouter.signIn(requestDTO))
         let response = await request.serializingDecodable(SignInResponseDTO.self).response
 
         print(response.value)
@@ -27,6 +27,8 @@ final class GoogleAuthService: GoogleAuthServiceProtocol {
             throw NetworkError.noResponse // TODO: - 커스텀 에러를 좀 더 상세하게 나눌 필요가 있어보임.
         }
 
+        print("signInWithGoogle - statusCode : \(statusCode)")
+
         switch statusCode {
         case 200:
             guard let dto = response.value else {
@@ -34,8 +36,10 @@ final class GoogleAuthService: GoogleAuthServiceProtocol {
             }
             return dto
         case 404:
+            print("404 - signInWithGoogle")
             throw AuthError.notMember
         default:
+            print("500 or the other - signInWithGoogle")
             throw NetworkError.serverError
         }
     }

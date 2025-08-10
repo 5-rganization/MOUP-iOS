@@ -7,10 +7,10 @@
 
 import Foundation
 
-final class GoogleAuthUseCase: GoogleAuthUseCaseProtocol {
+final class AuthUseCase: AuthUseCaseProtocol {
     // MARK: - Properties
-    private let googleAuthRepository: GoogleAuthRepositoryProtocol
-    init(googleAuthRepository: GoogleAuthRepositoryProtocol) {
+    private let googleAuthRepository: AuthRepositoryProtocol
+    init(googleAuthRepository: AuthRepositoryProtocol) {
         self.googleAuthRepository = googleAuthRepository
     }
 
