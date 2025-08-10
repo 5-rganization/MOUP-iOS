@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 final class HomeView: UIView {
     // MARK: - Properties
@@ -18,11 +20,6 @@ final class HomeView: UIView {
         $0.image = .homeAppTitle
     }
 
-//    private let refreshButton = UIButton().then {
-//        $0.setImage(.refreshButton, for: .normal)
-//        $0.tintColor = .gray700
-//    }
-
     private let refreshButton = UIButton().then {
         var config = UIButton.Configuration.plain()
         config.contentInsets = NSDirectionalEdgeInsets(top: 13.75, leading: 12.98, bottom: 13.75, trailing: 12.98)
@@ -30,22 +27,30 @@ final class HomeView: UIView {
         $0.configuration = config
     }
 
-    private let totalSalaryCardView = TotalSalaryCardView()
-    private let cardLogoImageView = UIImageView().then {
-        $0.image = .logoIcon
-        $0.alpha = 0.14
+    fileprivate let tableHeaderView = HomeHeaderContainerView(userRole: .worker) // TODO: - 실제 받아온 userRole 반영 필요
+    private lazy var tableView = UITableView().then {
+        $0.backgroundColor = .white
+        $0.estimatedRowHeight = 300
+        $0.rowHeight = UITableView.automaticDimension
     }
 
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)
-
+        print("HomeView init - frame: \(frame)")
         configure()
     }
 
     @available(*, unavailable, message: "storyboard is not supported.")
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented.")
+    }
+
+    // MARK: - layoutSubviews
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        setTableHeaderView()
     }
 
     // MARK: - Public Methods
@@ -61,8 +66,7 @@ private extension HomeView {
 
     // MARK: - setHierarchy
     func setHierarchy() {
-        addSubviews(topBar, totalSalaryCardView)
-        totalSalaryCardView.addSubviews(cardLogoImageView)
+        addSubviews(topBar, tableView)
         topBar.addSubviews(logoImageView, refreshButton)
     }
 
@@ -92,11 +96,30 @@ private extension HomeView {
             $0.size.equalTo(44)
         }
 
-        totalSalaryCardView.snp.makeConstraints {
-            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
-            $0.top.equalTo(topBar.snp.bottom).offset(12)
-            $0.height.equalTo(150)
+        tableView.snp.makeConstraints {
+            $0.top.equalTo(topBar.snp.bottom)
+            $0.directionalHorizontalEdges.bottom.equalToSuperview()
         }
     }
+
+    func setTableHeaderView() {
+        // TODO: - 테이블뷰 셀 상단 영역 8을 그림자를 위해 남겨놨으니 설정 필요
+        tableHeaderView.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 332)
+        tableView.tableHeaderView = tableHeaderView
+    }
+
 }
 
+extension Reactive where Base: HomeView {
+    var todayRoutineCardTap: ControlEvent<Void> {
+        return base.tableHeaderView.rx.todayRoutineCardTap
+    }
+
+    var allRoutineCardTap: ControlEvent<Void> {
+        return base.tableHeaderView.rx.allRoutineCardTap
+    }
+
+    var plusButtonTap: ControlEvent<Void> {
+        return base.tableHeaderView.rx.plusButtonTap
+    }
+}

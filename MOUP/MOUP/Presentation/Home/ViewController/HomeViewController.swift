@@ -6,11 +6,13 @@
 //
 
 import UIKit
+import RxSwift
 
 final class HomeViewController: UIViewController {
     weak var coordinator: HomeCoordinator?
     private let homeViewModel: HomeViewModel
     private let homeView = HomeView()
+    private let disposeBag = DisposeBag()
 
 
     // MARK: - loadView
@@ -36,6 +38,7 @@ final class HomeViewController: UIViewController {
 
         configure()
     }
+
 }
 
 private extension HomeViewController {
@@ -49,6 +52,19 @@ private extension HomeViewController {
     }
 
     func setBindings() {
+        homeView.rx.todayRoutineCardTap.subscribe(onNext: {
+            print("오늘의 루틴 탭")
+        })
+        .disposed(by: disposeBag)
 
+        homeView.rx.allRoutineCardTap.subscribe(onNext: {
+            print("모든 루틴 탭")
+        })
+        .disposed(by: disposeBag)
+
+        homeView.rx.plusButtonTap.subscribe(onNext: {
+            print("플러스 버튼 탭")
+        })
+        .disposed(by: disposeBag)
     }
 }

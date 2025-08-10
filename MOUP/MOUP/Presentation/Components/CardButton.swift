@@ -7,7 +7,8 @@
 
 import UIKit
 
-class CardView: UIView {
+// 보여주기만 하는 카드뷰의 경우 interaction을 false로 설정해 사용
+class CardButton: UIButton {
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -23,7 +24,7 @@ class CardView: UIView {
     // MARK: - Public Methods
 }
 
-private extension CardView {
+private extension CardButton {
     // MARK: - configure
     func configure() {
         setStyles()
