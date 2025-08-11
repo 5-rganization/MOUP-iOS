@@ -6,4 +6,5 @@
 //
 
 protocol WorkRegisterCoordinatorProtocol: Coordinator {
+    func showSelectColorLabel()
 }

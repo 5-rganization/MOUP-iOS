@@ -76,7 +76,7 @@ private extension WorkRoutinContainerView {
     // MARK: - setConstraints
     func setConstraints() {
         routinTitle.snp.makeConstraints {
-            $0.top.equalToSuperview()
+            $0.top.equalToSuperview().offset(12)
             $0.leading.equalToSuperview().offset(16)
         }
         

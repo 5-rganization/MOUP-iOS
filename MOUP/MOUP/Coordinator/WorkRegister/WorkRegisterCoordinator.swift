@@ -10,6 +10,7 @@ import UIKit
 final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
     var childCoordinators = [Coordinator]()
     private let navigationController: UINavigationController
+    private lazy var selectColorLabelViewModel = SelectColorLabelViewModel()
     
     func start() {
         //let viewModel = WorkRegisterViewModel()
@@ -23,5 +24,10 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
     
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
+    }
+    
+    func showSelectColorLabel() {
+        let vc = SelectColorLabelViewController(viewModel: selectColorLabelViewModel)
+        navigationController.pushViewController(vc, animated: true)
     }
 }

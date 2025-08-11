@@ -12,8 +12,8 @@ final class WorkRegisterViewController: UIViewController {
     
     // MARK: - Properties
     private let workRegisterView = WorkRegisterView()
-    private let coordinator: WorkRegisterCoordinatorProtocol
     private let disposeBag = DisposeBag()
+    weak var coordinator: WorkRegisterCoordinatorProtocol?
     
     //private let viewModel: <#ViewModel#>
     
@@ -110,6 +110,13 @@ private extension WorkRegisterViewController {
         workRegisterView.rx.routinTap
             .bind(onNext: {
                 print("루틴 추가 버튼 클릭")
+            })
+            .disposed(by: disposeBag)
+        
+        workRegisterView.rx.colorTap
+            .bind(onNext: {
+                print("컬러 선택 버튼 클릭")
+                self.coordinator?.showSelectColorLabel()
             })
             .disposed(by: disposeBag)
     }
