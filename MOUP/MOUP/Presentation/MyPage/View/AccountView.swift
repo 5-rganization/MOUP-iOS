@@ -24,7 +24,7 @@ final class AccountView: UIView {
     
     // MARK: - UI Components
     
-    private let navigationBar = BaseNavigationBar(title: "계정")
+    fileprivate let navigationBar = BaseNavigationBar(title: "계정")
     
     private let deleteAccountLabel = UILabel().then {
         $0.font = .bodyMedium(16)
@@ -124,6 +124,10 @@ private extension AccountView {
 }
 
 extension Reactive where Base: AccountView {
+    var backButtonTapped: ControlEvent<Void> {
+        base.navigationBar.rx.backBtnTapped
+    }
+    
     var deleteAccountTapped: ControlEvent<Void> {
         ControlEvent(events: base.deleteAccountTapped)
     }

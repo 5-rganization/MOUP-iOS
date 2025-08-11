@@ -39,6 +39,13 @@ private extension AccountViewController {
     
     // MARK: - setBindings
     func setBindings() {
+        accountView.rx.backButtonTapped
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            })
+            .disposed(by: disposeBag)
+        
         accountView.rx.deleteAccountTapped
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
