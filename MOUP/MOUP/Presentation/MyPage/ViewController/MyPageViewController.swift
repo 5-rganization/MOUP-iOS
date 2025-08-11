@@ -67,7 +67,7 @@ private extension MyPageViewController {
                 case .contact:
                     owner.presentContactMailComposer()
                 case .info:
-                    print("info tapped")
+                    owner.coordinator?.showInfoViewController()
                 }
             })
             .disposed(by: disposeBag)

@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class MyPageCoordinator: MyPageCoordinatorProtocol {
+final class MyPageCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     let navigationController: UINavigationController
 
@@ -31,5 +31,26 @@ final class MyPageCoordinator: MyPageCoordinatorProtocol {
         let deleteAccountModalVC = DeleteAccountModalViewController()
         deleteAccountModalVC.modalPresentationStyle = .overFullScreen
         navigationController.present(deleteAccountModalVC, animated: false)
+    }
+    
+    func showInfoViewController() {
+        let infoVC = InfoViewController()
+        infoVC.coordinator = self
+        navigationController.pushViewController(infoVC, animated: true)
+    }
+    
+    func showPolicy(_ kind: PolicyKind) {
+        let policyVC = PolicyViewController(
+            fileName: kind.fileName,
+            title: kind.title
+        )
+        policyVC.coordinator = self
+        navigationController.pushViewController(policyVC, animated: true)
+    }
+    
+    func showOpenSourceLicense() {
+        let openSourceLicenseVC = OpenSourceViewController()
+        openSourceLicenseVC.coordinator = self
+        navigationController.pushViewController(openSourceLicenseVC, animated: true)
     }
 }
