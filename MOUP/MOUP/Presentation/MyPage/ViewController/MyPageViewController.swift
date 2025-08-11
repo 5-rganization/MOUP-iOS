@@ -52,12 +52,6 @@ private extension MyPageViewController {
             })
             .disposed(by: disposeBag)
         
-        mypageView.rx.logoutButtonTapped
-            .subscribe(onNext: {
-                print("logoutButton tapped")
-            })
-            .disposed(by: disposeBag)
-        
         mypageView.rx.menuTapped
             .withUnretained(self)
             .subscribe(onNext: { owner, menu in
@@ -70,6 +64,14 @@ private extension MyPageViewController {
                     owner.coordinator?.showInfoViewController()
                 }
             })
+            .disposed(by: disposeBag)
+        
+        mypageView.rx.logoutButtonTapped
+            .bind(with: self) { owner, _ in
+                owner.coordinator?.showLogoutConfirm(from: owner) {
+                    print("로그아웃 완료")
+                }
+            }
             .disposed(by: disposeBag)
     }
 }

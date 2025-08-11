@@ -53,4 +53,17 @@ final class MyPageCoordinator: Coordinator {
         openSourceLicenseVC.coordinator = self
         navigationController.pushViewController(openSourceLicenseVC, animated: true)
     }
+    
+    func showLogoutConfirm(
+        from vc: UIViewController,
+        onConfirm: @escaping () -> Void
+    ) {
+        let logoutConfirmVC = DeleteAlertViewController(
+            alertTitle: "로그아웃 하시겠어요?",
+            alertMessage: "다시 로그인해야 서비스를 이용할 수 있어요.",
+            deleteButtonTitle: "로그아웃"
+        )
+        logoutConfirmVC.onDeleteConfirmed = onConfirm
+        vc.present(logoutConfirmVC, animated: true)
+    }
 }
