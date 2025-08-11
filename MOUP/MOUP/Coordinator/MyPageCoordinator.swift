@@ -21,6 +21,13 @@ final class MyPageCoordinator: Coordinator {
         navigationController.pushViewController(myPageVC, animated: false)
     }
     
+    func showEditNicknameModal() {
+        let editModalVC = EditModalViewController()
+        editModalVC.modalPresentationStyle = .overFullScreen
+        editModalVC.modalTransitionStyle = .crossDissolve
+        navigationController.present(editModalVC, animated: false)
+    }
+    
     func showAccountViewController() {
         let accountVC = AccountViewController()
         accountVC.coordinator = self

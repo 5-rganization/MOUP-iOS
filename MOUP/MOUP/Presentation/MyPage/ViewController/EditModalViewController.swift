@@ -9,6 +9,7 @@ import UIKit
 import Then
 import SnapKit
 import RxSwift
+import RxCocoa
 
 final class EditModalViewController: UIViewController {
     
@@ -16,7 +17,6 @@ final class EditModalViewController: UIViewController {
     
     private var bottomConstraint: Constraint?
     private let saveButtonDidTapSubject = PublishSubject<Void>()
-    private let viewModel: EditModalViewModel
     var onNicknameSaved: ((String) -> Void)?
     private let disposeBag = DisposeBag()
     
@@ -32,23 +32,12 @@ final class EditModalViewController: UIViewController {
         $0.setImage(UIImage.xMark, for: .normal)
     }
     
-    // MARK: - Initializer
-    
-    init(viewModel: EditModalViewModel) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     // MARK: - Lifecycle
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        editModal.textFieldView.becomeFirstResponder()
+        editModal.focusTextField()
     }
 
     override func viewDidLoad() {
@@ -57,10 +46,6 @@ final class EditModalViewController: UIViewController {
         configure()
         registerKeyboardNotifications()
     }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
 }
 
 private extension EditModalViewController {
@@ -68,7 +53,6 @@ private extension EditModalViewController {
         setHierarchy()
         setStyles()
         setConstraints()
-        setActions()
         setBindings()
     }
     
@@ -101,91 +85,42 @@ private extension EditModalViewController {
     }
     
     private func registerKeyboardNotifications() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(keyboardWillShow(notification:)),
-            name: UIResponder.keyboardWillShowNotification,
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(keyboardWillHide(notification:)),
-            name: UIResponder.keyboardWillHideNotification,
-            object: nil
-        )
-    }
-    
-    @objc private func keyboardWillShow(notification: Notification) {
-        guard let userInfo = notification.userInfo,
-              let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
-              let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double else { return }
-        
-        let keyboardHeight = keyboardFrame.height
-        bottomConstraint?.update(inset: keyboardHeight)
-        
-        UIView.animate(withDuration: animationDuration) {
-            self.view.layoutIfNeeded()
-        }
-    }
-    
-    @objc private func keyboardWillHide(notification: Notification) {
-        guard let userInfo = notification.userInfo,
-              let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double else { return }
-        
-        UIView.animate(withDuration: animationDuration) {
-            self.view.layoutIfNeeded()
-        }
-    }
-    
-    // MARK: - setActions
-    func setActions() {
-        closeButton.addTarget(
-            self,
-            action: #selector(closeButtonDidTap),
-            for: .touchUpInside
-        )
-        
-        editModal.saveButtonView.addTarget(
-            self,
-            action: #selector(saveButtonDidTap),
-            for: .touchUpInside
-        )
-    }
-    
-    @objc func closeButtonDidTap() {
-        dismiss(animated: true)
-    }
-    
-    @objc func saveButtonDidTap() {
-        saveButtonDidTapSubject.onNext(())
+        let willShow = NotificationCenter.default.rx.notification(UIResponder.keyboardWillShowNotification)
+        let willHide = NotificationCenter.default.rx.notification(UIResponder.keyboardWillHideNotification)
+
+        willShow
+            .compactMap { $0.userInfo }
+            .bind(with: self) { owner, info in
+                let frame = info[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect ?? .zero
+                let duration = info[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25
+                let bottomSafe = owner.view.safeAreaInsets.bottom
+                owner.bottomConstraint?.update(inset: max(0, frame.height - bottomSafe + 32))
+                UIView.animate(withDuration: duration) { owner.view.layoutIfNeeded() }
+            }
+            .disposed(by: disposeBag)
+
+        willHide
+            .compactMap { $0.userInfo }
+            .bind(with: self) { owner, info in
+                let duration = info[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25
+                owner.bottomConstraint?.update(inset: 0)
+                UIView.animate(withDuration: duration) { owner.view.layoutIfNeeded() }
+            }
+            .disposed(by: disposeBag)
     }
     
     // MARK: - setBindings
     func setBindings() {
-        let input = EditModalViewModel.Input(
-            textChanged: editModal.textFieldView.rx.text.orEmpty.asObservable(),
-            saveButtonDidTap: saveButtonDidTapSubject.asObservable()
-        )
-
-        let output = viewModel.transform(input: input)
-
-        output.saveCompleted
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] newNickname in
-                self?.onNicknameSaved?(newNickname)
-                self?.dismiss(animated: true)
-            })
+        editModal.rx.saveButtonTapped
+            .bind(with: self) { owner, _ in
+                owner.saveButtonDidTapSubject.onNext(())
+            }
             .disposed(by: disposeBag)
-
-        output.validationError
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] errorMessage in
-                let isValid = errorMessage.isEmpty
-                self?.editModal.updateValidationMessage(
-                    message: isValid ? "사용 가능한 닉네임이에요!" : errorMessage,
-                    isValid: isValid
-                )
-            })
+        
+        closeButton.rx.tap
+            .bind(with: self) { owner, _ in
+                owner.dismiss(animated: false)
+            }
             .disposed(by: disposeBag)
     }
 }

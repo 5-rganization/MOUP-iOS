@@ -47,9 +47,9 @@ private extension MyPageViewController {
     // MARK: - setBindings
     func setBindings() {
         mypageView.rx.editButtonTapped
-            .subscribe(onNext: {
-                print("editButton tapped")
-            })
+            .bind(with: self) { owner, _ in
+                owner.coordinator?.showEditNicknameModal()
+            }
             .disposed(by: disposeBag)
         
         mypageView.rx.menuTapped

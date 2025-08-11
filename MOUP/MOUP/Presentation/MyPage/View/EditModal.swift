@@ -8,6 +8,8 @@
 import UIKit
 import Then
 import SnapKit
+import RxSwift
+import RxCocoa
 
 final class EditModal: UIView {
     
@@ -20,20 +22,8 @@ final class EditModal: UIView {
         $0.textColor = .gray900
     }
     
-    private let textField = UITextField().then {
-        $0.font = .fieldsRegular(16)
-        $0.attributedPlaceholder = NSAttributedString(
-            string: "닉네임을 입력해주세요",
-            attributes: [
-                .foregroundColor: UIColor.gray400,
-                .font: UIFont.fieldsRegular(16)
-            ]
-        )
-        $0.layer.borderWidth = 1
-        $0.layer.borderColor = UIColor.gray400.cgColor
-        $0.layer.cornerRadius = 12
-        $0.clipsToBounds = true
-        $0.setLeftPadding(16)
+    private let textField = CustomTextField().then {
+        $0.placeholder = "닉네임을 입력해주세요"
     }
     
     private let validationLabel = UILabel().then {
@@ -43,7 +33,7 @@ final class EditModal: UIView {
         $0.text = "특수문자 제외 8자 이하로 입력해주세요"
     }
     
-    private let saveButton = UIButton().then {
+    fileprivate let saveButton = UIButton().then {
         $0.setTitle("저장", for: .normal)
         $0.titleLabel?.font = .buttonSemibold(18)
         $0.setTitleColor(.gray500, for: .normal)
@@ -51,10 +41,6 @@ final class EditModal: UIView {
         $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
     }
-    
-    // MARK: - Getter
-    var textFieldView: UITextField { textField }
-    var saveButtonView: UIButton { saveButton }
     
     // MARK: - Initializer
     
@@ -66,6 +52,12 @@ final class EditModal: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Public Methods
+    
+    func focusTextField() {
+        textField.becomeFirstResponder()
     }
     
     func updateValidationMessage(message: String, isValid: Bool) {
@@ -134,5 +126,11 @@ private extension EditModal {
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview().inset(12)
         }
+    }
+}
+
+extension Reactive where Base: EditModal {
+    var saveButtonTapped: ControlEvent<Void> {
+        base.saveButton.rx.tap
     }
 }
