@@ -176,7 +176,7 @@ private extension InfoRowView {
         case .checkBox:
             titleLabel.snp.makeConstraints {
                 $0.top.equalToSuperview().offset(12)
-                $0.leading.equalToSuperview().offset(12)
+                $0.leading.equalToSuperview().offset(16)
                 $0.bottom.equalToSuperview().inset(12)
             }
             
@@ -188,7 +188,7 @@ private extension InfoRowView {
         case .labelWithChevron:
             titleLabel.snp.makeConstraints {
                 $0.top.equalToSuperview().offset(12)
-                $0.leading.equalToSuperview().offset(12)
+                $0.leading.equalToSuperview().offset(16)
                 $0.bottom.equalToSuperview().inset(12)
             }
             
@@ -205,7 +205,7 @@ private extension InfoRowView {
         case .labelWithButton:
             titleLabel.snp.makeConstraints {
                 $0.top.equalToSuperview().offset(12)
-                $0.leading.equalToSuperview().offset(12)
+                $0.leading.equalToSuperview().offset(16)
                 $0.bottom.equalToSuperview().inset(12)
             }
             

@@ -19,6 +19,7 @@ final class WorkRegisterView: UIView {
     fileprivate let clockInTapSubject = PublishSubject<Void>()
     fileprivate let clockOutTapSubject = PublishSubject<Void>()
     fileprivate let lunchBreakTapSubject = PublishSubject<Void>()
+    fileprivate let routinTapSubject = PublishSubject<Void>()
     
     // MARK: - UI Components
     private let scrollView = UIScrollView()
@@ -33,6 +34,7 @@ final class WorkRegisterView: UIView {
     private let selectWorkplace = InfoRowView(title: "근무지 선택", type: .labelWithChevron(value: ""), frame: .zero)
     private let workDateContainerView = WorkDateContainerView()
     private let workTimeContainerView = WorkTimeContainerView()
+    private let workRoutinContainerView = WorkRoutinContainerView()
     
     private let registerButton = BaseButton(title: "등록하기", isSecondary: true)
     
@@ -80,6 +82,7 @@ private extension WorkRegisterView {
             selectWorkplace,
             workDateContainerView,
             workTimeContainerView,
+            workRoutinContainerView,
             registerButton
         )
     }
@@ -138,6 +141,10 @@ private extension WorkRegisterView {
             .bind(to: lunchBreakTapSubject)
             .disposed(by: disposeBag)
         
+        workRoutinContainerView.rx.routinTap
+            .bind(to: routinTapSubject)
+            .disposed(by: disposeBag)
+        
     }
 }
 
@@ -164,5 +171,9 @@ extension Reactive where Base: WorkRegisterView {
     
     var lunchBreakTap: ControlEvent<Void> {
         return ControlEvent(events: base.lunchBreakTapSubject.asObservable())
+    }
+    
+    var routinTap: ControlEvent<Void> {
+        return ControlEvent(events: base.routinTapSubject.asObservable())
     }
 }

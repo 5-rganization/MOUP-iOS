@@ -106,6 +106,12 @@ private extension WorkRegisterViewController {
                 print("휴게 버튼 클릭")
             })
             .disposed(by: disposeBag)
+        
+        workRegisterView.rx.routinTap
+            .bind(onNext: {
+                print("루틴 추가 버튼 클릭")
+            })
+            .disposed(by: disposeBag)
     }
     
 }
