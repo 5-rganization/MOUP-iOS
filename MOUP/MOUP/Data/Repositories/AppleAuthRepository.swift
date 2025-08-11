@@ -6,6 +6,7 @@
 //
 
 final class AppleAuthRepository: AppleAuthRepositoryProtocol {
+    
     // MARK: - Properties
     private let appleAuthService: AppleAuthServiceProtocol
     
@@ -14,12 +15,21 @@ final class AppleAuthRepository: AppleAuthRepositoryProtocol {
         self.appleAuthService = appleAuthService
     }
 
-    // MARK: - Internal Methods
-    func signInWithApple(requestDTO: SignInRequestDTO) async throws -> UserIdentifier {
-        let response = try await appleAuthService.signInWithApple(requestDTO: requestDTO)
+    // MARK: - signIn
+    func signIn(requestDTO: SignInRequestDTO) async throws -> UserIdentifier {
+        let response = try await appleAuthService.signIn(requestDTO: requestDTO)
         guard let userId = response.userId else {
             throw NetworkError.noResponse
         }
+        
+        return UserIdentifier(userId: userId)
+    }
+    
+    // MARK: - register
+    func register(requestDTO: RegisterRequestDTO) async throws -> UserIdentifier {
+        let response = try await appleAuthService.register(requestDTO: requestDTO)
+        let userId = response.userId
+        
         return UserIdentifier(userId: userId)
     }
 }

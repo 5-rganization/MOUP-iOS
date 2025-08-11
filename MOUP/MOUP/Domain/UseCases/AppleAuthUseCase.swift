@@ -8,6 +8,7 @@
 import Foundation
 
 final class AppleAuthUseCase: AppleAuthUseCaseProtocol {
+    
     // MARK: - Properties
     private let appleAuthRepository: AppleAuthRepositoryProtocol
     
@@ -16,10 +17,15 @@ final class AppleAuthUseCase: AppleAuthUseCaseProtocol {
         self.appleAuthRepository = appleAuthRepository
     }
 
-    // MARK: - Methods
-    func signInWithApple(requestDTO: SignInRequestDTO) async throws {
-        let userIdentifier = try await appleAuthRepository.signInWithApple(requestDTO: requestDTO)
-
+    // MARK: - signIn
+    func signIn(requestDTO: SignInRequestDTO) async throws {
+        let userIdentifier = try await appleAuthRepository.signIn(requestDTO: requestDTO)
+        UserDefaultsManager.shared.userId = userIdentifier.userId
+    }
+    
+    // MARK: - register
+    func register(requestDTO: RegisterRequestDTO) async throws {
+        let userIdentifier = try await appleAuthRepository.register(requestDTO: requestDTO)
         UserDefaultsManager.shared.userId = userIdentifier.userId
     }
 }

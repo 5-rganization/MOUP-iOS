@@ -6,5 +6,6 @@
 //
 
 protocol AppleAuthUseCaseProtocol: AnyObject {
-    func signInWithApple(requestDTO: SignInRequestDTO) async throws
+    func signIn(requestDTO: SignInRequestDTO) async throws
+    func register(requestDTO: RegisterRequestDTO) async throws
 }

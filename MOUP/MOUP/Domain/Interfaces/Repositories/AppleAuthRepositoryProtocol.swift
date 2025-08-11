@@ -6,5 +6,6 @@
 //
 
 protocol AppleAuthRepositoryProtocol: AnyObject {
-    func signInWithApple(requestDTO: SignInRequestDTO) async throws -> UserIdentifier
+    func signIn(requestDTO: SignInRequestDTO) async throws -> UserIdentifier
+    func register(requestDTO: RegisterRequestDTO) async throws -> UserIdentifier
 }
