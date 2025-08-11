@@ -88,6 +88,24 @@ private extension WorkRegisterViewController {
                 print("반복 버튼 클릭")
             })
             .disposed(by: disposeBag)
+        
+        workRegisterView.rx.clockInTap
+            .bind(onNext: {
+                print("출근 버튼 클릭")
+            })
+            .disposed(by: disposeBag)
+        
+        workRegisterView.rx.clockOutTap
+            .bind(onNext: {
+                print("퇴근 버튼 클릭")
+            })
+            .disposed(by: disposeBag)
+        
+        workRegisterView.rx.lunchBreakTap
+            .bind(onNext: {
+                print("휴게 버튼 클릭")
+            })
+            .disposed(by: disposeBag)
     }
     
 }

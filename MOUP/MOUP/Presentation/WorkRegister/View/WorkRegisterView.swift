@@ -14,8 +14,11 @@ final class WorkRegisterView: UIView {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     fileprivate let selectWorkplaceSubject = PublishSubject<Void>()
-    fileprivate let workDateTapSubject = PublishSubject<Void>()
+    fileprivate let dateTapSubject = PublishSubject<Void>()
     fileprivate let repetitionTapSubject = PublishSubject<Void>()
+    fileprivate let clockInTapSubject = PublishSubject<Void>()
+    fileprivate let clockOutTapSubject = PublishSubject<Void>()
+    fileprivate let lunchBreakTapSubject = PublishSubject<Void>()
     
     // MARK: - UI Components
     private let scrollView = UIScrollView()
@@ -29,6 +32,7 @@ final class WorkRegisterView: UIView {
     
     private let selectWorkplace = InfoRowView(title: "근무지 선택", type: .labelWithChevron(value: ""), frame: .zero)
     private let workDateContainerView = WorkDateContainerView()
+    private let workTimeContainerView = WorkTimeContainerView()
     
     private let registerButton = BaseButton(title: "등록하기", isSecondary: true)
     
@@ -75,6 +79,7 @@ private extension WorkRegisterView {
         stackView.addArrangedSubviews(
             selectWorkplace,
             workDateContainerView,
+            workTimeContainerView,
             registerButton
         )
     }
@@ -114,11 +119,23 @@ private extension WorkRegisterView {
             .disposed(by: disposeBag)
         
         workDateContainerView.rx.dateTap
-            .bind(to: workDateTapSubject)
+            .bind(to: dateTapSubject)
             .disposed(by: disposeBag)
         
         workDateContainerView.rx.repetitionTap
             .bind(to: repetitionTapSubject)
+            .disposed(by: disposeBag)
+        
+        workTimeContainerView.rx.clockInTap
+            .bind(to: clockInTapSubject)
+            .disposed(by: disposeBag)
+        
+        workTimeContainerView.rx.clockOutTap
+            .bind(to: clockOutTapSubject)
+            .disposed(by: disposeBag)
+        
+        workTimeContainerView.rx.lunchBreakTap
+            .bind(to: lunchBreakTapSubject)
             .disposed(by: disposeBag)
         
     }
@@ -130,10 +147,22 @@ extension Reactive where Base: WorkRegisterView {
     }
     
     var workDateTap: ControlEvent<Void> {
-        return ControlEvent(events: base.workDateTapSubject.asObservable())
+        return ControlEvent(events: base.dateTapSubject.asObservable())
     }
     
     var repetitionTap: ControlEvent<Void> {
         return ControlEvent(events: base.repetitionTapSubject.asObservable())
+    }
+    
+    var clockInTap: ControlEvent<Void> {
+        return ControlEvent(events: base.clockInTapSubject.asObservable())
+    }
+    
+    var clockOutTap: ControlEvent<Void> {
+        return ControlEvent(events: base.clockOutTapSubject.asObservable())
+    }
+    
+    var lunchBreakTap: ControlEvent<Void> {
+        return ControlEvent(events: base.lunchBreakTapSubject.asObservable())
     }
 }
