@@ -5,6 +5,8 @@
 //  Created by 서동환 on 8/8/25.
 //
 
+import OSLog
+
 import Alamofire
 
 protocol AppleAuthServiceProtocol: AnyObject {
@@ -12,9 +14,14 @@ protocol AppleAuthServiceProtocol: AnyObject {
 }
 
 final class AppleAuthService: AppleAuthServiceProtocol {
+    
+    // MARK: - Properties
+    private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
+    
     func signInWithApple(requestDTO: SignInRequestDTO) async throws -> SignInResponseDTO {
         let request = AF.request(AppleAuthRouter.signIn(requestDTO))
         let response = await request.serializingDecodable(SignInResponseDTO.self).response
+        logger.debug("\(String(reflecting: response), privacy: .private)")
         
         if let error = response.error {
             throw NetworkError.invalidResponse(error)
