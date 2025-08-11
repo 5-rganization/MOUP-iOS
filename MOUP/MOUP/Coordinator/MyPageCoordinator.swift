@@ -16,7 +16,9 @@ final class MyPageCoordinator: Coordinator {
     }
 
     func start() {
-        let myPageVC = MyPageViewController()
+        let logoutUseCase = LogoutUseCase()
+        let viewModel = MyPageViewModel(logoutUseCase: logoutUseCase)
+        let myPageVC = MyPageViewController(viewModel: viewModel)
         myPageVC.coordinator = self
         navigationController.pushViewController(myPageVC, animated: false)
     }
@@ -72,5 +74,18 @@ final class MyPageCoordinator: Coordinator {
         )
         logoutConfirmVC.onDeleteConfirmed = onConfirm
         vc.present(logoutConfirmVC, animated: true)
+    }
+    
+    func showLogoutFail(
+        from vc: UIViewController,
+        onConfirm: @escaping () -> Void
+    ) {
+        let logoutFailVC = DeleteAlertViewController(
+            alertTitle: "로그아웃에 실패했어요.",
+            alertMessage: "잠시 후에 다시 시도해주세요.",
+            deleteButtonTitle: "확인"
+        )
+        logoutFailVC.onDeleteConfirmed = onConfirm
+        vc.present(logoutFailVC, animated: true)
     }
 }

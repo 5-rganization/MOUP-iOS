@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import RxCocoa
 import MessageUI
 
 final class MyPageViewController: UIViewController {
@@ -14,9 +15,8 @@ final class MyPageViewController: UIViewController {
     // MARK: - Properties
     
     weak var coordinator: MyPageCoordinator?
-    
     private let mypageView = MyPageView()
-    
+    private let viewModel: MyPageViewModel
     private let disposeBag = DisposeBag()
     
     // MARK: - Lifecycle
@@ -29,6 +29,17 @@ final class MyPageViewController: UIViewController {
         super.viewDidLoad()
         
         configure()
+    }
+    
+    // MARK: - Initializer
+    
+    init(viewModel: MyPageViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
@@ -69,7 +80,33 @@ private extension MyPageViewController {
         mypageView.rx.logoutButtonTapped
             .bind(with: self) { owner, _ in
                 owner.coordinator?.showLogoutConfirm(from: owner) {
-                    print("로그아웃 완료")
+                    owner.viewModel.logoutConfirmed.onNext(())
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        viewModel.isLoading
+            .skip(1)
+            .drive(with: self) { owner, isLoading in
+                if isLoading {
+                    print("로그아웃 중입니다.")
+                } else {
+                    print("로그아웃 종료")
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        viewModel.logoutSuccess
+            .emit(with: self) { owner, _ in
+                print("로그아웃 성공! 로그인 화면으로 이동합니다.")
+            }
+            .disposed(by: disposeBag)
+        
+        viewModel.error
+            .emit(with: self) { owner, message in
+                owner.coordinator?.showLogoutFail(from: owner) {
+                    owner.dismiss(animated: true)
+                    print(message)
                 }
             }
             .disposed(by: disposeBag)
