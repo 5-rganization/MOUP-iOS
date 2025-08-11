@@ -79,7 +79,7 @@ private extension WorkDateContainerView {
         addSubviews(
             workDateTitle,
             container
-            )
+        )
         
         container.addSubviews(
             date,

@@ -37,6 +37,7 @@ final class WorkRegisterView: UIView {
     private let workTimeContainerView = WorkTimeContainerView()
     private let workRoutinContainerView = WorkRoutinContainerView()
     private let colorLabelContainerView = ColorLabelContainerView()
+    private let memoContainerView = MemoContainerView()
     
     private let registerButton = BaseButton(title: "등록하기", isSecondary: true)
     
@@ -77,7 +78,8 @@ private extension WorkRegisterView {
         )
         
         contentView.addSubviews(
-            stackView
+            stackView,
+            registerButton
         )
         
         stackView.addArrangedSubviews(
@@ -86,7 +88,7 @@ private extension WorkRegisterView {
             workTimeContainerView,
             workRoutinContainerView,
             colorLabelContainerView,
-            registerButton
+            memoContainerView
         )
     }
     
@@ -107,13 +109,14 @@ private extension WorkRegisterView {
         }
         
         stackView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(32)
-            $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(12)
+            $0.top.equalToSuperview().offset(20)
+            $0.horizontalEdges.equalToSuperview()
         }
         
         registerButton.snp.makeConstraints {
+            $0.top.equalTo(stackView.snp.bottom).offset(69)
             $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.bottom.equalTo(contentView).inset(12)
             $0.height.equalTo(45)
         }
     }
