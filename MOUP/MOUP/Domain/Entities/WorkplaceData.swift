@@ -7,6 +7,7 @@
 
 struct WorkplaceData {
     // 근무지 정보
+    let id: String
     let name: String
     let category: String
     

@@ -85,6 +85,7 @@ final class WorkplaceRegisterViewModel: WorkplaceRegisterViewModelInput, Workpla
                 ) = second
 
                 return WorkplaceData(
+                    id: "0", // TODO: - 없던 버전으로 바꾸기
                     name: name,
                     category: category,
                     payType: payType,
