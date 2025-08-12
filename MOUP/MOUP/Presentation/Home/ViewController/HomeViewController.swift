@@ -7,12 +7,22 @@
 
 import UIKit
 import RxSwift
+import RxDataSources
 
 final class HomeViewController: UIViewController {
+    // MARK: - Properties
     weak var coordinator: HomeCoordinator?
     private let homeViewModel: HomeViewModel
     private let homeView = HomeView()
     private let disposeBag = DisposeBag()
+
+    private lazy var dataSource = RxTableViewSectionedAnimatedDataSource<HomeTableViewFirstSection>(animationConfiguration: AnimationConfiguration(deleteAnimation: .automatic)) { dataSource, tableView, indexPath, item in
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: WorkerWorkplaceCell.identifier, for: indexPath) as? WorkerWorkplaceCell else {
+            return UITableViewCell()
+        }
+        cell.update(item: item)
+        return cell
+    }
 
 
     // MARK: - loadView
@@ -52,6 +62,9 @@ private extension HomeViewController {
     }
 
     func setBindings() {
+        let input = HomeViewModel.Input(viewDidLoad: Observable.just(()))
+        let output = homeViewModel.transform(input: input)
+
         homeView.rx.todayRoutineCardTap.subscribe(onNext: {
             print("오늘의 루틴 탭")
         })
@@ -66,5 +79,8 @@ private extension HomeViewController {
             print("플러스 버튼 탭")
         })
         .disposed(by: disposeBag)
+
+        homeView.setupTableView(section: output.firstSectionData, dataSource: dataSource)
+            .disposed(by: disposeBag)
     }
 }
