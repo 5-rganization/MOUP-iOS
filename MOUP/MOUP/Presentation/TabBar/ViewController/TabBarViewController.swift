@@ -5,17 +5,17 @@
 //  Created by 서동환 on 7/12/25.
 //
 
-import Foundation
-
 import UIKit
+import RxSwift
 
 final class TabBarViewController: UITabBarController {
     
     // MARK: - Properties
     
     // TODO: 추후 뷰 모델 넣기
-    // private let viewModel: ViewModel
-    
+    private let viewModel: TabBarViewModel
+    private let disposeBag = DisposeBag()
+
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -41,12 +41,9 @@ final class TabBarViewController: UITabBarController {
     }
     
     // MARK: - Initializer
-    
-    // TODO: 추후 뷰 모델 넣기
-    init() {
-        //self.viewModel = viewModel
+    init(viewModel: TabBarViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
-        configure()
     }
     
     @available(*, unavailable, message: "Storyboard is not supported")
@@ -86,5 +83,13 @@ private extension TabBarViewController {
     func setHierarchy() { }
     func setConstraints() { }
     func setActions() { }
-    func setBinding() { }
+    func setBinding() {
+        let input = TabBarViewModel.Input(viewDidLoad: Observable.just(()))
+        let output = viewModel.transform(input: input)
+
+        output.isSignedUp.subscribe(onNext: { [weak self] result in
+            print("가입 여부: \(result)")
+        })
+        .disposed(by: disposeBag)
+    }
 }

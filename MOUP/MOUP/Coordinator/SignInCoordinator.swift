@@ -12,16 +12,10 @@ final class SignInCoordinator: Coordinator {
     let window: UIWindow
 
     private let signInViewModel: SignInViewModel
-    private let googleAuthService: GoogleAuthServiceProtocol
-    private let googleAuthRepository: GoogleAuthRepositoryProtocol
-    private let googleAuthUseCase: GoogleAuthUseCaseProtocol
 
-    init(window: UIWindow) {
+    init(window: UIWindow, authUseCase: AuthUseCaseProtocol) {
         self.window = window
-        self.googleAuthService = GoogleAuthService()
-        self.googleAuthRepository = GoogleAuthRepository(googleAuthService: googleAuthService)
-        self.googleAuthUseCase = GoogleAuthUseCase(googleAuthRepository: googleAuthRepository)
-        self.signInViewModel = SignInViewModel(googleAuthUseCase: googleAuthUseCase)
+        self.signInViewModel = SignInViewModel(authUseCase: authUseCase)
     }
 
     func start() {
@@ -29,6 +23,7 @@ final class SignInCoordinator: Coordinator {
         signInViewController.coordinator = self
 
         let nav = UINavigationController(rootViewController: signInViewController)
+
         window.rootViewController = signInViewController
         window.makeKeyAndVisible()
     }
