@@ -28,7 +28,7 @@ extension NetworkError {
     var debugDescription: String? {
         switch self {
         case .serverError:
-            "서버 에러"
+            "500, 서버 에러"
         case .noResponse:
             "데이터를 불러올 수 없음"
         case .invalidResponse(let error):

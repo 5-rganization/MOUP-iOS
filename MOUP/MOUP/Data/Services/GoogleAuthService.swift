@@ -9,29 +9,34 @@ import Foundation
 import Alamofire
 
 protocol GoogleAuthServiceProtocol {
-    func signInWithGoogle(provider: String, providerId: String) async -> loginResponseEnum
+    func signInWithGoogle(requestDTO: SignInRequestDTO) async throws -> SignInResponseDTO
 }
 
 final class GoogleAuthService: GoogleAuthServiceProtocol {
-    func signInWithGoogle(provider: String, providerId: String) async -> loginResponseEnum {
-        let response = await AF.request(GoogleAuthRouter.signIn(provider: provider, providerId: providerId))
-            .serializingResponse(using: .data).response
+    func signInWithGoogle(requestDTO: SignInRequestDTO) async throws -> SignInResponseDTO {
+        let request = AF.request(GoogleAuthRouter.signIn(requestDTO))
+        let response = await request.serializingDecodable(SignInResponseDTO.self).response
+
+        print(response.value)
 
         if let error = response.error {
-            return .failure(NetworkError.invalidResponse(error))
+            throw NetworkError.invalidResponse(error)
         }
 
-        guard let status = response.response?.statusCode else {
-            return .failure(NetworkError.noResponse)
+        guard let statusCode = response.response?.statusCode else {
+            throw NetworkError.noResponse // TODO: - 커스텀 에러를 좀 더 상세하게 나눌 필요가 있어보임.
         }
 
-        switch status {
+        switch statusCode {
         case 200:
-            return .success
+            guard let dto = response.value else {
+                throw NetworkError.noResponse
+            }
+            return dto
         case 404:
-            return .notMember
+            throw AuthError.notMember
         default:
-            return .failure(NetworkError.serverError)
+            throw NetworkError.serverError
         }
     }
 }

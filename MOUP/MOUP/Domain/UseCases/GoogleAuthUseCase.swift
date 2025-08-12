@@ -15,7 +15,9 @@ final class GoogleAuthUseCase: GoogleAuthUseCaseProtocol {
     }
 
     // MARK: - Methods
-    func signInWithGoogle(provider: String, providerId: String) async -> loginResponseEnum {
-        return await googleAuthRepository.signInWithGoogle(provider: "LOGIN_GOOGLE", providerId: providerId)
+    func signInWithGoogle(requestDTO: SignInRequestDTO) async throws {
+        let userIdentifier = try await googleAuthRepository.signInWithGoogle(requestDTO: requestDTO)
+
+        UserDefaultsManager.shared.userId = userIdentifier.userId
     }
 }

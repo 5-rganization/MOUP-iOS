@@ -9,13 +9,22 @@ import Foundation
 import RxSwift
 import RxCocoa
 
+// MARK: - SignInOutputEvent
+enum SignInOutputEvent {
+    case navigateToSignUp
+    case showAlert(Error)
+}
+
 final class SignInViewModel {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    let googleLoginTapped = PublishRelay<Void>()
-    let googleLoginTriggered = PublishRelay<Void>()
+    private let googleAuthUseCase: GoogleAuthUseCaseProtocol
 
-    init() {
+    let googleLoginTriggered = PublishRelay<SignInRequestDTO>()
+    let signInOutputEventRelay = PublishRelay<SignInOutputEvent>()
+
+    init(googleAuthUseCase: GoogleAuthUseCaseProtocol) {
+        self.googleAuthUseCase = googleAuthUseCase
         configure()
     }
 }
@@ -28,17 +37,24 @@ private extension SignInViewModel {
 
     // MARK: - setBindings
     func setBindings() {
-        googleLoginTapped.subscribe(onNext: { [weak self] _ in
+        googleLoginTriggered.subscribe(onNext: { [weak self] request in
             guard let self else { return }
-            self.signInGoogle()
+            Task {
+                do {
+                    try await self.googleAuthUseCase.signInWithGoogle(requestDTO: request)
+                } catch let error as NetworkError {
+                    switch error {
+                    case .serverError, .noResponse, .invalidResponse(_):
+                        self.signInOutputEventRelay.accept(SignInOutputEvent.showAlert(error))
+                    }
+                } catch let error as AuthError {
+                    switch error {
+                    case .notMember:
+                        self.signInOutputEventRelay.accept(SignInOutputEvent.navigateToSignUp)
+                    }
+                }
+            }
         })
         .disposed(by: disposeBag)
-    }
-}
-
-private extension SignInViewModel {
-    // MARK: - google SignIn
-    func signInGoogle() { // TODO: - 러프하게 작성한 현 코드에 아키텍처 적용해야함
-        googleLoginTriggered.accept(())
     }
 }

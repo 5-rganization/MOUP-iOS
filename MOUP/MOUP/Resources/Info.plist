@@ -41,7 +41,7 @@
 	</array>
 	<key>GIDServerClientID</key>
 	<string>$(GID_SERVER_CLIENT_ID)</string>
-	<key>Base URL</key>
+	<key>BaseURL</key>
 	<string>$(BASE_URL)</string>
 </dict>
 </plist>
