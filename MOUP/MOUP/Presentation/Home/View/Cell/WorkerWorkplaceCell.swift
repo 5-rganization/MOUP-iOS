@@ -9,7 +9,13 @@ import UIKit
 
 class WorkerWorkplaceCell: UITableViewCell {
     // MARK: - Properties
-    private let identifier = "WorkerWorkplaceCell"
+    static let identifier = "WorkerWorkplaceCell"
+
+    // MARK: - UI Components
+    private let titleLabel = UILabel().then {
+        $0.font = .bodyMedium(16)
+        $0.textColor = .gray900
+    }
 
     // MARK: - Initializer
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -21,6 +27,16 @@ class WorkerWorkplaceCell: UITableViewCell {
     @available(*, unavailable, message: "storyboard is not supported.")
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented.")
+    }
+
+    // MARK: - Public Methods
+    func update(item: HomeSectionItem) {
+        switch item {
+        case .worker(let workerInfo):
+            self.titleLabel.text = workerInfo.workplace.name
+        case .owner:
+            break
+        }
     }
 }
 
@@ -34,16 +50,18 @@ private extension WorkerWorkplaceCell {
 
     // MARK: - setHierarchy
     func setHierarchy() {
-
+        addSubviews(titleLabel)
     }
 
     // MARK: - setStyles
     func setStyles() {
-
+        
     }
 
     // MARK: - setConstraints
     func setConstraints() {
-
+        titleLabel.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
     }
 }
