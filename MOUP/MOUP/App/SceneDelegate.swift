@@ -18,10 +18,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
         self.window = window
-        
-        let appCoordinator = AppCoordinator(window: window)
-        self.appCoordinator = appCoordinator
-        appCoordinator.start()
+
+        GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in // TODO: - 타 플랫폼 반영 시 미리 플랫폼 확인 및 분기 필요
+            let isSignedIn = (error == nil && user != nil)
+
+            let appCoordinator = AppCoordinator(window: window, isSignedIn: isSignedIn)
+            self.appCoordinator = appCoordinator
+            appCoordinator.start()
+        }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
