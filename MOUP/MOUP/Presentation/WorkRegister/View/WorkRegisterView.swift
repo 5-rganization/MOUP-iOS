@@ -56,6 +56,9 @@ final class WorkRegisterView: UIView {
     }
     
     // MARK: - Public Methods
+    func setWorkDateText(_ text: String) {
+        workDateContainerView.setDateText(text)
+    }
 }
 
 private extension WorkRegisterView {
@@ -189,5 +192,11 @@ extension Reactive where Base: WorkRegisterView {
     
     var colorTap: ControlEvent<Void> {
         return ControlEvent(events: base.colorTapSubject.asObservable())
+    }
+    
+    var selectedWorkDateText: Binder<String> {
+        Binder(base) { view, text in
+            view.setWorkDateText(text)
+        }
     }
 }

@@ -78,10 +78,24 @@ private extension WorkRegisterViewController {
             .disposed(by: disposeBag)
         
         workRegisterView.rx.workDateTap
-            .bind(onNext: {
-                print("날짜 버튼 클릭")
+            .bind(onNext: { [weak self] in
+                guard let self else { return }
+                let vm = WorkDatePickerViewModel(
+                    initialDate: Date(),
+                    confirmedDate: Date()
+                )
+                let vc = WorkDatePickerViewController(viewModel: vm)
+
+                vm.confirmSelectedDate
+                    .map { DateFormatter.dataSourceDateFormatter.string(from: $0) }
+                    .bind(to: self.workRegisterView.rx.selectedWorkDateText)
+                    .disposed(by: self.disposeBag)
+
+                self.present(vc, animated: true)
             })
             .disposed(by: disposeBag)
+
+
         
         workRegisterView.rx.repetitionTap
             .bind(onNext: {

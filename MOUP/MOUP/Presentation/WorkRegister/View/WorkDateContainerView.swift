@@ -63,6 +63,10 @@ final class WorkDateContainerView: UIView {
     }
     
     // MARK: - Public Methods
+    func setDateText(_ text: String) {
+        date.updateButtonTitle(to: text)
+    }
+
 }
 
 private extension WorkDateContainerView {
@@ -146,6 +150,12 @@ extension Reactive where Base: WorkDateContainerView {
     
     var repetitionTap: ControlEvent<Void> {
         return ControlEvent(events: base.repetitionSubject.asObservable())
+    }
+    
+    var selectedDateText: Binder<String> {
+        Binder(base) { view, text in
+            view.setDateText(text)
+        }
     }
 }
 
