@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import RxDataSources
 
 final class HomeView: UIView {
     // MARK: - Properties
@@ -28,10 +29,12 @@ final class HomeView: UIView {
     }
 
     fileprivate let tableHeaderView = HomeHeaderContainerView(userRole: .worker) // TODO: - 실제 받아온 userRole 반영 필요
-    private lazy var tableView = UITableView().then {
+    fileprivate lazy var tableView = UITableView().then {
         $0.backgroundColor = .white
         $0.estimatedRowHeight = 300
         $0.rowHeight = UITableView.automaticDimension
+        $0.register(WorkerWorkplaceCell.self, forCellReuseIdentifier: WorkerWorkplaceCell.identifier)
+        $0.register(OwnerWorkplaceCell.self, forCellReuseIdentifier: OwnerWorkplaceCell.identifier)
     }
 
     // MARK: - Initializer
@@ -54,6 +57,12 @@ final class HomeView: UIView {
     }
 
     // MARK: - Public Methods
+    func setupTableView(
+        section: Observable<[HomeTableViewFirstSection]>,
+        dataSource: RxTableViewSectionedAnimatedDataSource<HomeTableViewFirstSection>
+    ) -> Disposable {
+        return section.bind(to: tableView.rx.items(dataSource: dataSource))
+    }
 }
 
 private extension HomeView {

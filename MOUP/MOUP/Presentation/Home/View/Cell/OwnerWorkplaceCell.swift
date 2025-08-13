@@ -9,7 +9,7 @@ import UIKit
 
 class OwnerWorkplaceCell: UITableViewCell {
     // MARK: - Properties
-    private let identifier = "OwnerWorkplaceCell"
+    static let identifier = "OwnerWorkplaceCell"
 
     // MARK: - Initializer
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
