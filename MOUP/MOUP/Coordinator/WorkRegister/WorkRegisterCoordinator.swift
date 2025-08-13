@@ -16,7 +16,11 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
         //let viewModel = WorkRegisterViewModel()
         
         let vc = WorkRegisterViewController(
-            coordinator: self
+            coordinator: self,
+            workDatePickerViewModel: WorkDatePickerViewModel(),
+            clockInVM: WorkTimePickerViewModel(),
+            clockOutVM: WorkTimePickerViewModel(),
+            lunchVM: WorkTimePickerViewModel()
         )
         
         navigationController.pushViewController(vc, animated: false)

@@ -73,6 +73,17 @@ final class WorkTimeContainerView: UIView {
     }
     
     // MARK: - Public Methods
+    func setClockInText(_ text: String) {
+        clockIn.updateButtonTitle(to: text)
+    }
+
+    func setClockOutText(_ text: String) {
+        clockOut.updateButtonTitle(to: text)
+    }
+
+    func setLunchBreakText(_ text: String) {
+        lunchBreak.updateButtonTitle(to: text)
+    }
 }
 
 private extension WorkTimeContainerView {

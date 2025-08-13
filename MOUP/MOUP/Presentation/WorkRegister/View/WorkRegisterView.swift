@@ -59,6 +59,17 @@ final class WorkRegisterView: UIView {
     func setWorkDateText(_ text: String) {
         workDateContainerView.setDateText(text)
     }
+    
+    func setClockInText(_ text: String) {
+        workTimeContainerView.setClockInText(text)
+    }
+    func setClockOutText(_ text: String) {
+        workTimeContainerView.setClockOutText(text)
+    }
+    func setLunchBreakText(_ text: String) {
+        workTimeContainerView.setLunchBreakText(text)
+    }
+    
 }
 
 private extension WorkRegisterView {
@@ -197,6 +208,22 @@ extension Reactive where Base: WorkRegisterView {
     var selectedWorkDateText: Binder<String> {
         Binder(base) { view, text in
             view.setWorkDateText(text)
+        }
+    }
+    
+    var selectedClockInTimeText: Binder<String> {
+        Binder(base) { view, text in
+            view.setClockInText(text)
+        }
+    }
+    var selectedClockOutTimeText: Binder<String> {
+        Binder(base) { view, text in
+            view.setClockOutText(text)
+        }
+    }
+    var selectedLunchBreakTimeText: Binder<String> {
+        Binder(base) { view, text in
+            view.setLunchBreakText(text)
         }
     }
 }
