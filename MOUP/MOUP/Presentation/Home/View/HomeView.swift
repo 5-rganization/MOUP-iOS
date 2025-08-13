@@ -29,12 +29,15 @@ final class HomeView: UIView {
     }
 
     fileprivate let tableHeaderView = HomeHeaderContainerView(userRole: .worker) // TODO: - 실제 받아온 userRole 반영 필요
+
     fileprivate lazy var tableView = UITableView().then {
         $0.backgroundColor = .white
-        $0.estimatedRowHeight = 300
+        $0.estimatedRowHeight = 400
         $0.rowHeight = UITableView.automaticDimension
         $0.register(WorkerWorkplaceCell.self, forCellReuseIdentifier: WorkerWorkplaceCell.identifier)
         $0.register(OwnerWorkplaceCell.self, forCellReuseIdentifier: OwnerWorkplaceCell.identifier)
+        $0.separatorStyle = .none
+        $0.allowsSelection = false
     }
 
     // MARK: - Initializer
@@ -107,7 +110,8 @@ private extension HomeView {
 
         tableView.snp.makeConstraints {
             $0.top.equalTo(topBar.snp.bottom)
-            $0.directionalHorizontalEdges.bottom.equalToSuperview()
+            $0.directionalHorizontalEdges.equalToSuperview()
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(20)
         }
     }
 
