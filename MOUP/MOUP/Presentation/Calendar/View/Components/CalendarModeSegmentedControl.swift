@@ -1,5 +1,5 @@
 //
-//  CalendarModeToggleSegmentedControl.swift
+//  CalendarModeSegmentedControl.swift
 //  MOUP
 //
 //  Created by 서동환 on 8/13/25.
@@ -7,8 +7,8 @@
 
 import UIKit
 
-/// 캘린더 개인/공유 모드 전환 토글 버튼
-final class CalendarModeToggleSegmentedControl: UISegmentedControl {
+/// 캘린더 개인/공유 모드 전환 토글 세그먼트
+final class CalendarModeSegmentedControl: UISegmentedControl {
     
     // MARK: - Initializer
     override init(items: [Any]?) {
@@ -28,7 +28,7 @@ final class CalendarModeToggleSegmentedControl: UISegmentedControl {
     }
 }
 
-private extension CalendarModeToggleSegmentedControl {
+private extension CalendarModeSegmentedControl {
     // MARK: - setStyles
     func setStyles() {
         // SegmentedControl 자체 스타일 설정
