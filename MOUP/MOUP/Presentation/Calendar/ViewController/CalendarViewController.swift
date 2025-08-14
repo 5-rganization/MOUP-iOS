@@ -145,12 +145,10 @@ private extension CalendarViewController {
     
     func configureCell(cell: JTACDayCell?, cellState: CellState, calendarMode: CalendarMode, eventList: [CalendarEvent]) {
         guard let cell = cell as? CalendarDayCell else { return }
-        var calendar = Calendar.current
-        calendar.timeZone = .autoupdatingCurrent
         
         let dateBelongsToThisMonth = (cellState.dateBelongsTo == .thisMonth)
         let isSelected = cellState.isSelected
-        let isToday = calendar.isDateInToday(cellState.date)
+        let isToday = currCalendar.isDateInToday(cellState.date)
         
         cell.update(dateStr: cellState.text,
                     daysOfWeek: cellState.day,
