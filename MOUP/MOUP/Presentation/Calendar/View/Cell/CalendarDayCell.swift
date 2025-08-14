@@ -58,8 +58,8 @@ final class CalendarDayCell: JTACDayCell {
     }
     
     // MARK: - Methods
-    func update(dateStr: String, daysOfWeek: DaysOfWeek, isToday: Bool) {
-        _dayLabel.text = dateStr
+    func update(dateStr: String, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, isToday: Bool) {
+        dayLabel.text = dateStr
         
         if isToday {
             _dayLabel.textColor = .white
@@ -74,6 +74,11 @@ final class CalendarDayCell: JTACDayCell {
                 _dayLabel.textColor = .gray900
             }
         }
+        
+        dayLabel.isHidden = !dateBelongsToThisMonth
+        self.isUserInteractionEnabled = dateBelongsToThisMonth
+        
+        selectedView.isHidden = !isSelected
     }
 }
 

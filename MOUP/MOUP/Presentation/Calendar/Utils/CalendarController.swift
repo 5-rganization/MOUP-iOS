@@ -47,29 +47,20 @@ private extension CalendarController {
     
     func configureCell(cell: JTACDayCell?, cellState: CellState) {
         guard let cell = cell as? CalendarDayCell else { return }
-        handleCellColor(cell: cell, cellState: cellState)
-        handleCellSelection(cell: cell, cellState: cellState)
-        handleCellEvents(cell: cell, cellState: cellState)
-    }
-    
-    func handleCellColor(cell: CalendarDayCell, cellState: CellState) {
-        let dateBelongsToThisMonth = (cellState.dateBelongsTo == .thisMonth)
-        cell.dayLabel.isHidden = !dateBelongsToThisMonth
-        cell.isUserInteractionEnabled = dateBelongsToThisMonth
-    }
-    
-    func handleCellSelection(cell: CalendarDayCell, cellState: CellState) {
-        cell.selectedView.isHidden = !cellState.isSelected
-    }
-    
-    func handleCellEvents(cell: CalendarDayCell, cellState: CellState) {
         var calendar = Calendar.current
         calendar.timeZone = .autoupdatingCurrent
         
+        let dateBelongsToThisMonth = (cellState.dateBelongsTo == .thisMonth)
+        let isSelected = cellState.isSelected
+        let isToday = calendar.isDateInToday(cellState.date)
+        
         cell.update(dateStr: cellState.text,
                     daysOfWeek: cellState.day,
-                    isToday: calendar.isDateInToday(cellState.date))
+                    dateBelongsToThisMonth: dateBelongsToThisMonth,
+                    isSelected: isSelected,
+                    isToday: isToday)
     }
+
 }
 
 // MARK: - JTACMonthViewDataSource
