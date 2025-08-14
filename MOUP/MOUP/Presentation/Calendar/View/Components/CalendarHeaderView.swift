@@ -29,7 +29,7 @@ final class CalendarHeaderView: UIView {
         $0.configuration = config
     }
     /// 캘린더 개인/공유 모드 전환 토글 세그먼트
-    fileprivate let toggleSegment = CalendarModeSegmentedControl(items: ["개인", "공유"])
+    fileprivate let toggleSegment = CalendarModeSegmentedControl(items: CalendarMode.allCases.map { $0.rawValue })
     /// 필터 버튼
     fileprivate let filterButton = UIButton().then {
         var config = UIButton.Configuration.plain()
