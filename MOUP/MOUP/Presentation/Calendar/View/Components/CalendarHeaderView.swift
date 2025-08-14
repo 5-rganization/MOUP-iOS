@@ -7,7 +7,6 @@
 
 import UIKit
 
-import BetterSegmentedControl
 import RxCocoa
 import RxSwift
 import SnapKit

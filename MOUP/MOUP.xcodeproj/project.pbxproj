@@ -16,7 +16,6 @@
 		5B5304DC2E2251B00083F7CA /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304DB2E2251B00083F7CA /* FirebaseAnalyticsCore */; };
 		5B5304DE2E2251B00083F7CA /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304DD2E2251B00083F7CA /* FirebaseCore */; };
 		5B5304E02E2251B00083F7CA /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304DF2E2251B00083F7CA /* FirebaseCrashlytics */; };
-		5B5304E32E2251C70083F7CA /* BetterSegmentedControl in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304E22E2251C70083F7CA /* BetterSegmentedControl */; };
 		5B5304E62E2251DD0083F7CA /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304E52E2251DD0083F7CA /* RxCocoa */; };
 		5B5304E82E2251DD0083F7CA /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304E72E2251DD0083F7CA /* RxRelay */; };
 		5B5304EA2E2251DD0083F7CA /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304E92E2251DD0083F7CA /* RxSwift */; };
@@ -66,7 +65,6 @@
 				5B5304DE2E2251B00083F7CA /* FirebaseCore in Frameworks */,
 				5B5304D52E22516A0083F7CA /* SnapKit in Frameworks */,
 				5B5304E02E2251B00083F7CA /* FirebaseCrashlytics in Frameworks */,
-				5B5304E32E2251C70083F7CA /* BetterSegmentedControl in Frameworks */,
 				5B5304DA2E2251B00083F7CA /* FirebaseAnalytics in Frameworks */,
 				5B5304EF2E2251FD0083F7CA /* RxDataSources in Frameworks */,
 				5B5304E62E2251DD0083F7CA /* RxCocoa in Frameworks */,
@@ -142,7 +140,6 @@
 				5B5304DB2E2251B00083F7CA /* FirebaseAnalyticsCore */,
 				5B5304DD2E2251B00083F7CA /* FirebaseCore */,
 				5B5304DF2E2251B00083F7CA /* FirebaseCrashlytics */,
-				5B5304E22E2251C70083F7CA /* BetterSegmentedControl */,
 				5B5304E52E2251DD0083F7CA /* RxCocoa */,
 				5B5304E72E2251DD0083F7CA /* RxRelay */,
 				5B5304E92E2251DD0083F7CA /* RxSwift */,
@@ -184,7 +181,6 @@
 				5B5304D02E2251610083F7CA /* XCRemoteSwiftPackageReference "Then" */,
 				5B5304D32E22516A0083F7CA /* XCRemoteSwiftPackageReference "SnapKit" */,
 				5B5304D82E2251B00083F7CA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				5B5304E12E2251C70083F7CA /* XCRemoteSwiftPackageReference "BetterSegmentedControl" */,
 				5B5304E42E2251DD0083F7CA /* XCRemoteSwiftPackageReference "RxSwift" */,
 				5B5304EB2E2251FD0083F7CA /* XCRemoteSwiftPackageReference "RxDataSources" */,
 				5B95F7022E22525900C29F0D /* XCRemoteSwiftPackageReference "Alamofire" */,
@@ -516,14 +512,6 @@
 				minimumVersion = 11.15.0;
 			};
 		};
-		5B5304E12E2251C70083F7CA /* XCRemoteSwiftPackageReference "BetterSegmentedControl" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/gmarm/BetterSegmentedControl";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.1;
-			};
-		};
 		5B5304E42E2251DD0083F7CA /* XCRemoteSwiftPackageReference "RxSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReactiveX/RxSwift";
@@ -590,11 +578,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B5304D82E2251B00083F7CA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
-		};
-		5B5304E22E2251C70083F7CA /* BetterSegmentedControl */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 5B5304E12E2251C70083F7CA /* XCRemoteSwiftPackageReference "BetterSegmentedControl" */;
-			productName = BetterSegmentedControl;
 		};
 		5B5304E52E2251DD0083F7CA /* RxCocoa */ = {
 			isa = XCSwiftPackageProductDependency;
