@@ -24,9 +24,9 @@ final class CalendarViewModel {
     
     // MARK: - Output
     struct Output {
-        let calendarModelList: Observable<[CalendarEvent]>
+        let calendarModelList: Observable<(personal: [CalendarEvent], shared: [CalendarEvent])>
     }
-    private let calendarModelListRelay = BehaviorRelay<[CalendarEvent]>(value: [])
+    private let calendarModelListRelay = PublishRelay<(personal: [CalendarEvent], shared: [CalendarEvent])>()
     
     // MARK: - Input ➡️ Output Transform
     func transform(input: Input) -> Output {
