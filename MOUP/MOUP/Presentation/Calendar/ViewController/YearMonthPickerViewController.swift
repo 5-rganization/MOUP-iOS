@@ -66,7 +66,7 @@ private extension YearMonthPickerViewController {
     func configure() {
         setStyles()
         setDelegates()
-        setBinding()
+        setBindings()
     }
     
     // MARK: - setStyles
@@ -82,8 +82,8 @@ private extension YearMonthPickerViewController {
         yearMonthPickerView.getPickerView.delegate = self
     }
     
-    // MARK: - setBinding
-    func setBinding() {
+    // MARK: - setBindings
+    func setBindings() {
         yearMonthPickerView.rx.cancelButtonTap
             .subscribe(with: self) { owner, _ in
                 owner.delegate?.cancelButtonTapped()

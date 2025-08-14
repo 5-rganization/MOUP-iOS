@@ -70,7 +70,7 @@ private extension CalendarViewController {
     func configure() {
         setStyles()
         setDelegates()
-        setBinding()
+        setBindings()
     }
     
     // MARK: - setStyles
@@ -94,7 +94,7 @@ private extension CalendarViewController {
                 guard let title = owner.calendarView.getCalendarHeaderView.getYearMonthButtonTitle,
                       let currYear = Int(title.prefix(4)),
                       let currMonth = Int(title.suffix(2)) else { return }
-                owner.coordinator?.showYearMonthPickerVC(currYear: currYear, currMonth: currMonth)
+                owner.coordinator?.showYearMonthPicker(currYear: currYear, currMonth: currMonth)
             }.disposed(by: disposeBag)
         
         calendarView.getCalendarHeaderView.rx.toggleSegmentSelectedIndex

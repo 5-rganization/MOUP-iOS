@@ -57,7 +57,7 @@ private extension FilterViewController {
     func configure() {
         setStyles()
         setDelegates()
-        setBinding()
+        setBindings()
     }
     
     // MARK: - setStyles
@@ -70,8 +70,8 @@ private extension FilterViewController {
         self.presentationController?.delegate = self
     }
     
-    // MARK: - setBinding
-    func setBinding() {
+    // MARK: - setBindings
+    func setBindings() {
         // Child View Binding
         filterView.rx.applyButtonTap.asDriver()
             .drive(with: self, onNext: { owner, _ in
