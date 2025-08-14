@@ -18,16 +18,16 @@ final class CalendarDayCell: JTACDayCell {
     
     // MARK: - UI Components
     /// 구분선
-    private let _seperatorView = UIView().then {
+    private let seperatorView = UIView().then {
         $0.backgroundColor = .gray300
     }
     /// 선택됐을 때 표시되는 UI
-    private let _selectedView = UIView().then {
+    private let selectedView = UIView().then {
         $0.backgroundColor = .primary50
         $0.isHidden = true
     }
     /// 날짜(일) 라벨
-    private let _dayLabel = UILabel().then {
+    fileprivate let dateLabel = UILabel().then {
         $0.textColor = .gray900
         $0.font = .bodyMedium(14)
         $0.textAlignment = .center
@@ -35,10 +35,6 @@ final class CalendarDayCell: JTACDayCell {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 10
     }
-    
-    // MARK: - Getter
-    var selectedView: UIView { _selectedView }
-    var dayLabel: UILabel { _dayLabel }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -54,28 +50,28 @@ final class CalendarDayCell: JTACDayCell {
     // MARK: - Lifecycle
     override func prepareForReuse() {
         super.prepareForReuse()
-        _dayLabel.backgroundColor = .clear
+        dateLabel.backgroundColor = .clear
     }
     
     // MARK: - Methods
     func update(dateStr: String, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, isToday: Bool) {
-        dayLabel.text = dateStr
+        dateLabel.text = dateStr
         
         if isToday {
-            _dayLabel.textColor = .white
-            _dayLabel.backgroundColor = .gray900
+            dateLabel.textColor = .white
+            dateLabel.backgroundColor = .gray900
         } else {
             switch daysOfWeek {
             case .sunday:
-                _dayLabel.textColor = .sundayText
+                dateLabel.textColor = .sundayText
             case .saturday:
-                _dayLabel.textColor = .saturdayText
+                dateLabel.textColor = .saturdayText
             default:
-                _dayLabel.textColor = .gray900
+                dateLabel.textColor = .gray900
             }
         }
         
-        dayLabel.isHidden = !dateBelongsToThisMonth
+        dateLabel.isHidden = !dateBelongsToThisMonth
         self.isUserInteractionEnabled = dateBelongsToThisMonth
         
         selectedView.isHidden = !isSelected
@@ -92,9 +88,9 @@ private extension CalendarDayCell {
     
     // MARK: - setHierarchy
     func setHierarchy() {
-        self.contentView.addSubviews(_seperatorView,
-                                     _selectedView,
-                                     _dayLabel)
+        self.contentView.addSubviews(seperatorView,
+                                     selectedView,
+                                     dateLabel)
     }
     
     // MARK: - setStyles
@@ -104,20 +100,20 @@ private extension CalendarDayCell {
     
     // MARK: - setConstraints
     func setConstraints() {
-        _seperatorView.snp.makeConstraints {
+        seperatorView.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(1)
         }
         
-        _selectedView.snp.makeConstraints {
-            $0.top.equalTo(_seperatorView.snp.bottom)
+        selectedView.snp.makeConstraints {
+            $0.top.equalTo(seperatorView.snp.bottom)
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()
         }
         
-        _dayLabel.snp.makeConstraints {
-            $0.top.equalTo(_seperatorView.snp.bottom).offset(4)
+        dateLabel.snp.makeConstraints {
+            $0.top.equalTo(seperatorView.snp.bottom).offset(4)
             $0.width.height.equalTo(20)
             $0.centerX.equalToSuperview()
         }
