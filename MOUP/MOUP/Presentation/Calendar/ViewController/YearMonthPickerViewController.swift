@@ -22,17 +22,18 @@ protocol YearMonthPickerVCDelegate: AnyObject {
 final class YearMonthPickerViewController: UIViewController {
     
     // MARK: - Properties
-    weak var delegate: YearMonthPickerVCDelegate?
-    
     private let disposeBag = DisposeBag()
-    
     /// `JTACMonthView`가 표시하는 연/월 범위(2차원 `String` 배열)
     private let yearMonthList = [(CalendarRange.startYear...CalendarRange.endYear).map { String($0) }, (1...12).map { String($0) }]
     
+    // Initializer Injections
     /// `pickerView`에서 didSelect된 연도
     private var focusedYear: Int
     /// `pickerView`에서 didSelect된 월
     private var focusedMonth: Int
+    
+    // Property Injections
+    weak var delegate: YearMonthPickerVCDelegate?
     
     // MARK: - UI Components
     private let yearMonthPickerView = YearMonthPickerView()
