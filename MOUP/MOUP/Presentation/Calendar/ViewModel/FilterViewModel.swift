@@ -10,55 +10,36 @@ import Foundation
 import RxRelay
 import RxSwift
 
-/// 필터 VM Input
-protocol FilterViewModelInput {
-    var viewDidLoad: AnyObserver<Void> { get }
-    var applyButtonTapped: AnyObserver<Void> { get }
-}
-
-/// 필터 VM Output
-protocol FilterViewModelOutput {
-    var filterList: Observable<[FilterModel]> { get }
-}
-
 /// 필터 VM
-final class FilterViewModel: FilterViewModelInput, FilterViewModelOutput {
+final class FilterViewModel {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     
-    // MARK: - Inputs
-    private let viewDidLoadSubject = PublishSubject<Void>()
-    private let applyButtonTappedSubject = PublishSubject<Void>()
+    // MARK: - Input
+    struct Input {
+        let viewDidLoad: Observable<CalendarMode>
+    }
     
-    var viewDidLoad: AnyObserver<Void> { viewDidLoadSubject.asObserver() }
-    var applyButtonTapped: AnyObserver<Void> { applyButtonTappedSubject.asObserver() }
-    
-    // MARK: - Outputs
-    private let filterListRelay = BehaviorRelay<[FilterModel]>(value: [])
-    
-    var filterList: Observable<[FilterModel]>
+    // MARK: - Output
+    struct Output {
+        let filterDataList: Observable<[FilterData]>
+    }
+    private let filterListRelay = BehaviorRelay<[FilterData]>(value: [])
     
     // MARK: - Initializer
     init() {
-        self.filterList = filterListRelay.asObservable()
-        
-        bind()
+        // TODO: UseCase 주입
     }
-}
-
-private extension FilterViewModel {
-    // MARK: - Bind Input/Output
-    func bind() {
-        viewDidLoadSubject
-            .subscribe(with: self) { owner, _ in
+    
+    // MARK: - Input ➡️ Output Transform
+    func transform(input: Input) -> Output {
+        input.viewDidLoad
+            .subscribe(with: self) { owner, calendarMode in
                 // 사용자의 근무지/매장 불러오기
-                owner.filterListRelay.accept([FilterModel(workplaceId: "test", workplaceName: "테스트")])
+                owner.filterListRelay.accept(CalendarMockData.filterListMock)
             }.disposed(by: disposeBag)
         
-        applyButtonTappedSubject
-            .subscribe(with: self) { owner, _ in
-                
-            }.disposed(by: disposeBag)
+        return Output(filterDataList: filterListRelay.asObservable())
     }
 }

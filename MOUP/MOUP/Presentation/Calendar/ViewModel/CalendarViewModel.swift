@@ -28,6 +28,11 @@ final class CalendarViewModel {
     }
     private let calendarModelListRelay = PublishRelay<(personal: [CalendarEvent], shared: [CalendarEvent])>()
     
+    // MARK: - Initializer
+    init() {
+        // TODO: UseCase 주입
+    }
+    
     // MARK: - Input ➡️ Output Transform
     func transform(input: Input) -> Output {
         // TODO: 근무 이벤트 로딩

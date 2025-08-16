@@ -13,24 +13,32 @@ import RxSwift
 /// `FilterViewController`의 이벤트를 `FilterCoordinator`에 알리는 Delegate
 protocol FilterVCDelegate: AnyObject {
     func dismissGestureReceived()
-    func applyButtonTapped(model: FilterModel?)
+    func applyButtonTapped(filter: FilterData?)
 }
 
 /// 필터 VC
 final class FilterViewController: UIViewController {
     
     // MARK: - Properties
-    weak var delegate: FilterVCDelegate?
     private let disposeBag = DisposeBag()
     
+    // Initializer Injections
     private let viewModel: FilterViewModel
+    private let calendarMode: CalendarMode
+    
+    // Property Injections
+    weak var delegate: FilterVCDelegate?
+    
+    // Input Relays
+    private let viewDidLoadRelay = PublishRelay<CalendarMode>()
     
     // MARK: - UI Components
     private let filterView = FilterView()
     
     // MARK: - Initializer
-    init(viewModel: FilterViewModel) {
+    init(viewModel: FilterViewModel, calendarMode: CalendarMode) {
         self.viewModel = viewModel
+        self.calendarMode = calendarMode
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -47,8 +55,7 @@ final class FilterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
-        
-        viewModel.viewDidLoad.onNext(())
+        viewDidLoadRelay.accept(calendarMode)
     }
 }
 
@@ -72,19 +79,18 @@ private extension FilterViewController {
     
     // MARK: - setBindings
     func setBindings() {
-        // Child View Binding
+        // View 바인딩
         filterView.rx.applyButtonTap.asDriver()
             .drive(with: self, onNext: { owner, _ in
-                owner.delegate?.applyButtonTapped(model: nil)
+                owner.delegate?.applyButtonTapped(filter: nil)
             }).disposed(by: disposeBag)
         
-        // Inputs
-        filterView.rx.applyButtonTap
-            .bind(to: viewModel.applyButtonTapped)
-            .disposed(by: disposeBag)
+        // ViewModel 바인딩
+        let input = FilterViewModel.Input(viewDidLoad: viewDidLoadRelay.asObservable())
+        let output = viewModel.transform(input: input)
         
-        // Outputs
-        viewModel.filterList.asDriver(onErrorJustReturn: [])
+        // Output
+        output.filterDataList.asDriver(onErrorJustReturn: [])
             .drive(filterView.rx.filterTableViewDataSource)
             .disposed(by: disposeBag)
     }

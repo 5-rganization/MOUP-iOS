@@ -140,7 +140,7 @@ private extension FilterView {
 
 // MARK: - Extension Reactive
 extension Reactive where Base: FilterView {
-    var filterTableViewDataSource: Binder<([FilterModel])> {
+    var filterTableViewDataSource: Binder<([FilterData])> {
         return Binder(base) { view, filterModel in
             view.filterTableView.dataSource = nil
             view.filterTableView.delegate = nil

@@ -15,20 +15,22 @@ import RxSwift
 final class CalendarViewController: UIViewController {
     
     // MARK: - Properties
-    weak var coordinator: CalendarCoordinator?
     private let disposeBag = DisposeBag()
-    private let viewModel: CalendarViewModel
-    
-    private let currCalendar = Calendar.current
-    /// 현재 캘린더 연/월
-    private lazy var visibleYearMonth = BehaviorRelay<(year: Int, month: Int)>(value: (year: currCalendar.component(.year, from: .now),
-                                                                                       month: currCalendar.component(.month, from: .now)))
-    /// 캘린더 개인/공유 모드
-    private let selectedCalendarModeRelay = BehaviorRelay<CalendarMode>(value: .personal)
     /// 개인 근무 Dictionary
     private var personalEventDataSource: [Date: [CalendarEvent]] = [:]
     /// 공유 근무지 근무 Dictionary
     private var sharedEventDataSource: [Date: [CalendarEvent]] = [:]
+    
+    // Initializer Injections
+    weak var coordinator: CalendarCoordinator?
+    private let viewModel: CalendarViewModel
+    
+    // Input Relays
+    /// 현재 캘린더 연/월
+    private let visibleYearMonthRelay = BehaviorRelay<(year: Int, month: Int)>(value: (year: Calendar.current.component(.year, from: .now),
+                                                                                       month: Calendar.current.component(.month, from: .now)))
+    /// 캘린더 개인/공유 모드
+    private let selectedCalendarModeRelay = BehaviorRelay<CalendarMode>(value: .personal)
     
     // MARK: - UI Components
     private let calendarView = CalendarView()
@@ -103,11 +105,11 @@ private extension CalendarViewController {
         
         calendarView.getCalendarHeaderView.rx.filterButtonTap
             .subscribe(with: self) { owner, _ in
-                owner.coordinator?.showFilter()
+                owner.coordinator?.showFilter(calendarMode: owner.selectedCalendarModeRelay.value)
             }.disposed(by: disposeBag)
         
         // ViewModel 바인딩
-        let input = CalendarViewModel.Input(currMonth: visibleYearMonth.asObservable(), selectedCalendarMode: selectedCalendarModeRelay.asObservable())
+        let input = CalendarViewModel.Input(currMonth: visibleYearMonthRelay.asObservable(), selectedCalendarMode: selectedCalendarModeRelay.asObservable())
         let output = viewModel.transform(input: input)
         
         output.calendarModelList.asDriver(onErrorJustReturn: (personal: [], shared: []))
@@ -152,7 +154,7 @@ private extension CalendarViewController {
         
         let dateBelongsToThisMonth = (cellState.dateBelongsTo == .thisMonth)
         let isSelected = cellState.isSelected
-        let isToday = currCalendar.isDateInToday(cellState.date)
+        let isToday = Calendar.current.isDateInToday(cellState.date)
         
         cell.update(dateStr: cellState.text,
                     daysOfWeek: cellState.day,

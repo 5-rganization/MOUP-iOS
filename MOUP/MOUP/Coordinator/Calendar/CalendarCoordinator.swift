@@ -35,8 +35,9 @@ final class CalendarCoordinator: Coordinator {
         childCoordinators.append(yearMonthCoordinator)
     }
     
-    func showFilter() {
-        let filterCoordinator = FilterCoordinator(navigationController: self.navigationController)
+    func showFilter(calendarMode: CalendarMode) {
+        let filterCoordinator = FilterCoordinator(navigationController: self.navigationController,
+                                                  calendarMode: calendarMode)
         filterCoordinator.delegate = self
         filterCoordinator.start()
         childCoordinators.append(filterCoordinator)
@@ -64,7 +65,7 @@ extension CalendarCoordinator: FilterCoordinatorDelegate {
         navigationController.dismiss(animated: true)
     }
     
-    func applyFilter(_ coordinator: FilterCoordinator, model: FilterModel?) {
+    func applyFilter(_ coordinator: FilterCoordinator, filter: FilterData?) {
         childCoordinators = childCoordinators.filter { $0 !== coordinator }
         
         navigationController.dismiss(animated: true)
