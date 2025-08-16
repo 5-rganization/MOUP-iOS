@@ -27,8 +27,7 @@ final class CalendarViewController: UIViewController {
     
     // Input Relays
     /// 현재 캘린더 연/월
-    private let visibleYearMonthRelay = BehaviorRelay<(year: Int, month: Int)>(value: (year: Calendar.current.component(.year, from: .now),
-                                                                                       month: Calendar.current.component(.month, from: .now)))
+    private let visibleYearMonthRelay = PublishRelay<(year: Int, month: Int)>()
     /// 캘린더 개인/공유 모드
     private let selectedCalendarModeRelay = BehaviorRelay<CalendarMode>(value: .personal)
     
@@ -203,7 +202,8 @@ extension CalendarViewController: JTACMonthViewDelegate {
         guard let date = visibleDates.monthDates.first?.date else { return }
         let dateStr = DateFormatter.yearMonthDateFormatter.string(from: date)
         calendarView.getCalendarHeaderView.update(dateStr: dateStr)
-        
+        visibleYearMonthRelay.accept((year: Calendar.current.component(.year, from: date),
+                                      month: Calendar.current.component(.month, from: date)))
     }
     
     func calendar(_ calendar: JTACMonthView, shouldSelectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) -> Bool {
