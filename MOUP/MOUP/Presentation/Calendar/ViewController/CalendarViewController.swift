@@ -20,7 +20,6 @@ final class CalendarViewController: UIViewController {
     private let viewModel: CalendarViewModel
     
     private let currCalendar = Calendar.current
-    
     /// 현재 캘린더 연/월
     private lazy var visibleYearMonth = BehaviorRelay<(year: Int, month: Int)>(value: (year: currCalendar.component(.year, from: .now),
                                                                                        month: currCalendar.component(.month, from: .now)))
@@ -161,7 +160,6 @@ private extension CalendarViewController {
                     isSelected: isSelected,
                     isToday: isToday)
     }
-
 }
 
 // MARK: - JTACMonthViewDataSource
