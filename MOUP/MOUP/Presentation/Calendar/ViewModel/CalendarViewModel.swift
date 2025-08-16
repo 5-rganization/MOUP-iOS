@@ -47,9 +47,11 @@ final class CalendarViewModel {
                         calendarEventList = calendarEventList.filter { $0.workplaceId == personalFilterWorkplace.workplaceId }
                     }
                 case .shared:
-                    calendarEventList = CalendarMockData.sharedCalendarEventListMock
+                    calendarEventList = CalendarMockData.sharedCalendarEventListMock.sorted(by: { $0.workplaceName < $1.workplaceName })
                     if let sharedFilterWorkplace {
                         calendarEventList = calendarEventList.filter { $0.workplaceId == sharedFilterWorkplace.workplaceId }
+                    } else {
+                        calendarEventList = calendarEventList.filter { $0.workplaceId == calendarEventList.first?.workplaceId }
                     }
                 }
                 owner.calendarEventListRelay.accept(calendarEventList)
