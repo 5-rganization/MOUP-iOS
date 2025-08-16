@@ -15,6 +15,7 @@ protocol YearMonthPickerCoordinatorDelegate: AnyObject {
     func changeYearMonth(_ coordinator: YearMonthPickerCoordinator, focusedYear: Int, focusedMonth: Int)
 }
 
+/// 캘린더 ➡️ 연/월 Picker Coordinator
 final class YearMonthPickerCoordinator: Coordinator {
     
     // MARK: - Properties

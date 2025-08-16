@@ -13,6 +13,7 @@ protocol FilterCoordinatorDelegate: AnyObject {
     func applyFilter(_ coordinator: FilterCoordinator, filterWorkplace: FilterWorkplace?)
 }
 
+/// 캘린더 ➡️ 필터 Coordinator
 final class FilterCoordinator: Coordinator {
     
     // MARK: - Properties
