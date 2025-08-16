@@ -18,7 +18,8 @@ final class CalendarViewModel {
     struct Input {
         let visibleYearMonth: Observable<(year: Int, month: Int)>
         let calendarMode: Observable<CalendarMode>
-        let filterWorkplace: Observable<FilterWorkplace>
+        let personalFilterWorkplace: Observable<FilterWorkplace?>
+        let sharedFilterWorkplace: Observable<FilterWorkplace?>
     }
     
     // MARK: - Output
@@ -35,34 +36,23 @@ final class CalendarViewModel {
     // MARK: - Input ➡️ Output Transform
     func transform(input: Input) -> Output {
         // TODO: 근무 이벤트 로딩
-        Observable.combineLatest(input.visibleYearMonth, input.calendarMode, input.filterWorkplace)
+        Observable.combineLatest(input.visibleYearMonth, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
             .subscribe(with: self) { owner, combined in
-                let ((year, month), calendarMode, filterWorkplace) = combined
-                let calendarEventList: [CalendarEvent]
+                let ((year, month), calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
+                var calendarEventList: [CalendarEvent]
                 switch calendarMode {
                 case .personal:
                     calendarEventList = CalendarMockData.personalCalendarEventListMock
+                    if let personalFilterWorkplace {
+                        calendarEventList = calendarEventList.filter { $0.workplaceId == personalFilterWorkplace.workplaceId }
+                    }
                 case .shared:
                     calendarEventList = CalendarMockData.sharedCalendarEventListMock
-                }
-                var filtered: [CalendarEvent] = []
-                switch calendarMode {
-                case .personal:
-                    if filterWorkplace.workplaceId == -1 {
-                        // 전체 보기
-                        filtered = calendarEventList
-                    } else {
-                        filtered = calendarEventList.filter { $0.workplaceId == filterWorkplace.workplaceId }
-                    }
-                case .shared:
-                    if filterWorkplace.workplaceId == -1 {
-                        // 전체 보기
-                        filtered = calendarEventList
-                    } else {
-                        filtered = calendarEventList.filter { $0.workplaceId == filterWorkplace.workplaceId }
+                    if let sharedFilterWorkplace {
+                        calendarEventList = calendarEventList.filter { $0.workplaceId == sharedFilterWorkplace.workplaceId }
                     }
                 }
-                owner.calendarEventListRelay.accept(filtered)
+                owner.calendarEventListRelay.accept(calendarEventList)
             }.disposed(by: disposeBag)
         return Output(calendarEventList: calendarEventListRelay.asObservable())
     }

@@ -28,8 +28,10 @@ final class CalendarViewController: UIViewController {
     private let visibleYearMonthRelay = PublishRelay<(year: Int, month: Int)>()
     /// 캘린더 개인/공유 모드
     private let calendarModeRelay = BehaviorRelay<CalendarMode>(value: .personal)
-    /// 캘린더 근무지/매장 필터
-    private let filterWorkplaceRelay = BehaviorRelay<FilterWorkplace>(value: FilterWorkplace(workplaceId: -1, workplaceName: "전체 보기"))
+    /// 개인 캘린더 근무지/매장 필터
+    private let personalFilterWorkplaceRelay = BehaviorRelay<FilterWorkplace?>(value: nil)
+    /// 공유 캘린더 근무지/매장 필터
+    private let sharedFilterWorkplaceRelay = BehaviorRelay<FilterWorkplace?>(value: nil)
     
     // MARK: - UI Components
     private let calendarView = CalendarView()
@@ -64,8 +66,13 @@ final class CalendarViewController: UIViewController {
         calendarView.getMonthCalendarView.scrollToDate(date, animateScroll: true)
     }
     
-    func updateFilter(filter: FilterWorkplace) {
-        filterWorkplaceRelay.accept(filter)
+    func updateFilter(filterWorkplace: FilterWorkplace?) {
+        switch calendarModeRelay.value {
+        case .personal:
+            personalFilterWorkplaceRelay.accept(filterWorkplace)
+        case .shared:
+            sharedFilterWorkplaceRelay.accept(filterWorkplace)
+        }
     }
 }
 
@@ -108,13 +115,21 @@ private extension CalendarViewController {
         
         calendarView.getCalendarHeaderView.rx.filterButtonTap
             .subscribe(with: self) { owner, _ in
-                owner.coordinator?.showFilter(calendarMode: owner.calendarModeRelay.value)
+                let selectedFilterWorkplace: FilterWorkplace?
+                switch owner.calendarModeRelay.value {
+                case .personal:
+                    selectedFilterWorkplace = owner.personalFilterWorkplaceRelay.value
+                case .shared:
+                    selectedFilterWorkplace = owner.sharedFilterWorkplaceRelay.value
+                }
+                owner.coordinator?.showFilter(calendarMode: owner.calendarModeRelay.value, selectedFilterWorkplace: selectedFilterWorkplace)
             }.disposed(by: disposeBag)
         
         // ViewModel 바인딩
         let input = CalendarViewModel.Input(visibleYearMonth: visibleYearMonthRelay.asObservable(),
                                             calendarMode: calendarModeRelay.asObservable(),
-                                            filterWorkplace: filterWorkplaceRelay.asObservable())
+                                            personalFilterWorkplace: personalFilterWorkplaceRelay.asObservable(),
+                                            sharedFilterWorkplace: sharedFilterWorkplaceRelay.asObservable())
         let output = viewModel.transform(input: input)
         
         output.calendarEventList.asDriver(onErrorJustReturn: [])

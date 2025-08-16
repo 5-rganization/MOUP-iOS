@@ -9,7 +9,9 @@
 /// - `workplaceId`: 근무지/매장 ID `Int`
 /// - `workplaceName`: 근무자/매장 이름 `String`
 ///   - 예시: "세븐일레븐 동탄제일점"
+/// - `isShared`: 공유 캘린더 여부 `Bool`
 struct FilterWorkplace {
     let workplaceId: Int
     let workplaceName: String
+    let isShared: Bool
 }

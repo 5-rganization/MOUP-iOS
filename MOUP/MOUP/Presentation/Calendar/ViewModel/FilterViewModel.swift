@@ -38,9 +38,9 @@ final class FilterViewModel {
                 let filterList: [FilterWorkplace]
                 switch calendarMode {
                 case .personal:
-                    filterList = [FilterWorkplace(workplaceId: -1, workplaceName: "전체 보기")] + CalendarMockData.filterListMock
+                    filterList = [FilterWorkplace(workplaceId: -1, workplaceName: "전체 보기", isShared: false)] + CalendarMockData.filterListMock
                 case .shared:
-                    filterList = CalendarMockData.filterListMock
+                    filterList = CalendarMockData.filterListMock.filter { $0.isShared == true }
                 }
                 owner.filterWorkplaceListRelay.accept(filterList)
             }.disposed(by: disposeBag)

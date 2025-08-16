@@ -19,11 +19,14 @@ final class YearMonthPickerCoordinator: Coordinator {
     
     // MARK: - Properties
     var childCoordinators = [Coordinator]()
-    weak var delegate: YearMonthPickerCoordinatorDelegate?
-    let navigationController: UINavigationController
     
-    let currYear: Int
-    let currMonth: Int
+    // Initializer Injections
+    private let navigationController: UINavigationController
+    private let currYear: Int
+    private let currMonth: Int
+    
+    // Property Injections
+    weak var delegate: YearMonthPickerCoordinatorDelegate?
     
     // MARK: - Initialzier
     init(navigationController: UINavigationController,

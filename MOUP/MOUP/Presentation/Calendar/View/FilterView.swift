@@ -69,6 +69,10 @@ final class FilterView: UIView {
     func update(headerStr: String) {
         headerLabel.text = headerStr
     }
+    
+    func selectRow(at indexPath: IndexPath) {
+        filterWorkplaceTableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+    }
 }
 
 private extension FilterView {
@@ -142,6 +146,7 @@ private extension FilterView {
 extension Reactive where Base: FilterView {
     var filterWorkplaceTableViewDataSource: Binder<([FilterWorkplace])> {
         return Binder(base) { view, filterModel in
+            // RxSwift Delegate 오류 방지
             view.filterWorkplaceTableView.dataSource = nil
             view.filterWorkplaceTableView.delegate = nil
             
