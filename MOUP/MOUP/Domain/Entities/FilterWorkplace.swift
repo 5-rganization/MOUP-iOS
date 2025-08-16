@@ -1,5 +1,5 @@
 //
-//  FilterData.swift
+//  FilterWorkplace.swift
 //  MOUP
 //
 //  Created by 서동환 on 8/16/25.
@@ -9,7 +9,7 @@
 /// - `workplaceId`: 근무지/매장 ID `Int`
 /// - `workplaceName`: 근무자/매장 이름 `String`
 ///   - 예시: "세븐일레븐 동탄제일점"
-struct FilterData {
-    let workplaceId: String
+struct FilterWorkplace {
+    let workplaceId: Int
     let workplaceName: String
 }

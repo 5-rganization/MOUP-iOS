@@ -65,9 +65,9 @@ extension CalendarCoordinator: FilterCoordinatorDelegate {
         navigationController.dismiss(animated: true)
     }
     
-    func applyFilter(_ coordinator: FilterCoordinator, filter: FilterData?) {
+    func applyFilter(_ coordinator: FilterCoordinator, filterWorkplace: FilterWorkplace) {
         childCoordinators = childCoordinators.filter { $0 !== coordinator }
-        
+        calendarVC.updateFilter(filter: filterWorkplace)
         navigationController.dismiss(animated: true)
     }
 }

@@ -1,5 +1,5 @@
 //
-//  FilterCell.swift
+//  FilterWorkplaceCell.swift
 //  MOUP
 //
 //  Created by 서동환 on 7/31/25.
@@ -11,10 +11,10 @@ import SnapKit
 import Then
 
 /// 필터 목록 셀
-final class FilterCell: UITableViewCell {
+final class FilterWorkplaceCell: UITableViewCell {
     
     // MARK: - Properties
-    static let identifier = String(describing: FilterCell.self)
+    static let identifier = String(describing: FilterWorkplaceCell.self)
     
     // MARK: - UI Components
     private let workplaceNameLabel = UILabel().then {
@@ -64,7 +64,7 @@ final class FilterCell: UITableViewCell {
     }
 }
 
-private extension FilterCell {
+private extension FilterWorkplaceCell {
     // MARK: - configure
     func configure() {
         setHierarchy()

@@ -13,7 +13,7 @@ import RxSwift
 /// `FilterViewController`의 이벤트를 `FilterCoordinator`에 알리는 Delegate
 protocol FilterVCDelegate: AnyObject {
     func dismissGestureReceived()
-    func applyButtonTapped(filter: FilterData?)
+    func applyButtonTapped(filterWorkplace: FilterWorkplace)
 }
 
 /// 필터 VC
@@ -31,6 +31,9 @@ final class FilterViewController: UIViewController {
     
     // Input Relays
     private let viewDidLoadRelay = PublishRelay<CalendarMode>()
+    
+    // Interaction
+    private var selectedFilter: FilterWorkplace?
     
     // MARK: - UI Components
     private let filterView = FilterView()
@@ -80,17 +83,23 @@ private extension FilterViewController {
     // MARK: - setBindings
     func setBindings() {
         // View 바인딩
+        filterView.rx.filterWorkplaceTableViewModelSelected
+            .subscribe(with: self) { owner, filter in
+                owner.selectedFilter = filter
+            }.disposed(by: disposeBag)
+        
         filterView.rx.applyButtonTap.asDriver()
             .drive(with: self, onNext: { owner, _ in
-                owner.delegate?.applyButtonTapped(filter: nil)
+                guard let selectedFilter = owner.selectedFilter else { return }
+                owner.delegate?.applyButtonTapped(filterWorkplace: selectedFilter)
             }).disposed(by: disposeBag)
         
         // ViewModel 바인딩
         let input = FilterViewModel.Input(viewDidLoad: viewDidLoadRelay.asObservable())
         let output = viewModel.transform(input: input)
         
-        output.filterDataList.asDriver(onErrorJustReturn: [])
-            .drive(filterView.rx.filterTableViewDataSource)
+        output.filterWorkplaceList.asDriver(onErrorJustReturn: [])
+            .drive(filterView.rx.filterWorkplaceTableViewDataSource)
             .disposed(by: disposeBag)
     }
 }

@@ -21,9 +21,9 @@ final class FilterViewModel {
     
     // MARK: - Output
     struct Output {
-        let filterDataList: Observable<[FilterData]>
+        let filterWorkplaceList: Observable<[FilterWorkplace]>
     }
-    private let filterListRelay = BehaviorRelay<[FilterData]>(value: [])
+    private let filterWorkplaceListRelay = BehaviorRelay<[FilterWorkplace]>(value: [])
     
     // MARK: - Initializer
     init() {
@@ -35,9 +35,16 @@ final class FilterViewModel {
         input.viewDidLoad
             .subscribe(with: self) { owner, calendarMode in
                 // 사용자의 근무지/매장 불러오기
-                owner.filterListRelay.accept(CalendarMockData.filterListMock)
+                let filterList: [FilterWorkplace]
+                switch calendarMode {
+                case .personal:
+                    filterList = [FilterWorkplace(workplaceId: -1, workplaceName: "전체 보기")] + CalendarMockData.filterListMock
+                case .shared:
+                    filterList = CalendarMockData.filterListMock
+                }
+                owner.filterWorkplaceListRelay.accept(filterList)
             }.disposed(by: disposeBag)
         
-        return Output(filterDataList: filterListRelay.asObservable())
+        return Output(filterWorkplaceList: filterWorkplaceListRelay.asObservable())
     }
 }

@@ -16,15 +16,16 @@ final class CalendarViewModel {
     
     // MARK: - Input
     struct Input {
-        let currMonth: Observable<(year: Int, month: Int)>
-        let selectedCalendarMode: Observable<CalendarMode>
+        let visibleYearMonth: Observable<(year: Int, month: Int)>
+        let calendarMode: Observable<CalendarMode>
+        let filterWorkplace: Observable<FilterWorkplace>
     }
     
     // MARK: - Output
     struct Output {
-        let calendarModelList: Observable<(personal: [CalendarEvent], shared: [CalendarEvent])>
+        let calendarEventList: Observable<[CalendarEvent]>
     }
-    private let calendarModelListRelay = PublishRelay<(personal: [CalendarEvent], shared: [CalendarEvent])>()
+    private let calendarEventListRelay = PublishRelay<[CalendarEvent]>()
     
     // MARK: - Initializer
     init() {
@@ -34,7 +35,35 @@ final class CalendarViewModel {
     // MARK: - Input ➡️ Output Transform
     func transform(input: Input) -> Output {
         // TODO: 근무 이벤트 로딩
-        calendarModelListRelay.accept(CalendarMockData.calendarEventListMock)
-        return Output(calendarModelList: calendarModelListRelay.asObservable())
+        Observable.combineLatest(input.visibleYearMonth, input.calendarMode, input.filterWorkplace)
+            .subscribe(with: self) { owner, combined in
+                let ((year, month), calendarMode, filterWorkplace) = combined
+                let calendarEventList: [CalendarEvent]
+                switch calendarMode {
+                case .personal:
+                    calendarEventList = CalendarMockData.personalCalendarEventListMock
+                case .shared:
+                    calendarEventList = CalendarMockData.sharedCalendarEventListMock
+                }
+                var filtered: [CalendarEvent] = []
+                switch calendarMode {
+                case .personal:
+                    if filterWorkplace.workplaceId == -1 {
+                        // 전체 보기
+                        filtered = calendarEventList
+                    } else {
+                        filtered = calendarEventList.filter { $0.workplaceId == filterWorkplace.workplaceId }
+                    }
+                case .shared:
+                    if filterWorkplace.workplaceId == -1 {
+                        // 전체 보기
+                        filtered = calendarEventList
+                    } else {
+                        filtered = calendarEventList.filter { $0.workplaceId == filterWorkplace.workplaceId }
+                    }
+                }
+                owner.calendarEventListRelay.accept(filtered)
+            }.disposed(by: disposeBag)
+        return Output(calendarEventList: calendarEventListRelay.asObservable())
     }
 }

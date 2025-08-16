@@ -37,8 +37,8 @@ final class FilterView: UIView {
         $0.font = .headBold(16)
     }
     /// 필터 리스트 UI
-    fileprivate let filterTableView = UITableView().then {
-        $0.register(FilterCell.self, forCellReuseIdentifier: FilterCell.identifier)
+    fileprivate let filterWorkplaceTableView = UITableView().then {
+        $0.register(FilterWorkplaceCell.self, forCellReuseIdentifier: FilterWorkplaceCell.identifier)
         
         $0.separatorStyle = .none
         $0.rowHeight = 52  // 40 + 12(셀 간격)
@@ -86,7 +86,7 @@ private extension FilterView {
                          separatorView,
                          headerLabel,
                          emptyLabel,
-                         filterTableView,
+                         filterWorkplaceTableView,
                          applyButton)
     }
     
@@ -121,10 +121,10 @@ private extension FilterView {
         }
         
         emptyLabel.snp.makeConstraints {
-            $0.center.equalTo(filterTableView)
+            $0.center.equalTo(filterWorkplaceTableView)
         }
         
-        filterTableView.snp.makeConstraints {
+        filterWorkplaceTableView.snp.makeConstraints {
             $0.top.equalTo(headerLabel.snp.bottom).offset(12)
             $0.leading.trailing.equalTo(self.safeAreaLayoutGuide)
             $0.bottom.equalTo(applyButton.snp.top).offset(-12)
@@ -140,19 +140,20 @@ private extension FilterView {
 
 // MARK: - Extension Reactive
 extension Reactive where Base: FilterView {
-    var filterTableViewDataSource: Binder<([FilterData])> {
+    var filterWorkplaceTableViewDataSource: Binder<([FilterWorkplace])> {
         return Binder(base) { view, filterModel in
-            view.filterTableView.dataSource = nil
-            view.filterTableView.delegate = nil
+            view.filterWorkplaceTableView.dataSource = nil
+            view.filterWorkplaceTableView.delegate = nil
             
             Observable.just(filterModel)
-                .bind(to: view.filterTableView.rx.items(
-                    cellIdentifier: FilterCell.identifier,
-                    cellType: FilterCell.self
+                .bind(to: view.filterWorkplaceTableView.rx.items(
+                    cellIdentifier: FilterWorkplaceCell.identifier,
+                    cellType: FilterWorkplaceCell.self
                 )) { _, model, cell in
                     cell.update(workplaceName: model.workplaceName)
                 }.disposed(by: base.disposeBag)
         }
     }
+    var filterWorkplaceTableViewModelSelected: ControlEvent<FilterWorkplace> { base.filterWorkplaceTableView.rx.modelSelected(FilterWorkplace.self) }
     var applyButtonTap: ControlEvent<Void> { base.applyButton.rx.tap }
 }
