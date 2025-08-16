@@ -89,7 +89,6 @@ private extension FilterViewController {
         let input = FilterViewModel.Input(viewDidLoad: viewDidLoadRelay.asObservable())
         let output = viewModel.transform(input: input)
         
-        // Output
         output.filterDataList.asDriver(onErrorJustReturn: [])
             .drive(filterView.rx.filterTableViewDataSource)
             .disposed(by: disposeBag)

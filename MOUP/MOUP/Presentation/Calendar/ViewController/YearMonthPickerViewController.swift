@@ -9,7 +9,6 @@ import UIKit
 
 import RxCocoa
 import RxSwift
-import Then
 
 /// `YearMonthPickerViewController`의 이벤트를 `YearMonthPickerCoordinator`에 알리는 Delegate
 protocol YearMonthPickerVCDelegate: AnyObject {
