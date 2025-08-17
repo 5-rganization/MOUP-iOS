@@ -12,5 +12,7 @@ enum CalendarMockData {
                                                 CalendarEvent(eventId: 126, workplaceId: 135, workplaceName: "쿠팡 동탄1센터", workerId: 789, workerName: "김알바", workDate: "2025.08.25", startTime: "18:00", endTime: "04:00", restTime: 60, memo: "쿠팡 근무2", dailyIncome: 90270, colorLabel: "노란색")]
     static let sharedCalendarEventListMock = personalCalendarEventListMock + [CalendarEvent(eventId: 127, workplaceId: 456, workplaceName: "세븐일레븐 동탄제일점", workerId: 780, workerName: "이알바", workDate: "2025.08.25", startTime: "09:00", endTime: "19:00", restTime: 60, memo: "세븐일레븐 공유 근무1", dailyIncome: 90270, colorLabel: "노란색"),
                                                                               CalendarEvent(eventId: 128, workplaceId: 456, workplaceName: "세븐일레븐 동탄제일점", workerId: 780, workerName: "이알바", workDate: "2025.08.26", startTime: "12:00", endTime: "18:00", restTime: 30, memo: "세븐일레븐 공유 근무2", dailyIncome: 55165, colorLabel: "노란색")]
-    static let filterListMock = [FilterWorkplace(workplaceId: 456, workplaceName: "세븐일레븐 동탄제일점", isShared: true), FilterWorkplace(workplaceId: 135, workplaceName: "쿠팡 동탄1센터", isShared: false)]
+    static let filterListMock = [FilterWorkplace(workplaceId: 456, workplaceName: "세븐일레븐 동탄제일점", isShared: true),
+                                 FilterWorkplace(workplaceId: 135, workplaceName: "쿠팡 동탄1센터", isShared: false),
+                                 FilterWorkplace(workplaceId: 246, workplaceName: "세븐일레븐 동탄중심상가점", isShared: true)]
 }
