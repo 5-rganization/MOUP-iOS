@@ -14,13 +14,18 @@ import Then
 final class CalendarEventVStackView: UIStackView {
     
     // MARK: - UI Components
-    /// 근무 시간 or 근무자 이름 라벨
-    private let workHourOrNameLabel = UILabel().then {
+    /// 근무 시간 라벨
+    private let workHourLabel = UILabel().then {
+        $0.font = .bodyMedium(12)
+        $0.textAlignment = .left
+    }
+    /// 근무자 이름 라벨
+    private let workerNameLabel = UILabel().then {
         $0.font = .bodyMedium(12)
         $0.textAlignment = .left
     }
     /// 일급 라벨
-    private let dailyWageLabel = UILabel().then {
+    private let dailyIncomeLabel = UILabel().then {
         $0.font = .bodyMedium(12)
         $0.textAlignment = .left
     }
@@ -37,37 +42,43 @@ final class CalendarEventVStackView: UIStackView {
     }
     
     // MARK: - Internal Methods
-    func update(workHour: Double, workerName: String, wageType: String?, dailyWage: Int, calendarMode: CalendarMode, color: LabelColorString) {
-        let workHourStr = String(format: "%.1f", workHour)
+    func update(calendarMode: CalendarMode, event: CalendarEvent) {
+        guard let (workHourDecimal, workHourStr) = DateFormatter.workHourDecimal(startTime: event.startTime, endTime: event.endTime, restTime: event.restTime) else { return }
         if calendarMode == .shared {
-            workHourOrNameLabel.text = workerName
-        } else if workHourStr.last == "0" {
-            workHourOrNameLabel.text = "\(workHourStr.dropLast(2))시간"
+            workerNameLabel.text = event.workerName
+            workerNameLabel.isHidden = false
+            workHourLabel.isHidden = true
+            dailyIncomeLabel.isHidden = true
         } else {
-            workHourOrNameLabel.text = "\(workHourStr)시간"
-        }
-        
-        if calendarMode == .shared {
-            dailyWageLabel.isHidden = true
-        } else {
-            if wageType == "시급" {
+            workHourLabel.text = "\(workHourStr)시간"
+            workHourLabel.isHidden = false
+            workerNameLabel.isHidden = true
+            
+            switch event.salaryCalculation {
+            case .hourly:
                 // 시급
-                dailyWageLabel.text = NumberFormatter.decimalFormatter.string(for: Int(dailyWage))
-                dailyWageLabel.isHidden = false
-            } else if wageType == "고정" {
+                dailyIncomeLabel.text = NumberFormatter.decimalFormatter.string(for: Int(event.dailyIncome))
+                dailyIncomeLabel.isHidden = false
+            case .fixed:
                 // 고정급
-                dailyWageLabel.text = "고정급"
-                dailyWageLabel.isHidden = false
-            } else {
-                // 사장님 개인 캘린더
-                dailyWageLabel.text = "사장"
-                dailyWageLabel.isHidden = true
+                dailyIncomeLabel.text = "고정급"
+                dailyIncomeLabel.isHidden = false
             }
+            // TODO: 사장님 개인 캘린더
         }
         
-        self.backgroundColor = color.backgroundColor
-        workHourOrNameLabel.textColor = color.textColor
-        dailyWageLabel.textColor = color.textColor
+        // TODO: 개인 캘린더 모드일 때 자신의 근무가 아니면 primaryColor 처리 필요
+        if let labelColor = LabelColorString(rawValue: event.labelColor) {
+            self.backgroundColor = labelColor.backgroundColor
+            workHourLabel.textColor = labelColor.textColor
+            workerNameLabel.textColor = labelColor.textColor
+            dailyIncomeLabel.textColor = labelColor.textColor
+        } else {
+            self.backgroundColor = .primary100
+            workHourLabel.textColor = .primary600
+            workerNameLabel.textColor = .primary600
+            dailyIncomeLabel.textColor = .primary600
+        }
     }
 }
 
@@ -81,8 +92,9 @@ private extension CalendarEventVStackView {
     
     // MARK: - setHierarchy
     func setHierarchy() {
-        self.addArrangedSubviews(workHourOrNameLabel,
-                                 dailyWageLabel)
+        self.addArrangedSubviews(workHourLabel,
+                                 workerNameLabel,
+                                 dailyIncomeLabel)
     }
     
     // MARK: - setStyles
@@ -96,13 +108,16 @@ private extension CalendarEventVStackView {
     
     // MARK: - setConstraints
     func setConstraints() {
-        workHourOrNameLabel.snp.makeConstraints {
-            $0.height.equalTo(17)
+        workHourLabel.snp.makeConstraints {
+            $0.height.equalTo(18)
         }
         
-        dailyWageLabel.snp.makeConstraints {
-            $0.height.equalTo(17)
+        workerNameLabel.snp.makeConstraints {
+            $0.height.equalTo(18)
+        }
+        
+        dailyIncomeLabel.snp.makeConstraints {
+            $0.height.equalTo(18)
         }
     }
 }
-
