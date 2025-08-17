@@ -36,6 +36,19 @@ final class CalendarDayCell: JTACDayCell {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 10
     }
+    /// 근무 컨테이너 스택
+    private let eventsVStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = 4
+    }
+    /// 첫번째 열 근무 표시 UI
+    private let firstEventRow = CalendarEventVStackView()
+    /// 두번째 열 근무 표시 UI
+    private let secondEventRow = CalendarEventVStackView()
+    /// 세번째 열 근무 표시 UI
+    private let thirdEventRow = CalendarEventVStackView()
+    /// 근무 개수 표시 UI
+    private let eventCountRow = EventCountLabel()
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -55,7 +68,7 @@ final class CalendarDayCell: JTACDayCell {
     }
     
     // MARK: - Methods
-    func update(dateStr: String, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, isToday: Bool) {
+    func update(dateStr: String, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, isToday: Bool, calendarMode: CalendarMode, eventList: [CalendarEvent]) {
         dateLabel.text = dateStr
         
         if isToday {
@@ -91,7 +104,13 @@ private extension CalendarDayCell {
     func setHierarchy() {
         self.contentView.addSubviews(seperatorView,
                                      selectedView,
-                                     dateLabel)
+                                     dateLabel,
+                                     eventsVStackView)
+        
+        eventsVStackView.addArrangedSubviews(firstEventRow,
+                                             secondEventRow,
+                                             thirdEventRow,
+                                             eventCountRow)
     }
     
     // MARK: - setStyles
@@ -117,6 +136,15 @@ private extension CalendarDayCell {
             $0.top.equalTo(seperatorView.snp.bottom).offset(4)
             $0.width.height.equalTo(20)
             $0.centerX.equalToSuperview()
+        }
+        
+        eventsVStackView.snp.makeConstraints {
+            $0.top.equalTo(dateLabel.snp.bottom).offset(4)
+            $0.leading.trailing.equalToSuperview().inset(2)
+        }
+        
+        eventCountRow.snp.makeConstraints {
+            $0.height.equalTo(17)
         }
     }
 }

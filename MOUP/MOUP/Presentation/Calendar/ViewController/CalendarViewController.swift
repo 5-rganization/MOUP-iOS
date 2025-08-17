@@ -189,7 +189,9 @@ private extension CalendarViewController {
                     daysOfWeek: cellState.day,
                     dateBelongsToThisMonth: dateBelongsToThisMonth,
                     isSelected: isSelected,
-                    isToday: isToday)
+                    isToday: isToday,
+                    calendarMode: calendarMode,
+                    eventList: eventList)
     }
 }
 
