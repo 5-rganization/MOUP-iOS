@@ -68,6 +68,9 @@ private extension FilterViewController {
     // MARK: - setStyles
     func setStyles() {
         self.view.backgroundColor = .primaryBackground
+        
+        // TODO: 사용자 역할에 따라 변경
+        filterView.update(headerStr: "나의 근무지")
     }
     
     // MARK: - setDelegates
