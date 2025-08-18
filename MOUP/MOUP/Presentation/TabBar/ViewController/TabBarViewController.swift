@@ -33,6 +33,7 @@ final class TabBarViewController: UITabBarController {
         tabBarFrame.origin.y = self.view.frame.height - customHeight
         self.tabBar.frame = tabBarFrame
         
+        // 변경된 탭바 높이 safeAreaLayoutGuide에 반영
         let adjustment = customHeight - defaultHeight
         for vc in self.viewControllers ?? [] {
             vc.additionalSafeAreaInsets.bottom = adjustment
