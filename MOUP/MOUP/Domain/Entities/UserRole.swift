@@ -1,6 +1,6 @@
 //
 //  UserRole.swift
-//  Routory
+//  MOUP
 //
 //  Created by 서동환 on 6/18/25.
 //

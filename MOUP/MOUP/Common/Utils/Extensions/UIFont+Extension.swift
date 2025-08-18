@@ -1,6 +1,6 @@
 //
 //  UIFont+Extension.swift
-//  Routory
+//  MOUP
 //
 //  Created by 서동환 on 6/5/25.
 //
