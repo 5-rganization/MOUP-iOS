@@ -26,11 +26,17 @@ final class TabBarViewController: UITabBarController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
+        let defaultHeight: CGFloat = self.tabBar.frame.height
         let customHeight: CGFloat = 64 + self.view.safeAreaInsets.bottom
         var tabBarFrame = self.tabBar.frame
         tabBarFrame.size.height = customHeight
         tabBarFrame.origin.y = self.view.frame.height - customHeight
         self.tabBar.frame = tabBarFrame
+        
+        let adjustment = customHeight - defaultHeight
+        for vc in self.viewControllers ?? [] {
+            vc.additionalSafeAreaInsets.bottom = adjustment
+        }
     }
     
     // MARK: - Initializer
