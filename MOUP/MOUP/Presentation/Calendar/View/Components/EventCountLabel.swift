@@ -7,7 +7,7 @@
 
 import UIKit
 
-/// 공유 캘린더에서 특정 날짜 이벤트가 4개 이상일 때 보이는 라벨
+/// 공유 캘린더에서 특정 날짜 이벤트가 3~4개 이상일 때 보이는 라벨
 final class EventCountLabel: UILabel {
     
     // MARK: - Initializer

@@ -14,13 +14,8 @@ import Then
 final class EventRowVStackView: UIStackView {
     
     // MARK: - UI Components
-    /// 근무 시간 라벨
-    private let workHourLabel = UILabel().then {
-        $0.font = .bodyMedium(12)
-        $0.textAlignment = .left
-    }
-    /// 근무자 이름 라벨
-    private let workerNameLabel = UILabel().then {
+    /// 근무 시간 or 근무자 이름 라벨
+    private let workHourOrWorkerNameLabel = UILabel().then {
         $0.font = .bodyMedium(12)
         $0.textAlignment = .left
     }
@@ -50,9 +45,7 @@ final class EventRowVStackView: UIStackView {
         
         switch calendarMode {
         case .personal:
-            workHourLabel.text = workHour.str + "시간"
-            workHourLabel.isHidden = false
-            workerNameLabel.isHidden = true
+            workHourOrWorkerNameLabel.text = workHour.str + "시간"
             
             setUserLabelColor(event.labelColor)
             
@@ -67,9 +60,7 @@ final class EventRowVStackView: UIStackView {
             dailyIncomeLabel.isHidden = false
             // TODO: 사장님 개인 캘린더
         case .shared:
-            workerNameLabel.text = event.workerName
-            workerNameLabel.isHidden = false
-            workHourLabel.isHidden = true
+            workHourOrWorkerNameLabel.text = event.workerName
             dailyIncomeLabel.isHidden = true
             
             // TODO: 실제 로그인한 사용자의 ID를 반영해야 함
@@ -80,6 +71,14 @@ final class EventRowVStackView: UIStackView {
                 setOtherLabelColor()
             }
         }
+    }
+    
+    func reduceSize() {
+        dailyIncomeLabel.isHidden = true
+    }
+    
+    func restoreSize() {
+        dailyIncomeLabel.isHidden = false
     }
 }
 
@@ -93,8 +92,7 @@ private extension EventRowVStackView {
     
     // MARK: - setHierarchy
     func setHierarchy() {
-        self.addArrangedSubviews(workHourLabel,
-                                 workerNameLabel,
+        self.addArrangedSubviews(workHourOrWorkerNameLabel,
                                  dailyIncomeLabel)
     }
     
@@ -109,11 +107,7 @@ private extension EventRowVStackView {
     
     // MARK: - setConstraints
     func setConstraints() {
-        workHourLabel.snp.makeConstraints {
-            $0.height.equalTo(18)
-        }
-        
-        workerNameLabel.snp.makeConstraints {
+        workHourOrWorkerNameLabel.snp.makeConstraints {
             $0.height.equalTo(18)
         }
         
@@ -128,12 +122,11 @@ private extension EventRowVStackView {
     /// 사용자의 근무에 라벨 컬러를 설정하는 메서드
     func setUserLabelColor(_ labelColor: String) {
         guard let labelColor = LabelColorString(rawValue: labelColor) else {
-            assertionFailure("setUserLabelColor() 메서드 실행 실패) labelColor 값이 올바르지 않습니다.")
+            assertionFailure("setUserLabelColor() 메서드 실행 실패 - labelColor 값이 올바르지 않습니다.")
             return
         }
         self.backgroundColor = labelColor.backgroundColor
-        workHourLabel.textColor = labelColor.textColor
-        workerNameLabel.textColor = labelColor.textColor
+        workHourOrWorkerNameLabel.textColor = labelColor.textColor
         dailyIncomeLabel.textColor = labelColor.textColor
     }
     
@@ -141,8 +134,7 @@ private extension EventRowVStackView {
     func setOtherLabelColor() {
         // TODO: - 사장님 역할일 때 색상 처리 필요
         self.backgroundColor = .primary100
-        workHourLabel.textColor = .primary600
-        workerNameLabel.textColor = .primary600
+        workHourOrWorkerNameLabel.textColor = .primary600
         dailyIncomeLabel.textColor = .primary600
     }
 }

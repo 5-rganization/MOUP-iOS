@@ -1,5 +1,5 @@
 //
-//  EventRowContainerVStackView.swift
+//  EventContainerVStackView.swift
 //  MOUP
 //
 //  Created by 서동환 on 8/18/25.
@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 
 /// 캘린더 날짜 셀 내부 근무 표시 컨테이너 UI
-final class EventRowContainerVStackView: UIStackView {
+final class EventContainerVStackView: UIStackView {
     
     // MARK: - UI Components
     /// 첫 번째 열 근무 표시 UI
@@ -55,9 +55,19 @@ final class EventRowContainerVStackView: UIStackView {
             }
         }
     }
+    
+    func reduceSize() {
+        eventRows.forEach { $0.reduceSize() }
+        thirdEventRow.isHidden = true
+    }
+    
+    func restoreSize() {
+        eventRows.forEach { $0.restoreSize() }
+        thirdEventRow.isHidden = false
+    }
 }
 
-private extension EventRowContainerVStackView {
+private extension EventContainerVStackView {
     // MARK: - configure
     func configure() {
         setHierarchy()

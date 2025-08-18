@@ -23,12 +23,12 @@ final class CalendarDayCell: JTACDayCell {
         $0.backgroundColor = .gray300
     }
     /// 선택됐을 때 표시되는 UI
-    fileprivate let selectedView = UIView().then {
+    private let selectedView = UIView().then {
         $0.backgroundColor = .primary50
         $0.isHidden = true
     }
     /// 날짜(일) 라벨
-    fileprivate let dateLabel = UILabel().then {
+    private let dateLabel = UILabel().then {
         $0.textColor = .gray900
         $0.font = .bodyMedium(14)
         $0.textAlignment = .center
@@ -37,7 +37,7 @@ final class CalendarDayCell: JTACDayCell {
         $0.layer.cornerRadius = 10
     }
     /// 근무 컨테이너 스택
-    private let eventRowContainerVStackView = EventRowContainerVStackView()
+    private let eventContainerVStackView = EventContainerVStackView()
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -51,9 +51,17 @@ final class CalendarDayCell: JTACDayCell {
     }
     
     // MARK: - Lifecycle
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        if eventContainerVStackView.frame.maxY >= self.contentView.bounds.height {
+            eventContainerVStackView.reduceSize()
+        }
+    }
+    
     override func prepareForReuse() {
         super.prepareForReuse()
-        dateLabel.backgroundColor = .clear
+        eventContainerVStackView.restoreSize()
     }
     
     // MARK: - Methods
@@ -72,13 +80,15 @@ final class CalendarDayCell: JTACDayCell {
             default:
                 dateLabel.textColor = .gray900
             }
+            dateLabel.backgroundColor = .clear
         }
         
         self.isUserInteractionEnabled = dateBelongsToThisMonth
         dateLabel.isHidden = !dateBelongsToThisMonth
         selectedView.isHidden = !isSelected
         
-        eventRowContainerVStackView.update(calendarMode: calendarMode, eventList: eventList)
+        eventContainerVStackView.update(calendarMode: calendarMode, eventList: eventList)
+        layoutIfNeeded()
     }
 }
 
@@ -95,7 +105,7 @@ private extension CalendarDayCell {
         self.contentView.addSubviews(seperatorView,
                                      selectedView,
                                      dateLabel,
-                                     eventRowContainerVStackView)
+                                     eventContainerVStackView)
     }
     
     // MARK: - setStyles
@@ -123,7 +133,7 @@ private extension CalendarDayCell {
             $0.centerX.equalToSuperview()
         }
         
-        eventRowContainerVStackView.snp.makeConstraints {
+        eventContainerVStackView.snp.makeConstraints {
             $0.top.equalTo(dateLabel.snp.bottom).offset(4)
             $0.leading.trailing.equalToSuperview().inset(2)
         }
