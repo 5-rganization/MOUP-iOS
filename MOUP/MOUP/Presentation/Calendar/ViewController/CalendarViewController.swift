@@ -146,6 +146,10 @@ private extension CalendarViewController {
         
         output.calendarEventList.asDriver(onErrorJustReturn: [])
             .drive(with: self) { owner, calendarEventList in
+                print("==================================================")
+                print("calendarEventList")
+                dump(calendarEventList)
+                print("==================================================")
                 owner.populateDataSource(calendarEventList: calendarEventList)
             }.disposed(by: disposeBag)
     }
@@ -161,10 +165,6 @@ extension CalendarViewController {
             guard let eventDate = DateFormatter.dataSourceDateFormatter.date(from: event.workDate) else { continue }
             calendarEventDataSource[eventDate, default: []].append(event)
         }
-        print("==================================================")
-        print("calendarEventDataSource")
-        dump(calendarEventDataSource)
-        print("==================================================")
         calendarView.getMonthCalendarView.reloadData()
     }
 }

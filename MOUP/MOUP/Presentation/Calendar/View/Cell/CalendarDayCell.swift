@@ -37,18 +37,7 @@ final class CalendarDayCell: JTACDayCell {
         $0.layer.cornerRadius = 10
     }
     /// 근무 컨테이너 스택
-    private let eventsVStackView = UIStackView().then {
-        $0.axis = .vertical
-        $0.spacing = 4
-    }
-    /// 첫 번째 열 근무 표시 UI
-    private let firstEventRow = CalendarEventVStackView()
-    /// 두 번째 열 근무 표시 UI
-    private let secondEventRow = CalendarEventVStackView()
-    /// 세 번째 열 근무 표시 UI
-    private let thirdEventRow = CalendarEventVStackView()
-    /// 근무 개수 표시 UI
-    private let eventCountRow = EventCountLabel()
+    private let eventRowContainerVStackView = EventRowContainerVStackView()
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -89,24 +78,7 @@ final class CalendarDayCell: JTACDayCell {
         dateLabel.isHidden = !dateBelongsToThisMonth
         selectedView.isHidden = !isSelected
         
-        eventsVStackView.subviews.forEach { $0.isHidden = true }
-        
-        if !eventList.isEmpty {
-            if calendarMode == .shared && eventList.count > 3 {
-                eventCountRow.text = "+\(eventList.count - 3)"
-                eventCountRow.isHidden = false
-            }
-            
-            for (index, event) in eventList.enumerated() {
-                if index > 2 {
-                    break
-                } else {
-                    guard let eventRow = eventsVStackView.subviews[index] as? CalendarEventVStackView else { continue }
-                    eventRow.update(calendarMode: calendarMode, event: event)
-                    eventRow.isHidden = false
-                }
-            }
-        }
+        eventRowContainerVStackView.update(calendarMode: calendarMode, eventList: eventList)
     }
 }
 
@@ -123,12 +95,7 @@ private extension CalendarDayCell {
         self.contentView.addSubviews(seperatorView,
                                      selectedView,
                                      dateLabel,
-                                     eventsVStackView)
-        
-        eventsVStackView.addArrangedSubviews(firstEventRow,
-                                             secondEventRow,
-                                             thirdEventRow,
-                                             eventCountRow)
+                                     eventRowContainerVStackView)
     }
     
     // MARK: - setStyles
@@ -156,13 +123,9 @@ private extension CalendarDayCell {
             $0.centerX.equalToSuperview()
         }
         
-        eventsVStackView.snp.makeConstraints {
+        eventRowContainerVStackView.snp.makeConstraints {
             $0.top.equalTo(dateLabel.snp.bottom).offset(4)
             $0.leading.trailing.equalToSuperview().inset(2)
-        }
-        
-        eventCountRow.snp.makeConstraints {
-            $0.height.equalTo(17)
         }
     }
 }
