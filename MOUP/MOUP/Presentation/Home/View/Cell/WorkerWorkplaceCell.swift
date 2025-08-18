@@ -6,9 +6,10 @@
 //
 
 import UIKit
-import SnapKit
 import RxSwift
 import RxCocoa
+import SnapKit
+import Then
 
 class WorkerWorkplaceCell: UITableViewCell {
     // MARK: - Properties
