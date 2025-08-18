@@ -41,11 +41,11 @@ final class CalendarDayCell: JTACDayCell {
         $0.axis = .vertical
         $0.spacing = 4
     }
-    /// 첫번째 열 근무 표시 UI
+    /// 첫 번째 열 근무 표시 UI
     private let firstEventRow = CalendarEventVStackView()
-    /// 두번째 열 근무 표시 UI
+    /// 두 번째 열 근무 표시 UI
     private let secondEventRow = CalendarEventVStackView()
-    /// 세번째 열 근무 표시 UI
+    /// 세 번째 열 근무 표시 UI
     private let thirdEventRow = CalendarEventVStackView()
     /// 근무 개수 표시 UI
     private let eventCountRow = EventCountLabel()
@@ -68,7 +68,7 @@ final class CalendarDayCell: JTACDayCell {
     }
     
     // MARK: - Methods
-    func update(dateStr: String, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, isToday: Bool, calendarMode: CalendarMode, eventList: [CalendarEvent]) {
+    func update(dateStr: String, isToday: Bool, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, calendarMode: CalendarMode, eventList: [CalendarEvent]) {
         dateLabel.text = dateStr
         
         if isToday {
@@ -85,10 +85,28 @@ final class CalendarDayCell: JTACDayCell {
             }
         }
         
-        dateLabel.isHidden = !dateBelongsToThisMonth
         self.isUserInteractionEnabled = dateBelongsToThisMonth
-        
+        dateLabel.isHidden = !dateBelongsToThisMonth
         selectedView.isHidden = !isSelected
+        
+        eventsVStackView.subviews.forEach { $0.isHidden = true }
+        
+        if !eventList.isEmpty {
+            if calendarMode == .shared && eventList.count > 3 {
+                eventCountRow.text = "+\(eventList.count - 3)"
+                eventCountRow.isHidden = false
+            }
+            
+            for (index, event) in eventList.enumerated() {
+                if index > 2 {
+                    break
+                } else {
+                    guard let eventRow = eventsVStackView.subviews[index] as? CalendarEventVStackView else { continue }
+                    eventRow.update(calendarMode: calendarMode, event: event)
+                    eventRow.isHidden = false
+                }
+            }
+        }
     }
 }
 

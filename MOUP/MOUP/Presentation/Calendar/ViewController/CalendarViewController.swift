@@ -146,8 +146,6 @@ private extension CalendarViewController {
         
         output.calendarEventList.asDriver(onErrorJustReturn: [])
             .drive(with: self) { owner, calendarEventList in
-                print("calendarEventList")
-                dump(calendarEventList)
                 owner.populateDataSource(calendarEventList: calendarEventList)
             }.disposed(by: disposeBag)
     }
@@ -156,10 +154,17 @@ private extension CalendarViewController {
 // MARK: - Internal Calendar Methods
 extension CalendarViewController {
     func populateDataSource(calendarEventList: [CalendarEvent]) {
+        // TODO: 수신한 데이터 지우지 않는 방향으로 수정
+        calendarEventDataSource.removeAll()
+        
         for event in calendarEventList {
             guard let eventDate = DateFormatter.dataSourceDateFormatter.date(from: event.workDate) else { continue }
             calendarEventDataSource[eventDate, default: []].append(event)
         }
+        print("==================================================")
+        print("calendarEventDataSource")
+        dump(calendarEventDataSource)
+        print("==================================================")
         calendarView.getMonthCalendarView.reloadData()
     }
 }
@@ -186,10 +191,10 @@ private extension CalendarViewController {
         let isToday = Calendar.current.isDateInToday(cellState.date)
         
         cell.update(dateStr: cellState.text,
+                    isToday: isToday,
                     daysOfWeek: cellState.day,
                     dateBelongsToThisMonth: dateBelongsToThisMonth,
                     isSelected: isSelected,
-                    isToday: isToday,
                     calendarMode: calendarMode,
                     eventList: eventList)
     }

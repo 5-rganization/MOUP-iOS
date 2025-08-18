@@ -31,11 +31,11 @@ extension DateFormatter {
     }
     
     /// 근무 시간 계산용 `DateFormatter`
-    /// - `dateFormat`: `"hh:MM"`
+    /// - `dateFormat`: `"HH:mm"`
     /// - `locale`: `"ko_KR"`
     /// - `timeZone`: `"Asia/Seoul"`
     static let workHourDateFormatter = DateFormatter().then {
-        $0.dateFormat = "hh:MM"
+        $0.dateFormat = "HH:mm"
         $0.locale = Locale(identifier: "ko_KR")
         $0.timeZone = TimeZone(identifier: "Asia/Seoul")
     }
@@ -48,7 +48,7 @@ extension DateFormatter {
     /// - Returns:
     ///   - `decimal`: 근무시간 `Double`
     ///   - `workHour`:  최대 소수점 첫 번째 자리까지 표시하는 근무 시간 `String`
-    static func workHourDecimal(startTime: String, endTime: String, restTime: Int) -> (decimal: Double, workHour: String)? {
+    static func calculateWorkHour(startTime: String, endTime: String, restTime: Int) -> (decimal: Double, str: String)? {
         guard let startDate = workHourDateFormatter.date(from: startTime),
               let endDate = workHourDateFormatter.date(from: endTime) else { return nil }
         

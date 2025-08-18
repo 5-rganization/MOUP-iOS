@@ -43,14 +43,14 @@ final class CalendarEventVStackView: UIStackView {
     
     // MARK: - Internal Methods
     func update(calendarMode: CalendarMode, event: CalendarEvent) {
-        guard let (workHourDecimal, workHourStr) = DateFormatter.workHourDecimal(startTime: event.startTime, endTime: event.endTime, restTime: event.restTime) else { return }
+        guard let workHour = DateFormatter.calculateWorkHour(startTime: event.startTime, endTime: event.endTime, restTime: event.restTime) else { return }
         if calendarMode == .shared {
             workerNameLabel.text = event.workerName
             workerNameLabel.isHidden = false
             workHourLabel.isHidden = true
             dailyIncomeLabel.isHidden = true
         } else {
-            workHourLabel.text = "\(workHourStr)시간"
+            workHourLabel.text = "\(workHour.str)시간"
             workHourLabel.isHidden = false
             workerNameLabel.isHidden = true
             

@@ -14,27 +14,27 @@ enum LabelColorString: String, CaseIterable {
     case yellow = "노란색"
     case green = "초록색"
     case blue = "파란색"
-    case purple = "보라색"
     case indigo = "남색"
+    case purple = "보라색"
     
     var labelColor: UIColor {
         switch self {
         case ._default:
             return .primary500
         case .red:
-            return .systemRed
+            return .labelRed
         case .orange:
-            return .systemOrange
+            return .labelOrange
         case .yellow:
-            return .systemYellow
+            return .labelYellow
         case .green:
-            return .systemGreen
+            return .labelGreen
         case .blue:
-            return .systemBlue
-        case .purple:
-            return .systemPurple
+            return .labelBlue
         case .indigo:
-            return .systemIndigo
+            return .labelIndigo
+        case .purple:
+            return .labelPurple
         }
     }
     
@@ -52,10 +52,10 @@ enum LabelColorString: String, CaseIterable {
             return .greenBackground
         case .blue:
             return .blueBackground
-        case .purple:
-            return .purpleBackground
         case .indigo:
             return .indigoBackground
+        case .purple:
+            return .purpleBackground
         }
     }
     
@@ -73,10 +73,10 @@ enum LabelColorString: String, CaseIterable {
             return .greenText
         case .blue:
             return .blueText
-        case .purple:
-            return .purpleText
         case .indigo:
             return .indigoText
+        case .purple:
+            return .purpleText
         }
     }
 }
