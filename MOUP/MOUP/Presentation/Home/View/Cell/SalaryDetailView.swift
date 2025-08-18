@@ -1,23 +1,20 @@
 //
-//  OwnerWorkplaceCell.swift
+//  SalaryDetailView.swift
 //  MOUP
 //
-//  Created by 송규섭 on 8/1/25.
+//  Created by 송규섭 on 8/13/25.
 //
 
 import UIKit
-import RxSwift
-import RxCocoa
-import SnapKit
-import Then
 
-class OwnerWorkplaceCell: UITableViewCell {
+final class SalaryDetailView: UIView {
     // MARK: - Properties
-    static let identifier = "OwnerWorkplaceCell"
+
+    // MARK: - UI Components
 
     // MARK: - Initializer
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
 
         configure()
     }
@@ -26,9 +23,11 @@ class OwnerWorkplaceCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented.")
     }
+
+    // MARK: - Public Methods
 }
 
-private extension OwnerWorkplaceCell {
+private extension SalaryDetailView {
     // MARK: - configure
     func configure() {
         setHierarchy()
@@ -48,6 +47,7 @@ private extension OwnerWorkplaceCell {
 
     // MARK: - setConstraints
     func setConstraints() {
-        
+
     }
 }
+
