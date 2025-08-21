@@ -12,17 +12,15 @@ import SnapKit
 /// 캘린더 날짜 셀 내부 근무 표시 컨테이너 UI
 final class EventContainerVStackView: UIStackView {
     
+    // MARK: - Properties
+    private(set) var isReduced: Bool = false
+    private var eventListCount: Int = 0
+    
     // MARK: - UI Components
-    /// 첫 번째 열 근무 표시 UI
-    private let firstEventRow = EventRowVStackView()
-    /// 두 번째 열 근무 표시 UI
-    private let secondEventRow = EventRowVStackView()
-    /// 세 번째 열 근무 표시 UI
-    private let thirdEventRow = EventRowVStackView()
     /// 근무 표시 UI 배열
-    private lazy var eventRows = [firstEventRow, secondEventRow, thirdEventRow]
-    /// 근무 개수 표시 UI
-    private let eventCountRow = EventCountLabel()
+    private let eventRows = [EventRowVStackView(), EventRowVStackView(), EventRowVStackView(), EventRowVStackView()]
+    /// 나머지 근무 개수 표시 UI
+    private let restEventCountRow = RestEventCountLabel()
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -37,33 +35,48 @@ final class EventContainerVStackView: UIStackView {
     
     // MARK: - Internal Methods
     func update(calendarMode: CalendarMode, eventList: [CalendarEvent]) {
-        self.subviews.forEach { $0.isHidden = true }
+        self.arrangedSubviews.forEach { $0.isHidden = true }
         
-        if !eventList.isEmpty {
-            for (index, event) in eventList.enumerated() {
-                if index > 2 {
-                    if calendarMode == .shared {
-                        // 공유 캘린더 모드) 근무가 3개 초과일 때 근무 개수 UI 표시
-                        eventCountRow.text = "+\(eventList.count - 3)"
-                        eventCountRow.isHidden = false
-                    }
-                    break
-                } else {
-                    eventRows[index].update(calendarMode: calendarMode, event: event)
-                    eventRows[index].isHidden = false
-                }
+        // 근무가 4개 초과일 때 근무 개수 UI 표시
+        let displayLimit = 4
+        for (index, event) in eventList.enumerated() {
+            if index < displayLimit {
+                eventRows[index].update(calendarMode: calendarMode, event: event)
+                eventRows[index].isHidden = false
+            } else {
+                break
             }
         }
+        
+        eventListCount = eventList.count
+        
+        // 개인 캘린더 모드) 근무가 2개 초과일 때 급여 라벨 숨김
+        if calendarMode == .personal && eventListCount > 2 {
+            eventRows.forEach { $0.reduceSize() }
+        }
+        
+        showEventCountRow(displayLimit: displayLimit)
     }
     
+    /// `CalendarDayCell`이 공간 부족일 경우 근무 정보 중 일부를 숨김 처리하는 메서드
     func reduceSize() {
-        eventRows.forEach { $0.reduceSize() }
-        thirdEventRow.isHidden = true
+        // 근무가 1개 초과일 때 급여 라벨 숨김
+        let eventRowCount = eventRows.filter { $0.isHidden == false }.count
+        if eventRowCount > 1 {
+            eventRows.forEach { $0.reduceSize() }
+        }
+        eventRows.last?.isHidden = true
+        
+        // 근무가 3개 초과일 때 근무 개수 UI 표시
+        showEventCountRow(displayLimit: 3)
+        isReduced = true
     }
     
+    /// 숨김 처리된 근무 정보 복구
     func restoreSize() {
         eventRows.forEach { $0.restoreSize() }
-        thirdEventRow.isHidden = false
+        eventRows.last?.isHidden = false
+        isReduced = false
     }
 }
 
@@ -77,10 +90,8 @@ private extension EventContainerVStackView {
     
     // MARK: - setHierarchy
     func setHierarchy() {
-        self.addArrangedSubviews(firstEventRow,
-                                 secondEventRow,
-                                 thirdEventRow,
-                                 eventCountRow)
+        eventRows.forEach { self.addArrangedSubview($0) }
+        self.addArrangedSubview(restEventCountRow)
     }
     
     // MARK: - setStyles
@@ -91,8 +102,19 @@ private extension EventContainerVStackView {
     
     // MARK: - setConstraints
     func setConstraints() {
-        eventCountRow.snp.makeConstraints {
+        restEventCountRow.snp.makeConstraints {
             $0.height.equalTo(18)
+        }
+    }
+}
+
+private extension EventContainerVStackView {
+    func showEventCountRow(displayLimit: Int) {
+        if eventListCount > displayLimit {
+            // 마지막 근무 UI 자리에 표시
+            eventRows[displayLimit - 1].isHidden = true
+            restEventCountRow.text = "+\(eventListCount - displayLimit + 1)"
+            restEventCountRow.isHidden = false
         }
     }
 }

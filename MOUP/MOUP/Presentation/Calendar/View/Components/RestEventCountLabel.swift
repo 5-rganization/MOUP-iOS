@@ -1,5 +1,5 @@
 //
-//  EventCountLabel.swift
+//  RestEventCountLabel.swift
 //  MOUP
 //
 //  Created by 서동환 on 8/17/25.
@@ -8,7 +8,7 @@
 import UIKit
 
 /// 공유 캘린더에서 특정 날짜 이벤트가 3~4개 이상일 때 보이는 라벨
-final class EventCountLabel: UILabel {
+final class RestEventCountLabel: UILabel {
     
     // MARK: - Initializer
     override init(frame: CGRect) {

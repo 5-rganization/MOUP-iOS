@@ -45,8 +45,7 @@ final class EventRowVStackView: UIStackView {
         
         switch calendarMode {
         case .personal:
-            workHourOrWorkerNameLabel.text = workHour.str + "시간"
-            
+            workHourOrWorkerNameLabel.text = "\(workHour.str)시간"
             setUserLabelColor(event.labelColor)
             
             switch event.salaryCalculation {

@@ -36,7 +36,7 @@ final class CalendarDayCell: JTACDayCell {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 10
     }
-    /// 근무 컨테이너 스택
+    /// 근무 컨테이너 UI
     private let eventContainerVStackView = EventContainerVStackView()
     
     // MARK: - Initializer
@@ -54,17 +54,37 @@ final class CalendarDayCell: JTACDayCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        if eventContainerVStackView.frame.maxY >= self.contentView.bounds.height {
-            eventContainerVStackView.reduceSize()
+        // eventContainerVStackView의 minY 계산
+        let eventContainerMinY = dateLabel.frame.maxY + 4
+        
+        // eventContainerVStackView의 너비 계산
+        let targetWidth = self.contentView.bounds.width - 4
+        // systemLayoutSizeFitting에 전달할 목표 크기 계산 - 너비는 targetWidth, 높이는 시스템이 계산
+        let targetSize = CGSize(width: targetWidth, height: UIView.layoutFittingCompressedSize.height)
+        // targetSize를 이용하여 eventContainerVStackView의 잠재적인 최대 높이 계산
+        let requiredHeight = eventContainerVStackView.systemLayoutSizeFitting(targetSize,
+                                                                              withHorizontalFittingPriority: .required,
+                                                                              verticalFittingPriority: .fittingSizeLevel).height
+        // eventContainerVStackView의 잠재적인 maxY 계산
+        let potentialMaxY = eventContainerMinY + requiredHeight
+        
+        // 근무 컨테이너 UI가 캘린더 셀을 벗어났을 때(혹은 공간이 4 미만일 때)
+        if potentialMaxY + 4 >= self.contentView.bounds.height {
+            // eventContainerVStackView가 isReduced인 상태가 아니라면
+            if !eventContainerVStackView.isReduced {
+                // 근무 UI 크기 줄임
+                eventContainerVStackView.reduceSize()
+            }
         }
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        // 근무 UI 크기 원상 복구
         eventContainerVStackView.restoreSize()
     }
     
-    // MARK: - Methods
+    // MARK: - Internal Methods
     func update(dateStr: String, isToday: Bool, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, calendarMode: CalendarMode, eventList: [CalendarEvent]) {
         dateLabel.text = dateStr
         
@@ -88,7 +108,9 @@ final class CalendarDayCell: JTACDayCell {
         selectedView.isHidden = !isSelected
         
         eventContainerVStackView.update(calendarMode: calendarMode, eventList: eventList)
-        layoutIfNeeded()
+        if !eventList.isEmpty {
+            layoutIfNeeded()
+        }
     }
 }
 
