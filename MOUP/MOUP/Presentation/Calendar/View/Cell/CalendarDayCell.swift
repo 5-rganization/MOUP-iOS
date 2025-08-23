@@ -70,18 +70,9 @@ final class CalendarDayCell: JTACDayCell {
         
         // 근무 컨테이너 UI가 캘린더 셀을 벗어났을 때(혹은 공간이 4 미만일 때)
         if potentialMaxY + 4 >= self.contentView.bounds.height {
-            // eventContainerVStackView가 isReduced인 상태가 아니라면
-            if !eventContainerVStackView.isReduced {
-                // 근무 UI 크기 줄임
-                eventContainerVStackView.reduceSize()
-            }
+            // 근무 UI 크기 줄임
+            eventContainerVStackView.reduceSize()
         }
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        // 근무 UI 크기 원상 복구
-        eventContainerVStackView.restoreSize()
     }
     
     // MARK: - Internal Methods

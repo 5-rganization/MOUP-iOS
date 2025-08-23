@@ -75,10 +75,6 @@ final class EventRowVStackView: UIStackView {
     func reduceSize() {
         dailyIncomeLabel.isHidden = true
     }
-    
-    func restoreSize() {
-        dailyIncomeLabel.isHidden = false
-    }
 }
 
 private extension EventRowVStackView {

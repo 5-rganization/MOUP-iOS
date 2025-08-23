@@ -13,7 +13,7 @@ import SnapKit
 final class EventContainerVStackView: UIStackView {
     
     // MARK: - Properties
-    private(set) var isReduced: Bool = false
+    /// 해당 날짜 근무 개수
     private var eventListCount: Int = 0
     
     // MARK: - UI Components
@@ -48,9 +48,8 @@ final class EventContainerVStackView: UIStackView {
             }
         }
         
-        eventListCount = eventList.count
-        
         // 개인 캘린더 모드) 근무가 2개 초과일 때 급여 라벨 숨김
+        eventListCount = eventList.count
         if calendarMode == .personal && eventListCount > 2 {
             eventRows.forEach { $0.reduceSize() }
         }
@@ -61,22 +60,13 @@ final class EventContainerVStackView: UIStackView {
     /// `CalendarDayCell`이 공간 부족일 경우 근무 정보 중 일부를 숨김 처리하는 메서드
     func reduceSize() {
         // 근무가 1개 초과일 때 급여 라벨 숨김
-        let eventRowCount = eventRows.filter { $0.isHidden == false }.count
-        if eventRowCount > 1 {
+        if eventListCount > 1 {
             eventRows.forEach { $0.reduceSize() }
         }
         eventRows.last?.isHidden = true
         
         // 근무가 3개 초과일 때 근무 개수 UI 표시
         showEventCountRow(displayLimit: 3)
-        isReduced = true
-    }
-    
-    /// 숨김 처리된 근무 정보 복구
-    func restoreSize() {
-        eventRows.forEach { $0.restoreSize() }
-        eventRows.last?.isHidden = false
-        isReduced = false
     }
 }
 
