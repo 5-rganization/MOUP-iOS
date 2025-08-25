@@ -17,6 +17,8 @@ struct LoginResponseDTO: Decodable {
 /// 회원가입 API 응답 DTO
 struct RegisterResponseDTO: Decodable {
     let role: String
+    let accessToken: String
+    let refreshToken: String
 }
 
 /// 토큰 갱신 API 응답 DTO
