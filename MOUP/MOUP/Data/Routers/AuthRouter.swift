@@ -34,13 +34,10 @@ extension AuthRouter: URLRequestConvertible {
         }
     }
 
-    var parameters: Parameters? {
+    var requestBody: Encodable? {
         switch self {
         case .signIn(let signInRequestDTO):
-            return [
-                "provider": signInRequestDTO.provider,
-                "idToken": signInRequestDTO.idToken
-            ]
+            return signInRequestDTO
         }
     }
 
@@ -55,10 +52,16 @@ extension AuthRouter: URLRequestConvertible {
         let url = baseURL.appendingPathComponent(path)
         print("최종 url: \(url)")
         var request = try URLRequest(url: url, method: method)
-        request = try encoding.encode(request, with: parameters)
 
-        if let body = request.httpBody {
-            print(String(data: body, encoding: .utf8))
+        if let body = requestBody {
+            let encoder = JSONEncoder()
+            request.httpBody = try encoder.encode(body)
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+            if let httpBody = request.httpBody {
+                print("Request body: \(String(data: httpBody, encoding: .utf8) ?? "")")
+            }
+
         }
 
         return request

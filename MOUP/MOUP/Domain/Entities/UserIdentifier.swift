@@ -8,5 +8,5 @@
 import Foundation
 
 struct UserIdentifier {
-    let userId: String
+    let userId: Int64
 }
