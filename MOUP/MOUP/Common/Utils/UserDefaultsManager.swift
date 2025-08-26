@@ -11,8 +11,8 @@ final class UserDefaultsManager {
     static let shared = UserDefaultsManager()
     private init() {}
 
-    var userId: String? { // 로그인 후 받은 userId
-        get { UserDefaults.standard.string(forKey: "user_id") }
+    var userId: Int64? { // 로그인 후 받은 userId
+        get { UserDefaults.standard.object(forKey: "user_id") as? Int64 }
         set { UserDefaults.standard.set(newValue, forKey: "user_id") }
     }
 }
