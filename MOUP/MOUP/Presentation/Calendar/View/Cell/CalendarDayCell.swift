@@ -99,9 +99,6 @@ final class CalendarDayCell: JTACDayCell {
         selectedView.isHidden = !isSelected
         
         eventContainerVStackView.update(calendarMode: calendarMode, eventList: eventList)
-        if !eventList.isEmpty {
-            layoutIfNeeded()
-        }
     }
 }
 
