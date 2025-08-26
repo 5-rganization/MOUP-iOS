@@ -146,10 +146,10 @@ private extension CalendarViewController {
         
         output.calendarEventList.asDriver(onErrorJustReturn: [])
             .drive(with: self) { owner, calendarEventList in
-                print("==================================================")
-                print("calendarEventList")
-                dump(calendarEventList)
-                print("==================================================")
+//                print("==================================================")
+//                print("calendarEventList")
+//                dump(calendarEventList)
+//                print("==================================================")
                 owner.populateDataSource(calendarEventList: calendarEventList)
             }.disposed(by: disposeBag)
     }
