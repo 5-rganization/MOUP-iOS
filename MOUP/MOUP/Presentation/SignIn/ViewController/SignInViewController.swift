@@ -7,7 +7,7 @@
 
 import UIKit
 import RxSwift
-import GoogleSignIn
+import AppAuth
 
 final class SignInViewController: UIViewController {
     
@@ -16,6 +16,8 @@ final class SignInViewController: UIViewController {
     private let signInView = SignInView()
     private let disposeBag = DisposeBag()
     weak var coordinator: SignInCoordinator?
+
+    private let googleAuthCodeSubject = PublishSubject<String>()
 
     // MARK: - Lifecycle
     
@@ -70,39 +72,68 @@ private extension SignInViewController {
     func setConstraints() { }
     func setActions() { }
     func setBinding() {
-        signInView.rx.googleLoginTap.subscribe(onNext: { [weak self] _ in
-            guard let self else { return }
-            print("VC - 구글 로그인 시도됨")
-            self.signInGoogle()
-        })
-        .disposed(by: disposeBag)
+        let input = SignInViewModel.Input(
+            googleLoginTap: signInView.rx.googleLoginTap.asObservable(),
+            googleAuthCode: googleAuthCodeSubject.asObservable()
+        )
 
-        signInVM.signInOutputEventRelay.subscribe(onNext: { [weak self] event in
-            guard let self else { return }
+        let output = signInVM.transform(input: input)
+
+        output.startGoogleLogin
+            .subscribe(with: self) { _, _ in
+                self.signInGoogle()
+            }
+            .disposed(by: disposeBag)
+
+        output.signInResult
+            .subscribe(onNext: { result in
+                switch result {
+                case .navigateToSignUp:
+                    print("로그인 성공")
+                case .showAlert(let error):
+                    print("로그인 실패 : \(error.localizedDescription)")
+                }
+            })
+            .disposed(by: disposeBag)
 
 
-        })
-        .disposed(by: disposeBag)
     }
 
     // MARK: - signInGoogle
     func signInGoogle() {
-        GIDSignIn.sharedInstance.signIn(withPresenting: self) { [weak self] result, error in
-            guard let self else { return }
+        let config = OIDServiceConfiguration(
+            authorizationEndpoint: URL(string: "https://accounts.google.com/o/oauth2/v2/auth")!,
+            tokenEndpoint: URL(string: "https://oauth2.googleapis.com/token")!
+        )
 
-            if let error {
-                print(error.localizedDescription)
-                return
-            }
+        guard let redirectURI = Bundle.main.googleRedirectURI else {
+            print("googleRedirectURI를 찾을 수 없음")
+            return
+        }
 
-            guard let user = result?.user,
-                  let userIdentifier = user.userID,
-                  let identityToken = user.idToken?.tokenString else {
-                return
-            }
+        print("googleClientID: \(Bundle.main.googleClientID)\nredirectURI: \(redirectURI)")
 
-            signInVM.googleLoginTriggered.accept(SignInRequestDTO(provider: "LOGIN_GOOGLE", idToken: identityToken))
-            print("user: \(user)\nidToken: \(identityToken)")
+        let request = OIDAuthorizationRequest(
+            configuration: config,
+            clientId: Bundle.main.googleClientID,
+            scopes: ["openid", "profile", "email"],
+            redirectURL: URL(string: redirectURI)!,
+            responseType: OIDResponseTypeCode,
+            additionalParameters: nil
+        )
+
+        if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
+            appDelegate.currentAuthorizationFlow = OIDAuthorizationService.present(
+                request,
+                presenting: self,
+                callback: { response, error in
+                    if let code = response?.authorizationCode {
+                        self.googleAuthCodeSubject.onNext(code)
+                    } else {
+                        print("Authorization failed: \(error?.localizedDescription ?? "")")
+                    }
+                }
+            )
         }
     }
 }

@@ -20,28 +20,37 @@ final class SignInViewModel {
     private let disposeBag = DisposeBag()
     private let authUseCase: AuthUseCaseProtocol
 
-    let googleLoginTriggered = PublishRelay<SignInRequestDTO>()
+    let googleLoginTriggered = PublishRelay<Void>()
     let signInOutputEventRelay = PublishRelay<SignInOutputEvent>()
 
+    // MARK: - Input, Output
+    struct Input {
+        let googleLoginTap: Observable<Void>
+        let googleAuthCode: Observable<String>
+    }
+
+    struct Output {
+        let startGoogleLogin: Observable<Void>
+        let signInResult: Observable<SignInOutputEvent> // TODO: - 테스트 성공 후 ResponseDTO로 이전
+    }
+
+    // MARK: - Initializer
     init(authUseCase: AuthUseCaseProtocol) {
         self.authUseCase = authUseCase
         configure()
     }
-}
 
-private extension SignInViewModel {
-    // MARK: - configure
-    func configure() {
-        setBindings()
-    }
+    // MARK: - Transform
+    func transform(input: Input) -> Output {
+        input.googleLoginTap.subscribe(onNext: {
+            self.googleLoginTriggered.accept(())
+        })
+        .disposed(by: disposeBag)
 
-    // MARK: - setBindings
-    func setBindings() {
-        googleLoginTriggered.subscribe(onNext: { [weak self] request in
-            guard let self else { return }
+        input.googleAuthCode.subscribe(onNext: { code in
             Task {
                 do {
-                    try await self.authUseCase.signInWithGoogle(requestDTO: request)
+                    try await self.authUseCase.signInWithGoogle(requestDTO: SignInRequestDTO(provider: "LOGIN_GOOGLE", authCode: code))
                 } catch let error as NetworkError {
                     switch error {
                     case .serverError, .noResponse, .invalidResponse(_):
@@ -56,5 +65,22 @@ private extension SignInViewModel {
             }
         })
         .disposed(by: disposeBag)
+
+        return Output(
+            startGoogleLogin: googleLoginTriggered.asObservable(),
+            signInResult: signInOutputEventRelay.asObservable()
+        )
+    }
+}
+
+private extension SignInViewModel {
+    // MARK: - configure
+    func configure() {
+        setBindings()
+    }
+
+    // MARK: - setBindings
+    func setBindings() {
+
     }
 }
