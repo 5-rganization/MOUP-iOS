@@ -7,8 +7,15 @@
 
 import UIKit
 
-/// 왼쪽 모서리에 라벨 컬러를 표시하는 근무 UI
+/// 왼쪽 모서리에 라벨 컬러를 표시하는 UI
 final class LabelColorBorderView: UIView {
+    
+    // MARK: - Properties
+    private var borderColor: LabelColorString = ._default {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -26,17 +33,17 @@ final class LabelColorBorderView: UIView {
         super.draw(rect)
         
         let borderPath = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: rect.width, height: rect.height), cornerRadius: 12)
-        let contentPath = UIBezierPath(roundedRect: CGRect(x: 2, y: 0, width: rect.width - 2, height: rect.height), cornerRadius: 10.5)
+        borderColor.labelColor.setFill()
         borderPath.fill()
         
+        let contentPath = UIBezierPath(roundedRect: CGRect(x: 2, y: 0, width: rect.width - 2, height: rect.height), cornerRadius: 10.5)
         UIColor.gray100.setFill()
         contentPath.fill()
     }
     
     // MARK: - Internal Methods
     func update(borderColor: LabelColorString) {
-        borderColor.labelColor.setFill()
-        setNeedsDisplay()
+        self.borderColor = borderColor
     }
 }
 

@@ -16,7 +16,7 @@ protocol CalendarEventListModalVCDelegate: AnyObject {
     func dismissGestureReceived()
 }
 
-/// 근무 목록 VC
+/// 근무 리스트 VC
 final class CalendarEventListModalViewController: UIViewController {
     
     // MARK: - Properties
@@ -76,7 +76,22 @@ private extension CalendarEventListModalViewController {
         self.navigationController?.presentationController?.delegate = self
     }
     
-    func setBindings() {}
+    func setBindings() {
+        // ViewModel 바인딩
+        let input = CalendarEventListViewModel.Input(viewDidLoad: Observable.just(()))
+        let output = viewModel.transform(input: input)
+        
+        switch calendarMode {
+        case .personal:
+            output.calendarEventList.asDriver(onErrorJustReturn: [])
+                .drive(calendarEventListView.rx.personalEventTableViewDataSource)
+                .disposed(by: disposeBag)
+        case .shared:
+            output.calendarEventList.asDriver(onErrorJustReturn: [])
+                .drive(calendarEventListView.rx.sharedEventTableViewDataSource)
+                .disposed(by: disposeBag)
+        }
+    }
 }
 
 // MARK: - UIAdaptivePresentationControllerDelegate

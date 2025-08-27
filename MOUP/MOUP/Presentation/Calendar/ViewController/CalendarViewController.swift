@@ -61,6 +61,10 @@ final class CalendarViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         setCalendarView()
     }
     
@@ -197,8 +201,11 @@ private extension CalendarViewController {
                     eventList: eventList)
     }
     
-    func didSelectCell(selectedDay: Int) {
-        coordinator?.showCalendarEventList(selectedDay: selectedDay, calendarMode: calendarModeRelay.value)
+    func didSelectCell(selectedDate: Date) {
+        let selectedDay = Calendar.current.component(.day, from: selectedDate)
+        coordinator?.showCalendarEventList(selectedDay: selectedDay,
+                                           calendarEventList: calendarEventDataSource[selectedDate] ?? [],
+                                           calendarMode: calendarModeRelay.value)
     }
 }
 
@@ -245,8 +252,7 @@ extension CalendarViewController: JTACMonthViewDelegate {
     
     func calendar(_ calendar: JTACMonthView, didSelectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
         configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, eventList: calendarEventDataSource[date] ?? [])
-        let day = Calendar.current.component(.day, from: date)
-        didSelectCell(selectedDay: day)
+        didSelectCell(selectedDate: date)
     }
     
     func calendar(_ calendar: JTACMonthView, didDeselectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {

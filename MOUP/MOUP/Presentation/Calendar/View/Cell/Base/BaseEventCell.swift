@@ -1,8 +1,8 @@
 //
-//  EventCell.swift
+//  BaseEventCell.swift
 //  MOUP
 //
-//  Created by 서동환 on 8/26/25.
+//  Created by 서동환 on 8/27/25.
 //
 
 import UIKit
@@ -10,49 +10,45 @@ import UIKit
 import SnapKit
 import Then
 
-/// 근무 목록 셀
-final class EventCell: UITableViewCell {
-    
-    // MARK: - Properties
-    static let identifier = String(describing: EventCell.self)
+class BaseEventCell: UITableViewCell {
     
     // MARK: - UI Components
-    private let labelColorBorderView = LabelColorBorderView()
-    
-    private let workplaceOrWorkerNameLabel = UILabel().then {
+    /// 라벨 컬러 UI
+    let labelColorBorderView = LabelColorBorderView(frame: .zero)
+    /// 근무지 or 근무자 이름 라벨
+    let titleLabel = UILabel().then {
         $0.textColor = .gray900
         $0.font = .bodyMedium(16)
     }
-    
     /// 연동 표시 칩 UI
-    private let sharedChipLabel = ChipView(title: "연동")
-    
-    private let workplaceChipHStackView = UIStackView().then {
+    let sharedChipLabel = ChipView(title: "연동")
+    /// 근무지 or 근무자 이름 라벨 - 연동 표시 칩 UI 수평 컨테이너
+    let titleChipHStackView = UIStackView().then {
         $0.axis = .horizontal
         $0.spacing = 4
         $0.alignment = .center
     }
-    
-    private let workHourLabel = UILabel().then {
+    /// 근무 시간 라벨
+    let workHourLabel = UILabel().then {
         $0.textColor = .gray900
         $0.font = .bodyMedium(16)
     }
-    
-    private let leadingVStackView = UIStackView().then {
+    /// 근무지 or 근무자 이름 라벨 - 근무 시간 라벨 수직 컨테이너
+    let titleWorkHourVStackView = UIStackView().then {
         $0.axis = .vertical
         $0.spacing = 4
         $0.alignment = .leading
         $0.distribution = .fillEqually
     }
-    
-    private let ellipsisButton = UIButton().then {
+    /// 수정/삭제 메뉴 버튼
+    let ellipsisButton = UIButton().then {
         var config = UIButton.Configuration.plain()
         config.image = .ellipsisButton.withTintColor(.gray700, renderingMode: .alwaysOriginal)
         
         $0.configuration = config
     }
-    
-    private let dailyIncomeLabel = UILabel().then {
+    /// 일급 라벨
+    let dailyIncomeLabel = UILabel().then {
         $0.textColor = .gray900
         $0.font = .bodyMedium(16)
     }
@@ -76,19 +72,10 @@ final class EventCell: UITableViewCell {
         self.backgroundView = labelColorBorderView
         self.backgroundView?.frame = self.contentView.frame
     }
-    
-    // MARK: - Internal Methods
-    func update(calendarMode: CalendarMode, event: CalendarEvent) {
-        guard let borderColor = LabelColorString(rawValue: event.labelColor) else {
-            assertionFailure("LabelColorString 변환 실패 - labelColor 값이 올바르지 않습니다.")
-            return
-        }
-        labelColorBorderView.update(borderColor: borderColor)
-    }
 }
 
 // MARK: - UI Methods
-private extension EventCell {
+private extension BaseEventCell {
     // MARK: - configure
     func configure() {
         setHierarchy()
@@ -98,13 +85,13 @@ private extension EventCell {
     
     // MARK: - setHierarchy
     func setHierarchy() {
-        self.contentView.addSubviews(leadingVStackView, ellipsisButton,
+        self.contentView.addSubviews(titleWorkHourVStackView, ellipsisButton,
                                      dailyIncomeLabel)
         
-        workplaceChipHStackView.addArrangedSubviews(workplaceOrWorkerNameLabel, sharedChipLabel)
+        titleChipHStackView.addArrangedSubviews(titleLabel, sharedChipLabel)
         
-        leadingVStackView.addArrangedSubviews(workplaceChipHStackView,
-                                              workHourLabel)
+        titleWorkHourVStackView.addArrangedSubviews(titleChipHStackView,
+                                                    workHourLabel)
     }
     
     // MARK: - setStyles
@@ -114,7 +101,7 @@ private extension EventCell {
     
     // MARK: - setConstraints
     func setConstraints() {
-        leadingVStackView.snp.makeConstraints {
+        titleWorkHourVStackView.snp.makeConstraints {
             $0.top.bottom.equalToSuperview().inset(8)
             $0.leading.equalToSuperview().inset(16)
         }

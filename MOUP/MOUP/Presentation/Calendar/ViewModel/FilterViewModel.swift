@@ -34,7 +34,7 @@ final class FilterViewModel {
     func transform(input: Input) -> Output {
         input.viewDidLoad
             .subscribe(with: self) { owner, calendarMode in
-                // 사용자의 근무지/매장 불러오기
+                // TODO: 사용자의 근무지/매장 불러오기
                 let filterList: [FilterWorkplace]
                 switch calendarMode {
                 case .personal:

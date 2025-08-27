@@ -79,7 +79,7 @@ private extension FilterModalViewController {
     // MARK: - setBindings
     func setBindings() {
         // View 바인딩
-        filterView.rx.filterWorkplaceTableViewModelSelected
+        filterView.rx.filterTableViewModelSelected
             .subscribe(with: self) { owner, filterWorkplace in
                 if filterWorkplace.workplaceId != -1 {
                     owner.selectedFilterWorkplace = filterWorkplace
@@ -100,7 +100,7 @@ private extension FilterModalViewController {
         
         output.filterWorkplaceList.asDriver(onErrorJustReturn: [])
             .drive(with: self, onNext: { owner, filterWorkplaceList in
-                owner.filterView.rx.filterWorkplaceTableViewDataSource.onNext(filterWorkplaceList)
+                owner.filterView.rx.filterTableViewDataSource.onNext(filterWorkplaceList)
                 
                 // 초기 셀 선택 로직
                 if owner.selectedFilterWorkplace == nil {

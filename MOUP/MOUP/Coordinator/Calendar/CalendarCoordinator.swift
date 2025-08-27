@@ -22,7 +22,7 @@ final class CalendarCoordinator: Coordinator {
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
     }
-
+    
     // MARK: - Coordinator Methods
     func start() {
         navigationController.pushViewController(calendarVC, animated: false)
@@ -46,9 +46,10 @@ final class CalendarCoordinator: Coordinator {
         childCoordinators.append(filterCoordinator)
     }
     
-    func showCalendarEventList(selectedDay: Int, calendarMode: CalendarMode) {
+    func showCalendarEventList(selectedDay: Int, calendarEventList: [CalendarEvent], calendarMode: CalendarMode) {
         let calendarEventListCoordinator = CalendarEventListCoordinator(navigationController: navigationController,
                                                                         selectedDay: selectedDay,
+                                                                        calendarEventList: calendarEventList,
                                                                         calendarMode: calendarMode)
         calendarEventListCoordinator.delegate = self
         calendarEventListCoordinator.start()

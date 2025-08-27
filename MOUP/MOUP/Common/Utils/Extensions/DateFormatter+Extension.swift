@@ -46,9 +46,12 @@ extension DateFormatter {
     ///   - endTime: 퇴근 시간
     ///   - restTime: 휴게 시간
     /// - Returns:
-    ///   - `decimal`: 근무시간 `Double`
-    ///   - `workHour`:  최대 소수점 첫 번째 자리까지 표시하는 근무 시간 `String`
-    static func calculateWorkHour(startTime: String, endTime: String, restTime: Int) -> (decimal: Double, str: String)? {
+    ///   - `hoursInt`: 근무 시간 중 시간 `Int`
+    ///   - `minutesInt`:  근무 시간 중 분 `Int`
+    ///   - `decimal`: 총 근무 시간 `Double`
+    ///   - `str`:  최대 소수점 첫 번째 자리까지 표시하는 총 근무 시간 `String`
+    ///   - 반환값 예시: `Optional(hoursInt: 1, minutesInt: 20, decimal: 1.3333333333333333, str: "1.3")`
+    static func calculateWorkHour(startTime: String, endTime: String, restTime: Int) -> (hoursInt: Int, minutesInt: Int, decimal: Double, str: String)? {
         guard let startDate = workHourDateFormatter.date(from: startTime),
               let endDate = workHourDateFormatter.date(from: endTime) else { return nil }
         
@@ -61,14 +64,14 @@ extension DateFormatter {
         let hours = components.hour ?? 0
         let minutes = components.minute ?? 0
         
-        let decimal = Double(hours) + Double(minutes) / 60.0
-        let workHour: String
+        let workHourDecimal = Double(hours) + Double(minutes) / 60.0
+        let workHourStr: String
         if minutes >= 6 {
-            workHour = "\(String(format: "%.1f", decimal))"
+            workHourStr = "\(String(format: "%.1f", workHourDecimal))"
         } else {
-            workHour = "\(hours)"
+            workHourStr = "\(hours)"
         }
         
-        return (decimal, workHour)
+        return (hours, minutes, workHourDecimal, workHourStr)
     }
 }

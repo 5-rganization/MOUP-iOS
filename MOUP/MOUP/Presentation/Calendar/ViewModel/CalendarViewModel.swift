@@ -26,7 +26,7 @@ final class CalendarViewModel {
     struct Output {
         let calendarEventList: Observable<[CalendarEvent]>
     }
-    private let calendarEventListRelay = PublishRelay<[CalendarEvent]>()
+    private let calendarEventListRelay = BehaviorRelay<[CalendarEvent]>(value: [])
     
     // MARK: - Initializer
     init() {

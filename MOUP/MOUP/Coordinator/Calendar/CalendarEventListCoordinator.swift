@@ -22,21 +22,23 @@ final class CalendarEventListCoordinator: Coordinator {
     // Initializer Injections
     private let navigationController: UINavigationController
     private let selectedDay: Int
+    private let calendarEventList: [CalendarEvent]
     private let calendarMode: CalendarMode
     
     // Property Injections
     weak var delegate: CalendarEventListCoordinatorDelegate?
     
     // MARK: - Initializer
-    init(navigationController: UINavigationController, selectedDay: Int, calendarMode: CalendarMode) {
+    init(navigationController: UINavigationController, selectedDay: Int, calendarEventList: [CalendarEvent], calendarMode: CalendarMode) {
         self.navigationController = navigationController
         self.selectedDay = selectedDay
+        self.calendarEventList = calendarEventList
         self.calendarMode = calendarMode
     }
     
     // MARK: - Coordinator Methods
     func start() {
-        let calendarEventListVM = CalendarEventListViewModel()
+        let calendarEventListVM = CalendarEventListViewModel(calendarEventList: calendarEventList)
         let calendarEventListVC = CalendarEventListModalViewController(coordinator: self, viewModel: calendarEventListVM, selectedDay: selectedDay, calendarMode: calendarMode)
         calendarEventListVC.delegate = self
         

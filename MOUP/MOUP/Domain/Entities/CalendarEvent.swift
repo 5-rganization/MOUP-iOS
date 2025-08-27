@@ -26,12 +26,13 @@
 ///   - 예시: `60`
 /// - `memo`: 메모 `String`
 ///   - 예시: `"메모입니다."`
-/// - `salaryCalculation`: 급여 계산 `String`
-///   - 예시: `"시급"`
+/// - `salaryCalculation`: 급여 계산 `SalaryCalculation`
+///   - 예시: `.hourly`
 /// - `dailyIncome`: 일급 `Int`
 ///   - 예시: `100300`
 /// - `colorLabel`: 라벨 색상 `String`
 ///   - 예시: `"빨간색"`
+/// - `isShared`: 공유 여부 `Bool`
 struct CalendarEvent {
     let eventId: Int64
     let workplaceId: Int64
@@ -46,4 +47,5 @@ struct CalendarEvent {
     let salaryCalculation: SalaryCalculation
     let dailyIncome: Int
     let labelColor: String
+    let isShared: Bool
 }

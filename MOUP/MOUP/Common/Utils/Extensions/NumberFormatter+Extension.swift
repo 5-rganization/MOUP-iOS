@@ -17,7 +17,7 @@ extension NumberFormatter {
         $0.maximumFractionDigits = 0     // 소수점 제거
         $0.locale = Locale(identifier: "ko_KR")
     }
-
+    
     /// 문자열을 "2,000,000원" 형식으로 반환
     static func formattedWon(from number: String) -> String {
         // 쉼표 제거하고 Int로 변환
@@ -26,6 +26,16 @@ extension NumberFormatter {
         }
         // 포맷 후 "원" 붙이기
         return "\(decimalFormatter.string(from: NSNumber(value: intVal)) ?? number)원"
+    }
+    
+    /// 숫자를 "2,000,000원" 형식으로 반환
+    static func formattedWon(from number: Int) -> String {
+        guard let formatted = decimalFormatter.string(for: number) else {
+            assertionFailure("formattedWon() 메서드 실행 실패 - number가 올바르지 않습니다.")
+            return "\(number)원"
+        }
+        // 포맷 후 "원" 붙이기
+        return "\(formatted)원"
     }
     
     static func formattedDecimal(from number: String) -> String {

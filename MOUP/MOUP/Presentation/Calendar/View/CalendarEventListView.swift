@@ -12,8 +12,11 @@ import RxSwift
 import SnapKit
 import Then
 
-/// 근무 목록 UI
+/// 근무 리스트 UI
 final class CalendarEventListView: UIView {
+    
+    // MARK: - Properties
+    fileprivate let disposeBag = DisposeBag()
     
     // MARK: - UI Components
     /// 모달 핸들 UI
@@ -23,15 +26,23 @@ final class CalendarEventListView: UIView {
         $0.font = .headBold(20)
         $0.textColor = .gray900
     }
-    /// 근무 테이블 뷰
-    private let eventTableView = UITableView().then {
-        $0.register(EventCell.self, forCellReuseIdentifier: EventCell.identifier)
+    /// 근무 리스트
+    fileprivate let eventTableView = UITableView().then {
+        $0.register(PersonalModeEventCell.self, forCellReuseIdentifier: PersonalModeEventCell.identifier)
+        $0.register(SharedModeEventCell.self, forCellReuseIdentifier: SharedModeEventCell.identifier)
         
         $0.rowHeight = 84  // 64 + 16(셀 간격)
         $0.separatorStyle = .none
     }
+    /// 근무 리스트에 아이템이 없을 때 표시되는 라벨
+    private let emptyLabel = UILabel().then {
+        $0.text = "등록된 근무 일정이 없어요"
+        $0.textColor = .gray500
+        $0.font = .bodyMedium(16)
+        $0.textAlignment = .center
+    }
     /// 근무 등록 버튼
-    private let registerButton = BaseButton(title: "근무 등록하기")
+    fileprivate let registerButton = BaseButton(title: "근무 등록하기")
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -62,6 +73,7 @@ private extension CalendarEventListView {
     func setHierarchy() {
         self.addSubviews(grabberView,
                          dayLabel,
+                         emptyLabel,
                          eventTableView,
                          registerButton)
     }
@@ -87,6 +99,10 @@ private extension CalendarEventListView {
             $0.leading.equalTo(self.safeAreaLayoutGuide).inset(16)
         }
         
+        emptyLabel.snp.makeConstraints {
+            $0.center.equalTo(eventTableView)
+        }
+        
         eventTableView.snp.makeConstraints {
             $0.top.equalTo(dayLabel.snp.bottom).offset(12)
             $0.leading.trailing.equalTo(self.safeAreaLayoutGuide)
@@ -101,3 +117,38 @@ private extension CalendarEventListView {
     }
 }
 
+// MARK: - Extension Reactive
+extension Reactive where Base: CalendarEventListView {
+    var personalEventTableViewDataSource: Binder<[CalendarEvent]> {
+        return Binder(base) { view, event in
+            // RxSwift Delegate 오류 방지
+            view.eventTableView.dataSource = nil
+            view.eventTableView.delegate = nil
+            
+            Observable.just(event)
+                .bind(to: view.eventTableView.rx.items(
+                    cellIdentifier: PersonalModeEventCell.identifier,
+                    cellType: PersonalModeEventCell.self
+                )) { _, event, cell in
+                    cell.update(event: event)
+                }.disposed(by: base.disposeBag)
+        }
+    }
+    var sharedEventTableViewDataSource: Binder<[CalendarEvent]> {
+        return Binder(base) { view, event in
+            // RxSwift Delegate 오류 방지
+            view.eventTableView.dataSource = nil
+            view.eventTableView.delegate = nil
+            
+            Observable.just(event)
+                .bind(to: view.eventTableView.rx.items(
+                    cellIdentifier: SharedModeEventCell.identifier,
+                    cellType: SharedModeEventCell.self
+                )) { _, event, cell in
+                    cell.update(event: event)
+                }.disposed(by: base.disposeBag)
+        }
+    }
+    var eventTableViewModelSelected: ControlEvent<CalendarEvent> { base.eventTableView.rx.modelSelected(CalendarEvent.self) }
+    var registerButtonTap: ControlEvent<Void> { base.registerButton.rx.tap }
+}

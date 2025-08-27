@@ -9,6 +9,6 @@
 /// - `hourly`: 시급
 /// - `fixed`: 고정급
 enum SalaryCalculation: String {
-    case hourly
-    case fixed
+    case hourly = "시급"
+    case fixed = "고정급"
 }
