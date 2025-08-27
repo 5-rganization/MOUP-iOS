@@ -10,10 +10,9 @@ import SnapKit
 import Then
 
 final class SalaryDetailView: UIView {
+    // MARK: - Properties
+
     // MARK: - UI Components
-    private let stackView = UIStackView().then {
-        $0.axis = .vertical
-    }
     private var salaryDetailRows: [SalaryDetailRowView] = []
 
     // MARK: - Initializer
@@ -27,6 +26,8 @@ final class SalaryDetailView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented.")
     }
+
+    // MARK: - Public Methods
 }
 
 private extension SalaryDetailView {
@@ -40,24 +41,33 @@ private extension SalaryDetailView {
 
     // MARK: - setHierarchy
     func setHierarchy() {
-        addSubviews(stackView)
         salaryDetailRows.forEach {
-            stackView.addArrangedSubview($0)
+            addSubview($0)
         }
-
-        print("스택뷰의 개수: \(stackView.arrangedSubviews.count)")
     }
 
     // MARK: - setStyles
     func setStyles() {
-
+        backgroundColor = .clear
+        clipsToBounds = true
     }
 
     // MARK: - setConstraints
     func setConstraints() {
-        stackView.snp.makeConstraints {
-            $0.directionalVerticalEdges.equalToSuperview()
-            $0.directionalHorizontalEdges.equalToSuperview().inset(24)
+        for (index, row) in salaryDetailRows.enumerated() {
+            row.snp.makeConstraints {
+                $0.directionalHorizontalEdges.equalToSuperview().inset(24)
+
+                if index == 0 {
+                    $0.top.equalToSuperview()
+                } else {
+                    $0.top.equalTo(salaryDetailRows[index-1].snp.bottom)
+                }
+
+                if index == salaryDetailRows.count - 1 {
+                    $0.bottom.equalToSuperview()
+                }
+            }
         }
     }
 
