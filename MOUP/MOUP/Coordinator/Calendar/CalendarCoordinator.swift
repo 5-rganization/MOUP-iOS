@@ -13,7 +13,8 @@ final class CalendarCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     let navigationController: UINavigationController
     
-    private lazy var calendarVC = CalendarViewController(coordinator: self)
+    private lazy var calendarVM = CalendarViewModel()
+    private lazy var calendarVC = CalendarViewController(coordinator: self, viewModel: calendarVM)
     
     // MARK: - Initializer
     init(navigationController: UINavigationController) {

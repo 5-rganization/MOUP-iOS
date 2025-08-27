@@ -7,7 +7,6 @@
 
 import UIKit
 
-import BetterSegmentedControl
 import RxCocoa
 import RxSwift
 import SnapKit
@@ -28,21 +27,8 @@ final class CalendarHeaderView: UIView {
         
         $0.configuration = config
     }
-    /// 개인 ↔️ 공유 토글 버튼
-    fileprivate let toggleSwitch = BetterSegmentedControl().then {
-        $0.segments = LabelSegment.segments(withTitles: ["개인", "공유"],
-                                            normalFont: .buttonSemibold(16),
-                                            normalTextColor: .gray400,
-                                            selectedFont: .buttonSemibold(16),
-                                            selectedTextColor: .white)
-        $0.setOptions([.cornerRadius(12.5),
-                       .indicatorViewBackgroundColor(.gray700),
-                       .backgroundColor(.gray100)])
-        $0.indicatorViewInset = 1
-        
-        $0.layer.borderColor = UIColor.gray400.cgColor
-        $0.layer.borderWidth = 1
-    }
+    /// 캘린더 개인/공유 모드 전환 토글 세그먼트
+    fileprivate let toggleSegment = CalendarModeSegmentedControl(items: CalendarMode.allCases.map { $0.rawValue })
     /// 필터 버튼
     fileprivate let filterButton = UIButton().then {
         var config = UIButton.Configuration.plain()
@@ -78,7 +64,7 @@ private extension CalendarHeaderView {
 
     // MARK: - setHierarchy
     func setHierarchy() {
-        self.addSubviews(yearMonthButton, toggleSwitch, filterButton)
+        self.addSubviews(yearMonthButton, toggleSegment, filterButton)
     }
     
     // MARK: - setConstraints
@@ -89,7 +75,7 @@ private extension CalendarHeaderView {
             $0.centerY.equalToSuperview()
         }
         
-        toggleSwitch.snp.makeConstraints {
+        toggleSegment.snp.makeConstraints {
             $0.trailing.equalTo(filterButton.snp.leading).offset(-2)
             $0.centerY.equalToSuperview()
             $0.width.equalTo(90)
@@ -108,7 +94,7 @@ private extension CalendarHeaderView {
 // MARK: - Extension Reactive
 extension Reactive where Base: CalendarHeaderView {
     var yearMonthButtonTap: ControlEvent<Void> { base.yearMonthButton.rx.tap }
-//    var toggleButtonTap:
+    var toggleSegmentSelectedIndex: ControlProperty<Int> { base.toggleSegment.rx.selectedSegmentIndex }
     var filterButtonTap: ControlEvent<Void> { base.filterButton.rx.tap }
 }
 

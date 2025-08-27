@@ -1,12 +1,6 @@
 {
   "libraries": [
     {
-      "name": "BetterSegmentedControl",
-      "copyright": "Copyright © 2016 George Marmaridis gmarmas@gmail.com",
-      "license": "MIT License",
-      "url": "https://github.com/gmarm/BetterSegmentedControl"
-    },
-    {
       "name": "Firebase iOS SDK (Auth, Core, Firestore)",
       "copyright": "Copyright © Google LLC",
       "license": "Apache License 2.0",
