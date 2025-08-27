@@ -22,8 +22,8 @@ class BaseEventCell: UITableViewCell {
     }
     /// 연동 표시 칩 UI
     let sharedChipLabel = ChipView(title: "연동")
-    /// 근무지 or 근무자 이름 라벨 - 연동 표시 칩 UI 수평 컨테이너
-    let titleChipHStackView = UIStackView().then {
+    /// 좌측 상단 수평 컨테이너
+    let topLeadingHStackView = UIStackView().then {
         $0.axis = .horizontal
         $0.spacing = 4
         $0.alignment = .center
@@ -33,14 +33,14 @@ class BaseEventCell: UITableViewCell {
         $0.textColor = .gray900
         $0.font = .bodyMedium(16)
     }
-    /// 근무지 or 근무자 이름 라벨 - 근무 시간 라벨 수직 컨테이너
-    let titleWorkHourVStackView = UIStackView().then {
+    /// 좌측 수직 컨테이너
+    let leadingVStackView = UIStackView().then {
         $0.axis = .vertical
         $0.spacing = 4
         $0.alignment = .leading
         $0.distribution = .fillEqually
     }
-    /// 수정/삭제 메뉴 버튼
+    /// 수정/삭제 메뉴 표시용 버튼
     let ellipsisButton = UIButton().then {
         var config = UIButton.Configuration.plain()
         config.image = .ellipsisButton.withTintColor(.gray700, renderingMode: .alwaysOriginal)
@@ -90,12 +90,12 @@ private extension BaseEventCell {
     
     // MARK: - setHierarchy
     func setHierarchy() {
-        self.contentView.addSubviews(titleWorkHourVStackView, ellipsisButton,
+        self.contentView.addSubviews(leadingVStackView, ellipsisButton,
                                      dailyIncomeLabel)
         
-        titleChipHStackView.addArrangedSubviews(titleLabel, sharedChipLabel)
+        topLeadingHStackView.addArrangedSubviews(titleLabel, sharedChipLabel)
         
-        titleWorkHourVStackView.addArrangedSubviews(titleChipHStackView,
+        leadingVStackView.addArrangedSubviews(topLeadingHStackView,
                                                     workHourLabel)
     }
     
@@ -106,7 +106,7 @@ private extension BaseEventCell {
     
     // MARK: - setConstraints
     func setConstraints() {
-        titleWorkHourVStackView.snp.makeConstraints {
+        leadingVStackView.snp.makeConstraints {
             $0.top.bottom.equalToSuperview().inset(8)
             $0.leading.equalToSuperview().inset(16)
         }
