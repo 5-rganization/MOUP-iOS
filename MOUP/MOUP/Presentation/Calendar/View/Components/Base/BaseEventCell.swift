@@ -72,6 +72,11 @@ class BaseEventCell: UITableViewCell {
         self.backgroundView = labelColorBorderView
         self.backgroundView?.frame = self.contentView.frame
     }
+    
+    // MARK: - Internal Methods
+    func update(event: CalendarEvent) {
+        fatalError("update() 메서드 실행 실패 - 메서드가 오버라이딩 되지 않았습니다.")
+    }
 }
 
 // MARK: - UI Methods

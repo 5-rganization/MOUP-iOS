@@ -14,7 +14,7 @@ final class PersonalModeEventCell: BaseEventCell {
     static let identifier = String(describing: PersonalModeEventCell.self)
     
     // MARK: - Internal Methods
-    func update(event: CalendarEvent) {
+    override func update(event: CalendarEvent) {
         guard let borderColor = LabelColorString(rawValue: event.labelColor) else {
             assertionFailure("LabelColorString 변환 실패 - labelColor 값이 올바르지 않습니다.")
             return
