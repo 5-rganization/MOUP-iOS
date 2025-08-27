@@ -20,7 +20,9 @@ final class LabelColorBorderView: UIView {
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)
-        configure()
+        
+        self.clipsToBounds = true
+        self.layer.cornerRadius = 12
     }
     
     @available(*, unavailable, message: "storyboard is not supported.")
@@ -44,18 +46,5 @@ final class LabelColorBorderView: UIView {
     // MARK: - Internal Methods
     func update(borderColor: LabelColorString) {
         self.borderColor = borderColor
-    }
-}
-
-private extension LabelColorBorderView {
-    // MARK: - configure
-    func configure() {
-        setStyles()
-    }
-    
-    // MARK: - setStyles
-    func setStyles() {
-        self.clipsToBounds = true
-        self.layer.cornerRadius = 12
     }
 }

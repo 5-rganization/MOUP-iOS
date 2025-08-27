@@ -31,7 +31,7 @@ final class CalendarEventListView: UIView {
         $0.register(PersonalModeEventCell.self, forCellReuseIdentifier: PersonalModeEventCell.identifier)
         $0.register(SharedModeEventCell.self, forCellReuseIdentifier: SharedModeEventCell.identifier)
         
-        $0.rowHeight = 84  // 64 + 16(셀 간격)
+        $0.rowHeight = 80  // 68 + 12(셀 간격)
         $0.separatorStyle = .none
     }
     /// 근무 리스트에 아이템이 없을 때 표시되는 라벨

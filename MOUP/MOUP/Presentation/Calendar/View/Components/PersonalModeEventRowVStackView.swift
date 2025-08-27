@@ -15,13 +15,13 @@ final class PersonalModeEventRowVStackView: BaseEventRowVStackView {
     
     // MARK: - Internal Methods
     override func update(event: CalendarEvent) {
-        guard let workHour = DateFormatter.calculateWorkHour(startTime: event.startTime, endTime: event.endTime, restTime: event.restTime) else {
-            assertionFailure("calculateWorkHour() 메서드 실행 실패 - Argument가 올바르지 않습니다.")
-            return
-        }
+        setGivenLabelColor(event.labelColor)
         
-        titleLabel.text = "\(workHour.str)시간"
-        setUserLabelColor(event.labelColor)
+        if let workHour = DateFormatter.calculateWorkHour(startTime: event.startTime, endTime: event.endTime, restTime: event.restTime) {
+            titleLabel.text = "\(workHour.str)시간"
+        } else {
+            assertionFailure("calculateWorkHour() 메서드 실행 실패 - Argument가 올바르지 않습니다.")
+        }
         
         switch event.salaryCalculation {
         case .hourly:
@@ -31,8 +31,8 @@ final class PersonalModeEventRowVStackView: BaseEventRowVStackView {
             // 고정급
             dailyIncomeLabel.text = event.salaryCalculation.rawValue
         }
+        // TODO: 사장님 역할일 때 dailyIncomeLabel 숨김
         dailyIncomeLabel.isHidden = false
-        // TODO: 사장님 개인 캘린더
     }
     
     func reduceSize() {

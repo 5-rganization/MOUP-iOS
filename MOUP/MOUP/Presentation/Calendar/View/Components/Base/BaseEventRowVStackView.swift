@@ -36,7 +36,7 @@ class BaseEventRowVStackView: UIStackView {
         fatalError("init(coder:) has not been implemented.")
     }
     
-    // MARK: - Internal Methods
+    // MARK: - Override Methods
     func update(event: CalendarEvent) {
         fatalError("update() 메서드 실행 실패 - 메서드가 오버라이딩 되지 않았습니다.")
     }
@@ -77,12 +77,12 @@ private extension BaseEventRowVStackView {
     }
 }
 
-// MARK: - Methods
+// MARK: - Internal Methods
 extension BaseEventRowVStackView {
-    /// 사용자의 근무에 라벨 컬러를 설정하는 메서드
-    func setUserLabelColor(_ labelColor: String) {
-        guard let labelColor = LabelColorString(rawValue: labelColor) else {
-            assertionFailure("setUserLabelColor() 메서드 실행 실패 - labelColor 값이 올바르지 않습니다.")
+    /// 설정된 라벨 컬러를 적용하는 메서드
+    func setGivenLabelColor(_ labelColorStr: String) {
+        guard let labelColor = LabelColorString(rawValue: labelColorStr) else {
+            assertionFailure("setGivenLabelColor() 메서드 실행 실패 - labelColorStr 값이 올바르지 않습니다.")
             return
         }
         self.backgroundColor = labelColor.backgroundColor
@@ -90,9 +90,8 @@ extension BaseEventRowVStackView {
         dailyIncomeLabel.textColor = labelColor.textColor
     }
     
-    /// 다른 근무자의 근무에 라벨 컬러를 설정하는 메서드
-    func setOtherLabelColor() {
-        // TODO: - 사장님 역할일 때 색상 처리 필요
+    /// 기본 라벨 컬러를 적용하는 메서드
+    func setDefaultLabelColor() {
         self.backgroundColor = .primary100
         titleLabel.textColor = .primary600
         dailyIncomeLabel.textColor = .primary600

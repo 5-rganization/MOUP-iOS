@@ -14,27 +14,38 @@ class BaseEventCell: UITableViewCell {
     
     // MARK: - UI Components
     /// 라벨 컬러 UI
-    let labelColorBorderView = LabelColorBorderView(frame: .zero)
+    private let labelColorBorderView = LabelColorBorderView()
     /// 근무지 or 근무자 이름 라벨
     let titleLabel = UILabel().then {
-        $0.textColor = .gray900
         $0.font = .bodyMedium(16)
+        $0.textColor = .gray900
     }
     /// 연동 표시 칩 UI
     let sharedChipLabel = ChipView(title: "연동")
     /// 좌측 상단 수평 컨테이너
-    let topLeadingHStackView = UIStackView().then {
+    private let topLeadingHStackView = UIStackView().then {
         $0.axis = .horizontal
         $0.spacing = 4
         $0.alignment = .center
     }
-    /// 근무 시간 라벨
-    let workHourLabel = UILabel().then {
+    /// 출근 시간 ~ 퇴근 시간 라벨
+    private let startEndTimeLabel = UILabel().then {
+        $0.font = .bodyMedium(14)
         $0.textColor = .gray900
-        $0.font = .bodyMedium(16)
+    }
+    /// 근무 시간 라벨
+    private let workHourLabel = UILabel().then {
+        $0.font = .bodyMedium(12)
+        $0.textColor = .gray900
+    }
+    /// 좌측 하단 수평 컨테이너
+    private let bottomLeadingHStackView = UIStackView().then {
+        $0.axis = .horizontal
+        $0.spacing = 4
+        $0.alignment = .center
     }
     /// 좌측 수직 컨테이너
-    let leadingVStackView = UIStackView().then {
+    private let leadingVStackView = UIStackView().then {
         $0.axis = .vertical
         $0.spacing = 4
         $0.alignment = .leading
@@ -49,8 +60,8 @@ class BaseEventCell: UITableViewCell {
     }
     /// 일급 라벨
     let dailyIncomeLabel = UILabel().then {
+        $0.font = .bodyMedium(14)
         $0.textColor = .gray900
-        $0.font = .bodyMedium(16)
     }
     
     // MARK: - Initializer
@@ -73,7 +84,7 @@ class BaseEventCell: UITableViewCell {
         self.backgroundView?.frame = self.contentView.frame
     }
     
-    // MARK: - Internal Methods
+    // MARK: - Override Methods
     func update(event: CalendarEvent) {
         fatalError("update() 메서드 실행 실패 - 메서드가 오버라이딩 되지 않았습니다.")
     }
@@ -94,9 +105,10 @@ private extension BaseEventCell {
                                      dailyIncomeLabel)
         
         topLeadingHStackView.addArrangedSubviews(titleLabel, sharedChipLabel)
+        bottomLeadingHStackView.addArrangedSubviews(startEndTimeLabel, workHourLabel)
         
         leadingVStackView.addArrangedSubviews(topLeadingHStackView,
-                                                    workHourLabel)
+                                              bottomLeadingHStackView)
     }
     
     // MARK: - setStyles
@@ -127,6 +139,43 @@ private extension BaseEventCell {
             $0.trailing.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview().inset(8)
             $0.height.equalTo(24)
+        }
+    }
+}
+
+// MARK: - Internal Methods
+extension BaseEventCell {
+    /// 설정된 라벨 컬러를 적용하는 메서드
+    func setGivenLabelColor(_ labelColorStr: String) {
+        guard let labelColor = LabelColorString(rawValue: labelColorStr) else {
+            assertionFailure("setGivenLabelColor() 메서드 실행 실패 - labelColorStr 값이 올바르지 않습니다.")
+            return
+        }
+        labelColorBorderView.update(borderColor: labelColor)
+    }
+    
+    /// 기본 라벨 컬러를 적용하는 메서드
+    func setDefaultLabelColor() {
+        labelColorBorderView.update(borderColor: ._default)
+    }
+    
+    func setTimeInfoUI(startTime: String, endTime: String, restTime: Int) {
+        if let workHour = DateFormatter.calculateWorkHour(startTime: startTime, endTime: endTime, restTime: restTime) {
+            startEndTimeLabel.text = "\(startTime) ~ \(endTime)"
+            var workHourText: String
+            if workHour.minutesInt == 0 {
+                workHourText = " (\(workHour.hoursInt)시간"
+            } else {
+                workHourText = " (\(workHour.hoursInt)시간 \(workHour.minutesInt)분"
+            }
+            
+            if restTime > 0 {
+                workHourText += " - 휴게 \(restTime)분"
+            }
+            workHourText += ")"
+            workHourLabel.text = workHourText
+        } else {
+            assertionFailure("calculateWorkHour() 메서드 실행 실패 - Argument가 올바르지 않습니다.")
         }
     }
 }

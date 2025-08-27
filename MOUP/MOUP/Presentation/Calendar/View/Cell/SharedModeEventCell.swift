@@ -15,10 +15,21 @@ final class SharedModeEventCell: BaseEventCell {
     
     // MARK: - Internal Methods
     override func update(event: CalendarEvent) {
-        guard let borderColor = LabelColorString(rawValue: event.labelColor) else {
-            assertionFailure("LabelColorString 변환 실패 - labelColor 값이 올바르지 않습니다.")
-            return
+        // TODO: 실제 로그인한 사용자의 ID를 반영해야 함
+        // 사용자의 workerId가 789임을 가정
+        if event.workerId == 789 {
+            // TODO: 사장님 역할일 땐 setDefaultLabelColor()
+            setGivenLabelColor(event.labelColor)
+        } else {
+            setDefaultLabelColor()
         }
-        labelColorBorderView.update(borderColor: borderColor)
+        
+        titleLabel.text = event.workerName
+        sharedChipLabel.isHidden = !event.isShared
+        
+        setTimeInfoUI(startTime: event.startTime, endTime: event.endTime, restTime: event.restTime)
+        
+        // TODO: 사장님 역할일 때 dailyIncomeLabel 표시
+        dailyIncomeLabel.isHidden = true
     }
 }
