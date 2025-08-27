@@ -1,5 +1,5 @@
 //
-//  FilterViewController.swift
+//  FilterModalViewController.swift
 //  MOUP
 //
 //  Created by 서동환 on 7/31/25.
@@ -10,14 +10,14 @@ import UIKit
 import RxCocoa
 import RxSwift
 
-/// `FilterViewController`의 이벤트를 `FilterCoordinator`에 알리는 Delegate
-protocol FilterVCDelegate: AnyObject {
+/// `FilterModalViewController`의 이벤트를 `FilterCoordinator`에 알리는 Delegate
+protocol FilterModalVCDelegate: AnyObject {
     func dismissGestureReceived()
     func applyButtonTapped(filterWorkplace: FilterWorkplace?)
 }
 
 /// 필터 VC
-final class FilterViewController: UIViewController {
+final class FilterModalViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
@@ -28,7 +28,7 @@ final class FilterViewController: UIViewController {
     private var selectedFilterWorkplace: FilterWorkplace?
     
     // Property Injections
-    weak var delegate: FilterVCDelegate?
+    weak var delegate: FilterModalVCDelegate?
     
     // MARK: - UI Components
     private let filterView = FilterView()
@@ -54,10 +54,11 @@ final class FilterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
+        setFilterView()
     }
 }
 
-private extension FilterViewController {
+private extension FilterModalViewController {
     // MARK: - configure
     func configure() {
         setStyles()
@@ -68,9 +69,6 @@ private extension FilterViewController {
     // MARK: - setStyles
     func setStyles() {
         self.view.backgroundColor = .primaryBackground
-        
-        // TODO: 사용자 역할에 따라 변경
-        filterView.update(headerStr: "나의 근무지")
     }
     
     // MARK: - setDelegates
@@ -119,7 +117,12 @@ private extension FilterViewController {
 }
 
 // MARK: - Private Methods
-private extension FilterViewController {
+private extension FilterModalViewController {
+    func setFilterView() {
+        // TODO: 사용자 역할에 따라 변경
+        filterView.update(headerStr: "나의 근무지")
+    }
+    
     func setDefaultSelect(firstOfList filterWorkplace: FilterWorkplace?) {
         if filterWorkplace?.workplaceId == -1 {
             selectedFilterWorkplace = nil
@@ -131,7 +134,7 @@ private extension FilterViewController {
 }
 
 // MARK: - UIAdaptivePresentationControllerDelegate
-extension FilterViewController: UIAdaptivePresentationControllerDelegate {
+extension FilterModalViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
         delegate?.dismissGestureReceived()
     }

@@ -7,7 +7,7 @@
 
 import UIKit
 
-/// 캘린더 Coordinator
+/// `CalendarViewController` Coordinator
 final class CalendarCoordinator: Coordinator {
     
     // MARK: - Properties
@@ -45,6 +45,15 @@ final class CalendarCoordinator: Coordinator {
         filterCoordinator.start()
         childCoordinators.append(filterCoordinator)
     }
+    
+    func showCalendarEventList(selectedDay: Int, calendarMode: CalendarMode) {
+        let calendarEventListCoordinator = CalendarEventListCoordinator(navigationController: navigationController,
+                                                                        selectedDay: selectedDay,
+                                                                        calendarMode: calendarMode)
+        calendarEventListCoordinator.delegate = self
+        calendarEventListCoordinator.start()
+        childCoordinators.append(calendarEventListCoordinator)
+    }
 }
 
 // MARK: - YearMonthCoordinatorDelegate
@@ -63,7 +72,7 @@ extension CalendarCoordinator: YearMonthPickerCoordinatorDelegate {
 
 // MARK: - FilterCoordinatorDelegate
 extension CalendarCoordinator: FilterCoordinatorDelegate {
-    func cancelled(_ coordinator: FilterCoordinator) {
+    func dismissed(_ coordinator: FilterCoordinator) {
         childCoordinators = childCoordinators.filter { $0 !== coordinator }
         navigationController.dismiss(animated: true)
     }
@@ -71,6 +80,14 @@ extension CalendarCoordinator: FilterCoordinatorDelegate {
     func applyFilter(_ coordinator: FilterCoordinator, filterWorkplace: FilterWorkplace?) {
         childCoordinators = childCoordinators.filter { $0 !== coordinator }
         calendarVC.updateFilter(filterWorkplace: filterWorkplace)
+        navigationController.dismiss(animated: true)
+    }
+}
+
+// MARK: - CalendarEventListCoordinatorDelegate
+extension CalendarCoordinator: CalendarEventListCoordinatorDelegate {
+    func dismissed(_ coordinator: CalendarEventListCoordinator) {
+        childCoordinators = childCoordinators.filter { $0 !== coordinator }
         navigationController.dismiss(animated: true)
     }
 }

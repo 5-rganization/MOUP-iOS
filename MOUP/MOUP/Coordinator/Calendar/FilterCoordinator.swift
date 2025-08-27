@@ -9,11 +9,13 @@ import UIKit
 
 /// `FilterCoordinator`의 화면 전환 이벤트를 `CalendarCoordinator`에 알리는 Delegate
 protocol FilterCoordinatorDelegate: AnyObject {
-    func cancelled(_ coordinator: FilterCoordinator)
+    /// 필터 선택 화면 내림
+    func dismissed(_ coordinator: FilterCoordinator)
+    /// 선택한 필터 적용
     func applyFilter(_ coordinator: FilterCoordinator, filterWorkplace: FilterWorkplace?)
 }
 
-/// 캘린더 ➡️ 필터 Coordinator
+/// `FilterModalViewController` Coordinator
 final class FilterCoordinator: Coordinator {
     
     // MARK: - Properties
@@ -37,7 +39,7 @@ final class FilterCoordinator: Coordinator {
     // MARK: - Coordinator Methods
     func start() {
         let filterVM = FilterViewModel()
-        let filterVC = FilterViewController(viewModel: filterVM, calendarMode: calendarMode, selectedFilterWorkplace: selectedFilterWorkplace)
+        let filterVC = FilterModalViewController(viewModel: filterVM, calendarMode: calendarMode, selectedFilterWorkplace: selectedFilterWorkplace)
         filterVC.delegate = self
         
         if let sheet = filterVC.sheetPresentationController {
@@ -50,10 +52,10 @@ final class FilterCoordinator: Coordinator {
     }
 }
 
-// MARK: - FilterVCDelegate
-extension FilterCoordinator: FilterVCDelegate {
+// MARK: - FilterModalVCDelegate
+extension FilterCoordinator: FilterModalVCDelegate {
     func dismissGestureReceived() {
-        delegate?.cancelled(self)
+        delegate?.dismissed(self)
     }
     
     func applyButtonTapped(filterWorkplace: FilterWorkplace?) {

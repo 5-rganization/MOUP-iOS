@@ -28,7 +28,7 @@ final class CalendarDayCell: JTACDayCell {
         $0.isHidden = true
     }
     /// 날짜(일) 라벨
-    private let dateLabel = UILabel().then {
+    private let dayLabel = UILabel().then {
         $0.textColor = .gray900
         $0.font = .bodyMedium(14)
         $0.textAlignment = .center
@@ -55,7 +55,7 @@ final class CalendarDayCell: JTACDayCell {
         super.layoutSubviews()
         
         // eventContainerVStackView의 minY 계산
-        let eventContainerMinY = dateLabel.frame.maxY + 4
+        let eventContainerMinY = dayLabel.frame.maxY + 4
         
         // eventContainerVStackView의 너비 계산
         let targetWidth = self.contentView.bounds.width - 4
@@ -82,25 +82,25 @@ final class CalendarDayCell: JTACDayCell {
     
     // MARK: - Internal Methods
     func update(dateStr: String, isToday: Bool, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, calendarMode: CalendarMode, eventList: [CalendarEvent]) {
-        dateLabel.text = dateStr
+        dayLabel.text = dateStr
         
         if isToday {
-            dateLabel.textColor = .white
-            dateLabel.backgroundColor = .gray900
+            dayLabel.textColor = .white
+            dayLabel.backgroundColor = .gray900
         } else {
             switch daysOfWeek {
             case .sunday:
-                dateLabel.textColor = .sundayText
+                dayLabel.textColor = .sundayText
             case .saturday:
-                dateLabel.textColor = .saturdayText
+                dayLabel.textColor = .saturdayText
             default:
-                dateLabel.textColor = .gray900
+                dayLabel.textColor = .gray900
             }
-            dateLabel.backgroundColor = .clear
+            dayLabel.backgroundColor = .clear
         }
         
         self.isUserInteractionEnabled = dateBelongsToThisMonth
-        dateLabel.isHidden = !dateBelongsToThisMonth
+        dayLabel.isHidden = !dateBelongsToThisMonth
         selectedView.isHidden = !isSelected
         
         let displayCount = 4
@@ -125,7 +125,7 @@ private extension CalendarDayCell {
     func setHierarchy() {
         self.contentView.addSubviews(seperatorView,
                                      selectedView,
-                                     dateLabel,
+                                     dayLabel,
                                      eventContainerVStackView)
     }
     
@@ -148,14 +148,14 @@ private extension CalendarDayCell {
             $0.bottom.equalToSuperview()
         }
         
-        dateLabel.snp.makeConstraints {
+        dayLabel.snp.makeConstraints {
             $0.top.equalTo(seperatorView.snp.bottom).offset(4)
             $0.width.height.equalTo(20)
             $0.centerX.equalToSuperview()
         }
         
         eventContainerVStackView.snp.makeConstraints {
-            $0.top.equalTo(dateLabel.snp.bottom).offset(4)
+            $0.top.equalTo(dayLabel.snp.bottom).offset(4)
             $0.leading.trailing.equalToSuperview().inset(2)
         }
     }

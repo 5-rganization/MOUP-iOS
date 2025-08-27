@@ -15,7 +15,7 @@ protocol YearMonthPickerCoordinatorDelegate: AnyObject {
     func changeYearMonth(_ coordinator: YearMonthPickerCoordinator, focusedYear: Int, focusedMonth: Int)
 }
 
-/// 캘린더 ➡️ 연/월 Picker Coordinator
+/// `YearMonthPickerModalViewController` Coordinator
 final class YearMonthPickerCoordinator: Coordinator {
     
     // MARK: - Properties
@@ -30,9 +30,7 @@ final class YearMonthPickerCoordinator: Coordinator {
     weak var delegate: YearMonthPickerCoordinatorDelegate?
     
     // MARK: - Initialzier
-    init(navigationController: UINavigationController,
-         currYear: Int,
-         currMonth: Int) {
+    init(navigationController: UINavigationController, currYear: Int, currMonth: Int) {
         self.navigationController = navigationController
         self.currYear = currYear
         self.currMonth = currMonth
@@ -40,7 +38,7 @@ final class YearMonthPickerCoordinator: Coordinator {
     
     // MARK: - Coordinator Methods
     func start() {
-        let yearMonthPickerVC = YearMonthPickerViewController(currYear: currYear, currMonth: currMonth)
+        let yearMonthPickerVC = YearMonthPickerModalViewController(currYear: currYear, currMonth: currMonth)
         yearMonthPickerVC.delegate = self
         
         if let sheet = yearMonthPickerVC.sheetPresentationController {
@@ -53,8 +51,8 @@ final class YearMonthPickerCoordinator: Coordinator {
     }
 }
 
-// MARK: - YearMonthPickerVCDelegate
-extension YearMonthPickerCoordinator: YearMonthPickerVCDelegate {
+// MARK: - YearMonthPickerModalVCDelegate
+extension YearMonthPickerCoordinator: YearMonthPickerModalVCDelegate {
     func dismissGestureReceived() {
         delegate?.cancelled(self)
     }

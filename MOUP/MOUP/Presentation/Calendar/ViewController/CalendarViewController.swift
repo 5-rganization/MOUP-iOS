@@ -172,8 +172,6 @@ extension CalendarViewController {
 // MARK: - Private Calendar Methods
 private extension CalendarViewController {
     func setCalendarView() {
-        calendarView.getMonthCalendarView.register(CalendarDayCell.self, forCellWithReuseIdentifier: CalendarDayCell.identifier)
-        
         calendarView.getMonthCalendarView.scrollToDate(.now, animateScroll: false)
         
         calendarView.getMonthCalendarView.visibleDates { [weak self] visibleDates in
@@ -197,6 +195,10 @@ private extension CalendarViewController {
                     isSelected: isSelected,
                     calendarMode: calendarMode,
                     eventList: eventList)
+    }
+    
+    func didSelectCell(selectedDay: Int) {
+        coordinator?.showCalendarEventList(selectedDay: selectedDay, calendarMode: calendarModeRelay.value)
     }
 }
 
@@ -243,6 +245,8 @@ extension CalendarViewController: JTACMonthViewDelegate {
     
     func calendar(_ calendar: JTACMonthView, didSelectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
         configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, eventList: calendarEventDataSource[date] ?? [])
+        let day = Calendar.current.component(.day, from: date)
+        didSelectCell(selectedDay: day)
     }
     
     func calendar(_ calendar: JTACMonthView, didDeselectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
