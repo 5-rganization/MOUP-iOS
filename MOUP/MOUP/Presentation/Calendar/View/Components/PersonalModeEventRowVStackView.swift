@@ -29,7 +29,7 @@ final class PersonalModeEventRowVStackView: BaseEventRowVStackView {
             dailyIncomeLabel.text = NumberFormatter.decimalFormatter.string(for: event.dailyIncome)
         case .fixed:
             // 고정급
-            dailyIncomeLabel.text = "고정급"
+            dailyIncomeLabel.text = event.salaryCalculation.rawValue
         }
         dailyIncomeLabel.isHidden = false
         // TODO: 사장님 개인 캘린더
