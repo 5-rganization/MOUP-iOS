@@ -13,13 +13,17 @@ import SnapKit
 final class EventContainerVStackView: UIStackView {
     
     // MARK: - Properties
-    /// 해당 날짜 근무 개수
+    /// 근무 개수
     private var eventListCount: Int = 0
+    /// `restEventCountRow`를 표시할 기준 근무 개수
+    private let displayLimit: Int = 4
     
     // MARK: - UI Components
-    /// 근무 표시 UI 배열
-    private let eventRows = [EventRowVStackView(), EventRowVStackView(), EventRowVStackView(), EventRowVStackView()]
-    /// 나머지 근무 개수 표시 UI
+    /// 근무 표시 UI 배열(개인 캘린더 모드)
+    private let personalModeEventRows = (0..<4).map { _ in PersonalModeEventRowVStackView() }
+    /// 근무 표시 UI 배열(공유 캘린더 모드)
+    private let sharedModeEventRows = (0..<4).map { _ in SharedModeEventRowVStackView() }
+    /// 미표시된 근무 개수 표시 UI
     private let restEventCountRow = RestEventCountLabel()
     
     // MARK: - Initializer
@@ -34,36 +38,52 @@ final class EventContainerVStackView: UIStackView {
     }
     
     // MARK: - Internal Methods
-    func update(calendarMode: CalendarMode, eventList: [CalendarEvent]) {
+    func updatePersonalModeEventRows(eventList: [CalendarEvent]) {
         self.arrangedSubviews.forEach { $0.isHidden = true }
         
-        // 근무가 4개 초과일 때 근무 개수 UI 표시
-        let displayLimit = 4
         for (index, event) in eventList.enumerated() {
             if index < displayLimit {
-                eventRows[index].update(calendarMode: calendarMode, event: event)
-                eventRows[index].isHidden = false
+                personalModeEventRows[index].update(event: event)
+                personalModeEventRows[index].isHidden = false
             } else {
                 break
             }
         }
         
-        // 개인 캘린더 모드) 근무가 2개 초과일 때 급여 라벨 숨김
         eventListCount = eventList.count
-        if calendarMode == .personal && eventListCount > 2 {
-            eventRows.forEach { $0.reduceSize() }
+        // 근무가 2개 초과일 때 급여 라벨 숨김
+        if eventListCount > 2 {
+            personalModeEventRows.forEach { $0.reduceSize() }
         }
         
         showEventCountRow(displayLimit: displayLimit)
     }
     
-    /// `CalendarDayCell`이 공간 부족일 경우 근무 정보 중 일부를 숨김 처리하는 메서드
-    func reduceSize() {
-        // 근무가 1개 초과일 때 급여 라벨 숨김
-        if eventListCount > 1 {
-            eventRows.forEach { $0.reduceSize() }
+    func updateSharedModeEventRows(eventList: [CalendarEvent]) {
+        self.arrangedSubviews.forEach { $0.isHidden = true }
+        
+        for (index, event) in eventList.enumerated() {
+            if index < displayLimit {
+                sharedModeEventRows[index].update(event: event)
+                sharedModeEventRows[index].isHidden = false
+            } else {
+                break
+            }
         }
-        eventRows.last?.isHidden = true
+        
+        eventListCount = eventList.count
+        
+        showEventCountRow(displayLimit: displayLimit)
+    }
+    
+    /// `CalendarDayCell`이 공간 부족일 경우 UI 중 일부를 숨김 처리하는 메서드
+    func reduceSize() {
+        if eventListCount > 1 {
+            personalModeEventRows.forEach { $0.reduceSize() }
+        }
+        personalModeEventRows.last?.isHidden = true
+        
+        sharedModeEventRows.last?.isHidden = true
         
         // 근무가 3개 초과일 때 근무 개수 UI 표시
         showEventCountRow(displayLimit: 3)
@@ -80,7 +100,8 @@ private extension EventContainerVStackView {
     
     // MARK: - setHierarchy
     func setHierarchy() {
-        eventRows.forEach { self.addArrangedSubview($0) }
+        personalModeEventRows.forEach { self.addArrangedSubview($0) }
+        sharedModeEventRows.forEach { self.addArrangedSubview($0) }
         self.addArrangedSubview(restEventCountRow)
     }
     
@@ -102,7 +123,8 @@ private extension EventContainerVStackView {
     func showEventCountRow(displayLimit: Int) {
         if eventListCount > displayLimit {
             // 마지막 근무 UI 자리에 표시
-            eventRows[displayLimit - 1].isHidden = true
+            personalModeEventRows[displayLimit - 1].isHidden = true
+            sharedModeEventRows[displayLimit - 1].isHidden = true
             restEventCountRow.text = "+\(eventListCount - displayLimit + 1)"
             restEventCountRow.isHidden = false
         }

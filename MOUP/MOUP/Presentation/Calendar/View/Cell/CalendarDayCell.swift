@@ -98,7 +98,12 @@ final class CalendarDayCell: JTACDayCell {
         dateLabel.isHidden = !dateBelongsToThisMonth
         selectedView.isHidden = !isSelected
         
-        eventContainerVStackView.update(calendarMode: calendarMode, eventList: eventList)
+        switch calendarMode {
+        case .personal:
+            eventContainerVStackView.updatePersonalModeEventRows(eventList: eventList)
+        case .shared:
+            eventContainerVStackView.updateSharedModeEventRows(eventList: eventList)
+        }
     }
 }
 
