@@ -56,6 +56,23 @@ class WorkerWorkplaceCell: UITableViewCell {
 
     // 세 번째 섹션 뷰 - 출퇴근 버튼
     private let thirdSectionView = UIView()
+
+    private let attendanceButtonStackView = UIStackView().then {
+        $0.axis = .horizontal
+        $0.spacing = 12
+    }
+
+    private let startWorkButton = BaseButton().then {
+        $0.update(title: "출근", isSecondary: false, fontSize: 16)
+    }
+
+    private let endWorkButton = BaseButton().then {
+        $0.update(title: "퇴근", isSecondary: true, fontSize: 16)
+    }
+
+    // 네 번째 섹션 뷰
+    private let fourthSectionView = UIView()
+
     private let chevronImageView = UIImageView().then {
         $0.image = .chevronDown
     }
@@ -113,14 +130,23 @@ private extension WorkerWorkplaceCell {
             untilPaydayLabel,
             totalEarnedLabel
         )
+        attendanceButtonStackView.addArrangedSubviews(
+            startWorkButton,
+            endWorkButton
+        )
         thirdSectionView.addSubviews(
+            attendanceButtonStackView
+        )
+        fourthSectionView.addSubviews(
             chevronImageView
         )
         stackView.addArrangedSubviews(
             firstSectionView,
             secondSectionView,
-            thirdSectionView
+            thirdSectionView,
+            fourthSectionView
         )
+
     }
 
     // MARK: - setStyles
@@ -145,11 +171,13 @@ private extension WorkerWorkplaceCell {
         nameLabel.snp.makeConstraints {
             $0.top.equalToSuperview().inset(12)
             $0.leading.equalToSuperview().inset(16)
+            $0.height.equalTo(24)
         }
 
         untilPaydayLabel.snp.makeConstraints {
             $0.top.equalTo(nameLabel.snp.bottom)
             $0.leading.equalToSuperview().inset(16)
+            $0.height.equalTo(18)
         }
 
         menuButton.snp.makeConstraints {
@@ -161,6 +189,7 @@ private extension WorkerWorkplaceCell {
         totalEarnedLabel.snp.makeConstraints {
             $0.top.equalTo(menuButton.snp.bottom).offset(10)
             $0.trailing.equalToSuperview().inset(16)
+            $0.height.equalTo(21)
             $0.bottom.equalToSuperview()
         }
 
@@ -170,6 +199,13 @@ private extension WorkerWorkplaceCell {
         }
 
         // 세 번째 섹션
+        attendanceButtonStackView.snp.makeConstraints {
+            $0.directionalVerticalEdges.equalToSuperview()
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(44)
+        }
+
+        // 네 번째 섹션
         chevronImageView.snp.makeConstraints {
             $0.top.equalToSuperview().inset(12)
             $0.centerX.equalToSuperview()
