@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 import Then
 
-/// 캘린더 근무 표시 UI의 부모 클래스
+/// 캘린더 근무 표시 UI의 부모 `class`
 class BaseEventRowVStackView: UIStackView {
     
     // MARK: - UI Components
@@ -68,11 +68,11 @@ private extension BaseEventRowVStackView {
     // MARK: - setConstraints
     func setConstraints() {
         titleLabel.snp.makeConstraints {
-            $0.height.equalTo(18)
+            $0.height.equalTo(EventRowSize.baseComponentHeight)
         }
         
         dailyIncomeLabel.snp.makeConstraints {
-            $0.height.equalTo(18)
+            $0.height.equalTo(EventRowSize.baseComponentHeight)
         }
     }
 }

@@ -15,8 +15,6 @@ final class EventContainerVStackView: UIStackView {
     // MARK: - Properties
     /// 근무 개수
     private var eventListCount: Int = 0
-    /// `restEventCountRow`를 표시할 기준 근무 개수
-    private let displayLimit: Int = 4
     
     // MARK: - UI Components
     /// 근무 표시 UI 배열(개인 캘린더 모드)
@@ -24,7 +22,7 @@ final class EventContainerVStackView: UIStackView {
     /// 근무 표시 UI 배열(공유 캘린더 모드)
     private let sharedModeEventRows = (0..<4).map { _ in SharedModeEventRowVStackView() }
     /// 미표시된 근무 개수 표시 UI
-    private let restEventCountRow = RestEventCountLabel()
+    private let restEventCountRow = RestEventCountRowLabel()
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -38,11 +36,15 @@ final class EventContainerVStackView: UIStackView {
     }
     
     // MARK: - Internal Methods
-    func updatePersonalModeEventRows(eventList: [CalendarEvent]) {
+    /// 개인 캘린더 모드일 때 근무 표시 UI를 업데이트하는 메서드
+    /// - Parameters:
+    ///   - eventList: 근무 Entity 배열 `[CalendarEvent]`
+    ///   - displayCount: 표시할 근무 UI 개수 `Int`
+    func updatePersonalModeEventRows(eventList: [CalendarEvent], displayCount: Int) {
         self.arrangedSubviews.forEach { $0.isHidden = true }
         
         for (index, event) in eventList.enumerated() {
-            if index < displayLimit {
+            if index < displayCount {
                 personalModeEventRows[index].update(event: event)
                 personalModeEventRows[index].isHidden = false
             } else {
@@ -56,14 +58,18 @@ final class EventContainerVStackView: UIStackView {
             personalModeEventRows.forEach { $0.reduceSize() }
         }
         
-        showEventCountRow(displayLimit: displayLimit)
+        showRestEventCountRowIfRemain(displayedCount: displayCount)
     }
     
-    func updateSharedModeEventRows(eventList: [CalendarEvent]) {
+    /// 공유 캘린더 모드일 때 근무 표시 UI를 업데이트하는 메서드
+    /// - Parameters:
+    ///   - eventList: 근무 Entity 배열 `[CalendarEvent]`
+    ///   - displayCount: 표시할 근무 UI 개수 `Int`
+    func updateSharedModeEventRows(eventList: [CalendarEvent], displayCount: Int) {
         self.arrangedSubviews.forEach { $0.isHidden = true }
         
         for (index, event) in eventList.enumerated() {
-            if index < displayLimit {
+            if index < displayCount {
                 sharedModeEventRows[index].update(event: event)
                 sharedModeEventRows[index].isHidden = false
             } else {
@@ -73,20 +79,21 @@ final class EventContainerVStackView: UIStackView {
         
         eventListCount = eventList.count
         
-        showEventCountRow(displayLimit: displayLimit)
+        showRestEventCountRowIfRemain(displayedCount: displayCount)
     }
     
     /// `CalendarDayCell`이 공간 부족일 경우 UI 중 일부를 숨김 처리하는 메서드
-    func reduceSize() {
+    /// - Parameters:
+    ///   - displayCount: 표시할 근무 UI 개수 `Int`
+    func reduceHeight(displayCount: Int) {
         if eventListCount > 1 {
             personalModeEventRows.forEach { $0.reduceSize() }
         }
-        personalModeEventRows.last?.isHidden = true
+        personalModeEventRows.dropFirst(displayCount).forEach { $0.isHidden = true }
+
+        sharedModeEventRows.dropFirst(displayCount).forEach { $0.isHidden = true }
         
-        sharedModeEventRows.last?.isHidden = true
-        
-        // 근무가 3개 초과일 때 근무 개수 UI 표시
-        showEventCountRow(displayLimit: 3)
+        showRestEventCountRowIfRemain(displayedCount: displayCount)
     }
 }
 
@@ -114,18 +121,21 @@ private extension EventContainerVStackView {
     // MARK: - setConstraints
     func setConstraints() {
         restEventCountRow.snp.makeConstraints {
-            $0.height.equalTo(18)
+            $0.height.equalTo(EventRowSize.baseComponentHeight)
         }
     }
 }
 
 private extension EventContainerVStackView {
-    func showEventCountRow(displayLimit: Int) {
-        if eventListCount > displayLimit {
+    /// 표시되지 않은 근무 개수를 표시하는 메서드
+    /// - Parameters:
+    ///   - displayedCount: 표시된 근무 UI 개수 `Int`
+    func showRestEventCountRowIfRemain(displayedCount: Int) {
+        if eventListCount > displayedCount {
             // 마지막 근무 UI 자리에 표시
-            personalModeEventRows[displayLimit - 1].isHidden = true
-            sharedModeEventRows[displayLimit - 1].isHidden = true
-            restEventCountRow.text = "+\(eventListCount - displayLimit + 1)"
+            personalModeEventRows[displayedCount - 1].isHidden = true
+            sharedModeEventRows[displayedCount - 1].isHidden = true
+            restEventCountRow.text = "+\(eventListCount - displayedCount + 1)"
             restEventCountRow.isHidden = false
         }
     }

@@ -68,10 +68,15 @@ final class CalendarDayCell: JTACDayCell {
         // eventContainerVStackView의 잠재적인 maxY 계산
         let potentialMaxY = eventContainerMinY + requiredHeight
         
-        // 근무 컨테이너 UI가 캘린더 셀을 벗어났을 때(혹은 공간이 4 미만일 때)
-        if potentialMaxY + 4 >= self.contentView.bounds.height {
+        // eventContainerVStackView의 최대 maxY 계산(여백 4 포함)
+        let possibleMaxY = self.contentView.bounds.height - 4
+        
+        // 근무 컨테이너 UI가 캘린더 셀을 벗어나거나 여백이 4 미만일 때
+        if potentialMaxY >= possibleMaxY {
+            let possibleMaxHeight = possibleMaxY - eventContainerMinY
+            let reducedCount = Int(possibleMaxHeight / (EventRowSize.baseComponentHeight + eventContainerVStackView.spacing))
             // 근무 UI 크기 줄임
-            eventContainerVStackView.reduceSize()
+            eventContainerVStackView.reduceHeight(displayCount: reducedCount)
         }
     }
     
@@ -98,11 +103,12 @@ final class CalendarDayCell: JTACDayCell {
         dateLabel.isHidden = !dateBelongsToThisMonth
         selectedView.isHidden = !isSelected
         
+        let displayCount = 4
         switch calendarMode {
         case .personal:
-            eventContainerVStackView.updatePersonalModeEventRows(eventList: eventList)
+            eventContainerVStackView.updatePersonalModeEventRows(eventList: eventList, displayCount: displayCount)
         case .shared:
-            eventContainerVStackView.updateSharedModeEventRows(eventList: eventList)
+            eventContainerVStackView.updateSharedModeEventRows(eventList: eventList, displayCount: displayCount)
         }
     }
 }
