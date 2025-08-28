@@ -137,7 +137,7 @@ private extension FilterView {
         applyButton.snp.makeConstraints {
             $0.leading.trailing.equalTo(self.safeAreaLayoutGuide).inset(16)
             $0.bottom.equalTo(self.safeAreaLayoutGuide).inset(12)
-            $0.height.equalTo(44)
+            $0.height.equalTo(45)
         }
     }
 }
