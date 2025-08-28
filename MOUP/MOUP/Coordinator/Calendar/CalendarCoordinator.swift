@@ -58,8 +58,7 @@ final class CalendarCoordinator: Coordinator {
     
     func dismissCalendarEventList() {
         guard let coordinator = childCoordinators.first(where: { $0 is CalendarEventListCoordinator }) else {
-            assertionFailure("dismissCalendarEventList() 메서드 실행 실패 - childCoordinators에 CalendarEventListCoordinator가 존재하지 않습니다.")
-            return
+            fatalError("dismissCalendarEventList() 메서드 실행 실패 - childCoordinators에 CalendarEventListCoordinator가 존재하지 않습니다.")
         }
         removeChildCoordinator(coordinator, needToDismiss: true)
     }

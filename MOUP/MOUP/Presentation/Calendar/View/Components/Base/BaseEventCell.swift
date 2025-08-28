@@ -10,6 +10,7 @@ import UIKit
 import SnapKit
 import Then
 
+/// 근무 목록 셀의 부모 `class`
 class BaseEventCell: UITableViewCell {
     
     // MARK: - UI Components

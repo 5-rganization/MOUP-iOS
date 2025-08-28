@@ -16,7 +16,7 @@ protocol FilterModalVCDelegate: AnyObject {
     func applyButtonTapped(filterWorkplace: FilterWorkplace?)
 }
 
-/// 필터 VC
+/// 필터 모달 VC
 final class FilterModalViewController: UIViewController {
     
     // MARK: - Properties

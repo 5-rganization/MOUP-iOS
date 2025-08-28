@@ -16,7 +16,7 @@ protocol CalendarEventListModalVCDelegate: AnyObject {
     func dismissGestureReceived()
 }
 
-/// 근무 리스트 VC
+/// 근무 리스트 모달 VC
 final class CalendarEventListModalViewController: UIViewController {
     
     // MARK: - Properties
