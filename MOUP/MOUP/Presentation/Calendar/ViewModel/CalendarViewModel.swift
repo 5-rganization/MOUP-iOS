@@ -5,6 +5,8 @@
 //  Created by 서동환 on 7/12/25.
 //
 
+import Foundation
+
 import RxRelay
 import RxSwift
 
@@ -16,7 +18,7 @@ final class CalendarViewModel {
     
     // MARK: - Input
     struct Input {
-        let visibleYearMonth: Observable<(year: Int, month: Int)>
+        let visibleDate: Observable<Date>
         let calendarMode: Observable<CalendarMode>
         let personalFilterWorkplace: Observable<FilterWorkplace?>
         let sharedFilterWorkplace: Observable<FilterWorkplace?>
@@ -36,9 +38,9 @@ final class CalendarViewModel {
     // MARK: - Input ➡️ Output Transform
     func transform(input: Input) -> Output {
         // TODO: 근무 이벤트 로딩
-        Observable.combineLatest(input.visibleYearMonth, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
+        Observable.combineLatest(input.visibleDate, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
             .subscribe(with: self) { owner, combined in
-                let ((year, month), calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
+                let (visibleDate, calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
                 var calendarEventList: [CalendarEvent]
                 switch calendarMode {
                 case .personal:

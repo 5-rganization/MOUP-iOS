@@ -25,8 +25,8 @@ final class CalendarViewController: UIViewController {
     private let viewModel: CalendarViewModel
     
     // Input Relays
-    /// 현재 캘린더 연/월
-    private let visibleYearMonthRelay = PublishRelay<(year: Int, month: Int)>()
+    /// 현재 캘린더에 보이는 날짜
+    private let visibleDateRelay = BehaviorRelay<Date>(value: .now)
     /// 캘린더 개인/공유 모드
     private let calendarModeRelay = BehaviorRelay<CalendarMode>(value: .personal)
     /// 개인 캘린더 근무지/매장 필터
@@ -162,7 +162,7 @@ private extension CalendarViewController {
             }.disposed(by: disposeBag)
         
         // ViewModel 바인딩
-        let input = CalendarViewModel.Input(visibleYearMonth: visibleYearMonthRelay.asObservable(),
+        let input = CalendarViewModel.Input(visibleDate: visibleDateRelay.asObservable(),
                                             calendarMode: calendarModeRelay.asObservable(),
                                             personalFilterWorkplace: personalFilterWorkplaceRelay.asObservable(),
                                             sharedFilterWorkplace: sharedFilterWorkplaceRelay.asObservable())
@@ -203,13 +203,7 @@ extension CalendarViewController {
 // MARK: - Private Calendar Methods
 private extension CalendarViewController {
     func setCalendarView() {
-        calendarView.getMonthCalendarView.scrollToDate(.now, animateScroll: false)
-        
-        calendarView.getMonthCalendarView.visibleDates { [weak self] visibleDates in
-            guard let self, let date = visibleDates.monthDates.first?.date else { return }
-            let dateStr = DateFormatter.yearMonthDateFormatter.string(from: date)
-            calendarView.getCalendarHeaderView.update(dateStr: dateStr)
-        }
+        calendarView.getMonthCalendarView.scrollToDate(visibleDateRelay.value, animateScroll: false)
     }
     
     func configureCell(cell: JTACDayCell?, cellState: CellState, calendarMode: CalendarMode, eventList: [CalendarEvent]) {
@@ -286,8 +280,7 @@ extension CalendarViewController: JTACMonthViewDelegate {
         guard let date = visibleDates.monthDates.first?.date else { return }
         let dateStr = DateFormatter.yearMonthDateFormatter.string(from: date)
         calendarView.getCalendarHeaderView.update(dateStr: dateStr)
-        visibleYearMonthRelay.accept((year: Calendar.current.component(.year, from: date),
-                                      month: Calendar.current.component(.month, from: date)))
+        visibleDateRelay.accept(date)
     }
     
     func calendar(_ calendar: JTACMonthView, didSelectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
