@@ -34,6 +34,10 @@ final class CalendarViewController: UIViewController {
     /// 공유 캘린더 근무지/매장 필터
     private let sharedFilterWorkplaceRelay = BehaviorRelay<FilterWorkplace?>(value: nil)
     
+    // Others
+    /// 선택한 날짜
+    private var selectedDate: Date?
+    
     // MARK: - UI Components
     private let todayButton = UIBarButtonItem(title: "오늘").then {
         $0.setTitleTextAttributes([.font: UIFont.headBold(14), .foregroundColor: UIColor.gray900], for: .normal)
@@ -90,6 +94,7 @@ private extension CalendarViewController {
     func configure() {
         setStyles()
         setDelegates()
+        setActions()
         setBindings()
     }
     
@@ -107,12 +112,20 @@ private extension CalendarViewController {
         calendarView.getMonthCalendarView.calendarDelegate = self
     }
     
+    // MARK: - setActions
+    func setActions() {
+        // CalendarEventListModalVC 이외 영역 터치
+        let calendarViewTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(didCalendarViewTap(_:)))
+        calendarViewTapRecognizer.cancelsTouchesInView = false
+        calendarView.addGestureRecognizer(calendarViewTapRecognizer)
+    }
+    
     // MARK: - setBindings
     func setBindings() {
         // View 바인딩
         todayButton.rx.tap
             .subscribe(with: self) { owner, _ in
-                owner.calendarView.getMonthCalendarView.deselectAllDates()
+                owner.deselectCell()
                 owner.calendarView.getMonthCalendarView.scrollToDate(.now, animateScroll: true)
             }.disposed(by: disposeBag)
         
@@ -156,6 +169,13 @@ private extension CalendarViewController {
 //                print("==================================================")
                 owner.populateDataSource(calendarEventList: calendarEventList)
             }.disposed(by: disposeBag)
+    }
+}
+
+// MARK: - @objc Methods
+@objc private extension CalendarViewController {
+    func didCalendarViewTap(_ sender: UITapGestureRecognizer) {
+        deselectCell()
     }
 }
 
@@ -207,6 +227,13 @@ private extension CalendarViewController {
                                            calendarEventList: calendarEventDataSource[selectedDate] ?? [],
                                            calendarMode: calendarModeRelay.value)
     }
+    
+    func deselectCell() {
+        if let selectedDate {
+            calendarView.getMonthCalendarView.deselect(dates: [selectedDate])
+            coordinator?.dismissCalendarEventList()
+        }
+    }
 }
 
 // MARK: - JTACMonthViewDataSource
@@ -251,11 +278,13 @@ extension CalendarViewController: JTACMonthViewDelegate {
     }
     
     func calendar(_ calendar: JTACMonthView, didSelectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
+        selectedDate = date
         configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, eventList: calendarEventDataSource[date] ?? [])
         didSelectCell(selectedDate: date)
     }
     
     func calendar(_ calendar: JTACMonthView, didDeselectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
+        selectedDate = nil
         configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, eventList: calendarEventDataSource[date] ?? [])
     }
 }
