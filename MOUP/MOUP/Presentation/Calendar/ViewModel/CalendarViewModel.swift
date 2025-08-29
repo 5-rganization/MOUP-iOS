@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 
 import RxRelay
 import RxSwift
@@ -14,6 +15,7 @@ import RxSwift
 final class CalendarViewModel {
     
     // MARK: - Properties
+    private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     private let disposeBag = DisposeBag()
     
     // MARK: - Input
@@ -37,10 +39,12 @@ final class CalendarViewModel {
     
     // MARK: - Input ➡️ Output Transform
     func transform(input: Input) -> Output {
-        // TODO: 근무 이벤트 로딩
+        // TODO: 근무 데이터 로딩 API 호출
         Observable.combineLatest(input.visibleDate, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
             .subscribe(with: self) { owner, combined in
                 let (visibleDate, calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
+                owner.logger.debug("근무 데이터 로딩 API 호출")
+                
                 var calendarWorkList: [CalendarWork]
                 switch calendarMode {
                 case .personal:
@@ -59,6 +63,7 @@ final class CalendarViewModel {
                 }
                 calendarWorkList.sort(by: owner.sortCalendarWorkList)
                 owner.calendarWorkListRelay.accept(calendarWorkList)
+                owner.logger.debug("근무 데이터 로딩 완료")
             }.disposed(by: disposeBag)
         return Output(calendarWorkList: calendarWorkListRelay.asObservable())
     }

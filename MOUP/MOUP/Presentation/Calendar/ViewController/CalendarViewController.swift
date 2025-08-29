@@ -26,7 +26,7 @@ final class CalendarViewController: UIViewController {
     
     // Input Relays
     /// 현재 캘린더에 보이는 날짜
-    private let visibleDateRelay = BehaviorRelay<Date>(value: .now)
+    private let visibleDateRelay = PublishRelay<Date>()
     /// 캘린더 개인/공유 모드
     private let calendarModeRelay = BehaviorRelay<CalendarMode>(value: .personal)
     /// 개인 캘린더 근무지/매장 필터
@@ -35,6 +35,8 @@ final class CalendarViewController: UIViewController {
     private let sharedFilterWorkplaceRelay = BehaviorRelay<FilterWorkplace?>(value: nil)
     
     // Others
+    /// 현재 캘린더에 보이는 날짜
+    private var visibleDate: Date = .now
     /// 선택한 날짜
     private var selectedDate: Date?
     
@@ -199,12 +201,8 @@ extension CalendarViewController {
         calendarView.getMonthCalendarView.reloadData()
     }
     
-    func updateDataSource(date: Date? = nil) {
-        if let date {
-            visibleDateRelay.accept(date)
-        } else {
-            visibleDateRelay.accept(visibleDateRelay.value)
-        }
+    func updateDataSource() {
+        visibleDateRelay.accept(visibleDate)
     }
     
     func selectCell(date: Date) {
@@ -222,7 +220,8 @@ extension CalendarViewController {
 // MARK: - Private Calendar Methods
 private extension CalendarViewController {
     func setCalendarView() {
-        calendarView.getMonthCalendarView.scrollToDate(visibleDateRelay.value, animateScroll: false)
+        visibleDate = .now
+        calendarView.getMonthCalendarView.scrollToDate(visibleDate, animateScroll: false)
     }
     
     func configureCell(cell: JTACDayCell?, cellState: CellState, calendarMode: CalendarMode, workList: [CalendarWork]) {
@@ -284,9 +283,11 @@ extension CalendarViewController: JTACMonthViewDelegate {
     
     func calendar(_ calendar: JTACMonthView, didScrollToDateSegmentWith visibleDates: DateSegmentInfo) {
         guard let date = visibleDates.monthDates.first?.date else { return }
+        visibleDate = date
+        updateDataSource()
+        
         let dateStr = DateFormatter.yearMonthDateFormatter.string(from: date)
         calendarView.getCalendarHeaderView.update(dateStr: dateStr)
-        updateDataSource(date: date)
     }
     
     func calendar(_ calendar: JTACMonthView, didSelectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {

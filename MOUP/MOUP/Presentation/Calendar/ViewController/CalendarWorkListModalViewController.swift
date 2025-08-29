@@ -93,7 +93,7 @@ private extension CalendarWorkListModalViewController {
         case .personal:
             output.calendarWorkList.asDriver(onErrorJustReturn: [])
                 .drive(with: self, onNext: { owner, workList in
-                    owner.calendarWorkListView.rx.emptyViewIsHidden.onNext(!workList.isEmpty)
+                    owner.calendarWorkListView.rx.emptyLabelIsHidden.onNext(!workList.isEmpty)
                     owner.calendarWorkListView.rx.workTableViewIsHidden.onNext(workList.isEmpty)
                     owner.calendarWorkListView.rx.personalWorkTableViewDataSource.onNext(workList)
                 })
@@ -101,7 +101,7 @@ private extension CalendarWorkListModalViewController {
         case .shared:
             output.calendarWorkList.asDriver(onErrorJustReturn: [])
                 .drive(with: self, onNext: { owner, workList in
-                    owner.calendarWorkListView.rx.emptyViewIsHidden.onNext(!workList.isEmpty)
+                    owner.calendarWorkListView.rx.emptyLabelIsHidden.onNext(!workList.isEmpty)
                     owner.calendarWorkListView.rx.workTableViewIsHidden.onNext(workList.isEmpty)
                     owner.calendarWorkListView.rx.sharedWorkTableViewDataSource.onNext(workList)
                 })

@@ -102,7 +102,7 @@ private extension FilterModalViewController {
         
         output.filterWorkplaceList.asDriver(onErrorJustReturn: [])
             .drive(with: self, onNext: { owner, filterWorkplaceList in
-                owner.filterView.rx.emptyViewIsHidden.onNext(!filterWorkplaceList.isEmpty)
+                owner.filterView.rx.emptyLabelIsHidden.onNext(!filterWorkplaceList.isEmpty)
                 owner.filterView.rx.filterTableViewIsHidden.onNext(filterWorkplaceList.isEmpty)
                 owner.filterView.rx.filterTableViewDataSource.onNext(filterWorkplaceList)
                 
