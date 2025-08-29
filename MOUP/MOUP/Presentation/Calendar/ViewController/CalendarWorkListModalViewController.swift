@@ -1,5 +1,5 @@
 //
-//  CalendarEventListModalViewController.swift
+//  CalendarWorkListModalViewController.swift
 //  MOUP
 //
 //  Created by 서동환 on 8/26/25.
@@ -11,36 +11,36 @@ import RxCocoa
 import RxSwift
 import Then
 
-/// `CalendarEventListModalViewController`의 이벤트를 `CalendarEventListCoordinator`에 알리는 Delegate
-protocol CalendarEventListModalVCDelegate: AnyObject {
+/// `CalendarWorkListModalViewController`의 이벤트를 `CalendarWorkListCoordinator`에 알리는 Delegate
+protocol CalendarWorkListModalVCDelegate: AnyObject {
     func dismissGestureReceived()
 }
 
 /// 근무 리스트 모달 VC
-final class CalendarEventListModalViewController: UIViewController {
+final class CalendarWorkListModalViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     
     // Initializer Injections
-    weak var coordinator: CalendarEventListCoordinator?
-    private let viewModel: CalendarEventListViewModel
+    weak var coordinator: CalendarWorkListCoordinator?
+    private let viewModel: CalendarWorkListViewModel
     private let selectedDay: Int
     private let calendarMode: CalendarMode
     
     // Property Injections
-    weak var delegate: CalendarEventListModalVCDelegate?
+    weak var delegate: CalendarWorkListModalVCDelegate?
     
     // Input Relays
-    private let deleteEventIdRelay = PublishRelay<Int64>()
+    private let deleteWorkIdRelay = PublishRelay<Int64>()
     
     // MARK: - UI Components
-    private lazy var calendarEventListView = CalendarEventListView().then {
+    private lazy var calendarWorkListView = CalendarWorkListView().then {
         $0.delegate = self
     }
     
     // MARK: - Initializer
-    init(coordinator: CalendarEventListCoordinator, viewModel: CalendarEventListViewModel, selectedDay: Int, calendarMode: CalendarMode) {
+    init(coordinator: CalendarWorkListCoordinator, viewModel: CalendarWorkListViewModel, selectedDay: Int, calendarMode: CalendarMode) {
         self.coordinator = coordinator
         self.viewModel = viewModel
         self.selectedDay = selectedDay
@@ -55,18 +55,18 @@ final class CalendarEventListModalViewController: UIViewController {
     
     // MARK: - Lifecycle
     override func loadView() {
-        self.view = calendarEventListView
+        self.view = calendarWorkListView
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
-        calendarEventListView.update(day: selectedDay)
+        calendarWorkListView.update(day: selectedDay)
     }
 }
 
 // MARK: - UI Methods
-private extension CalendarEventListModalViewController {
+private extension CalendarWorkListModalViewController {
     func configure() {
         setStyles()
         setDelegates()
@@ -83,35 +83,35 @@ private extension CalendarEventListModalViewController {
     
     func setBindings() {
         // ViewModel 바인딩
-        let input = CalendarEventListViewModel.Input(viewDidLoad: Observable.just(()), deleteEventId: deleteEventIdRelay.asObservable())
+        let input = CalendarWorkListViewModel.Input(viewDidLoad: Observable.just(()), deleteWorkId: deleteWorkIdRelay.asObservable())
         let output = viewModel.transform(input: input)
         
         switch calendarMode {
         case .personal:
-            output.calendarEventList.asDriver(onErrorJustReturn: [])
-                .drive(calendarEventListView.rx.personalEventTableViewDataSource)
+            output.calendarWorkList.asDriver(onErrorJustReturn: [])
+                .drive(calendarWorkListView.rx.personalWorkTableViewDataSource)
                 .disposed(by: disposeBag)
         case .shared:
-            output.calendarEventList.asDriver(onErrorJustReturn: [])
-                .drive(calendarEventListView.rx.sharedEventTableViewDataSource)
+            output.calendarWorkList.asDriver(onErrorJustReturn: [])
+                .drive(calendarWorkListView.rx.sharedWorkTableViewDataSource)
                 .disposed(by: disposeBag)
         }
     }
 }
 
-// MARK: - CalendarEventListViewDelegate
-extension CalendarEventListModalViewController: CalendarEventListViewDelegate {
-    func editEvent(event: CalendarEvent) {
+// MARK: - CalendarWorkListViewDelegate
+extension CalendarWorkListModalViewController: CalendarWorkListViewDelegate {
+    func editWork(work: CalendarWork) {
         // TODO: - 근무 수정 화면 연결
     }
     
-    func deleteEvent(id: Int64) {
+    func deleteWork(id: Int64) {
         print("근무 삭제")
     }
 }
 
 // MARK: - UIAdaptivePresentationControllerDelegate
-extension CalendarEventListModalViewController: UIAdaptivePresentationControllerDelegate {
+extension CalendarWorkListModalViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
         delegate?.dismissGestureReceived()
     }

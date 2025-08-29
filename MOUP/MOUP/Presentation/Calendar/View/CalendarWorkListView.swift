@@ -1,5 +1,5 @@
 //
-//  CalendarEventListView.swift
+//  CalendarWorkListView.swift
 //  MOUP
 //
 //  Created by 서동환 on 8/26/25.
@@ -12,19 +12,19 @@ import RxSwift
 import SnapKit
 import Then
 
-protocol CalendarEventListViewDelegate: AnyObject {
-    func editEvent(event: CalendarEvent)
-    func deleteEvent(id: Int64)
+protocol CalendarWorkListViewDelegate: AnyObject {
+    func editWork(work: CalendarWork)
+    func deleteWork(id: Int64)
 }
 
 /// 근무 리스트 UI
-final class CalendarEventListView: UIView {
+final class CalendarWorkListView: UIView {
     
     // MARK: - Properties
     fileprivate let disposeBag = DisposeBag()
     
     // Property Injections
-    weak var delegate: CalendarEventListViewDelegate?
+    weak var delegate: CalendarWorkListViewDelegate?
     
     // MARK: - UI Components
     /// 모달 핸들 UI
@@ -35,9 +35,9 @@ final class CalendarEventListView: UIView {
         $0.textColor = .gray900
     }
     /// 근무 리스트
-    fileprivate let eventTableView = UITableView().then {
-        $0.register(PersonalModeEventCell.self, forCellReuseIdentifier: PersonalModeEventCell.identifier)
-        $0.register(SharedModeEventCell.self, forCellReuseIdentifier: SharedModeEventCell.identifier)
+    fileprivate let workTableView = UITableView().then {
+        $0.register(PersonalModeWorkCell.self, forCellReuseIdentifier: PersonalModeWorkCell.identifier)
+        $0.register(SharedModeWorkCell.self, forCellReuseIdentifier: SharedModeWorkCell.identifier)
         
         $0.rowHeight = 80  // 68 + 12(셀 간격)
         $0.separatorStyle = .none
@@ -69,7 +69,7 @@ final class CalendarEventListView: UIView {
     }
 }
 
-private extension CalendarEventListView {
+private extension CalendarWorkListView {
     // MARK: - configure
     func configure() {
         setHierarchy()
@@ -82,7 +82,7 @@ private extension CalendarEventListView {
         self.addSubviews(grabberView,
                          dayLabel,
                          emptyLabel,
-                         eventTableView,
+                         workTableView,
                          registerButton)
     }
     
@@ -108,10 +108,10 @@ private extension CalendarEventListView {
         }
         
         emptyLabel.snp.makeConstraints {
-            $0.center.equalTo(eventTableView)
+            $0.center.equalTo(workTableView)
         }
         
-        eventTableView.snp.makeConstraints {
+        workTableView.snp.makeConstraints {
             $0.top.equalTo(dayLabel.snp.bottom).offset(12)
             $0.leading.trailing.equalTo(self.safeAreaLayoutGuide)
             $0.bottom.equalTo(registerButton.snp.top).offset(-12)
@@ -126,51 +126,51 @@ private extension CalendarEventListView {
 }
 
 // MARK: - Extension Reactive
-extension Reactive where Base: CalendarEventListView {
-    var personalEventTableViewDataSource: Binder<[CalendarEvent]> {
-        return Binder(base) { view, event in
+extension Reactive where Base: CalendarWorkListView {
+    var personalWorkTableViewDataSource: Binder<[CalendarWork]> {
+        return Binder(base) { view, work in
             // RxSwift Delegate 오류 방지
-            view.eventTableView.dataSource = nil
-            view.eventTableView.delegate = nil
+            view.workTableView.dataSource = nil
+            view.workTableView.delegate = nil
             
-            Observable.just(event)
-                .bind(to: view.eventTableView.rx.items(
-                    cellIdentifier: PersonalModeEventCell.identifier,
-                    cellType: PersonalModeEventCell.self
-                )) { _, event, cell in
+            Observable.just(work)
+                .bind(to: view.workTableView.rx.items(
+                    cellIdentifier: PersonalModeWorkCell.identifier,
+                    cellType: PersonalModeWorkCell.self
+                )) { _, work, cell in
                     let editAction = UIAction(title: "수정하기") { _ in
-                        base.delegate?.editEvent(event: event)
+                        base.delegate?.editWork(work: work)
                     }
                     let deleteAction = UIAction(title: "삭제하기", attributes: .destructive) { _ in
-                        base.delegate?.deleteEvent(id: event.id)
+                        base.delegate?.deleteWork(id: work.id)
                     }
                     cell.menuButton.menu = UIMenu(children: [editAction, deleteAction])
-                    cell.update(event: event)
+                    cell.update(work: work)
                 }.disposed(by: base.disposeBag)
         }
     }
-    var sharedEventTableViewDataSource: Binder<[CalendarEvent]> {
-        return Binder(base) { view, event in
+    var sharedWorkTableViewDataSource: Binder<[CalendarWork]> {
+        return Binder(base) { view, work in
             // RxSwift Delegate 오류 방지
-            view.eventTableView.dataSource = nil
-            view.eventTableView.delegate = nil
+            view.workTableView.dataSource = nil
+            view.workTableView.delegate = nil
             
-            Observable.just(event)
-                .bind(to: view.eventTableView.rx.items(
-                    cellIdentifier: SharedModeEventCell.identifier,
-                    cellType: SharedModeEventCell.self
-                )) { _, event, cell in
+            Observable.just(work)
+                .bind(to: view.workTableView.rx.items(
+                    cellIdentifier: SharedModeWorkCell.identifier,
+                    cellType: SharedModeWorkCell.self
+                )) { _, work, cell in
                     let editAction = UIAction(title: "수정하기") { _ in
-                        base.delegate?.editEvent(event: event)
+                        base.delegate?.editWork(work: work)
                     }
                     let deleteAction = UIAction(title: "삭제하기", attributes: .destructive) { _ in
-                        base.delegate?.deleteEvent(id: event.id)
+                        base.delegate?.deleteWork(id: work.id)
                     }
                     cell.menuButton.menu = UIMenu(children: [editAction, deleteAction])
-                    cell.update(event: event)
+                    cell.update(work: work)
                 }.disposed(by: base.disposeBag)
         }
     }
-    var eventTableViewModelSelected: ControlEvent<CalendarEvent> { base.eventTableView.rx.modelSelected(CalendarEvent.self) }
+    var workTableViewModelSelected: ControlEvent<CalendarWork> { base.workTableView.rx.modelSelected(CalendarWork.self) }
     var registerButtonTap: ControlEvent<Void> { base.registerButton.rx.tap }
 }

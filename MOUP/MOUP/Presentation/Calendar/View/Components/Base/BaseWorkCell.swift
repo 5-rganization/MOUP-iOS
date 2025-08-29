@@ -1,5 +1,5 @@
 //
-//  BaseEventCell.swift
+//  BaseWorkCell.swift
 //  MOUP
 //
 //  Created by 서동환 on 8/27/25.
@@ -11,7 +11,7 @@ import SnapKit
 import Then
 
 /// 근무 목록 셀의 부모 `class`
-class BaseEventCell: UITableViewCell {
+class BaseWorkCell: UITableViewCell {
     
     // MARK: - UI Components
     /// 라벨 컬러 UI
@@ -87,13 +87,13 @@ class BaseEventCell: UITableViewCell {
     }
     
     // MARK: - Override Methods
-    func update(event: CalendarEvent) {
+    func update(work: CalendarWork) {
         fatalError("update() 메서드 실행 실패 - 메서드가 오버라이딩 되지 않았습니다.")
     }
 }
 
 // MARK: - UI Methods
-private extension BaseEventCell {
+private extension BaseWorkCell {
     // MARK: - configure
     func configure() {
         setHierarchy()
@@ -146,7 +146,7 @@ private extension BaseEventCell {
 }
 
 // MARK: - Internal Methods
-extension BaseEventCell {
+extension BaseWorkCell {
     /// 설정된 라벨 컬러를 적용하는 메서드
     func setGivenLabelColor(_ labelColorStr: String) {
         guard let labelColor = LabelColorString(rawValue: labelColorStr) else {

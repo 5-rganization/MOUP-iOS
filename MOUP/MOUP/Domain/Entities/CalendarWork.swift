@@ -1,5 +1,5 @@
 //
-//  CalendarEvent.swift
+//  CalendarWork.swift
 //  MOUP
 //
 //  Created by 서동환 on 8/14/25.
@@ -33,7 +33,7 @@
 /// - `colorLabel`: 라벨 색상 `String`
 ///   - 예시: `"빨간색"`
 /// - `isShared`: 공유 여부 `Bool`
-struct CalendarEvent {
+struct CalendarWork {
     let id: Int64
     let workplaceId: Int64
     let workplaceName: String

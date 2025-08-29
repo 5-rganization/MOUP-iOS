@@ -1,5 +1,5 @@
 //
-//  CalendarEventListViewModel.swift
+//  CalendarWorkListViewModel.swift
 //  MOUP
 //
 //  Created by 서동환 on 8/26/25.
@@ -8,29 +8,29 @@
 import RxRelay
 import RxSwift
 
-final class CalendarEventListViewModel {
+final class CalendarWorkListViewModel {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     
     // Initializer Injections
-    private var calendarEventList: [CalendarEvent] = []
+    private var calendarWorkList: [CalendarWork] = []
     
     // MARK: - Input
     struct Input {
         let viewDidLoad: Observable<Void>
-        let deleteEventId: Observable<Int64>
+        let deleteWorkId: Observable<Int64>
     }
     
     // MARK: - Output
     struct Output {
-        let calendarEventList: Observable<[CalendarEvent]>
+        let calendarWorkList: Observable<[CalendarWork]>
     }
-    private let calendarEventListRelay = BehaviorRelay<[CalendarEvent]>(value: [])
+    private let calendarWorkListRelay = BehaviorRelay<[CalendarWork]>(value: [])
     
     // MARK: - Initializer
-    init(calendarEventList: [CalendarEvent]) {
-        self.calendarEventList = calendarEventList
+    init(calendarWorkList: [CalendarWork]) {
+        self.calendarWorkList = calendarWorkList
         // TODO: UseCase 주입
     }
     
@@ -39,8 +39,8 @@ final class CalendarEventListViewModel {
         // TODO: 근무 이벤트 로딩
         input.viewDidLoad
             .subscribe(with: self) { owner, _ in
-                owner.calendarEventListRelay.accept(owner.calendarEventList)
+                owner.calendarWorkListRelay.accept(owner.calendarWorkList)
             }.disposed(by: disposeBag)
-        return Output(calendarEventList: calendarEventListRelay.asObservable())
+        return Output(calendarWorkList: calendarWorkListRelay.asObservable())
     }
 }

@@ -1,5 +1,5 @@
 //
-//  SharedModeEventRowVStackView.swift
+//  SharedModeWorkRowVStackView.swift
 //  MOUP
 //
 //  Created by 서동환 on 8/17/25.
@@ -11,20 +11,20 @@ import SnapKit
 import Then
 
 /// 캘린더 근무 표시 UI(공유 캘린더 모드)
-final class SharedModeEventRowVStackView: BaseEventRowVStackView {
+final class SharedModeWorkRowVStackView: BaseWorkRowVStackView {
     
     // MARK: - Internal Methods
-    override func update(event: CalendarEvent) {
+    override func update(work: CalendarWork) {
         // TODO: 실제 로그인한 사용자의 ID를 반영해야 함
         // 사용자의 workerId가 789임을 가정
-        if event.workerId == 789 {
+        if work.workerId == 789 {
             // TODO: 사장님 역할일 땐 setDefaultLabelColor()
-            setGivenLabelColor(event.labelColor)
+            setGivenLabelColor(work.labelColor)
         } else {
             setDefaultLabelColor()
         }
         
-        titleLabel.text = event.workerName
+        titleLabel.text = work.workerName
         dailyIncomeLabel.isHidden = true
     }
 }

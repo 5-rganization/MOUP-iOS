@@ -26,9 +26,9 @@ final class CalendarViewModel {
     
     // MARK: - Output
     struct Output {
-        let calendarEventList: Observable<[CalendarEvent]>
+        let calendarWorkList: Observable<[CalendarWork]>
     }
-    private let calendarEventListRelay = BehaviorRelay<[CalendarEvent]>(value: [])
+    private let calendarWorkListRelay = BehaviorRelay<[CalendarWork]>(value: [])
     
     // MARK: - Initializer
     init() {
@@ -41,31 +41,31 @@ final class CalendarViewModel {
         Observable.combineLatest(input.visibleDate, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
             .subscribe(with: self) { owner, combined in
                 let (visibleDate, calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
-                var calendarEventList: [CalendarEvent]
+                var calendarWorkList: [CalendarWork]
                 switch calendarMode {
                 case .personal:
-                    calendarEventList = CalendarMockData.personalCalendarEventListMock
+                    calendarWorkList = CalendarMockData.personalCalendarWorkListMock
                     if let personalFilterWorkplace {
-                        calendarEventList = calendarEventList.filter { $0.workplaceId == personalFilterWorkplace.workplaceId }
+                        calendarWorkList = calendarWorkList.filter { $0.workplaceId == personalFilterWorkplace.workplaceId }
                     }
                 case .shared:
-                    calendarEventList = CalendarMockData.sharedCalendarEventListMock
+                    calendarWorkList = CalendarMockData.sharedCalendarWorkListMock
                     if let sharedFilterWorkplace {
-                        calendarEventList = calendarEventList.filter { $0.workplaceId == sharedFilterWorkplace.workplaceId }
+                        calendarWorkList = calendarWorkList.filter { $0.workplaceId == sharedFilterWorkplace.workplaceId }
                     } else {
-                        let firstWorkplaceId = calendarEventList.sorted(by: { $0.workplaceName < $1.workplaceName }).first?.workplaceId
-                        calendarEventList = calendarEventList.filter { $0.workplaceId == firstWorkplaceId }
+                        let firstWorkplaceId = calendarWorkList.sorted(by: { $0.workplaceName < $1.workplaceName }).first?.workplaceId
+                        calendarWorkList = calendarWorkList.filter { $0.workplaceId == firstWorkplaceId }
                     }
                 }
-                calendarEventList.sort(by: owner.sortCalendarEventList)
-                owner.calendarEventListRelay.accept(calendarEventList)
+                calendarWorkList.sort(by: owner.sortCalendarWorkList)
+                owner.calendarWorkListRelay.accept(calendarWorkList)
             }.disposed(by: disposeBag)
-        return Output(calendarEventList: calendarEventListRelay.asObservable())
+        return Output(calendarWorkList: calendarWorkListRelay.asObservable())
     }
 }
 
 private extension CalendarViewModel {
-    func sortCalendarEventList(_ lhs: CalendarEvent, _ rhs: CalendarEvent) -> Bool {
+    func sortCalendarWorkList(_ lhs: CalendarWork, _ rhs: CalendarWork) -> Bool {
         return lhs.startTime < rhs.startTime || lhs.endTime < rhs.endTime
     }
 }

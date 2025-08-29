@@ -46,19 +46,19 @@ final class CalendarCoordinator: Coordinator {
         childCoordinators.append(filterCoordinator)
     }
     
-    func showCalendarEventList(selectedDay: Int, calendarEventList: [CalendarEvent], calendarMode: CalendarMode) {
-        let calendarEventListCoordinator = CalendarEventListCoordinator(navigationController: navigationController,
-                                                                        selectedDay: selectedDay,
-                                                                        calendarEventList: calendarEventList,
-                                                                        calendarMode: calendarMode)
-        calendarEventListCoordinator.delegate = self
-        calendarEventListCoordinator.start()
-        childCoordinators.append(calendarEventListCoordinator)
+    func showCalendarWorkList(selectedDay: Int, calendarWorkList: [CalendarWork], calendarMode: CalendarMode) {
+        let calendarWorkListCoordinator = CalendarWorkListCoordinator(navigationController: navigationController,
+                                                                      selectedDay: selectedDay,
+                                                                      calendarWorkList: calendarWorkList,
+                                                                      calendarMode: calendarMode)
+        calendarWorkListCoordinator.delegate = self
+        calendarWorkListCoordinator.start()
+        childCoordinators.append(calendarWorkListCoordinator)
     }
     
-    func dismissCalendarEventList() {
-        guard let coordinator = childCoordinators.first(where: { $0 is CalendarEventListCoordinator }) else {
-            fatalError("dismissCalendarEventList() 메서드 실행 실패 - childCoordinators에 CalendarEventListCoordinator가 존재하지 않습니다.")
+    func dismissCalendarWorkList() {
+        guard let coordinator = childCoordinators.first(where: { $0 is CalendarWorkListCoordinator }) else {
+            fatalError("dismissCalendarWorkList() 메서드 실행 실패 - childCoordinators에 CalendarWorkListCoordinator가 존재하지 않습니다.")
         }
         removeChildCoordinator(coordinator, needToDismiss: true)
     }
@@ -102,9 +102,9 @@ extension CalendarCoordinator: FilterCoordinatorDelegate {
     }
 }
 
-// MARK: - CalendarEventListCoordinatorDelegate
-extension CalendarCoordinator: CalendarEventListCoordinatorDelegate {
-    func dismissed(_ coordinator: CalendarEventListCoordinator) {
+// MARK: - CalendarWorkListCoordinatorDelegate
+extension CalendarCoordinator: CalendarWorkListCoordinatorDelegate {
+    func dismissed(_ coordinator: CalendarWorkListCoordinator) {
         calendarVC.deselectCell()
         removeChildCoordinator(coordinator, needToDismiss: false)
     }
