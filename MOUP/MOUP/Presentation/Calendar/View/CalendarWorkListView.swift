@@ -12,8 +12,11 @@ import RxSwift
 import SnapKit
 import Then
 
+/// `CalendarWorkListView`의 이벤트를 `CalendarWorkListModalViewController`에 
 protocol CalendarWorkListViewDelegate: AnyObject {
+    /// 근무 수정
     func editWork(work: CalendarWork)
+    /// 근무 삭제
     func deleteWork(id: Int64)
 }
 

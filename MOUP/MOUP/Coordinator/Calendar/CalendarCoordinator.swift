@@ -108,4 +108,8 @@ extension CalendarCoordinator: CalendarWorkListCoordinatorDelegate {
         calendarVC.deselectCell()
         removeChildCoordinator(coordinator, needToDismiss: false)
     }
+    
+    func updateDataSource() {
+        calendarVC.updateDataSource()
+    }
 }

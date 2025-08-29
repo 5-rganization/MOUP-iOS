@@ -7,7 +7,7 @@
 
 import UIKit
 
-/// `FilterCoordinator`의 화면 전환 이벤트를 `CalendarCoordinator`에 알리는 Delegate
+/// `FilterCoordinator`의 이벤트를 `CalendarCoordinator`에 전달하는 Delegate
 protocol FilterCoordinatorDelegate: AnyObject {
     /// 필터 선택 화면 내림
     func dismissed(_ coordinator: FilterCoordinator)
@@ -54,7 +54,7 @@ final class FilterCoordinator: Coordinator {
 
 // MARK: - FilterModalVCDelegate
 extension FilterCoordinator: FilterModalVCDelegate {
-    func dismissGestureReceived() {
+    func dismissReceived() {
         delegate?.dismissed(self)
     }
     

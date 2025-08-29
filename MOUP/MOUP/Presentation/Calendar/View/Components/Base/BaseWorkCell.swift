@@ -29,7 +29,7 @@ class BaseWorkCell: UITableViewCell {
         $0.spacing = 4
         $0.alignment = .center
     }
-    /// 출근 시간 ~ 퇴근 시간 라벨
+    /// 출퇴근 시간 라벨
     private let startEndTimeLabel = UILabel().then {
         $0.font = .bodyMedium(14)
         $0.textColor = .gray900
@@ -161,6 +161,7 @@ extension BaseWorkCell {
         labelColorBorderView.update(borderColor: ._default)
     }
     
+    /// 출퇴근 시간, 근무 시간을 계산하여 각 UI에 적용하는 메서드
     func setTimeInfoUI(startTime: String, endTime: String, restTime: Int) {
         if let workHour = DateFormatter.calculateWorkHour(startTime: startTime, endTime: endTime, restTime: restTime) {
             startEndTimeLabel.text = "\(startTime) ~ \(endTime)"

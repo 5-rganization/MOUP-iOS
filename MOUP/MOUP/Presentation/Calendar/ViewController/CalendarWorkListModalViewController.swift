@@ -11,9 +11,12 @@ import RxCocoa
 import RxSwift
 import Then
 
-/// `CalendarWorkListModalViewController`의 이벤트를 `CalendarWorkListCoordinator`에 알리는 Delegate
+/// `CalendarWorkListModalViewController`의 이벤트를 `CalendarWorkListCoordinator`에 전달하는 Delegate
 protocol CalendarWorkListModalVCDelegate: AnyObject {
-    func dismissGestureReceived()
+    /// `presentationControllerDidDismiss`를 감지했을 때 사용되는 메서드
+    func dismissReceived()
+    /// 캘린더에 업데이트가 필요할 때 사용되는 메서드
+    func updateCalendarDataSource()
 }
 
 /// 근무 리스트 모달 VC
@@ -106,13 +109,14 @@ extension CalendarWorkListModalViewController: CalendarWorkListViewDelegate {
     }
     
     func deleteWork(id: Int64) {
-        print("근무 삭제")
+        deleteWorkIdRelay.accept(id)
+        delegate?.updateCalendarDataSource()
     }
 }
 
 // MARK: - UIAdaptivePresentationControllerDelegate
 extension CalendarWorkListModalViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        delegate?.dismissGestureReceived()
+        delegate?.dismissReceived()
     }
 }

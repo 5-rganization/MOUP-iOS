@@ -62,7 +62,7 @@ private extension CalendarHeaderView {
         setHierarchy()
         setConstraints()
     }
-
+    
     // MARK: - setHierarchy
     func setHierarchy() {
         self.addSubviews(yearMonthButton, toggleSegment, filterButton)

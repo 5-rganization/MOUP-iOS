@@ -7,10 +7,12 @@
 
 import UIKit
 
-/// `CalendarWorkListCoordinator`의 화면 전환 이벤트를 `CalendarCoordinator`에 알리는 Delegate
+/// `CalendarWorkListCoordinator`의 이벤트를 `CalendarCoordinator`에 전달하는 Delegate
 protocol CalendarWorkListCoordinatorDelegate: AnyObject {
     /// 근무 목록 화면 내림
     func dismissed(_ coordinator: CalendarWorkListCoordinator)
+    /// 캘린더 업데이트 요청
+    func updateDataSource()
 }
 
 /// `CalendarWorkListModalViewController` Coordinator
@@ -56,7 +58,11 @@ final class CalendarWorkListCoordinator: Coordinator {
 
 // MARK: - CalendarWorkListModalVCDelegate
 extension CalendarWorkListCoordinator: CalendarWorkListModalVCDelegate {
-    func dismissGestureReceived() {
+    func dismissReceived() {
         delegate?.dismissed(self)
+    }
+    
+    func updateCalendarDataSource() {
+        delegate?.updateDataSource()
     }
 }

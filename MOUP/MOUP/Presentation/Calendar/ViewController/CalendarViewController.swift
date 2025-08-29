@@ -92,17 +92,6 @@ final class CalendarViewController: UIViewController {
             sharedFilterWorkplaceRelay.accept(filterWorkplace)
         }
     }
-    
-    func selectCell(date: Date) {
-        calendarView.getMonthCalendarView.scrollToDate(date, animateScroll: true)
-        calendarView.getMonthCalendarView.selectDates([date])
-    }
-    
-    func deselectCell() {
-        if let selectedDate {
-            calendarView.getMonthCalendarView.deselect(dates: [selectedDate])
-        }
-    }
 }
 
 private extension CalendarViewController {
@@ -209,6 +198,25 @@ extension CalendarViewController {
         
         calendarView.getMonthCalendarView.reloadData()
     }
+    
+    func updateDataSource(date: Date? = nil) {
+        if let date {
+            visibleDateRelay.accept(date)
+        } else {
+            visibleDateRelay.accept(visibleDateRelay.value)
+        }
+    }
+    
+    func selectCell(date: Date) {
+        calendarView.getMonthCalendarView.scrollToDate(date, animateScroll: true)
+        calendarView.getMonthCalendarView.selectDates([date])
+    }
+    
+    func deselectCell() {
+        if let selectedDate {
+            calendarView.getMonthCalendarView.deselect(dates: [selectedDate])
+        }
+    }
 }
 
 // MARK: - Private Calendar Methods
@@ -236,8 +244,8 @@ private extension CalendarViewController {
     func didSelectCell(selectedDate: Date) {
         let selectedDay = Calendar.current.component(.day, from: selectedDate)
         coordinator?.showCalendarWorkList(selectedDay: selectedDay,
-                                           calendarWorkList: calendarWorkDataSource[selectedDate] ?? [],
-                                           calendarMode: calendarModeRelay.value)
+                                          calendarWorkList: calendarWorkDataSource[selectedDate] ?? [],
+                                          calendarMode: calendarModeRelay.value)
         calendarViewTapRecognizer.isEnabled = true
     }
     
@@ -278,7 +286,7 @@ extension CalendarViewController: JTACMonthViewDelegate {
         guard let date = visibleDates.monthDates.first?.date else { return }
         let dateStr = DateFormatter.yearMonthDateFormatter.string(from: date)
         calendarView.getCalendarHeaderView.update(dateStr: dateStr)
-        visibleDateRelay.accept(date)
+        updateDataSource(date: date)
     }
     
     func calendar(_ calendar: JTACMonthView, didSelectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {

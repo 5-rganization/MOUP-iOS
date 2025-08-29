@@ -7,7 +7,7 @@
 
 import UIKit
 
-/// `YearMonthPickerCoordinator`의 화면 전환 이벤트를 `CalendarCoordinator`에 알리는 Delegate
+/// `YearMonthPickerCoordinator`의 이벤트를 `CalendarCoordinator`에 전달하는 Delegate
 protocol YearMonthPickerCoordinatorDelegate: AnyObject {
     /// 연/월 Picker 화면 내림
     func dismissed(_ coordinator: YearMonthPickerCoordinator)
@@ -55,7 +55,7 @@ final class YearMonthPickerCoordinator: Coordinator {
 
 // MARK: - YearMonthPickerModalVCDelegate
 extension YearMonthPickerCoordinator: YearMonthPickerModalVCDelegate {
-    func dismissGestureReceived() {
+    func dismissReceived() {
         delegate?.dismissed(self)
     }
     

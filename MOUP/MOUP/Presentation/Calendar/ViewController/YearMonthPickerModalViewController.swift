@@ -10,10 +10,13 @@ import UIKit
 import RxCocoa
 import RxSwift
 
-/// `YearMonthPickerModalViewController`의 이벤트를 `YearMonthPickerCoordinator`에 알리는 Delegate
+/// `YearMonthPickerModalViewController`의 이벤트를 `YearMonthPickerCoordinator`에 전달하는 Delegate
 protocol YearMonthPickerModalVCDelegate: AnyObject {
-    func dismissGestureReceived()
+    /// `presentationControllerDidDismiss`를 감지했을 때 사용되는 메서드
+    func dismissReceived()
+    /// 취소 버튼을 탭했을 때 사용되는 메서드
     func cancelButtonTapped()
+    /// 이동 버튼을 탭했을 때 사용되는 메서드
     func gotoButtonTapped(focusedYear: Int, focusedMonth: Int)
 }
 
@@ -153,6 +156,6 @@ extension YearMonthPickerModalViewController: UIPickerViewDelegate {
 // MARK: - UIAdaptivePresentationControllerDelegate
 extension YearMonthPickerModalViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        delegate?.dismissGestureReceived()
+        delegate?.dismissReceived()
     }
 }

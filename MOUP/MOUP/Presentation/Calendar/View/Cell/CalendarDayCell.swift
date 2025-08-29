@@ -63,8 +63,8 @@ final class CalendarDayCell: JTACDayCell {
         let targetSize = CGSize(width: targetWidth, height: UIView.layoutFittingCompressedSize.height)
         // targetSize를 이용하여 workContainerVStackView의 잠재적인 최대 높이 계산
         let requiredHeight = workContainerVStackView.systemLayoutSizeFitting(targetSize,
-                                                                              withHorizontalFittingPriority: .required,
-                                                                              verticalFittingPriority: .fittingSizeLevel).height
+                                                                             withHorizontalFittingPriority: .required,
+                                                                             verticalFittingPriority: .fittingSizeLevel).height
         // workContainerVStackView의 잠재적인 maxY 계산
         let potentialMaxY = workContainerMinY + requiredHeight
         

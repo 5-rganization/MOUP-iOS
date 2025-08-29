@@ -90,7 +90,7 @@ final class WorkContainerVStackView: UIStackView {
             personalModeWorkRows.forEach { $0.reduceSize() }
         }
         personalModeWorkRows.dropFirst(displayCount).forEach { $0.isHidden = true }
-
+        
         sharedModeWorkRows.dropFirst(displayCount).forEach { $0.isHidden = true }
         
         showRestWorkCountRowIfRemain(displayedCount: displayCount)

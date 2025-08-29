@@ -10,9 +10,11 @@ import UIKit
 import RxCocoa
 import RxSwift
 
-/// `FilterModalViewController`의 이벤트를 `FilterCoordinator`에 알리는 Delegate
+/// `FilterModalViewController`의 이벤트를 `FilterCoordinator`에 전달하는 Delegate
 protocol FilterModalVCDelegate: AnyObject {
-    func dismissGestureReceived()
+    /// `presentationControllerDidDismiss`를 감지했을 때 사용되는 메서드
+    func dismissReceived()
+    /// 적용하기 버튼을 탭했을 때 사용되는 메서드
     func applyButtonTapped(filterWorkplace: FilterWorkplace?)
 }
 
@@ -136,6 +138,6 @@ private extension FilterModalViewController {
 // MARK: - UIAdaptivePresentationControllerDelegate
 extension FilterModalViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        delegate?.dismissGestureReceived()
+        delegate?.dismissReceived()
     }
 }

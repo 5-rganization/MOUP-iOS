@@ -36,11 +36,19 @@ final class CalendarWorkListViewModel {
     
     // MARK: - Input ➡️ Output Transform
     func transform(input: Input) -> Output {
-        // TODO: 근무 이벤트 로딩
         input.viewDidLoad
             .subscribe(with: self) { owner, _ in
                 owner.calendarWorkListRelay.accept(owner.calendarWorkList)
             }.disposed(by: disposeBag)
+        
+        input.deleteWorkId
+            .subscribe(with: self) { owner, id in
+                // TODO: 근무 삭제 API 호출
+                // 삭제 확인된 경우
+                owner.calendarWorkList = owner.calendarWorkList.filter { $0.id != id }
+                owner.calendarWorkListRelay.accept(owner.calendarWorkList)
+            }.disposed(by: disposeBag)
+        
         return Output(calendarWorkList: calendarWorkListRelay.asObservable())
     }
 }
