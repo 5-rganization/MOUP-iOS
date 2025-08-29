@@ -64,6 +64,16 @@ final class CalendarCoordinator: Coordinator {
     }
 }
 
+// MARK: - Private Methods
+private extension CalendarCoordinator {
+    func removeChildCoordinator(_ coordinator: Coordinator, needToDismiss: Bool) {
+        childCoordinators = childCoordinators.filter { $0 !== coordinator }
+        if needToDismiss {
+            navigationController.dismiss(animated: true)
+        }
+    }
+}
+
 // MARK: - YearMonthCoordinatorDelegate
 extension CalendarCoordinator: YearMonthPickerCoordinatorDelegate {
     func dismissed(_ coordinator: YearMonthPickerCoordinator) {
@@ -95,15 +105,7 @@ extension CalendarCoordinator: FilterCoordinatorDelegate {
 // MARK: - CalendarEventListCoordinatorDelegate
 extension CalendarCoordinator: CalendarEventListCoordinatorDelegate {
     func dismissed(_ coordinator: CalendarEventListCoordinator) {
+        calendarVC.deselectCell()
         removeChildCoordinator(coordinator, needToDismiss: false)
-    }
-}
-
-private extension CalendarCoordinator {
-    func removeChildCoordinator(_ coordinator: Coordinator, needToDismiss: Bool) {
-        childCoordinators = childCoordinators.filter { $0 !== coordinator }
-        if needToDismiss {
-            navigationController.dismiss(animated: true)
-        }
     }
 }

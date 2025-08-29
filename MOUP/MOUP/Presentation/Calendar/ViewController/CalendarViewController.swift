@@ -92,6 +92,17 @@ final class CalendarViewController: UIViewController {
             sharedFilterWorkplaceRelay.accept(filterWorkplace)
         }
     }
+    
+    func selectCell(date: Date) {
+        calendarView.getMonthCalendarView.scrollToDate(date, animateScroll: true)
+        calendarView.getMonthCalendarView.selectDates([date])
+    }
+    
+    func deselectCell() {
+        if let selectedDate {
+            calendarView.getMonthCalendarView.deselect(dates: [selectedDate])
+        }
+    }
 }
 
 private extension CalendarViewController {
@@ -183,6 +194,7 @@ private extension CalendarViewController {
 @objc private extension CalendarViewController {
     func didCalendarViewTap(_ sender: UITapGestureRecognizer) {
         deselectCell()
+        coordinator?.dismissCalendarEventList()
     }
 }
 
@@ -222,17 +234,6 @@ private extension CalendarViewController {
                     eventList: eventList)
     }
     
-    func selectCell(date: Date) {
-        calendarView.getMonthCalendarView.scrollToDate(date, animateScroll: true)
-        calendarView.getMonthCalendarView.selectDates([date])
-    }
-    
-    func deselectCell() {
-        if let selectedDate {
-            calendarView.getMonthCalendarView.deselect(dates: [selectedDate])
-        }
-    }
-    
     func didSelectCell(selectedDate: Date) {
         let selectedDay = Calendar.current.component(.day, from: selectedDate)
         coordinator?.showCalendarEventList(selectedDay: selectedDay,
@@ -242,7 +243,6 @@ private extension CalendarViewController {
     }
     
     func didDeselectCell() {
-        coordinator?.dismissCalendarEventList()
         calendarViewTapRecognizer.isEnabled = false
     }
 }
@@ -262,18 +262,16 @@ extension CalendarViewController: JTACMonthViewDataSource {
 
 // MARK: - JTACMonthViewDelegate
 extension CalendarViewController: JTACMonthViewDelegate {
+    func calendar(_ calendar: JTACMonthView, willDisplay cell: JTACDayCell, forItemAt date: Date, cellState: CellState, indexPath: IndexPath) {
+        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, eventList: calendarEventDataSource[date] ?? [])
+    }
+    
     func calendar(_ calendar: JTACMonthView, cellForItemAt date: Date, cellState: CellState, indexPath: IndexPath) -> JTACDayCell {
         guard let cell = calendar.dequeueReusableJTAppleCell(withReuseIdentifier: CalendarDayCell.identifier, for: indexPath) as? CalendarDayCell else {
             return JTACDayCell()
         }
-        
-        self.calendar(calendar, willDisplay: cell, forItemAt: date, cellState: cellState, indexPath: indexPath)
-        
-        return cell
-    }
-    
-    func calendar(_ calendar: JTACMonthView, willDisplay cell: JTACDayCell, forItemAt date: Date, cellState: CellState, indexPath: IndexPath) {
         configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, eventList: calendarEventDataSource[date] ?? [])
+        return cell
     }
     
     func calendar(_ calendar: JTACMonthView, didScrollToDateSegmentWith visibleDates: DateSegmentInfo) {

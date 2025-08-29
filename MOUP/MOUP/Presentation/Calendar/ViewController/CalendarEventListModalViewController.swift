@@ -73,7 +73,7 @@ private extension CalendarEventListModalViewController {
     }
     
     func setDelegates() {
-        self.navigationController?.presentationController?.delegate = self
+        self.presentationController?.delegate = self
     }
     
     func setBindings() {

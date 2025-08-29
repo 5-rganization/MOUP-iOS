@@ -60,4 +60,3 @@ extension CalendarEventListCoordinator: CalendarEventListModalVCDelegate {
         delegate?.dismissed(self)
     }
 }
-
