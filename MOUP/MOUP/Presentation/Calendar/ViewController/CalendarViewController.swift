@@ -194,7 +194,6 @@ private extension CalendarViewController {
 @objc private extension CalendarViewController {
     func didCalendarViewTap(_ sender: UITapGestureRecognizer) {
         deselectCell()
-        coordinator?.dismissCalendarEventList()
     }
 }
 
@@ -243,6 +242,7 @@ private extension CalendarViewController {
     }
     
     func didDeselectCell() {
+        coordinator?.dismissCalendarEventList()
         calendarViewTapRecognizer.isEnabled = false
     }
 }
