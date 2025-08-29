@@ -45,7 +45,7 @@ final class FilterView: UIView {
         $0.sectionHeaderTopPadding = 0.0
     }
     /// 필터 리스트에 아이템이 없을 때 표시되는 라벨
-    private let emptyLabel = UILabel().then {
+    fileprivate let emptyLabel = UILabel().then {
         $0.text = "등록된 공유 캘린더가 없어요"
         $0.textColor = .gray500
         $0.font = .bodyMedium(16)
@@ -160,5 +160,7 @@ extension Reactive where Base: FilterView {
         }
     }
     var filterTableViewModelSelected: ControlEvent<FilterWorkplace> { base.filterTableView.rx.modelSelected(FilterWorkplace.self) }
+    var filterTableViewIsHidden: Binder<Bool> { base.filterTableView.rx.isHidden }
+    var emptyLabelIsHidden: Binder<Bool> { base.emptyLabel.rx.isHidden }
     var applyButtonTap: ControlEvent<Void> { base.applyButton.rx.tap }
 }

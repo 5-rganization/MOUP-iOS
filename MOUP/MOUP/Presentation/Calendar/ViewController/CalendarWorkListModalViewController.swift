@@ -92,11 +92,19 @@ private extension CalendarWorkListModalViewController {
         switch calendarMode {
         case .personal:
             output.calendarWorkList.asDriver(onErrorJustReturn: [])
-                .drive(calendarWorkListView.rx.personalWorkTableViewDataSource)
+                .drive(with: self, onNext: { owner, workList in
+                    owner.calendarWorkListView.rx.emptyViewIsHidden.onNext(!workList.isEmpty)
+                    owner.calendarWorkListView.rx.workTableViewIsHidden.onNext(workList.isEmpty)
+                    owner.calendarWorkListView.rx.personalWorkTableViewDataSource.onNext(workList)
+                })
                 .disposed(by: disposeBag)
         case .shared:
             output.calendarWorkList.asDriver(onErrorJustReturn: [])
-                .drive(calendarWorkListView.rx.sharedWorkTableViewDataSource)
+                .drive(with: self, onNext: { owner, workList in
+                    owner.calendarWorkListView.rx.emptyViewIsHidden.onNext(!workList.isEmpty)
+                    owner.calendarWorkListView.rx.workTableViewIsHidden.onNext(workList.isEmpty)
+                    owner.calendarWorkListView.rx.sharedWorkTableViewDataSource.onNext(workList)
+                })
                 .disposed(by: disposeBag)
         }
     }
