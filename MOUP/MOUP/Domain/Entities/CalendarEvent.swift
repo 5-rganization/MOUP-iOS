@@ -6,7 +6,7 @@
 //
 
 /// 캘린더 근무 Entity
-/// - `eventId`: 근무 ID `Int64`
+/// - `id`: 근무 ID `Int64`
 /// - `workplaceId`: 근무지/매장 ID `Int64`
 /// - `workplaceName`: 근무자/매장 이름 `String`
 ///   - 예시: `"세븐일레븐 동탄제일점"`
@@ -34,7 +34,7 @@
 ///   - 예시: `"빨간색"`
 /// - `isShared`: 공유 여부 `Bool`
 struct CalendarEvent {
-    let eventId: Int64
+    let id: Int64
     let workplaceId: Int64
     let workplaceName: String
     let workerId: Int64

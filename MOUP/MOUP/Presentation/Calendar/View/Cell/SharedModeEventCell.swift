@@ -31,5 +31,6 @@ final class SharedModeEventCell: BaseEventCell {
         
         // TODO: 사장님 역할일 때 dailyIncomeLabel 표시
         dailyIncomeLabel.isHidden = true
+        // TODO: 알바생 역할일 때 자신의 근무가 아니면 menuButton 숨김
     }
 }

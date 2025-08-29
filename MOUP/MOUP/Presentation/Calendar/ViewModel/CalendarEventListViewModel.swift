@@ -19,6 +19,7 @@ final class CalendarEventListViewModel {
     // MARK: - Input
     struct Input {
         let viewDidLoad: Observable<Void>
+        let deleteEventId: Observable<Int64>
     }
     
     // MARK: - Output

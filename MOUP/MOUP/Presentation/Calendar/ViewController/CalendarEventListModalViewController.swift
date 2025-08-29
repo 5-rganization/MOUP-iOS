@@ -31,8 +31,13 @@ final class CalendarEventListModalViewController: UIViewController {
     // Property Injections
     weak var delegate: CalendarEventListModalVCDelegate?
     
+    // Input Relays
+    private let deleteEventIdRelay = PublishRelay<Int64>()
+    
     // MARK: - UI Components
-    private let calendarEventListView = CalendarEventListView()
+    private lazy var calendarEventListView = CalendarEventListView().then {
+        $0.delegate = self
+    }
     
     // MARK: - Initializer
     init(coordinator: CalendarEventListCoordinator, viewModel: CalendarEventListViewModel, selectedDay: Int, calendarMode: CalendarMode) {
@@ -78,7 +83,7 @@ private extension CalendarEventListModalViewController {
     
     func setBindings() {
         // ViewModel 바인딩
-        let input = CalendarEventListViewModel.Input(viewDidLoad: Observable.just(()))
+        let input = CalendarEventListViewModel.Input(viewDidLoad: Observable.just(()), deleteEventId: deleteEventIdRelay.asObservable())
         let output = viewModel.transform(input: input)
         
         switch calendarMode {
@@ -91,6 +96,17 @@ private extension CalendarEventListModalViewController {
                 .drive(calendarEventListView.rx.sharedEventTableViewDataSource)
                 .disposed(by: disposeBag)
         }
+    }
+}
+
+// MARK: - CalendarEventListViewDelegate
+extension CalendarEventListModalViewController: CalendarEventListViewDelegate {
+    func editEvent(event: CalendarEvent) {
+        // TODO: - 근무 수정 화면 연결
+    }
+    
+    func deleteEvent(id: Int64) {
+        print("근무 삭제")
     }
 }
 

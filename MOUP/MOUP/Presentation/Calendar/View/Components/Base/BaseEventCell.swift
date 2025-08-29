@@ -53,11 +53,12 @@ class BaseEventCell: UITableViewCell {
         $0.distribution = .fillEqually
     }
     /// 수정/삭제 메뉴 표시용 버튼
-    let ellipsisButton = UIButton().then {
+    let menuButton = UIButton().then {
         var config = UIButton.Configuration.plain()
         config.image = .ellipsisButton.withTintColor(.gray700, renderingMode: .alwaysOriginal)
         
         $0.configuration = config
+        $0.showsMenuAsPrimaryAction = true
     }
     /// 일급 라벨
     let dailyIncomeLabel = UILabel().then {
@@ -102,14 +103,14 @@ private extension BaseEventCell {
     
     // MARK: - setHierarchy
     func setHierarchy() {
-        self.contentView.addSubviews(leadingVStackView, ellipsisButton,
+        self.contentView.addSubviews(leadingVStackView, menuButton,
                                      dailyIncomeLabel)
-        
-        topLeadingHStackView.addArrangedSubviews(titleLabel, sharedChipLabel)
-        bottomLeadingHStackView.addArrangedSubviews(startEndTimeLabel, workHourLabel)
         
         leadingVStackView.addArrangedSubviews(topLeadingHStackView,
                                               bottomLeadingHStackView)
+        
+        topLeadingHStackView.addArrangedSubviews(titleLabel, sharedChipLabel)
+        bottomLeadingHStackView.addArrangedSubviews(startEndTimeLabel, workHourLabel)
     }
     
     // MARK: - setStyles
@@ -129,7 +130,7 @@ private extension BaseEventCell {
             $0.height.equalTo(18)
         }
         
-        ellipsisButton.snp.makeConstraints {
+        menuButton.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.trailing.equalToSuperview().inset(6)
             $0.width.equalTo(44)

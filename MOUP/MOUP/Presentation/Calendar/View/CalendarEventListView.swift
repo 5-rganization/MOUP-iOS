@@ -12,11 +12,19 @@ import RxSwift
 import SnapKit
 import Then
 
+protocol CalendarEventListViewDelegate: AnyObject {
+    func editEvent(event: CalendarEvent)
+    func deleteEvent(id: Int64)
+}
+
 /// 근무 리스트 UI
 final class CalendarEventListView: UIView {
     
     // MARK: - Properties
     fileprivate let disposeBag = DisposeBag()
+    
+    // Property Injections
+    weak var delegate: CalendarEventListViewDelegate?
     
     // MARK: - UI Components
     /// 모달 핸들 UI
@@ -130,6 +138,13 @@ extension Reactive where Base: CalendarEventListView {
                     cellIdentifier: PersonalModeEventCell.identifier,
                     cellType: PersonalModeEventCell.self
                 )) { _, event, cell in
+                    let editAction = UIAction(title: "수정하기") { _ in
+                        base.delegate?.editEvent(event: event)
+                    }
+                    let deleteAction = UIAction(title: "삭제하기", attributes: .destructive) { _ in
+                        base.delegate?.deleteEvent(id: event.id)
+                    }
+                    cell.menuButton.menu = UIMenu(children: [editAction, deleteAction])
                     cell.update(event: event)
                 }.disposed(by: base.disposeBag)
         }
@@ -145,6 +160,13 @@ extension Reactive where Base: CalendarEventListView {
                     cellIdentifier: SharedModeEventCell.identifier,
                     cellType: SharedModeEventCell.self
                 )) { _, event, cell in
+                    let editAction = UIAction(title: "수정하기") { _ in
+                        base.delegate?.editEvent(event: event)
+                    }
+                    let deleteAction = UIAction(title: "삭제하기", attributes: .destructive) { _ in
+                        base.delegate?.deleteEvent(id: event.id)
+                    }
+                    cell.menuButton.menu = UIMenu(children: [editAction, deleteAction])
                     cell.update(event: event)
                 }.disposed(by: base.disposeBag)
         }
