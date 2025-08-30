@@ -51,6 +51,8 @@ class WorkerWorkplaceCell: UITableViewCell {
         $0.textColor = .gray900
     }
 
+    private let workplaceOfficialChip = WorkplaceOfficialChip()
+
     // 두 번째 섹션 뷰 - 가변 급여 상세 테이블
     private let secondSectionView = SalaryDetailView()
 
@@ -128,7 +130,8 @@ private extension WorkerWorkplaceCell {
         firstSectionView.addSubviews(
             nameLabel,
             untilPaydayLabel,
-            totalEarnedLabel
+            totalEarnedLabel,
+            workplaceOfficialChip
         )
         attendanceButtonStackView.addArrangedSubviews(
             startWorkButton,
@@ -191,6 +194,11 @@ private extension WorkerWorkplaceCell {
             $0.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(21)
             $0.bottom.equalToSuperview()
+        }
+
+        workplaceOfficialChip.snp.makeConstraints {
+            $0.leading.equalTo(nameLabel.snp.trailing).offset(4)
+            $0.top.equalToSuperview().inset(15)
         }
 
         // 두 번째 섹션
