@@ -22,7 +22,7 @@ final class EditModal: UIView {
         $0.textColor = .gray900
     }
     
-    private let textField = CustomTextField().then {
+    fileprivate let textField = CustomTextField().then {
         $0.placeholder = "닉네임을 입력해주세요"
     }
     
@@ -130,6 +130,10 @@ private extension EditModal {
 }
 
 extension Reactive where Base: EditModal {
+    var text: ControlProperty<String> {
+        base.textField.rx.text.orEmpty
+    }
+    
     var saveButtonTapped: ControlEvent<Void> {
         base.saveButton.rx.tap
     }

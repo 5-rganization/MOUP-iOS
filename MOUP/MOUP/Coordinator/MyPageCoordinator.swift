@@ -24,7 +24,8 @@ final class MyPageCoordinator: Coordinator {
     }
     
     func showEditNicknameModal() {
-        let editModalVC = EditModalViewController()
+        let viewModel = EditModalViewModel()
+        let editModalVC = EditModalViewController(viewModel: viewModel)
         editModalVC.modalPresentationStyle = .overFullScreen
         editModalVC.modalTransitionStyle = .crossDissolve
         navigationController.present(editModalVC, animated: false)

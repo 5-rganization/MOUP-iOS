@@ -19,6 +19,7 @@ final class EditModalViewController: UIViewController {
     private let saveButtonDidTapSubject = PublishSubject<Void>()
     var onNicknameSaved: ((String) -> Void)?
     private let disposeBag = DisposeBag()
+    private let viewModel: EditModalViewModel
     
     // MARK: - UI Components
     
@@ -45,6 +46,17 @@ final class EditModalViewController: UIViewController {
         
         configure()
         registerKeyboardNotifications()
+    }
+    
+    // MARK: - Initializer
+    
+    init(viewModel: EditModalViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
@@ -111,16 +123,18 @@ private extension EditModalViewController {
     
     // MARK: - setBindings
     func setBindings() {
-        editModal.rx.saveButtonTapped
-            .bind(with: self) { owner, _ in
-                owner.saveButtonDidTapSubject.onNext(())
-            }
-            .disposed(by: disposeBag)
+//        editModal.rx.saveButtonTapped
+//            .bind(with: self) { owner, _ in
+//                owner.saveButtonDidTapSubject.onNext(())
+//            }
+//            .disposed(by: disposeBag)
         
         closeButton.rx.tap
             .bind(with: self) { owner, _ in
                 owner.dismiss(animated: false)
             }
             .disposed(by: disposeBag)
+        
+        let input = EditModalViewModel
     }
 }
