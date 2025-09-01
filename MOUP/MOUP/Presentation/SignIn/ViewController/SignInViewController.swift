@@ -86,10 +86,12 @@ private extension SignInViewController {
             .disposed(by: disposeBag)
 
         output.signInResult
-            .subscribe(onNext: { result in
+            .subscribe(onNext: { [weak self] result in
+                guard let self else { return }
                 switch result {
                 case .navigateToSignUp:
-                    print("로그인 성공")
+                    print("회원가입 필요")
+                    self.coordinator?.moveToTabBar()
                 case .showAlert(let error):
                     print("로그인 실패 : \(error.localizedDescription)")
                 }

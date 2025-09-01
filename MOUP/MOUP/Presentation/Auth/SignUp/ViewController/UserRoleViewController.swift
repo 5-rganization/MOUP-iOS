@@ -10,6 +10,7 @@ import RxSwift
 
 class UserRoleViewController: UIViewController {
     // MARK: - Properties
+    weak var coordinator: SignUpCoordinator?
     private let userRoleView = UserRoleView()
     private let disposeBag = DisposeBag()
 
@@ -39,8 +40,12 @@ private extension UserRoleViewController {
         })
         .disposed(by: disposeBag)
 
-        userRoleView.rx.startButtonTap.subscribe(onNext: {
+        userRoleView.rx.startButtonTap
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] in
+            guard let self else { return }
             print("시작하기 탭")
+            self.coordinator?.didFinishSignUp()
         })
         .disposed(by: disposeBag)
     }
