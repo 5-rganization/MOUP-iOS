@@ -31,10 +31,17 @@ final class AppCoordinator: Coordinator {
             childCoordinators.append(tabBarCoordinator)
             tabBarCoordinator.start()
         } else {
-            let signInCoordinator = SignInCoordinator(window: window, authUseCase: authUseCase)
+            let signInCoordinator = SignInCoordinator(coordinator: self, window: window, authUseCase: authUseCase)
             childCoordinators.append(signInCoordinator)
             signInCoordinator.start()
         }
+    }
+
+    func moveToTabBar() {
+        childCoordinators.removeAll()
+        let tabBarCoordinator = TabBarCoordinator(window: window, authUseCase: authUseCase)
+        childCoordinators.append(tabBarCoordinator)
+        tabBarCoordinator.start()
     }
 }
 
