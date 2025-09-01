@@ -5,52 +5,44 @@
 //  Created by 서동환 on 7/12/25.
 //
 
+import Foundation
 import RxSwift
 import RxCocoa
 
-protocol MyPageViewModelInput {
-    var logoutConfirmed: AnyObserver<Void> { get }
-}
-
-protocol MyPageViewModelOutput {
-    var isLoading: Driver<Bool> { get }
-    var logoutSuccess: Signal<Void> { get }
-    var error: Signal<String> { get }
-}
-
-final class MyPageViewModel: MyPageViewModelInput, MyPageViewModelOutput {
+final class MyPageViewModel {
     
-    // MARK: - Input
+    struct Input {
+        let logoutConfirmed: Observable<Void>
+    }
     
-    private let logoutConfirmedSubject = PublishSubject<Void>()
-    var logoutConfirmed: AnyObserver<Void> { logoutConfirmedSubject.asObserver() }
-    
-    // MARK: - Output
-    
-    let isLoading: Driver<Bool>
-    let logoutSuccess: Signal<Void>
-    let error: Signal<String>
+    struct Output {
+        let isLoading: Driver<Bool>
+        let logoutSuccess: Signal<Void>
+        let error: Signal<String>
+    }
     
     private let disposeBag = DisposeBag()
     
-    init(logoutUseCase: LogoutUseCase) {
+    func transform(_ input: Input) -> Output {
         let loadingRelay = BehaviorRelay<Bool>(value: false)
         let successRelay = PublishRelay<Void>()
         let errorRelay = PublishRelay<String>()
         
-        self.isLoading = loadingRelay.asDriver()
-        self.logoutSuccess = successRelay.asSignal()
-        self.error = errorRelay.asSignal()
-        
-        logoutConfirmedSubject
+        input.logoutConfirmed
             .flatMapLatest {
-                logoutUseCase.execute()
-                    .do(
-                        onSubscribe: { loadingRelay.accept(true) },
-                        onDispose: { loadingRelay.accept(false) }
-                    )
-                    .andThen(Observable.just(()))
-                    .materialize()
+                // TODO: - usecase 연결
+                Observable<Void>.create { observer in
+                    loadingRelay.accept(true)
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        observer.onNext(())
+                        observer.onCompleted()
+                        loadingRelay.accept(false)
+                    }
+                    
+                    return Disposables.create()
+                }
+                .materialize()
             }
             .subscribe(onNext: { event in
                 switch event {
@@ -63,5 +55,11 @@ final class MyPageViewModel: MyPageViewModelInput, MyPageViewModelOutput {
                 }
             })
             .disposed(by: disposeBag)
+        
+        return Output(
+            isLoading: loadingRelay.asDriver(),
+            logoutSuccess: successRelay.asSignal(),
+            error: errorRelay.asSignal()
+        )
     }
 }

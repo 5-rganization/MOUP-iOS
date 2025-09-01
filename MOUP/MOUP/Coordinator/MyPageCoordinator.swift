@@ -11,8 +11,7 @@ final class MyPageCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     let navigationController: UINavigationController
     
-    private let logoutUseCase = LogoutUseCase()
-    private lazy var viewModel = MyPageViewModel(logoutUseCase: logoutUseCase)
+    private lazy var viewModel = MyPageViewModel()
     private lazy var myPageVC = MyPageViewController(viewModel: viewModel)
 
     init(navigationController: UINavigationController) {

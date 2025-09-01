@@ -83,39 +83,54 @@ private extension MyPageViewController {
             })
             .disposed(by: disposeBag)
         
-        mypageView.rx.logoutButtonTapped
-            .bind(with: self) { owner, _ in
-                owner.coordinator?.showLogoutConfirm(from: owner) {
-                    owner.viewModel.logoutConfirmed.onNext(())
-                }
+        let logoutConfirmed: Observable<Void> = mypageView.rx.logoutButtonTapped
+            .flatMapLatest { [weak self] _ -> Observable<Void> in
+                guard let self else { return .empty() }
+                return self.presentLogoutConfirmedAsObservable()
             }
-            .disposed(by: disposeBag)
+            .share()
         
-        viewModel.isLoading
+        let input = MyPageViewModel.Input(logoutConfirmed: logoutConfirmed)
+        let output = viewModel.transform(input)
+        
+        output.isLoading
             .skip(1)
-            .drive(with: self) { owner, isLoading in
-                if isLoading {
-                    print("로그아웃 중입니다.")
-                } else {
-                    print("로그아웃 종료")
-                }
+            .drive(with: self) { _, isLoading in
+                print(isLoading ? "로그아웃 중입니다." : "로그아웃 완료")
             }
             .disposed(by: disposeBag)
         
-        viewModel.logoutSuccess
-            .emit(with: self) { owner, _ in
-                print("로그아웃 성공! 로그인 화면으로 이동합니다.")
-            }
+        output.logoutSuccess
+            .emit(onNext: {
+                print("로그아웃 성공. 로그인 화면으로 이동")
+                // TODO: - 로그인 화면으로 전환
+            })
             .disposed(by: disposeBag)
         
-        viewModel.error
+        output.error
             .emit(with: self) { owner, message in
                 owner.coordinator?.showLogoutFail(from: owner) {
-                    owner.dismiss(animated: true)
+                    owner.dismiss(animated: false)
                     print(message)
                 }
             }
             .disposed(by: disposeBag)
+    }
+    
+    func presentLogoutConfirmedAsObservable() -> Observable<Void> {
+        Observable<Void>.create { [weak self] observer in
+            guard let self else {
+                observer.onCompleted()
+                return Disposables.create()
+            }
+            self.coordinator?.showLogoutConfirm(from: self) {
+                observer.onNext(())
+                observer.onCompleted()
+            }
+            return Disposables.create()
+        }
+        .take(1)
+        .observe(on: MainScheduler.instance)
     }
 }
 
