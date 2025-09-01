@@ -123,18 +123,44 @@ private extension EditModalViewController {
     
     // MARK: - setBindings
     func setBindings() {
-//        editModal.rx.saveButtonTapped
-//            .bind(with: self) { owner, _ in
-//                owner.saveButtonDidTapSubject.onNext(())
-//            }
-//            .disposed(by: disposeBag)
+        let input = EditModalViewModel.Input(
+            text: editModal.rx.text
+                .debounce(
+                    .milliseconds(120),
+                    scheduler: MainScheduler.instance
+                )
+                .distinctUntilChanged()
+                .asObservable(),
+            saveTap: editModal.rx.saveButtonTapped.asObservable()
+        )
+        
+        let output = viewModel.transform(input)
+        
+        Driver
+            .combineLatest(
+                output.viewState,
+                output.isSaveEnabled
+            )
+            .drive(with: self) { owner, combined in
+                let (state, enabled) = combined
+                owner.editModal.updateValidationLabel(
+                    state: state,
+                    isEnabled: enabled
+                )
+            }
+            .disposed(by: disposeBag)
+        
+        output.saveSuccess
+            .emit(with: self) { owner, nickname in
+                owner.onNicknameSaved?(nickname)
+                owner.dismiss(animated: false)
+            }
+            .disposed(by: disposeBag)
         
         closeButton.rx.tap
             .bind(with: self) { owner, _ in
                 owner.dismiss(animated: false)
             }
             .disposed(by: disposeBag)
-        
-        let input = EditModalViewModel
     }
 }

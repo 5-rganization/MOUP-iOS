@@ -60,20 +60,27 @@ final class EditModal: UIView {
         textField.becomeFirstResponder()
     }
     
-    func updateValidationMessage(message: String, isValid: Bool) {
-        if textField.text?.isEmpty == true {
-            validationLabel.text = message
+    func updateValidationLabel(
+        state: ValidationViewState,
+        isEnabled: Bool
+    ) {
+        switch state {
+        case .empty(let placeholder):
+            validationLabel.text = placeholder
             validationLabel.textColor = .gray700
-            saveButton.setTitleColor(.gray500, for: .normal)
-            saveButton.backgroundColor = .gray300
-        } else if isValid {
+        case .valid(let message):
             validationLabel.text = message
             validationLabel.textColor = .success
+        case .invalid(let message):
+            validationLabel.text = message
+            validationLabel.textColor = .fail
+        }
+        
+        saveButton.isEnabled = isEnabled
+        if isEnabled {
             saveButton.setTitleColor(.white, for: .normal)
             saveButton.backgroundColor = .primary500
         } else {
-            validationLabel.text = message
-            validationLabel.textColor = .fail
             saveButton.setTitleColor(.gray500, for: .normal)
             saveButton.backgroundColor = .gray300
         }

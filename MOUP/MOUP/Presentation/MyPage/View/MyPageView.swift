@@ -104,6 +104,12 @@ final class MyPageView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - Public Methods
+    
+    func updateNickname(_ nickname: String) {
+        nicknameLabel.text = nickname
+    }
 }
 
 private extension MyPageView {

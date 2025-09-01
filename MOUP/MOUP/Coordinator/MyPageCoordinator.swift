@@ -10,15 +10,16 @@ import UIKit
 final class MyPageCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     let navigationController: UINavigationController
+    
+    private let logoutUseCase = LogoutUseCase()
+    private lazy var viewModel = MyPageViewModel(logoutUseCase: logoutUseCase)
+    private lazy var myPageVC = MyPageViewController(viewModel: viewModel)
 
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
     }
 
     func start() {
-        let logoutUseCase = LogoutUseCase()
-        let viewModel = MyPageViewModel(logoutUseCase: logoutUseCase)
-        let myPageVC = MyPageViewController(viewModel: viewModel)
         myPageVC.coordinator = self
         navigationController.pushViewController(myPageVC, animated: false)
     }
@@ -28,6 +29,10 @@ final class MyPageCoordinator: Coordinator {
         let editModalVC = EditModalViewController(viewModel: viewModel)
         editModalVC.modalPresentationStyle = .overFullScreen
         editModalVC.modalTransitionStyle = .crossDissolve
+        editModalVC.onNicknameSaved = { [weak self] nickname in
+            guard let self else { return }
+            self.myPageVC.updateNickname(nickname)
+        }
         navigationController.present(editModalVC, animated: false)
     }
     
