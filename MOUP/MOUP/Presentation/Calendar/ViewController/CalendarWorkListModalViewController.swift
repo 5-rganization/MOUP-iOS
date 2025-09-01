@@ -15,6 +15,12 @@ import Then
 protocol CalendarWorkListModalVCDelegate: AnyObject {
     /// `presentationControllerDidDismiss`를 감지했을 때 사용되는 메서드
     func dismissReceived()
+    /// 근무 목록 셀을 탭했을 때 사용되는 메서드
+    func workCellTapped(work: CalendarWork)
+    /// 수정하기 버튼을 탭했을 때 사용되는 메서드
+    func editButtonTapped(work: CalendarWork)
+    /// 근무 등록하기 버튼을 탭했을 때 사용되는 메서드
+    func registerButtonTapped()
     /// 캘린더에 업데이트가 필요할 때 사용되는 메서드
     func updateCalendarDataSource()
 }
@@ -85,6 +91,17 @@ private extension CalendarWorkListModalViewController {
     }
     
     func setBindings() {
+        // View 바인딩
+        calendarWorkListView.rx.workTableViewModelSelected.asDriver()
+            .drive(with: self) { owner, work in
+                owner.coordinator?.workCellTapped(work: work)
+            }.disposed(by: disposeBag)
+        
+        calendarWorkListView.rx.registerButtonTap.asDriver()
+            .drive(with: self) { owner, _ in
+                owner.coordinator?.registerButtonTapped()
+            }.disposed(by: disposeBag)
+        
         // ViewModel 바인딩
         let input = CalendarWorkListViewModel.Input(viewDidLoad: Observable.just(()), deleteWorkId: deleteWorkIdRelay.asObservable())
         let output = viewModel.transform(input: input)
@@ -107,7 +124,7 @@ private extension CalendarWorkListModalViewController {
 // MARK: - CalendarWorkListViewDelegate
 extension CalendarWorkListModalViewController: CalendarWorkListViewDelegate {
     func editWork(work: CalendarWork) {
-        // TODO: - 근무 수정 화면 연결
+        delegate?.editButtonTapped(work: work)
     }
     
     func deleteWork(id: Int64) {

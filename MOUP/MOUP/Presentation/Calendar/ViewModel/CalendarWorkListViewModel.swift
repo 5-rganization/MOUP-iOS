@@ -5,12 +5,15 @@
 //  Created by 서동환 on 8/26/25.
 //
 
+import OSLog
+
 import RxRelay
 import RxSwift
 
 final class CalendarWorkListViewModel {
     
     // MARK: - Properties
+    private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     private let disposeBag = DisposeBag()
     
     // Initializer Injections
@@ -47,6 +50,7 @@ final class CalendarWorkListViewModel {
                 // 삭제 확인된 경우
                 owner.calendarWorkList = owner.calendarWorkList.filter { $0.id != id }
                 owner.calendarWorkListRelay.accept(owner.calendarWorkList)
+                owner.logger.debug("근무 ID: \(id) - 삭제 성공")
             }.disposed(by: disposeBag)
         
         return Output(calendarWorkList: calendarWorkListRelay.asObservable())

@@ -11,6 +11,9 @@ import UIKit
 protocol CalendarWorkListCoordinatorDelegate: AnyObject {
     /// 근무 목록 화면 내림
     func dismissed(_ coordinator: CalendarWorkListCoordinator)
+    // TODO: 근무 엔티티를 직접 전달 or 근무 ID만 전달
+    /// 근무 등록 화면 표시
+    func showWorkRegister(work: CalendarWork?)
     /// 캘린더 업데이트 요청
     func updateDataSource()
 }
@@ -60,6 +63,18 @@ final class CalendarWorkListCoordinator: Coordinator {
 extension CalendarWorkListCoordinator: CalendarWorkListModalVCDelegate {
     func dismissReceived() {
         delegate?.dismissed(self)
+    }
+    
+    func workCellTapped(work: CalendarWork) {
+        delegate?.showWorkRegister(work: work)
+    }
+    
+    func editButtonTapped(work: CalendarWork) {
+        delegate?.showWorkRegister(work: work)
+    }
+    
+    func registerButtonTapped() {
+        delegate?.showWorkRegister(work: nil)
     }
     
     func updateCalendarDataSource() {

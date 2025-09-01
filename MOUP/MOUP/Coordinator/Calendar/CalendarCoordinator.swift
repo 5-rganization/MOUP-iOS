@@ -6,11 +6,14 @@
 //
 
 import UIKit
+import OSLog
 
 /// `CalendarViewController` Coordinator
 final class CalendarCoordinator: Coordinator {
     
     // MARK: - Properties
+    private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
+    
     var childCoordinators = [Coordinator]()
     private lazy var calendarVM = CalendarViewModel()
     private lazy var calendarVC = CalendarViewController(coordinator: self, viewModel: calendarVM)
@@ -107,6 +110,16 @@ extension CalendarCoordinator: CalendarWorkListCoordinatorDelegate {
     func dismissed(_ coordinator: CalendarWorkListCoordinator) {
         calendarVC.deselectCell()
         removeChildCoordinator(coordinator, needToDismiss: false)
+    }
+    
+    func showWorkRegister(work: CalendarWork?) {
+        // TODO: - 근무 수정 화면 연결
+        if let work {
+            logger.debug("WorkRegisterVC 표시 - 근무 수정")
+            dump(work)
+        } else {
+            logger.debug("WorkRegisterVC 표시 - 근무 등록")
+        }
     }
     
     func updateDataSource() {
