@@ -220,7 +220,6 @@ extension CalendarViewController {
 // MARK: - Private Calendar Methods
 private extension CalendarViewController {
     func setCalendarView() {
-        visibleDate = .now
         calendarView.getMonthCalendarView.scrollToDate(visibleDate, animateScroll: false)
     }
     
