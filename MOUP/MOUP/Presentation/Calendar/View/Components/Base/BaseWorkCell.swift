@@ -31,12 +31,12 @@ class BaseWorkCell: UITableViewCell {
     }
     /// 출퇴근 시간 라벨
     private let startEndTimeLabel = UILabel().then {
-        $0.font = .bodyMedium(14)
+        $0.font = .bodyMedium(16)
         $0.textColor = .gray900
     }
     /// 근무 시간 라벨
     private let workHourLabel = UILabel().then {
-        $0.font = .bodyMedium(12)
+        $0.font = .bodyMedium(16)
         $0.textColor = .gray900
     }
     /// 좌측 하단 수평 컨테이너
@@ -62,7 +62,7 @@ class BaseWorkCell: UITableViewCell {
     }
     /// 일급 라벨
     let dailyIncomeLabel = UILabel().then {
-        $0.font = .bodyMedium(14)
+        $0.font = .bodyMedium(16)
         $0.textColor = .gray900
     }
     
@@ -165,17 +165,13 @@ extension BaseWorkCell {
     func setTimeInfoUI(startTime: String, endTime: String, restTime: Int) {
         if let workHour = DateFormatter.calculateWorkHour(startTime: startTime, endTime: endTime, restTime: restTime) {
             startEndTimeLabel.text = "\(startTime) ~ \(endTime)"
-            var workHourText: String
-            if workHour.minutesInt == 0 {
-                workHourText = " (\(workHour.hoursInt)시간"
-            } else {
-                workHourText = " (\(workHour.hoursInt)시간 \(workHour.minutesInt)분"
-            }
             
-            if restTime > 0 {
-                workHourText += " - 휴게 \(restTime)분"
+            let workHourText: String
+            if workHour.minutesInt == 0 {
+                workHourText = " (\(workHour.hoursInt)시간)"
+            } else {
+                workHourText = " (\(workHour.hoursInt)시간 \(workHour.minutesInt)분)"
             }
-            workHourText += ")"
             workHourLabel.text = workHourText
         } else {
             assertionFailure("calculateWorkHour() 메서드 실행 실패 - Argument가 올바르지 않습니다.")
