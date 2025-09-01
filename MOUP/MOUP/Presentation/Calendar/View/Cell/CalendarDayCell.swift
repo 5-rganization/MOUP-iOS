@@ -13,6 +13,7 @@ import Then
 
 /// 캘린더 내부 날짜 셀
 final class CalendarDayCell: JTACDayCell {
+    
     // MARK: - Properties
     static let identifier = String(describing: CalendarDayCell.self)
     
@@ -22,7 +23,7 @@ final class CalendarDayCell: JTACDayCell {
         $0.backgroundColor = .gray300
     }
     /// 선택됐을 때 표시되는 UI
-    private let selectedView = UIView().then {
+    fileprivate let selectedView = UIView().then {
         $0.backgroundColor = .primary50
         $0.isHidden = true
     }

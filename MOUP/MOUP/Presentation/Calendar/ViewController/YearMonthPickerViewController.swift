@@ -9,7 +9,6 @@ import UIKit
 
 import RxCocoa
 import RxSwift
-import Then
 
 /// `YearMonthPickerViewController`의 이벤트를 `YearMonthPickerCoordinator`에 알리는 Delegate
 protocol YearMonthPickerVCDelegate: AnyObject {
@@ -18,20 +17,22 @@ protocol YearMonthPickerVCDelegate: AnyObject {
     func gotoButtonTapped(focusedYear: Int, focusedMonth: Int)
 }
 
+/// 연/월 Picker VC
 final class YearMonthPickerViewController: UIViewController {
     
     // MARK: - Properties
-    weak var delegate: YearMonthPickerVCDelegate?
-    
     private let disposeBag = DisposeBag()
-    
     /// `JTACMonthView`가 표시하는 연/월 범위(2차원 `String` 배열)
     private let yearMonthList = [(CalendarRange.startYear...CalendarRange.endYear).map { String($0) }, (1...12).map { String($0) }]
     
+    // Initializer Injections
     /// `pickerView`에서 didSelect된 연도
     private var focusedYear: Int
     /// `pickerView`에서 didSelect된 월
     private var focusedMonth: Int
+    
+    // Property Injections
+    weak var delegate: YearMonthPickerVCDelegate?
     
     // MARK: - UI Components
     private let yearMonthPickerView = YearMonthPickerView()
@@ -65,7 +66,7 @@ private extension YearMonthPickerViewController {
     func configure() {
         setStyles()
         setDelegates()
-        setBinding()
+        setBindings()
     }
     
     // MARK: - setStyles
@@ -81,8 +82,8 @@ private extension YearMonthPickerViewController {
         yearMonthPickerView.getPickerView.delegate = self
     }
     
-    // MARK: - setBinding
-    func setBinding() {
+    // MARK: - setBindings
+    func setBindings() {
         yearMonthPickerView.rx.cancelButtonTap
             .subscribe(with: self) { owner, _ in
                 owner.delegate?.cancelButtonTapped()

@@ -15,11 +15,14 @@ import Then
 
 /// 캘린더 UI
 final class CalendarView: UIView {
+    
     // MARK: - UI Components
     /// 캘린더 상단 헤더
     private let calendarHeaderView = CalendarHeaderView()
     /// 캘린더
     private let monthCalendarView = JTACMonthView().then {
+        $0.register(CalendarDayCell.self, forCellWithReuseIdentifier: CalendarDayCell.identifier)
+        
         $0.minimumLineSpacing = 0
         $0.minimumInteritemSpacing = 0
         $0.scrollDirection = .horizontal
@@ -30,10 +33,6 @@ final class CalendarView: UIView {
     }
     /// 캘린더 요일 표시
     private let dayOfTheWeekHStackView = DaysOfTheWeekHStackView()
-    
-    // MARK: - Getter
-    var getCalendarHeaderView: CalendarHeaderView { calendarHeaderView }
-    var getMonthCalendarView: JTACMonthView { monthCalendarView }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -87,4 +86,10 @@ private extension CalendarView {
             $0.bottom.equalTo(self.safeAreaLayoutGuide)
         }
     }
+}
+
+// MARK: - Getter
+extension CalendarView {
+    var getCalendarHeaderView: CalendarHeaderView { calendarHeaderView }
+    var getMonthCalendarView: JTACMonthView { monthCalendarView }
 }

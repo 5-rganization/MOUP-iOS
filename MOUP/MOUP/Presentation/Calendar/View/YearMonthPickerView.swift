@@ -12,6 +12,7 @@ import RxSwift
 import SnapKit
 import Then
 
+/// 연/월 Picker UI
 final class YearMonthPickerView: UIView {
     
     // MARK: - UI Components

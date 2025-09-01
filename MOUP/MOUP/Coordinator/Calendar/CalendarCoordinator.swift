@@ -7,14 +7,16 @@
 
 import UIKit
 
+/// 캘린더 Coordinator
 final class CalendarCoordinator: Coordinator {
     
     // MARK: - Properties
     var childCoordinators = [Coordinator]()
-    let navigationController: UINavigationController
-    
     private lazy var calendarVM = CalendarViewModel()
     private lazy var calendarVC = CalendarViewController(coordinator: self, viewModel: calendarVM)
+    
+    // Initializer Injections
+    private let navigationController: UINavigationController
     
     // MARK: - Initializer
     init(navigationController: UINavigationController) {
@@ -26,13 +28,22 @@ final class CalendarCoordinator: Coordinator {
         navigationController.pushViewController(calendarVC, animated: false)
     }
     
-    func showYearMonthPickerVC(currYear: Int, currMonth: Int) {
-        let yearMonthCoordinator = YearMonthPickerCoordinator(navigationController: self.navigationController,
+    func showYearMonthPicker(currYear: Int, currMonth: Int) {
+        let yearMonthCoordinator = YearMonthPickerCoordinator(navigationController: navigationController,
                                                               currYear: currYear,
                                                               currMonth: currMonth)
         yearMonthCoordinator.delegate = self
         yearMonthCoordinator.start()
         childCoordinators.append(yearMonthCoordinator)
+    }
+    
+    func showFilter(calendarMode: CalendarMode, selectedFilterWorkplace: FilterWorkplace?) {
+        let filterCoordinator = FilterCoordinator(navigationController: navigationController,
+                                                  calendarMode: calendarMode,
+                                                  selectedFilterWorkplace: selectedFilterWorkplace)
+        filterCoordinator.delegate = self
+        filterCoordinator.start()
+        childCoordinators.append(filterCoordinator)
     }
 }
 
@@ -50,3 +61,16 @@ extension CalendarCoordinator: YearMonthPickerCoordinatorDelegate {
     }
 }
 
+// MARK: - FilterCoordinatorDelegate
+extension CalendarCoordinator: FilterCoordinatorDelegate {
+    func cancelled(_ coordinator: FilterCoordinator) {
+        childCoordinators = childCoordinators.filter { $0 !== coordinator }
+        navigationController.dismiss(animated: true)
+    }
+    
+    func applyFilter(_ coordinator: FilterCoordinator, filterWorkplace: FilterWorkplace?) {
+        childCoordinators = childCoordinators.filter { $0 !== coordinator }
+        calendarVC.updateFilter(filterWorkplace: filterWorkplace)
+        navigationController.dismiss(animated: true)
+    }
+}

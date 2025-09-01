@@ -15,21 +15,23 @@ import RxSwift
 final class CalendarViewController: UIViewController {
     
     // MARK: - Properties
-    weak var coordinator: CalendarCoordinator?
     private let disposeBag = DisposeBag()
+    /// 캘린더 근무 Dictionary
+    private var calendarEventDataSource: [Date: [CalendarEvent]] = [:]
+    
+    // Initializer Injections
+    weak var coordinator: CalendarCoordinator?
     private let viewModel: CalendarViewModel
     
-    private let currCalendar = Calendar.current
-    
+    // Input Relays
     /// 현재 캘린더 연/월
-    private lazy var visibleYearMonth = BehaviorRelay<(year: Int, month: Int)>(value: (year: currCalendar.component(.year, from: .now),
-                                                                                       month: currCalendar.component(.month, from: .now)))
+    private let visibleYearMonthRelay = PublishRelay<(year: Int, month: Int)>()
     /// 캘린더 개인/공유 모드
-    private let selectedCalendarModeRelay = BehaviorRelay<CalendarMode>(value: .personal)
-    /// 개인 근무 Dictionary
-    private var personalEventDataSource: [Date: [CalendarEvent]] = [:]
-    /// 공유 근무지 근무 Dictionary
-    private var sharedEventDataSource: [Date: [CalendarEvent]] = [:]
+    private let calendarModeRelay = BehaviorRelay<CalendarMode>(value: .personal)
+    /// 개인 캘린더 근무지/매장 필터
+    private let personalFilterWorkplaceRelay = BehaviorRelay<FilterWorkplace?>(value: nil)
+    /// 공유 캘린더 근무지/매장 필터
+    private let sharedFilterWorkplaceRelay = BehaviorRelay<FilterWorkplace?>(value: nil)
     
     // MARK: - UI Components
     private let calendarView = CalendarView()
@@ -63,6 +65,15 @@ final class CalendarViewController: UIViewController {
         guard let date = DateFormatter.dataSourceDateFormatter.date(from: "\(focusedYear).\(formattedMonth).01") else { return }
         calendarView.getMonthCalendarView.scrollToDate(date, animateScroll: true)
     }
+    
+    func updateFilter(filterWorkplace: FilterWorkplace?) {
+        switch calendarModeRelay.value {
+        case .personal:
+            personalFilterWorkplaceRelay.accept(filterWorkplace)
+        case .shared:
+            sharedFilterWorkplaceRelay.accept(filterWorkplace)
+        }
+    }
 }
 
 private extension CalendarViewController {
@@ -94,20 +105,37 @@ private extension CalendarViewController {
                 guard let title = owner.calendarView.getCalendarHeaderView.getYearMonthButtonTitle,
                       let currYear = Int(title.prefix(4)),
                       let currMonth = Int(title.suffix(2)) else { return }
-                owner.coordinator?.showYearMonthPickerVC(currYear: currYear, currMonth: currMonth)
+                owner.coordinator?.showYearMonthPicker(currYear: currYear, currMonth: currMonth)
             }.disposed(by: disposeBag)
         
         calendarView.getCalendarHeaderView.rx.toggleSegmentSelectedIndex
             .subscribe(with: self) { owner, selectedIndex in
-                owner.selectedCalendarModeRelay.accept(CalendarMode.allCases[selectedIndex])
+                owner.calendarModeRelay.accept(CalendarMode.allCases[selectedIndex])
+            }.disposed(by: disposeBag)
+        
+        calendarView.getCalendarHeaderView.rx.filterButtonTap
+            .subscribe(with: self) { owner, _ in
+                let selectedFilterWorkplace: FilterWorkplace?
+                switch owner.calendarModeRelay.value {
+                case .personal:
+                    selectedFilterWorkplace = owner.personalFilterWorkplaceRelay.value
+                case .shared:
+                    selectedFilterWorkplace = owner.sharedFilterWorkplaceRelay.value
+                }
+                owner.coordinator?.showFilter(calendarMode: owner.calendarModeRelay.value, selectedFilterWorkplace: selectedFilterWorkplace)
             }.disposed(by: disposeBag)
         
         // ViewModel 바인딩
-        let input = CalendarViewModel.Input(currMonth: visibleYearMonth.asObservable(), selectedCalendarMode: selectedCalendarModeRelay.asObservable())
+        let input = CalendarViewModel.Input(visibleYearMonth: visibleYearMonthRelay.asObservable(),
+                                            calendarMode: calendarModeRelay.asObservable(),
+                                            personalFilterWorkplace: personalFilterWorkplaceRelay.asObservable(),
+                                            sharedFilterWorkplace: sharedFilterWorkplaceRelay.asObservable())
         let output = viewModel.transform(input: input)
         
-        output.calendarModelList.asDriver(onErrorJustReturn: (personal: [], shared: []))
+        output.calendarEventList.asDriver(onErrorJustReturn: [])
             .drive(with: self) { owner, calendarEventList in
+                print("calendarEventList")
+                dump(calendarEventList)
                 owner.populateDataSource(calendarEventList: calendarEventList)
             }.disposed(by: disposeBag)
     }
@@ -115,16 +143,11 @@ private extension CalendarViewController {
 
 // MARK: - Internal Calendar Methods
 extension CalendarViewController {
-    func populateDataSource(calendarEventList: (personal: [CalendarEvent], shared: [CalendarEvent])) {
-        for event in calendarEventList.personal {
+    func populateDataSource(calendarEventList: [CalendarEvent]) {
+        for event in calendarEventList {
             guard let eventDate = DateFormatter.dataSourceDateFormatter.date(from: event.workDate) else { continue }
-            personalEventDataSource[eventDate, default: []].append(event)
+            calendarEventDataSource[eventDate, default: []].append(event)
         }
-        for event in calendarEventList.shared {
-            guard let eventDate = DateFormatter.dataSourceDateFormatter.date(from: event.workDate) else { continue }
-            sharedEventDataSource[eventDate, default: []].append(event)
-        }
-        
         calendarView.getMonthCalendarView.reloadData()
     }
 }
@@ -148,7 +171,7 @@ private extension CalendarViewController {
         
         let dateBelongsToThisMonth = (cellState.dateBelongsTo == .thisMonth)
         let isSelected = cellState.isSelected
-        let isToday = currCalendar.isDateInToday(cellState.date)
+        let isToday = Calendar.current.isDateInToday(cellState.date)
         
         cell.update(dateStr: cellState.text,
                     daysOfWeek: cellState.day,
@@ -156,7 +179,6 @@ private extension CalendarViewController {
                     isSelected: isSelected,
                     isToday: isToday)
     }
-
 }
 
 // MARK: - JTACMonthViewDataSource
@@ -185,20 +207,15 @@ extension CalendarViewController: JTACMonthViewDelegate {
     }
     
     func calendar(_ calendar: JTACMonthView, willDisplay cell: JTACDayCell, forItemAt date: Date, cellState: CellState, indexPath: IndexPath) {
-        let calendarMode = selectedCalendarModeRelay.value
-        switch selectedCalendarModeRelay.value {
-        case .personal:
-            configureCell(cell: cell, cellState: cellState, calendarMode: calendarMode, eventList: personalEventDataSource[date] ?? [])
-        case .shared:
-            configureCell(cell: cell, cellState: cellState, calendarMode: calendarMode, eventList: sharedEventDataSource[date] ?? [])
-        }
+        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, eventList: calendarEventDataSource[date] ?? [])
     }
     
     func calendar(_ calendar: JTACMonthView, didScrollToDateSegmentWith visibleDates: DateSegmentInfo) {
         guard let date = visibleDates.monthDates.first?.date else { return }
         let dateStr = DateFormatter.yearMonthDateFormatter.string(from: date)
         calendarView.getCalendarHeaderView.update(dateStr: dateStr)
-        
+        visibleYearMonthRelay.accept((year: Calendar.current.component(.year, from: date),
+                                      month: Calendar.current.component(.month, from: date)))
     }
     
     func calendar(_ calendar: JTACMonthView, shouldSelectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) -> Bool {
@@ -206,22 +223,10 @@ extension CalendarViewController: JTACMonthViewDelegate {
     }
     
     func calendar(_ calendar: JTACMonthView, didSelectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
-        let calendarMode = selectedCalendarModeRelay.value
-        switch selectedCalendarModeRelay.value {
-        case .personal:
-            configureCell(cell: cell, cellState: cellState, calendarMode: calendarMode, eventList: personalEventDataSource[date] ?? [])
-        case .shared:
-            configureCell(cell: cell, cellState: cellState, calendarMode: calendarMode, eventList: sharedEventDataSource[date] ?? [])
-        }
+        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, eventList: calendarEventDataSource[date] ?? [])
     }
     
     func calendar(_ calendar: JTACMonthView, didDeselectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
-        let calendarMode = selectedCalendarModeRelay.value
-        switch selectedCalendarModeRelay.value {
-        case .personal:
-            configureCell(cell: cell, cellState: cellState, calendarMode: calendarMode, eventList: personalEventDataSource[date] ?? [])
-        case .shared:
-            configureCell(cell: cell, cellState: cellState, calendarMode: calendarMode, eventList: sharedEventDataSource[date] ?? [])
-        }
+        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, eventList: calendarEventDataSource[date] ?? [])
     }
 }

@@ -5,8 +5,6 @@
 //  Created by 서동환 on 7/12/25.
 //
 
-import Foundation
-
 import RxRelay
 import RxSwift
 
@@ -18,20 +16,46 @@ final class CalendarViewModel {
     
     // MARK: - Input
     struct Input {
-        let currMonth: Observable<(year: Int, month: Int)>
-        let selectedCalendarMode: Observable<CalendarMode>
+        let visibleYearMonth: Observable<(year: Int, month: Int)>
+        let calendarMode: Observable<CalendarMode>
+        let personalFilterWorkplace: Observable<FilterWorkplace?>
+        let sharedFilterWorkplace: Observable<FilterWorkplace?>
     }
     
     // MARK: - Output
     struct Output {
-        let calendarModelList: Observable<(personal: [CalendarEvent], shared: [CalendarEvent])>
+        let calendarEventList: Observable<[CalendarEvent]>
     }
-    private let calendarModelListRelay = PublishRelay<(personal: [CalendarEvent], shared: [CalendarEvent])>()
+    private let calendarEventListRelay = PublishRelay<[CalendarEvent]>()
+    
+    // MARK: - Initializer
+    init() {
+        // TODO: UseCase 주입
+    }
     
     // MARK: - Input ➡️ Output Transform
     func transform(input: Input) -> Output {
         // TODO: 근무 이벤트 로딩
-        calendarModelListRelay.accept(CalendarMockData.calendarEventListMock)
-        return Output(calendarModelList: calendarModelListRelay.asObservable())
+        Observable.combineLatest(input.visibleYearMonth, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
+            .subscribe(with: self) { owner, combined in
+                let ((year, month), calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
+                var calendarEventList: [CalendarEvent]
+                switch calendarMode {
+                case .personal:
+                    calendarEventList = CalendarMockData.personalCalendarEventListMock
+                    if let personalFilterWorkplace {
+                        calendarEventList = calendarEventList.filter { $0.workplaceId == personalFilterWorkplace.workplaceId }
+                    }
+                case .shared:
+                    calendarEventList = CalendarMockData.sharedCalendarEventListMock.sorted(by: { $0.workplaceName < $1.workplaceName })
+                    if let sharedFilterWorkplace {
+                        calendarEventList = calendarEventList.filter { $0.workplaceId == sharedFilterWorkplace.workplaceId }
+                    } else {
+                        calendarEventList = calendarEventList.filter { $0.workplaceId == calendarEventList.first?.workplaceId }
+                    }
+                }
+                owner.calendarEventListRelay.accept(calendarEventList)
+            }.disposed(by: disposeBag)
+        return Output(calendarEventList: calendarEventListRelay.asObservable())
     }
 }
