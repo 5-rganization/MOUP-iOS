@@ -13,7 +13,7 @@ final class DeleteAccountModalViewController: UIViewController {
     // MARK: - Properties
     
     private var hasAnimatedIn = false
-    
+    private let viewModel: DeleteAccountViewModel
     private let disposeBag = DisposeBag()
     
     // MARK: - UI Components
@@ -42,6 +42,17 @@ final class DeleteAccountModalViewController: UIViewController {
             hasAnimatedIn = true
             animateModalIn()
         }
+    }
+    
+    // MARK: - Initializer
+    
+    init(viewModel: DeleteAccountViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
@@ -94,9 +105,27 @@ private extension DeleteAccountModalViewController {
             })
             .disposed(by: disposeBag)
         
-        deleteAccountModal.rx.deleteAccountButtonTapped
-            .subscribe(onNext: {
-                print("deleteAccountButtonTapped")
+        let input = DeleteAccountViewModel.Input(
+            deleteTap: deleteAccountModal.rx.deleteAccountButtonTapped.asObservable()
+        )
+        
+        let output = viewModel.transform(input)
+        
+        output.deleteSuccess
+            .withUnretained(self)
+            .emit(onNext: { owner, _ in
+                owner.animateModalOut {
+                    print("회원탈퇴 성공")
+                    // TODO: - 로그인 화면으로 이동
+                    owner.dismiss(animated: false)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        output.errorMessage
+            .withUnretained(self)
+            .emit(onNext: { owner, _ in
+                print("회원탈퇴 실패")
             })
             .disposed(by: disposeBag)
     }
