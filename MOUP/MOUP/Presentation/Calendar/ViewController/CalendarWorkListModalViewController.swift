@@ -89,24 +89,18 @@ private extension CalendarWorkListModalViewController {
         let input = CalendarWorkListViewModel.Input(viewDidLoad: Observable.just(()), deleteWorkId: deleteWorkIdRelay.asObservable())
         let output = viewModel.transform(input: input)
         
-        switch calendarMode {
-        case .personal:
-            output.calendarWorkList.asDriver(onErrorJustReturn: [])
-                .drive(with: self, onNext: { owner, workList in
-                    owner.calendarWorkListView.rx.emptyLabelIsHidden.onNext(!workList.isEmpty)
-                    owner.calendarWorkListView.rx.workTableViewIsHidden.onNext(workList.isEmpty)
+        output.calendarWorkList.asDriver(onErrorJustReturn: [])
+            .drive(with: self, onNext: { owner, workList in
+                owner.calendarWorkListView.rx.emptyLabelIsHidden.onNext(!workList.isEmpty)
+                owner.calendarWorkListView.rx.workTableViewIsHidden.onNext(workList.isEmpty)
+                
+                switch owner.calendarMode {
+                case .personal:
                     owner.calendarWorkListView.rx.personalWorkTableViewDataSource.onNext(workList)
-                })
-                .disposed(by: disposeBag)
-        case .shared:
-            output.calendarWorkList.asDriver(onErrorJustReturn: [])
-                .drive(with: self, onNext: { owner, workList in
-                    owner.calendarWorkListView.rx.emptyLabelIsHidden.onNext(!workList.isEmpty)
-                    owner.calendarWorkListView.rx.workTableViewIsHidden.onNext(workList.isEmpty)
+                case .shared:
                     owner.calendarWorkListView.rx.sharedWorkTableViewDataSource.onNext(workList)
-                })
-                .disposed(by: disposeBag)
-        }
+                }
+            }).disposed(by: disposeBag)
     }
 }
 
