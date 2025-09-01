@@ -69,8 +69,9 @@ final class CalendarViewModel {
     }
 }
 
+// MARK: - Private Methods
 private extension CalendarViewModel {
     func sortCalendarWorkList(_ lhs: CalendarWork, _ rhs: CalendarWork) -> Bool {
-        return lhs.startTime < rhs.startTime || lhs.endTime < rhs.endTime
+        return (lhs.startTime, lhs.endTime) < (rhs.startTime, rhs.endTime)
     }
 }
