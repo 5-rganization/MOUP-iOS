@@ -16,7 +16,7 @@ extension Bundle {
         if let urlTypes = infoDictionary?["CFBundleURLTypes"] as? [[String: Any]],
            let urlSchemes = urlTypes.first?["CFBundleURLSchemes"] as? [String],
            let reversedClientID = urlSchemes.first {
-            return "\(reversedClientID):/oauthredirect"
+            return "\(reversedClientID):/oauth2redirect"
         }
         return nil
     }

@@ -129,8 +129,10 @@ private extension SignInViewController {
                 request,
                 presenting: self,
                 callback: { response, error in
-                    if let code = response?.authorizationCode {
-                        self.googleAuthCodeSubject.onNext(code)
+                    if let code = response?.authorizationCode,
+                       let codeVerifier = request.codeVerifier {
+                        print("request... => \(codeVerifier) \(code)")
+                        self.googleAuthCodeSubject.onNext("\(codeVerifier) \(code)")
                     } else {
                         print("Authorization failed: \(error?.localizedDescription ?? "")")
                     }

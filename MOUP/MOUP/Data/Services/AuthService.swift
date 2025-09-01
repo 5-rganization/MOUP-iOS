@@ -18,10 +18,7 @@ final class AuthService: AuthServiceProtocol {
         let response = await request.serializingDecodable(SignInResponseDTO.self).response
 
         print(response.value)
-
-        if let error = response.error {
-            throw NetworkError.invalidResponse(error)
-        }
+        print("statusCode: \(response.response?.statusCode)")
 
         guard let statusCode = response.response?.statusCode else {
             throw NetworkError.noResponse // TODO: - 커스텀 에러를 좀 더 상세하게 나눌 필요가 있어보임.
