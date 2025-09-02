@@ -7,6 +7,9 @@
 
 import Foundation
 
-struct UserIdentifier {
+struct User {
     let userId: Int64
+    let role: UserRole
+    let accessToken: String
+    let refreshToken: String
 }
