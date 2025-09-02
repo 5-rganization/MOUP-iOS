@@ -34,7 +34,7 @@ final class SignInCoordinator: Coordinator {
         let signUpViewModel = SignUpViewModel()
         let signUpCoordinator = SignUpCoordinator(coordinator: self, signUpViewModel: signUpViewModel, window: window)
         signUpCoordinator.start()
-        childCoordinators.append(signUpCoordinator)
+        childCoordinators.append(signUpCoordinator) // moveToTabBar 등 공개 메서드 유지를 위함
     }
 
     func moveToTabBar() {
