@@ -9,15 +9,31 @@ import Foundation
 
 final class AuthRepository: AuthRepositoryProtocol {
     // MARK: - Properties
-    private let googleAuthService: AuthServiceProtocol
-    init(googleAuthService: AuthServiceProtocol) {
-        self.googleAuthService = googleAuthService
+    private let authService: AuthServiceProtocol
+    init(authService: AuthServiceProtocol) {
+        self.authService = authService
     }
 
     // MARK: - Methods
-    func signInWithGoogle(requestDTO: SignInRequestDTO) async throws -> UserIdentifier {
-        let response = try await googleAuthService.signInWithGoogle(requestDTO: requestDTO)
-        let userId = response.userId
-        return UserIdentifier(userId: userId)
+    func signIn(requestDTO: LoginRequestDTO) async throws -> User {
+        let response = try await authService.signIn(requestDTO: requestDTO)
+        let user = User(
+            userId: response.userId,
+            role: response.role == "ROLE_WORKER" ? .worker : .owner,
+            accessToken: response.accessToken,
+            refreshToken: response.refreshToken
+        )
+        return user
+    }
+
+    func signUp(requestDTO: RegisterRequestDTO) async throws -> User {
+        let response = try await authService.signUp(requestDTO: requestDTO)
+        let user = User(
+            userId: response.userId,
+            role: response.role == "ROLE_WORKER" ? .worker : .owner,
+            accessToken: response.accessToken,
+            refreshToken: response.refreshToken
+        )
+        return user
     }
 }

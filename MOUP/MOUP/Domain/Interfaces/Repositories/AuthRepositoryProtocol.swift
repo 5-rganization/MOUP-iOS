@@ -8,5 +8,6 @@
 import Foundation
 
 protocol AuthRepositoryProtocol: AnyObject {
-    func signInWithGoogle(requestDTO: SignInRequestDTO) async throws -> UserIdentifier
+    func signIn(requestDTO: LoginRequestDTO) async throws -> User
+    func signUp(requestDTO: RegisterRequestDTO) async throws -> User
 }

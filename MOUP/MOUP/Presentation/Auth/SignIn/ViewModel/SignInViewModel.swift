@@ -50,7 +50,7 @@ final class SignInViewModel {
         input.googleAuthCode.subscribe(onNext: { code in
             Task {
                 do {
-                    try await self.authUseCase.signInWithGoogle(requestDTO: SignInRequestDTO(provider: "LOGIN_GOOGLE", authCode: code))
+                    try await self.authUseCase.signIn(requestDTO: LoginRequestDTO(provider: "LOGIN_GOOGLE", authCode: code))
                 } catch let error as NetworkError {
                     switch error {
                     case .serverError, .noResponse, .invalidResponse(_):

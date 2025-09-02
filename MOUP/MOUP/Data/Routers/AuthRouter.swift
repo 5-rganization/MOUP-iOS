@@ -9,7 +9,8 @@ import Foundation
 import Alamofire
 
 enum AuthRouter {
-    case signIn(SignInRequestDTO)
+    case signIn(LoginRequestDTO)
+    case signUp(RegisterRequestDTO)
 }
 
 extension AuthRouter: URLRequestConvertible {
@@ -24,12 +25,14 @@ extension AuthRouter: URLRequestConvertible {
         switch self {
         case .signIn:
             return "/auth/login"
+        case .signUp:
+            return "/auth/register"
         }
     }
 
     var method: HTTPMethod {
         switch self {
-        case .signIn:
+        case .signIn, .signUp:
             return .post
         }
     }
@@ -38,12 +41,14 @@ extension AuthRouter: URLRequestConvertible {
         switch self {
         case .signIn(let signInRequestDTO):
             return signInRequestDTO
+        case .signUp(let signUpRequestDTO):
+            return signUpRequestDTO
         }
     }
 
     var encoding: ParameterEncoding {
         switch self {
-        case .signIn:
+        case .signIn, .signUp:
             return JSONEncoding.default
         }
     }
