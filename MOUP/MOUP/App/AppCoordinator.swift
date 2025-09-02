@@ -21,8 +21,8 @@ final class AppCoordinator: Coordinator {
         self.isSignedIn = isSignedIn
         print("자동 로그인 가능 여부 : \(isSignedIn)")
         self.authService = AuthService()
-        self.authRepository = AuthRepository(googleAuthService: authService)
-        self.authUseCase = AuthUseCase(googleAuthRepository: authRepository)
+        self.authRepository = AuthRepository(authService: authService)
+        self.authUseCase = AuthUseCase(authRepository: authRepository)
     }
 
     func start() {
