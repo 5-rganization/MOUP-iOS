@@ -23,12 +23,12 @@ final class CalendarDayCell: JTACDayCell {
         $0.backgroundColor = .gray300
     }
     /// 선택됐을 때 표시되는 UI
-    fileprivate let selectedView = UIView().then {
+    private let selectedView = UIView().then {
         $0.backgroundColor = .primary50
         $0.isHidden = true
     }
     /// 날짜(일) 라벨
-    fileprivate let dateLabel = UILabel().then {
+    private let dateLabel = UILabel().then {
         $0.textColor = .gray900
         $0.font = .bodyMedium(14)
         $0.textAlignment = .center
@@ -36,6 +36,8 @@ final class CalendarDayCell: JTACDayCell {
         $0.clipsToBounds = true
         $0.layer.cornerRadius = 10
     }
+    /// 근무 컨테이너 UI
+    private let eventContainerVStackView = EventContainerVStackView()
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -49,13 +51,37 @@ final class CalendarDayCell: JTACDayCell {
     }
     
     // MARK: - Lifecycle
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        dateLabel.backgroundColor = .clear
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        // eventContainerVStackView의 minY 계산
+        let eventContainerMinY = dateLabel.frame.maxY + 4
+        
+        // eventContainerVStackView의 너비 계산
+        let targetWidth = self.contentView.bounds.width - 4
+        // systemLayoutSizeFitting에 전달할 목표 크기 계산 - 너비는 targetWidth, 높이는 시스템이 계산
+        let targetSize = CGSize(width: targetWidth, height: UIView.layoutFittingCompressedSize.height)
+        // targetSize를 이용하여 eventContainerVStackView의 잠재적인 최대 높이 계산
+        let requiredHeight = eventContainerVStackView.systemLayoutSizeFitting(targetSize,
+                                                                              withHorizontalFittingPriority: .required,
+                                                                              verticalFittingPriority: .fittingSizeLevel).height
+        // eventContainerVStackView의 잠재적인 maxY 계산
+        let potentialMaxY = eventContainerMinY + requiredHeight
+        
+        // eventContainerVStackView의 최대 maxY 계산(여백 4 포함)
+        let possibleMaxY = self.contentView.bounds.height - 4
+        
+        // 근무 컨테이너 UI가 캘린더 셀을 벗어나거나 여백이 4 미만일 때
+        if potentialMaxY >= possibleMaxY {
+            let possibleMaxHeight = possibleMaxY - eventContainerMinY
+            let reducedCount = Int(possibleMaxHeight / (EventRowSize.baseComponentHeight + eventContainerVStackView.spacing))
+            // 근무 UI 크기 줄임
+            eventContainerVStackView.reduceHeight(displayCount: reducedCount)
+        }
     }
     
-    // MARK: - Methods
-    func update(dateStr: String, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, isToday: Bool) {
+    // MARK: - Internal Methods
+    func update(dateStr: String, isToday: Bool, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, calendarMode: CalendarMode, eventList: [CalendarEvent]) {
         dateLabel.text = dateStr
         
         if isToday {
@@ -70,12 +96,20 @@ final class CalendarDayCell: JTACDayCell {
             default:
                 dateLabel.textColor = .gray900
             }
+            dateLabel.backgroundColor = .clear
         }
         
-        dateLabel.isHidden = !dateBelongsToThisMonth
         self.isUserInteractionEnabled = dateBelongsToThisMonth
-        
+        dateLabel.isHidden = !dateBelongsToThisMonth
         selectedView.isHidden = !isSelected
+        
+        let displayCount = 4
+        switch calendarMode {
+        case .personal:
+            eventContainerVStackView.updatePersonalModeEventRows(eventList: eventList, displayCount: displayCount)
+        case .shared:
+            eventContainerVStackView.updateSharedModeEventRows(eventList: eventList, displayCount: displayCount)
+        }
     }
 }
 
@@ -91,7 +125,8 @@ private extension CalendarDayCell {
     func setHierarchy() {
         self.contentView.addSubviews(seperatorView,
                                      selectedView,
-                                     dateLabel)
+                                     dateLabel,
+                                     eventContainerVStackView)
     }
     
     // MARK: - setStyles
@@ -117,6 +152,11 @@ private extension CalendarDayCell {
             $0.top.equalTo(seperatorView.snp.bottom).offset(4)
             $0.width.height.equalTo(20)
             $0.centerX.equalToSuperview()
+        }
+        
+        eventContainerVStackView.snp.makeConstraints {
+            $0.top.equalTo(dateLabel.snp.bottom).offset(4)
+            $0.leading.trailing.equalToSuperview().inset(2)
         }
     }
 }

@@ -47,15 +47,23 @@ final class CalendarViewModel {
                         calendarEventList = calendarEventList.filter { $0.workplaceId == personalFilterWorkplace.workplaceId }
                     }
                 case .shared:
-                    calendarEventList = CalendarMockData.sharedCalendarEventListMock.sorted(by: { $0.workplaceName < $1.workplaceName })
+                    calendarEventList = CalendarMockData.sharedCalendarEventListMock
                     if let sharedFilterWorkplace {
                         calendarEventList = calendarEventList.filter { $0.workplaceId == sharedFilterWorkplace.workplaceId }
                     } else {
-                        calendarEventList = calendarEventList.filter { $0.workplaceId == calendarEventList.first?.workplaceId }
+                        let firstWorkplaceId = calendarEventList.sorted(by: { $0.workplaceName < $1.workplaceName }).first?.workplaceId
+                        calendarEventList = calendarEventList.filter { $0.workplaceId == firstWorkplaceId }
                     }
                 }
+                calendarEventList.sort(by: owner.sortCalendarEventList)
                 owner.calendarEventListRelay.accept(calendarEventList)
             }.disposed(by: disposeBag)
         return Output(calendarEventList: calendarEventListRelay.asObservable())
+    }
+}
+
+private extension CalendarViewModel {
+    func sortCalendarEventList(_ lhs: CalendarEvent, _ rhs: CalendarEvent) -> Bool {
+        return lhs.startTime < rhs.startTime || lhs.endTime < rhs.endTime
     }
 }

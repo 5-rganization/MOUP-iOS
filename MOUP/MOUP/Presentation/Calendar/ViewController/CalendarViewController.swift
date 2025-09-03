@@ -10,6 +10,7 @@ import UIKit
 import JTAppleCalendar
 import RxCocoa
 import RxSwift
+import Then
 
 /// 캘린더 탭 VC
 final class CalendarViewController: UIViewController {
@@ -34,6 +35,10 @@ final class CalendarViewController: UIViewController {
     private let sharedFilterWorkplaceRelay = BehaviorRelay<FilterWorkplace?>(value: nil)
     
     // MARK: - UI Components
+    private let todayButton = UIBarButtonItem(title: "오늘").then {
+        $0.setTitleTextAttributes([.font: UIFont.headBold(14), .foregroundColor: UIColor.gray900], for: .normal)
+        $0.setTitleTextAttributes([.font: UIFont.headBold(14), .foregroundColor: UIColor.gray900], for: .selected)
+    }
     private let calendarView = CalendarView()
     
     // MARK: - Initializer
@@ -86,7 +91,8 @@ private extension CalendarViewController {
     
     // MARK: - setStyles
     func setStyles() {
-        self.title = "캘린더"
+        self.setNavigationBar(title: "캘린더")
+        self.navigationItem.rightBarButtonItem = todayButton
         
         self.view.backgroundColor = .primaryBackground
     }
@@ -100,6 +106,12 @@ private extension CalendarViewController {
     // MARK: - setBindings
     func setBindings() {
         // View 바인딩
+        todayButton.rx.tap
+            .subscribe(with: self) { owner, _ in
+                owner.calendarView.getMonthCalendarView.deselectAllDates()
+                owner.calendarView.getMonthCalendarView.scrollToDate(.now, animateScroll: true)
+            }.disposed(by: disposeBag)
+        
         calendarView.getCalendarHeaderView.rx.yearMonthButtonTap
             .subscribe(with: self) { owner, _ in
                 guard let title = owner.calendarView.getCalendarHeaderView.getYearMonthButtonTitle,
@@ -134,8 +146,10 @@ private extension CalendarViewController {
         
         output.calendarEventList.asDriver(onErrorJustReturn: [])
             .drive(with: self) { owner, calendarEventList in
-                print("calendarEventList")
-                dump(calendarEventList)
+//                print("==================================================")
+//                print("calendarEventList")
+//                dump(calendarEventList)
+//                print("==================================================")
                 owner.populateDataSource(calendarEventList: calendarEventList)
             }.disposed(by: disposeBag)
     }
@@ -144,6 +158,9 @@ private extension CalendarViewController {
 // MARK: - Internal Calendar Methods
 extension CalendarViewController {
     func populateDataSource(calendarEventList: [CalendarEvent]) {
+        // TODO: 수신한 데이터 지우지 않는 방향으로 수정
+        calendarEventDataSource.removeAll()
+        
         for event in calendarEventList {
             guard let eventDate = DateFormatter.dataSourceDateFormatter.date(from: event.workDate) else { continue }
             calendarEventDataSource[eventDate, default: []].append(event)
@@ -174,10 +191,12 @@ private extension CalendarViewController {
         let isToday = Calendar.current.isDateInToday(cellState.date)
         
         cell.update(dateStr: cellState.text,
+                    isToday: isToday,
                     daysOfWeek: cellState.day,
                     dateBelongsToThisMonth: dateBelongsToThisMonth,
                     isSelected: isSelected,
-                    isToday: isToday)
+                    calendarMode: calendarMode,
+                    eventList: eventList)
     }
 }
 
