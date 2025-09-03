@@ -6,23 +6,36 @@
 //
 
 import UIKit
+import RxSwift
 
 final class SignUpCoordinator: Coordinator {
     weak var signInCoordinator: SignInCoordinator?
     private var navigationController: UINavigationController?
     let window: UIWindow
     var childCoordinators = [Coordinator]()
+    private let provider: LoginProvider // 회원가입 플랫폼 식별용
+    private let authorizationCode: String
+    private let authUseCase: AuthUseCaseProtocol
+    private let disposeBag = DisposeBag()
 
-    private let signUpViewModel: SignUpViewModel
+    private var userRoleViewModel: UserRoleViewModel?
 
-    init(coordinator: SignInCoordinator, signUpViewModel: SignUpViewModel, window: UIWindow) {
+    init(
+        coordinator: SignInCoordinator,
+        window: UIWindow,
+        provider: LoginProvider,
+        authorizationCode: String,
+        authUseCase: AuthUseCaseProtocol
+    ) {
         self.signInCoordinator = coordinator
-        self.signUpViewModel = signUpViewModel
         self.window = window
+        self.provider = provider
+        self.authorizationCode = authorizationCode
+        self.authUseCase = authUseCase
     }
 
     func start() {
-        let nicknameViewModel = NicknameViewModel()
+        let nicknameViewModel = NicknameViewModel(provider: provider)
         let nicknameViewController = NicknameViewController(nicknameViewModel: nicknameViewModel)
         nicknameViewController.coordinator = self
         let nav = UINavigationController(rootViewController: nicknameViewController)
@@ -37,11 +50,34 @@ final class SignUpCoordinator: Coordinator {
     }
 
     /// 닉네임 설정 페이지로 이동
-    func goToSetUserRole(with nickname: String) {
-        let userRoleViewModel = UserRoleViewModel(nickname: nickname)
-        let userRoleViewController = UserRoleViewController(userRoleViewModel: userRoleViewModel)
+    func goToSetUserRole(with nickname: String, provider: LoginProvider) {
+        print("goToSetUserRole - nickname: \(nickname)")
+        self.userRoleViewModel = UserRoleViewModel(
+            nickname: nickname,
+            authorizationCode: authorizationCode,
+            provider: provider,
+            authUseCase: authUseCase
+        )
+        let userRoleViewController = UserRoleViewController(userRoleViewModel: userRoleViewModel!)
         userRoleViewController.coordinator = self
-        navigationController?.pushViewController(userRoleViewController, animated: true)
+        DispatchQueue.main.async {
+            self.navigationController?.pushViewController(userRoleViewController, animated: true)
+        }
+    }
+
+    func didSetUserRole(userRole: UserRole) {
+        let roleConfirmVC = RoleConfirmationViewController(userRole: userRole)
+        roleConfirmVC.modalPresentationStyle = .overFullScreen
+        roleConfirmVC.modalTransitionStyle = .crossDissolve
+        roleConfirmVC.confirmButtonTapRelay
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.userRoleViewModel?.signUpTriggerRelay.accept(())
+            })
+            .disposed(by: disposeBag)
+        DispatchQueue.main.async {
+            self.navigationController?.present(roleConfirmVC, animated: true)
+        }
     }
 
     func didFinishSignUp() {

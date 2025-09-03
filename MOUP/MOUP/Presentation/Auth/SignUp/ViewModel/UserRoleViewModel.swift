@@ -11,15 +11,24 @@ import RxRelay
 
 final class UserRoleViewModel {
     // MARK: - Properties
-    private let disposeBag = DisposeBag()
     private let nickname: String
+    private let provider: LoginProvider
+    private let authorizationCode: String
+    private let authUseCase: AuthUseCaseProtocol
+    private let disposeBag = DisposeBag()
     private var selectedRoleRelay = BehaviorRelay<UserRole?>(value: nil)
     private let signupResultRelay = PublishRelay<Bool>()
     private let didTapStartRelay = PublishRelay<Void>()
-
+    let signUpTriggerRelay = PublishRelay<Void>()
+    
     // MARK: - Initializer
-    init(nickname: String) {
+    init(nickname: String, authorizationCode: String, provider: LoginProvider, authUseCase: AuthUseCaseProtocol) {
         self.nickname = nickname
+        self.authorizationCode = authorizationCode
+        self.provider = provider
+        self.authUseCase = authUseCase
+        print("userRoleViewModel - nickname: \(nickname)주입받음")
+        setBindings()
     }
 
     // MARK: - Input, Output
@@ -40,7 +49,6 @@ final class UserRoleViewModel {
             .withUnretained(self)
             .subscribe(onNext: { owner, userRole in
                 owner.selectedRoleRelay.accept(userRole)
-                print("selectedRole(VM) 설정됨 : \(owner.selectedRoleRelay.value)")
             })
             .disposed(by: disposeBag)
 
@@ -61,8 +69,36 @@ final class UserRoleViewModel {
 }
 
 private extension UserRoleViewModel {
+    func setBindings() {
+        signUpTriggerRelay
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.signUp()
+            })
+            .disposed(by: disposeBag)
+    }
+
     func signUp() {
-        print("회원가입 탭")
-        signupResultRelay.accept(false)
+        print("회원가입 시작")
+        guard let userRole = selectedRoleRelay.value else {
+            return
+        }
+
+        Task {
+            do {
+                try await authUseCase.signUp(
+                    requestDTO: RegisterRequestDTO(
+                        provider: provider.rawValue,
+                        authCode: authorizationCode,
+                        username: "",
+                        nickname: nickname,
+                        role: userRole.rawValue
+                    )
+                )
+                signupResultRelay.accept(true)
+            } catch {
+                signupResultRelay.accept(false)
+            }
+        }
     }
 }

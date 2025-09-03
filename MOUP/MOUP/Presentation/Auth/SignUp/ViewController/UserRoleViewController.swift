@@ -56,9 +56,12 @@ private extension UserRoleViewController {
 
         output.didTapStart
             .observe(on: MainScheduler.instance)
+            .withLatestFrom(output.selectedRole)
             .withUnretained(self)
-            .subscribe(onNext: { owner, _ in
+            .subscribe(onNext: { owner, role in
                 print("시작하기 탭")
+                guard let role else { return }
+                owner.coordinator?.didSetUserRole(userRole: role)
             })
             .disposed(by: disposeBag)
 

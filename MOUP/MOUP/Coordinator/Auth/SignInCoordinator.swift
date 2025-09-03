@@ -12,12 +12,14 @@ final class SignInCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     let window: UIWindow
 
-    private let signInViewModel: SignInViewModel
+    private let authUseCase: AuthUseCaseProtocol
+    private lazy var signInViewModel = SignInViewModel(authUseCase: authUseCase)
 
     init(coordinator: AppCoordinator, window: UIWindow, authUseCase: AuthUseCaseProtocol) {
         self.appCoordinator = coordinator
         self.window = window
-        self.signInViewModel = SignInViewModel(authUseCase: authUseCase)
+
+        self.authUseCase = authUseCase
     }
 
     func start() {
@@ -30,9 +32,14 @@ final class SignInCoordinator: Coordinator {
         window.makeKeyAndVisible()
     }
 
-    func moveToSignUp() {
-        let signUpViewModel = SignUpViewModel()
-        let signUpCoordinator = SignUpCoordinator(coordinator: self, signUpViewModel: signUpViewModel, window: window)
+    func moveToSignUp(provider: LoginProvider, authorizationCode: String) {
+        let signUpCoordinator = SignUpCoordinator(
+            coordinator: self,
+            window: window,
+            provider: provider,
+            authorizationCode: authorizationCode,
+            authUseCase: authUseCase
+        )
         signUpCoordinator.start()
         childCoordinators.append(signUpCoordinator) // moveToTabBar 등 공개 메서드 유지를 위함
     }

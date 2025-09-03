@@ -11,11 +11,17 @@ import RxRelay
 
 final class NicknameViewModel {
     // MARK: - Properties
+    let provider: LoginProvider
     private let disposeBag = DisposeBag()
     private let nicknameRelay = BehaviorRelay<String>(value: "")
     private let nicknameValidRelay = BehaviorRelay<Bool>(value: false)
     private let nicknameEditingStartedRelay = BehaviorRelay<Bool>(value: false)
     private let didTapNextRelay = PublishRelay<String>()
+
+    // MARK: - Initializer
+    init(provider: LoginProvider) {
+        self.provider = provider
+    }
 
     // MARK: - Input, Output
     struct Input {
@@ -27,6 +33,7 @@ final class NicknameViewModel {
         let isValidNickname: Observable<Bool>
         let nicknameEditingStarted: Observable<Bool>
         let didTapNext: Observable<String> // 닉네임 방출
+        let provider: Observable<LoginProvider>
     }
 
     // MARK: - transform
@@ -43,6 +50,7 @@ final class NicknameViewModel {
             .skip(1)
             .withUnretained(self)
             .subscribe(onNext: { owner, text in
+                owner.nicknameRelay.accept(text)
                 if !owner.nicknameEditingStartedRelay.value {
                     if text.count > 0 {
                         owner.nicknameEditingStartedRelay.accept(true)
@@ -56,7 +64,8 @@ final class NicknameViewModel {
         return Output(
             isValidNickname: nicknameValidRelay.asObservable(),
             nicknameEditingStarted: nicknameEditingStartedRelay.asObservable(),
-            didTapNext: didTapNextRelay.asObservable()
+            didTapNext: didTapNextRelay.asObservable(),
+            provider: Observable.just(provider)
         )
     }
 }

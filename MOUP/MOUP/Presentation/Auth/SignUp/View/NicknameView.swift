@@ -95,14 +95,14 @@ private extension NicknameView {
     // MARK: - setConstraints
     func setConstraints() {
         nicknameTitleLabel.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).inset(28)
-            $0.directionalHorizontalEdges.equalToSuperview().inset(32)
+            $0.top.equalTo(safeAreaLayoutGuide).inset(32)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
         }
 
         nicknameTextField.snp.makeConstraints {
-            $0.top.equalTo(nicknameTitleLabel.snp.bottom).offset(20)
+            $0.top.equalTo(nicknameTitleLabel.snp.bottom).offset(22)
             $0.directionalHorizontalEdges.equalTo(nicknameTitleLabel)
-            $0.height.equalTo(40)
+            $0.height.equalTo(48)
         }
 
         noticeLabel.snp.makeConstraints {
@@ -111,8 +111,8 @@ private extension NicknameView {
         }
 
         startButton.snp.makeConstraints {
-            $0.top.equalTo(noticeLabel.snp.bottom).offset(32)
             $0.directionalHorizontalEdges.equalTo(nicknameTitleLabel)
+            $0.bottom.equalTo(keyboardLayoutGuide).inset(24)
             $0.height.equalTo(44)
         }
     }

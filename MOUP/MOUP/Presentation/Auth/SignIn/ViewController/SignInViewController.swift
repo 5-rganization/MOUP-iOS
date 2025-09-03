@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import RxRelay
 import AppAuth
 
 final class SignInViewController: UIViewController {
@@ -17,7 +18,7 @@ final class SignInViewController: UIViewController {
     private let disposeBag = DisposeBag()
     weak var coordinator: SignInCoordinator?
 
-    private let googleAuthCodeSubject = PublishSubject<String>()
+    private let googleAuthCodeRelay = BehaviorRelay<String>(value: "")
 
     // MARK: - Lifecycle
     
@@ -74,27 +75,41 @@ private extension SignInViewController {
     func setBinding() {
         let input = SignInViewModel.Input(
             googleLoginTap: signInView.rx.googleLoginTap.asObservable(),
-            googleAuthCode: googleAuthCodeSubject.asObservable()
+            googleAuthCode: googleAuthCodeRelay.asObservable()
         )
 
         let output = signInVM.transform(input: input)
 
         output.startGoogleLogin
-            .subscribe(with: self) { _, _ in
-                self.signInGoogle()
+            .withUnretained(self)
+            .subscribe { owner, _ in
+                owner.signInGoogle()
             }
             .disposed(by: disposeBag)
 
-        output.signInResult
+        Observable.combineLatest(output.signInResult, output.loginProvider)
+            .withUnretained(self)
             .observe(on: MainScheduler.instance )
-            .subscribe(onNext: { [weak self] result in
-                guard let self else { return }
-                switch result {
-                case .navigateToSignUp:
-                    print("회원가입 필요")
-                    self.coordinator?.moveToSignUp()
-                case .showAlert(let error):
-                    print("로그인 실패 : \(error.localizedDescription)")
+            .subscribe(
+                onNext: {
+                    owner,
+                    tuple in
+                    switch tuple.0 {
+                    case .loginSuccessed:
+                        print("로그인 성공")
+                        owner.coordinator?.moveToTabBar()
+                    case .navigateToSignUp:
+                        print("회원가입 필요")
+                        guard let provider = tuple.1 else {
+                            print("provider is nil")
+                            return
+                        }
+                        owner.coordinator?.moveToSignUp(
+                            provider: provider,
+                            authorizationCode: owner.googleAuthCodeRelay.value
+                        )
+                    case .showAlert(let error):
+                        print("로그인 실패 : \(error.localizedDescription)")
                 }
             })
             .disposed(by: disposeBag)
@@ -133,7 +148,7 @@ private extension SignInViewController {
                     if let code = response?.authorizationCode,
                        let codeVerifier = request.codeVerifier {
                         print("request... => \(codeVerifier) \(code)")
-                        self.googleAuthCodeSubject.onNext("\(codeVerifier) \(code)")
+                        self.googleAuthCodeRelay.accept("\(codeVerifier) \(code)")
                     } else {
                         print("Authorization failed: \(error?.localizedDescription ?? "")")
                     }

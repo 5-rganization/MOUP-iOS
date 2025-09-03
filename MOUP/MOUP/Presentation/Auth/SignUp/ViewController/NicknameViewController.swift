@@ -44,6 +44,7 @@ private extension NicknameViewController {
     // MARK: - configure
     func configure() {
         setBindings()
+        setNavigationBar(title: "닉네임 설정")
     }
 
     // MARK: - setBindings
@@ -65,11 +66,12 @@ private extension NicknameViewController {
             })
             .disposed(by: disposeBag)
 
-        output.didTapNext
+        Observable
+            .combineLatest(output.didTapNext, output.provider)
             .withUnretained(self)
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { owner, nickname in
-                owner.coordinator?.goToSetUserRole(with: nickname)
+            .subscribe(onNext: { owner, tuple in // tuple - 0: String(nickname), 1: provider
+                owner.coordinator?.goToSetUserRole(with: tuple.0, provider: tuple.1)
             })
             .disposed(by: disposeBag)
     }
