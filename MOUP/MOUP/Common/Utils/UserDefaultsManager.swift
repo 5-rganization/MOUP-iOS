@@ -15,4 +15,9 @@ final class UserDefaultsManager {
         get { UserDefaults.standard.object(forKey: "user_id") as? Int64 }
         set { UserDefaults.standard.set(newValue, forKey: "user_id") }
     }
+
+    var userRole: String? {
+        get { UserDefaults.standard.object(forKey: "user_role") as? String }
+        set { UserDefaults.standard.set(newValue, forKey: "user_role") }
+    }
 }
