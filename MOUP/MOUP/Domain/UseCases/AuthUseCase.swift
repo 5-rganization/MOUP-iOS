@@ -19,6 +19,17 @@ final class AuthUseCase: AuthUseCaseProtocol {
         let user = try await authRepository.signIn(requestDTO: requestDTO)
 
         UserDefaultsManager.shared.userId = user.userId
-        // TODO: - Keychain에 jwt 저장 로직 필요
+        UserDefaultsManager.shared.userRole = user.role.rawValue
+        KeychainManager.shared.save(key: "accessToken", token: user.accessToken)
+        KeychainManager.shared.save(key: "refreshToken", token: user.refreshToken)
+    }
+
+    func signUp(requestDTO: RegisterRequestDTO) async throws {
+        let user = try await authRepository.signUp(requestDTO: requestDTO)
+
+        UserDefaultsManager.shared.userId = user.userId
+        UserDefaultsManager.shared.userRole = user.role.rawValue
+        KeychainManager.shared.save(key: "accessToken", token: user.accessToken)
+        KeychainManager.shared.save(key: "refreshToken", token: user.refreshToken)
     }
 }

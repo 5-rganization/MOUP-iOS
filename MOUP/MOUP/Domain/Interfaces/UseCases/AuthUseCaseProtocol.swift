@@ -9,4 +9,5 @@ import Foundation
 
 protocol AuthUseCaseProtocol: AnyObject {
     func signIn(requestDTO: LoginRequestDTO) async throws
+    func signUp(requestDTO: RegisterRequestDTO) async throws
 }

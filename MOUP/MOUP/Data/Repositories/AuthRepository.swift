@@ -19,7 +19,7 @@ final class AuthRepository: AuthRepositoryProtocol {
         let response = try await authService.signIn(requestDTO: requestDTO)
         let user = User(
             userId: response.userId,
-            role: response.role == "ROLE_WORKER" ? .worker : .owner,
+            role: UserRole(rawValue: response.role) ?? .worker,
             accessToken: response.accessToken,
             refreshToken: response.refreshToken
         )
