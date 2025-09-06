@@ -80,7 +80,7 @@ private extension DeleteAccountModalViewController {
     func setConstraints() {
         deleteAccountModal.snp.makeConstraints {
             $0.height.equalTo(348)
-            $0.horizontalEdges.equalToSuperview()
+            $0.directionalHorizontalEdges.equalToSuperview()
             $0.bottom.equalToSuperview()
         }
     }

@@ -134,7 +134,7 @@ private extension DeleteAccountModal {
         
         handleView.snp.makeConstraints {
             $0.top.equalToSuperview()
-            $0.horizontalEdges.equalToSuperview()
+            $0.directionalHorizontalEdges.equalToSuperview()
             $0.height.equalTo(28)
         }
         
@@ -146,13 +146,13 @@ private extension DeleteAccountModal {
         
         cancelButton.snp.makeConstraints {
             $0.top.equalTo(deleteAccountNoticeStackView.snp.bottom).offset(36)
-            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(44)
         }
         
         deleteAccountButton.snp.makeConstraints {
             $0.top.equalTo(cancelButton.snp.bottom).offset(8)
-            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(44)
         }
     }

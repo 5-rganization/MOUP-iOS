@@ -119,7 +119,7 @@ private extension EditModal {
         
         textField.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(20)
-            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(48)
         }
         
@@ -130,7 +130,7 @@ private extension EditModal {
         
         saveButton.snp.makeConstraints {
             $0.height.equalTo(44)
-            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview().inset(12)
         }
     }

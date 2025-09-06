@@ -89,12 +89,12 @@ private extension AccountView {
     func setConstraints() {
         navigationBar.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide)
-            $0.horizontalEdges.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
         }
         
         deleteAccountView.snp.makeConstraints {
             $0.top.equalTo(navigationBar.snp.bottom).offset(32)
-            $0.horizontalEdges.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide).inset(16)
             $0.height.equalTo(48)
         }
         

@@ -92,7 +92,7 @@ private extension MenuRowView {
         }
         
         separatorView.snp.makeConstraints {
-            $0.horizontalEdges.bottom.equalToSuperview()
+            $0.directionalHorizontalEdges.bottom.equalToSuperview()
             $0.height.equalTo(1)
         }
     }

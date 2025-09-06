@@ -96,13 +96,13 @@ private extension PolicyViewController {
     // MARK: - setConstraints
     func setConstraints() {
         navigationBar.snp.makeConstraints {
-            $0.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            $0.top.directionalHorizontalEdges.equalTo(view.safeAreaLayoutGuide)
             $0.height.equalTo(50)
         }
         
         tableView.snp.makeConstraints {
             $0.top.equalTo(navigationBar.snp.bottom)
-            $0.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
 

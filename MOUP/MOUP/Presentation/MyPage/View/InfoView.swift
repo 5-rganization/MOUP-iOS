@@ -112,12 +112,12 @@ private extension InfoView {
     func setConstraints() {
         navigationBar.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide)
-            $0.horizontalEdges.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
         }
         
         menuStackView.snp.makeConstraints {
             $0.top.equalTo(navigationBar.snp.bottom).offset(32)
-            $0.horizontalEdges.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide).inset(16)
         }
         
         appVersionTitleLabel.snp.makeConstraints {
@@ -132,7 +132,7 @@ private extension InfoView {
         
         appVersionView.snp.makeConstraints {
             $0.top.equalTo(menuStackView.snp.bottom).offset(20)
-            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(48)
         }
     }

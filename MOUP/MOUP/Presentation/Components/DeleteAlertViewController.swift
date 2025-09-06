@@ -123,7 +123,7 @@ private extension DeleteAlertViewController {
         contentView.snp.makeConstraints {
             $0.center.equalToSuperview()
             $0.height.equalTo(210)
-            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(24)
         }
         
         titleLabel.snp.makeConstraints {
@@ -133,12 +133,12 @@ private extension DeleteAlertViewController {
         
         messageLabel.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(20)
-            $0.horizontalEdges.equalToSuperview().offset(16)
+            $0.directionalHorizontalEdges.equalToSuperview().offset(16)
         }
         
         buttonStackView.snp.makeConstraints {
             $0.top.equalTo(messageLabel.snp.bottom).offset(40)
-            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview().inset(20)
             $0.height.equalTo(45)
         }

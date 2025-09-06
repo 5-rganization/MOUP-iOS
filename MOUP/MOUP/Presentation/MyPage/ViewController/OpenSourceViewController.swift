@@ -166,13 +166,13 @@ private extension OpenSourceViewController {
     // MARK: - setConstraints
     func setConstraints() {
         navigationBar.snp.makeConstraints {
-            $0.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            $0.top.directionalHorizontalEdges.equalTo(view.safeAreaLayoutGuide)
             $0.height.equalTo(50)
         }
 
         scrollView.snp.makeConstraints {
             $0.top.equalTo(navigationBar.snp.bottom)
-            $0.bottom.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.directionalHorizontalEdges.equalTo(view.safeAreaLayoutGuide)
         }
 
         contentStackView.snp.makeConstraints {

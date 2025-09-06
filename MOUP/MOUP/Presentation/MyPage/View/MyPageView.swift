@@ -182,12 +182,12 @@ private extension MyPageView {
         
         menuStackView.snp.makeConstraints {
             $0.top.equalTo(profileImageFrame.snp.bottom).offset(32)
-            $0.horizontalEdges.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide).inset(16)
         }
         
         logoutButton.snp.makeConstraints {
             $0.top.equalTo(menuStackView.snp.bottom).offset(20)
-            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(44)
         }
     }
