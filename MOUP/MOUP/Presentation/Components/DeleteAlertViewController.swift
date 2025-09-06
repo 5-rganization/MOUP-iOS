@@ -147,15 +147,13 @@ private extension DeleteAlertViewController {
     // MARK: - setActions
     func setActions() {
         cancelButton.rx.tap
-            .withUnretained(self)
-            .bind { owner, _ in
+            .bind(with: self) { owner, _ in
                 owner.dismiss(animated: true)
             }
             .disposed(by: disposeBag)
         
         deleteButton.rx.tap
-            .withUnretained(self)
-            .bind { owner, _ in
+            .bind(with: self) { owner, _ in
                 owner.onDeleteConfirmed?()
                 owner.dismiss(animated: true)
             }
