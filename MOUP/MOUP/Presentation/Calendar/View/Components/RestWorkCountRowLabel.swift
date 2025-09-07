@@ -1,5 +1,5 @@
 //
-//  RestEventCountRowLabel.swift
+//  RestWorkCountRowLabel.swift
 //  MOUP
 //
 //  Created by 서동환 on 8/17/25.
@@ -7,8 +7,8 @@
 
 import UIKit
 
-/// 공유 캘린더에서 특정 날짜 이벤트가 3~4개 이상일 때 보이는 라벨
-final class RestEventCountRowLabel: UILabel {
+/// 공유 캘린더에서 특정 날짜 근무가 3~4개 이상일 때 보이는 라벨
+final class RestWorkCountRowLabel: UILabel {
     
     // MARK: - Initializer
     override init(frame: CGRect) {

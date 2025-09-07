@@ -6,11 +6,14 @@
 //
 
 import UIKit
+import OSLog
 
-/// 캘린더 Coordinator
+/// `CalendarViewController` Coordinator
 final class CalendarCoordinator: Coordinator {
     
     // MARK: - Properties
+    private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
+    
     var childCoordinators = [Coordinator]()
     private lazy var calendarVM = CalendarViewModel()
     private lazy var calendarVC = CalendarViewController(coordinator: self, viewModel: calendarVM)
@@ -22,7 +25,7 @@ final class CalendarCoordinator: Coordinator {
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
     }
-
+    
     // MARK: - Coordinator Methods
     func start() {
         navigationController.pushViewController(calendarVC, animated: false)
@@ -45,32 +48,81 @@ final class CalendarCoordinator: Coordinator {
         filterCoordinator.start()
         childCoordinators.append(filterCoordinator)
     }
+    
+    func showCalendarWorkList(selectedDay: Int, calendarWorkList: [CalendarWork], calendarMode: CalendarMode) {
+        let calendarWorkListCoordinator = CalendarWorkListCoordinator(navigationController: navigationController,
+                                                                      selectedDay: selectedDay,
+                                                                      calendarWorkList: calendarWorkList,
+                                                                      calendarMode: calendarMode)
+        calendarWorkListCoordinator.delegate = self
+        calendarWorkListCoordinator.start()
+        childCoordinators.append(calendarWorkListCoordinator)
+    }
+    
+    func dismissCalendarWorkList() {
+        guard let coordinator = childCoordinators.first(where: { $0 is CalendarWorkListCoordinator }) else {
+            fatalError("dismissCalendarWorkList() 메서드 실행 실패 - childCoordinators에 CalendarWorkListCoordinator가 존재하지 않습니다.")
+        }
+        removeChildCoordinator(coordinator, needToDismiss: true)
+    }
+}
+
+// MARK: - Private Methods
+private extension CalendarCoordinator {
+    func removeChildCoordinator(_ coordinator: Coordinator, needToDismiss: Bool) {
+        childCoordinators = childCoordinators.filter { $0 !== coordinator }
+        if needToDismiss {
+            navigationController.dismiss(animated: true)
+        }
+    }
 }
 
 // MARK: - YearMonthCoordinatorDelegate
 extension CalendarCoordinator: YearMonthPickerCoordinatorDelegate {
+    func dismissed(_ coordinator: YearMonthPickerCoordinator) {
+        removeChildCoordinator(coordinator, needToDismiss: false)
+    }
+    
     func cancelled(_ coordinator: YearMonthPickerCoordinator) {
-        childCoordinators = childCoordinators.filter { $0 !== coordinator }
-        navigationController.dismiss(animated: true)
+        removeChildCoordinator(coordinator, needToDismiss: true)
     }
     
     func changeYearMonth(_ coordinator: YearMonthPickerCoordinator, focusedYear: Int, focusedMonth: Int) {
-        childCoordinators = childCoordinators.filter { $0 !== coordinator }
         calendarVC.updateYearMonth(focusedYear: focusedYear, focusedMonth: focusedMonth)
-        navigationController.dismiss(animated: true)
+        removeChildCoordinator(coordinator, needToDismiss: true)
     }
 }
 
 // MARK: - FilterCoordinatorDelegate
 extension CalendarCoordinator: FilterCoordinatorDelegate {
-    func cancelled(_ coordinator: FilterCoordinator) {
-        childCoordinators = childCoordinators.filter { $0 !== coordinator }
-        navigationController.dismiss(animated: true)
+    func dismissed(_ coordinator: FilterCoordinator) {
+        removeChildCoordinator(coordinator, needToDismiss: false)
     }
     
     func applyFilter(_ coordinator: FilterCoordinator, filterWorkplace: FilterWorkplace?) {
-        childCoordinators = childCoordinators.filter { $0 !== coordinator }
         calendarVC.updateFilter(filterWorkplace: filterWorkplace)
-        navigationController.dismiss(animated: true)
+        removeChildCoordinator(coordinator, needToDismiss: true)
+    }
+}
+
+// MARK: - CalendarWorkListCoordinatorDelegate
+extension CalendarCoordinator: CalendarWorkListCoordinatorDelegate {
+    func dismissed(_ coordinator: CalendarWorkListCoordinator) {
+        calendarVC.deselectCell()
+        removeChildCoordinator(coordinator, needToDismiss: false)
+    }
+    
+    func showWorkRegister(work: CalendarWork?) {
+        // TODO: - 근무 수정 화면 연결
+        if let work {
+            logger.debug("WorkRegisterVC 표시 - 근무 수정")
+            dump(work)
+        } else {
+            logger.debug("WorkRegisterVC 표시 - 근무 등록")
+        }
+    }
+    
+    func updateDataSource() {
+        calendarVC.updateDataSource()
     }
 }

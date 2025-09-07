@@ -1,5 +1,5 @@
 //
-//  YearMonthPickerViewController.swift
+//  YearMonthPickerModalViewController.swift
 //  MOUP
 //
 //  Created by 서동환 on 7/26/25.
@@ -10,15 +10,18 @@ import UIKit
 import RxCocoa
 import RxSwift
 
-/// `YearMonthPickerViewController`의 이벤트를 `YearMonthPickerCoordinator`에 알리는 Delegate
-protocol YearMonthPickerVCDelegate: AnyObject {
-    func dismissGestureReceived()
+/// `YearMonthPickerModalViewController`의 이벤트를 `YearMonthPickerCoordinator`에 전달하는 Delegate
+protocol YearMonthPickerModalVCDelegate: AnyObject {
+    /// `presentationControllerDidDismiss`를 감지했을 때 사용되는 메서드
+    func dismissReceived()
+    /// 취소 버튼을 탭했을 때 사용되는 메서드
     func cancelButtonTapped()
+    /// 이동 버튼을 탭했을 때 사용되는 메서드
     func gotoButtonTapped(focusedYear: Int, focusedMonth: Int)
 }
 
-/// 연/월 Picker VC
-final class YearMonthPickerViewController: UIViewController {
+/// 연/월 Picker 모달 VC
+final class YearMonthPickerModalViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
@@ -32,7 +35,7 @@ final class YearMonthPickerViewController: UIViewController {
     private var focusedMonth: Int
     
     // Property Injections
-    weak var delegate: YearMonthPickerVCDelegate?
+    weak var delegate: YearMonthPickerModalVCDelegate?
     
     // MARK: - UI Components
     private let yearMonthPickerView = YearMonthPickerView()
@@ -57,11 +60,11 @@ final class YearMonthPickerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
-        setDefaultSelect(currYear: focusedYear, currMonth: focusedMonth)
+        setYearMonthPickerView(currYear: focusedYear, currMonth: focusedMonth)
     }
 }
 
-private extension YearMonthPickerViewController {
+private extension YearMonthPickerModalViewController {
     // MARK: - configure
     func configure() {
         setStyles()
@@ -97,8 +100,9 @@ private extension YearMonthPickerViewController {
 }
 
 // MARK: - Private Methods
-private extension YearMonthPickerViewController {
-    func setDefaultSelect(currYear: Int, currMonth: Int) {
+private extension YearMonthPickerModalViewController {
+    func setYearMonthPickerView(currYear: Int, currMonth: Int) {
+        // 기본 선택 연/월 설정
         let yearRow = currYear - CalendarRange.startYear
         let monthRow = currMonth - 1
         yearMonthPickerView.getPickerView.selectRow(yearRow, inComponent: PickerViewComponents.year, animated: false)
@@ -107,7 +111,7 @@ private extension YearMonthPickerViewController {
 }
 
 // MARK: - UIPickerViewDataSource
-extension YearMonthPickerViewController: UIPickerViewDataSource {
+extension YearMonthPickerModalViewController: UIPickerViewDataSource {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return yearMonthList.count
     }
@@ -118,7 +122,7 @@ extension YearMonthPickerViewController: UIPickerViewDataSource {
 }
 
 // MARK: - UIPickerViewDelegate
-extension YearMonthPickerViewController: UIPickerViewDelegate {
+extension YearMonthPickerModalViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
         return 44
     }
@@ -150,8 +154,8 @@ extension YearMonthPickerViewController: UIPickerViewDelegate {
 }
 
 // MARK: - UIAdaptivePresentationControllerDelegate
-extension YearMonthPickerViewController: UIAdaptivePresentationControllerDelegate {
+extension YearMonthPickerModalViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        delegate?.dismissGestureReceived()
+        delegate?.dismissReceived()
     }
 }

@@ -1,5 +1,5 @@
 //
-//  FilterViewController.swift
+//  FilterModalViewController.swift
 //  MOUP
 //
 //  Created by 서동환 on 7/31/25.
@@ -10,14 +10,16 @@ import UIKit
 import RxCocoa
 import RxSwift
 
-/// `FilterViewController`의 이벤트를 `FilterCoordinator`에 알리는 Delegate
-protocol FilterVCDelegate: AnyObject {
-    func dismissGestureReceived()
+/// `FilterModalViewController`의 이벤트를 `FilterCoordinator`에 전달하는 Delegate
+protocol FilterModalVCDelegate: AnyObject {
+    /// `presentationControllerDidDismiss`를 감지했을 때 사용되는 메서드
+    func dismissReceived()
+    /// 적용하기 버튼을 탭했을 때 사용되는 메서드
     func applyButtonTapped(filterWorkplace: FilterWorkplace?)
 }
 
-/// 필터 VC
-final class FilterViewController: UIViewController {
+/// 필터 모달 VC
+final class FilterModalViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
@@ -28,7 +30,7 @@ final class FilterViewController: UIViewController {
     private var selectedFilterWorkplace: FilterWorkplace?
     
     // Property Injections
-    weak var delegate: FilterVCDelegate?
+    weak var delegate: FilterModalVCDelegate?
     
     // MARK: - UI Components
     private let filterView = FilterView()
@@ -54,10 +56,11 @@ final class FilterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
+        setFilterView()
     }
 }
 
-private extension FilterViewController {
+private extension FilterModalViewController {
     // MARK: - configure
     func configure() {
         setStyles()
@@ -68,9 +71,6 @@ private extension FilterViewController {
     // MARK: - setStyles
     func setStyles() {
         self.view.backgroundColor = .primaryBackground
-        
-        // TODO: 사용자 역할에 따라 변경
-        filterView.update(headerStr: "나의 근무지")
     }
     
     // MARK: - setDelegates
@@ -81,7 +81,7 @@ private extension FilterViewController {
     // MARK: - setBindings
     func setBindings() {
         // View 바인딩
-        filterView.rx.filterWorkplaceTableViewModelSelected
+        filterView.rx.filterTableViewModelSelected
             .subscribe(with: self) { owner, filterWorkplace in
                 if filterWorkplace.workplaceId != -1 {
                     owner.selectedFilterWorkplace = filterWorkplace
@@ -102,7 +102,9 @@ private extension FilterViewController {
         
         output.filterWorkplaceList.asDriver(onErrorJustReturn: [])
             .drive(with: self, onNext: { owner, filterWorkplaceList in
-                owner.filterView.rx.filterWorkplaceTableViewDataSource.onNext(filterWorkplaceList)
+                owner.filterView.rx.emptyLabelIsHidden.onNext(!filterWorkplaceList.isEmpty)
+                owner.filterView.rx.filterTableViewIsHidden.onNext(filterWorkplaceList.isEmpty)
+                owner.filterView.rx.filterTableViewDataSource.onNext(filterWorkplaceList)
                 
                 // 초기 셀 선택 로직
                 if owner.selectedFilterWorkplace == nil {
@@ -119,7 +121,12 @@ private extension FilterViewController {
 }
 
 // MARK: - Private Methods
-private extension FilterViewController {
+private extension FilterModalViewController {
+    func setFilterView() {
+        // TODO: 사용자 역할에 따라 변경
+        filterView.update(headerStr: "나의 근무지")
+    }
+    
     func setDefaultSelect(firstOfList filterWorkplace: FilterWorkplace?) {
         if filterWorkplace?.workplaceId == -1 {
             selectedFilterWorkplace = nil
@@ -131,8 +138,8 @@ private extension FilterViewController {
 }
 
 // MARK: - UIAdaptivePresentationControllerDelegate
-extension FilterViewController: UIAdaptivePresentationControllerDelegate {
+extension FilterModalViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        delegate?.dismissGestureReceived()
+        delegate?.dismissReceived()
     }
 }

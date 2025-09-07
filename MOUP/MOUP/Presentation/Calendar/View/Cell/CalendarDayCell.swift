@@ -28,7 +28,7 @@ final class CalendarDayCell: JTACDayCell {
         $0.isHidden = true
     }
     /// 날짜(일) 라벨
-    private let dateLabel = UILabel().then {
+    private let dayLabel = UILabel().then {
         $0.textColor = .gray900
         $0.font = .bodyMedium(14)
         $0.textAlignment = .center
@@ -37,7 +37,7 @@ final class CalendarDayCell: JTACDayCell {
         $0.layer.cornerRadius = 10
     }
     /// 근무 컨테이너 UI
-    private let eventContainerVStackView = EventContainerVStackView()
+    private let workContainerVStackView = WorkContainerVStackView()
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -54,61 +54,61 @@ final class CalendarDayCell: JTACDayCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        // eventContainerVStackView의 minY 계산
-        let eventContainerMinY = dateLabel.frame.maxY + 4
+        // workContainerVStackView의 minY 계산
+        let workContainerMinY = dayLabel.frame.maxY + 4
         
-        // eventContainerVStackView의 너비 계산
+        // workContainerVStackView의 너비 계산
         let targetWidth = self.contentView.bounds.width - 4
         // systemLayoutSizeFitting에 전달할 목표 크기 계산 - 너비는 targetWidth, 높이는 시스템이 계산
         let targetSize = CGSize(width: targetWidth, height: UIView.layoutFittingCompressedSize.height)
-        // targetSize를 이용하여 eventContainerVStackView의 잠재적인 최대 높이 계산
-        let requiredHeight = eventContainerVStackView.systemLayoutSizeFitting(targetSize,
-                                                                              withHorizontalFittingPriority: .required,
-                                                                              verticalFittingPriority: .fittingSizeLevel).height
-        // eventContainerVStackView의 잠재적인 maxY 계산
-        let potentialMaxY = eventContainerMinY + requiredHeight
+        // targetSize를 이용하여 workContainerVStackView의 잠재적인 최대 높이 계산
+        let requiredHeight = workContainerVStackView.systemLayoutSizeFitting(targetSize,
+                                                                             withHorizontalFittingPriority: .required,
+                                                                             verticalFittingPriority: .fittingSizeLevel).height
+        // workContainerVStackView의 잠재적인 maxY 계산
+        let potentialMaxY = workContainerMinY + requiredHeight
         
-        // eventContainerVStackView의 최대 maxY 계산(여백 4 포함)
+        // workContainerVStackView의 최대 maxY 계산(여백 4 포함)
         let possibleMaxY = self.contentView.bounds.height - 4
         
         // 근무 컨테이너 UI가 캘린더 셀을 벗어나거나 여백이 4 미만일 때
         if potentialMaxY >= possibleMaxY {
-            let possibleMaxHeight = possibleMaxY - eventContainerMinY
-            let reducedCount = Int(possibleMaxHeight / (EventRowSize.baseComponentHeight + eventContainerVStackView.spacing))
+            let possibleMaxHeight = possibleMaxY - workContainerMinY
+            let reducedCount = Int(possibleMaxHeight / (WorkRowSize.baseComponentHeight + workContainerVStackView.spacing))
             // 근무 UI 크기 줄임
-            eventContainerVStackView.reduceHeight(displayCount: reducedCount)
+            workContainerVStackView.reduceHeight(displayCount: reducedCount)
         }
     }
     
     // MARK: - Internal Methods
-    func update(dateStr: String, isToday: Bool, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, calendarMode: CalendarMode, eventList: [CalendarEvent]) {
-        dateLabel.text = dateStr
+    func update(dateStr: String, isToday: Bool, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, calendarMode: CalendarMode, workList: [CalendarWork]) {
+        dayLabel.text = dateStr
         
         if isToday {
-            dateLabel.textColor = .white
-            dateLabel.backgroundColor = .gray900
+            dayLabel.textColor = .white
+            dayLabel.backgroundColor = .gray900
         } else {
             switch daysOfWeek {
             case .sunday:
-                dateLabel.textColor = .sundayText
+                dayLabel.textColor = .sundayText
             case .saturday:
-                dateLabel.textColor = .saturdayText
+                dayLabel.textColor = .saturdayText
             default:
-                dateLabel.textColor = .gray900
+                dayLabel.textColor = .gray900
             }
-            dateLabel.backgroundColor = .clear
+            dayLabel.backgroundColor = .clear
         }
         
         self.isUserInteractionEnabled = dateBelongsToThisMonth
-        dateLabel.isHidden = !dateBelongsToThisMonth
+        dayLabel.isHidden = !dateBelongsToThisMonth
         selectedView.isHidden = !isSelected
         
         let displayCount = 4
         switch calendarMode {
         case .personal:
-            eventContainerVStackView.updatePersonalModeEventRows(eventList: eventList, displayCount: displayCount)
+            workContainerVStackView.updatePersonalModeWorkRows(workList: workList, displayCount: displayCount)
         case .shared:
-            eventContainerVStackView.updateSharedModeEventRows(eventList: eventList, displayCount: displayCount)
+            workContainerVStackView.updateSharedModeWorkRows(workList: workList, displayCount: displayCount)
         }
     }
 }
@@ -125,8 +125,8 @@ private extension CalendarDayCell {
     func setHierarchy() {
         self.contentView.addSubviews(seperatorView,
                                      selectedView,
-                                     dateLabel,
-                                     eventContainerVStackView)
+                                     dayLabel,
+                                     workContainerVStackView)
     }
     
     // MARK: - setStyles
@@ -148,14 +148,14 @@ private extension CalendarDayCell {
             $0.bottom.equalToSuperview()
         }
         
-        dateLabel.snp.makeConstraints {
+        dayLabel.snp.makeConstraints {
             $0.top.equalTo(seperatorView.snp.bottom).offset(4)
             $0.width.height.equalTo(20)
             $0.centerX.equalToSuperview()
         }
         
-        eventContainerVStackView.snp.makeConstraints {
-            $0.top.equalTo(dateLabel.snp.bottom).offset(4)
+        workContainerVStackView.snp.makeConstraints {
+            $0.top.equalTo(dayLabel.snp.bottom).offset(4)
             $0.leading.trailing.equalToSuperview().inset(2)
         }
     }

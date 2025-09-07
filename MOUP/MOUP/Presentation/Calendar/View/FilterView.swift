@@ -36,16 +36,16 @@ final class FilterView: UIView {
         $0.textColor = .gray900
         $0.font = .headBold(16)
     }
-    /// 필터 리스트 UI
-    fileprivate let filterWorkplaceTableView = UITableView().then {
-        $0.register(FilterWorkplaceCell.self, forCellReuseIdentifier: FilterWorkplaceCell.identifier)
+    /// 필터 리스트
+    fileprivate let filterTableView = UITableView().then {
+        $0.register(FilterCell.self, forCellReuseIdentifier: FilterCell.identifier)
         
         $0.separatorStyle = .none
         $0.rowHeight = 52  // 40 + 12(셀 간격)
         $0.sectionHeaderTopPadding = 0.0
     }
     /// 필터 리스트에 아이템이 없을 때 표시되는 라벨
-    private let emptyLabel = UILabel().then {
+    fileprivate let emptyLabel = UILabel().then {
         $0.text = "등록된 공유 캘린더가 없어요"
         $0.textColor = .gray500
         $0.font = .bodyMedium(16)
@@ -71,7 +71,7 @@ final class FilterView: UIView {
     }
     
     func selectRow(at indexPath: IndexPath) {
-        filterWorkplaceTableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+        filterTableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
     }
 }
 
@@ -90,7 +90,7 @@ private extension FilterView {
                          separatorView,
                          headerLabel,
                          emptyLabel,
-                         filterWorkplaceTableView,
+                         filterTableView,
                          applyButton)
     }
     
@@ -125,10 +125,10 @@ private extension FilterView {
         }
         
         emptyLabel.snp.makeConstraints {
-            $0.center.equalTo(filterWorkplaceTableView)
+            $0.center.equalTo(filterTableView)
         }
         
-        filterWorkplaceTableView.snp.makeConstraints {
+        filterTableView.snp.makeConstraints {
             $0.top.equalTo(headerLabel.snp.bottom).offset(12)
             $0.leading.trailing.equalTo(self.safeAreaLayoutGuide)
             $0.bottom.equalTo(applyButton.snp.top).offset(-12)
@@ -144,21 +144,23 @@ private extension FilterView {
 
 // MARK: - Extension Reactive
 extension Reactive where Base: FilterView {
-    var filterWorkplaceTableViewDataSource: Binder<([FilterWorkplace])> {
-        return Binder(base) { view, filterModel in
+    var filterTableViewDataSource: Binder<([FilterWorkplace])> {
+        return Binder(base) { view, filterWorkplace in
             // RxSwift Delegate 오류 방지
-            view.filterWorkplaceTableView.dataSource = nil
-            view.filterWorkplaceTableView.delegate = nil
+            view.filterTableView.dataSource = nil
+            view.filterTableView.delegate = nil
             
-            Observable.just(filterModel)
-                .bind(to: view.filterWorkplaceTableView.rx.items(
-                    cellIdentifier: FilterWorkplaceCell.identifier,
-                    cellType: FilterWorkplaceCell.self
-                )) { _, model, cell in
-                    cell.update(workplaceName: model.workplaceName)
+            Observable.just(filterWorkplace)
+                .bind(to: view.filterTableView.rx.items(
+                    cellIdentifier: FilterCell.identifier,
+                    cellType: FilterCell.self
+                )) { _, filterWorkplace, cell in
+                    cell.update(workplaceName: filterWorkplace.workplaceName)
                 }.disposed(by: base.disposeBag)
         }
     }
-    var filterWorkplaceTableViewModelSelected: ControlEvent<FilterWorkplace> { base.filterWorkplaceTableView.rx.modelSelected(FilterWorkplace.self) }
+    var filterTableViewModelSelected: ControlEvent<FilterWorkplace> { base.filterTableView.rx.modelSelected(FilterWorkplace.self) }
+    var filterTableViewIsHidden: Binder<Bool> { base.filterTableView.rx.isHidden }
+    var emptyLabelIsHidden: Binder<Bool> { base.emptyLabel.rx.isHidden }
     var applyButtonTap: ControlEvent<Void> { base.applyButton.rx.tap }
 }

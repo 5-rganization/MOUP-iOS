@@ -7,15 +7,17 @@
 
 import UIKit
 
-/// `YearMonthPickerCoordinator`의 화면 전환 이벤트를 `CalendarCoordinator`에 알리는 Delegate
+/// `YearMonthPickerCoordinator`의 이벤트를 `CalendarCoordinator`에 전달하는 Delegate
 protocol YearMonthPickerCoordinatorDelegate: AnyObject {
+    /// 연/월 Picker 화면 내림
+    func dismissed(_ coordinator: YearMonthPickerCoordinator)
     /// 연/월 이동 취소
     func cancelled(_ coordinator: YearMonthPickerCoordinator)
     /// 선택한 연/월로 이동
     func changeYearMonth(_ coordinator: YearMonthPickerCoordinator, focusedYear: Int, focusedMonth: Int)
 }
 
-/// 캘린더 ➡️ 연/월 Picker Coordinator
+/// `YearMonthPickerModalViewController` Coordinator
 final class YearMonthPickerCoordinator: Coordinator {
     
     // MARK: - Properties
@@ -30,9 +32,7 @@ final class YearMonthPickerCoordinator: Coordinator {
     weak var delegate: YearMonthPickerCoordinatorDelegate?
     
     // MARK: - Initialzier
-    init(navigationController: UINavigationController,
-         currYear: Int,
-         currMonth: Int) {
+    init(navigationController: UINavigationController, currYear: Int, currMonth: Int) {
         self.navigationController = navigationController
         self.currYear = currYear
         self.currMonth = currMonth
@@ -40,7 +40,7 @@ final class YearMonthPickerCoordinator: Coordinator {
     
     // MARK: - Coordinator Methods
     func start() {
-        let yearMonthPickerVC = YearMonthPickerViewController(currYear: currYear, currMonth: currMonth)
+        let yearMonthPickerVC = YearMonthPickerModalViewController(currYear: currYear, currMonth: currMonth)
         yearMonthPickerVC.delegate = self
         
         if let sheet = yearMonthPickerVC.sheetPresentationController {
@@ -53,10 +53,10 @@ final class YearMonthPickerCoordinator: Coordinator {
     }
 }
 
-// MARK: - YearMonthPickerVCDelegate
-extension YearMonthPickerCoordinator: YearMonthPickerVCDelegate {
-    func dismissGestureReceived() {
-        delegate?.cancelled(self)
+// MARK: - YearMonthPickerModalVCDelegate
+extension YearMonthPickerCoordinator: YearMonthPickerModalVCDelegate {
+    func dismissReceived() {
+        delegate?.dismissed(self)
     }
     
     func cancelButtonTapped() {

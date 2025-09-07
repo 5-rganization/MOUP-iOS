@@ -1,5 +1,5 @@
 //
-//  BaseEventRowVStackView.swift
+//  BaseWorkRowVStackView.swift
 //  MOUP
 //
 //  Created by 서동환 on 8/27/25.
@@ -11,7 +11,7 @@ import SnapKit
 import Then
 
 /// 캘린더 근무 표시 UI의 부모 `class`
-class BaseEventRowVStackView: UIStackView {
+class BaseWorkRowVStackView: UIStackView {
     
     // MARK: - UI Components
     /// 근무 시간 or 근무자 이름 라벨
@@ -36,13 +36,13 @@ class BaseEventRowVStackView: UIStackView {
         fatalError("init(coder:) has not been implemented.")
     }
     
-    // MARK: - Internal Methods
-    func update(event: CalendarEvent) {
+    // MARK: - Override Methods
+    func update(work: CalendarWork) {
         fatalError("update() 메서드 실행 실패 - 메서드가 오버라이딩 되지 않았습니다.")
     }
 }
 
-private extension BaseEventRowVStackView {
+private extension BaseWorkRowVStackView {
     // MARK: - configure
     func configure() {
         setHierarchy()
@@ -68,21 +68,21 @@ private extension BaseEventRowVStackView {
     // MARK: - setConstraints
     func setConstraints() {
         titleLabel.snp.makeConstraints {
-            $0.height.equalTo(EventRowSize.baseComponentHeight)
+            $0.height.equalTo(WorkRowSize.baseComponentHeight)
         }
         
         dailyIncomeLabel.snp.makeConstraints {
-            $0.height.equalTo(EventRowSize.baseComponentHeight)
+            $0.height.equalTo(WorkRowSize.baseComponentHeight)
         }
     }
 }
 
-// MARK: - Methods
-extension BaseEventRowVStackView {
-    /// 사용자의 근무에 라벨 컬러를 설정하는 메서드
-    func setUserLabelColor(_ labelColor: String) {
-        guard let labelColor = LabelColorString(rawValue: labelColor) else {
-            assertionFailure("setUserLabelColor() 메서드 실행 실패 - labelColor 값이 올바르지 않습니다.")
+// MARK: - Internal Methods
+extension BaseWorkRowVStackView {
+    /// 설정된 라벨 컬러를 적용하는 메서드
+    func setGivenLabelColor(_ labelColorStr: String) {
+        guard let labelColor = LabelColorString(rawValue: labelColorStr) else {
+            assertionFailure("setGivenLabelColor() 메서드 실행 실패 - labelColorStr 값이 올바르지 않습니다.")
             return
         }
         self.backgroundColor = labelColor.backgroundColor
@@ -90,9 +90,8 @@ extension BaseEventRowVStackView {
         dailyIncomeLabel.textColor = labelColor.textColor
     }
     
-    /// 다른 근무자의 근무에 라벨 컬러를 설정하는 메서드
-    func setOtherLabelColor() {
-        // TODO: - 사장님 역할일 때 색상 처리 필요
+    /// 기본 라벨 컬러를 적용하는 메서드
+    func setDefaultLabelColor() {
         self.backgroundColor = .primary100
         titleLabel.textColor = .primary600
         dailyIncomeLabel.textColor = .primary600

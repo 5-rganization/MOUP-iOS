@@ -5,6 +5,9 @@
 //  Created by 서동환 on 7/12/25.
 //
 
+import Foundation
+import OSLog
+
 import RxRelay
 import RxSwift
 
@@ -12,11 +15,12 @@ import RxSwift
 final class CalendarViewModel {
     
     // MARK: - Properties
+    private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     private let disposeBag = DisposeBag()
     
     // MARK: - Input
     struct Input {
-        let visibleYearMonth: Observable<(year: Int, month: Int)>
+        let visibleDate: Observable<Date>
         let calendarMode: Observable<CalendarMode>
         let personalFilterWorkplace: Observable<FilterWorkplace?>
         let sharedFilterWorkplace: Observable<FilterWorkplace?>
@@ -24,9 +28,9 @@ final class CalendarViewModel {
     
     // MARK: - Output
     struct Output {
-        let calendarEventList: Observable<[CalendarEvent]>
+        let calendarWorkList: Observable<[CalendarWork]>
     }
-    private let calendarEventListRelay = PublishRelay<[CalendarEvent]>()
+    private let calendarWorkListRelay = BehaviorRelay<[CalendarWork]>(value: [])
     
     // MARK: - Initializer
     init() {
@@ -35,35 +39,39 @@ final class CalendarViewModel {
     
     // MARK: - Input ➡️ Output Transform
     func transform(input: Input) -> Output {
-        // TODO: 근무 이벤트 로딩
-        Observable.combineLatest(input.visibleYearMonth, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
+        // TODO: 근무 데이터 로딩 API 호출
+        Observable.combineLatest(input.visibleDate, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
             .subscribe(with: self) { owner, combined in
-                let ((year, month), calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
-                var calendarEventList: [CalendarEvent]
+                let (visibleDate, calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
+                owner.logger.debug("근무 데이터 로딩 API 호출")
+                
+                var calendarWorkList: [CalendarWork]
                 switch calendarMode {
                 case .personal:
-                    calendarEventList = CalendarMockData.personalCalendarEventListMock
+                    calendarWorkList = CalendarMockData.personalCalendarWorkListMock
                     if let personalFilterWorkplace {
-                        calendarEventList = calendarEventList.filter { $0.workplaceId == personalFilterWorkplace.workplaceId }
+                        calendarWorkList = calendarWorkList.filter { $0.workplaceId == personalFilterWorkplace.workplaceId }
                     }
                 case .shared:
-                    calendarEventList = CalendarMockData.sharedCalendarEventListMock
+                    calendarWorkList = CalendarMockData.sharedCalendarWorkListMock
                     if let sharedFilterWorkplace {
-                        calendarEventList = calendarEventList.filter { $0.workplaceId == sharedFilterWorkplace.workplaceId }
+                        calendarWorkList = calendarWorkList.filter { $0.workplaceId == sharedFilterWorkplace.workplaceId }
                     } else {
-                        let firstWorkplaceId = calendarEventList.sorted(by: { $0.workplaceName < $1.workplaceName }).first?.workplaceId
-                        calendarEventList = calendarEventList.filter { $0.workplaceId == firstWorkplaceId }
+                        let firstWorkplaceId = calendarWorkList.sorted(by: { $0.workplaceName < $1.workplaceName }).first?.workplaceId
+                        calendarWorkList = calendarWorkList.filter { $0.workplaceId == firstWorkplaceId }
                     }
                 }
-                calendarEventList.sort(by: owner.sortCalendarEventList)
-                owner.calendarEventListRelay.accept(calendarEventList)
+                calendarWorkList.sort(by: owner.sortCalendarWorkList)
+                owner.calendarWorkListRelay.accept(calendarWorkList)
+                owner.logger.debug("근무 데이터 로딩 완료")
             }.disposed(by: disposeBag)
-        return Output(calendarEventList: calendarEventListRelay.asObservable())
+        return Output(calendarWorkList: calendarWorkListRelay.asObservable())
     }
 }
 
+// MARK: - Private Methods
 private extension CalendarViewModel {
-    func sortCalendarEventList(_ lhs: CalendarEvent, _ rhs: CalendarEvent) -> Bool {
-        return lhs.startTime < rhs.startTime || lhs.endTime < rhs.endTime
+    func sortCalendarWorkList(_ lhs: CalendarWork, _ rhs: CalendarWork) -> Bool {
+        return (lhs.startTime, lhs.endTime) < (rhs.startTime, rhs.endTime)
     }
 }

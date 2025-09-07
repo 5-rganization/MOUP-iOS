@@ -35,7 +35,7 @@ private extension DaysOfTheWeekHStackView {
     // MARK: - setHierarchy
     func setHierarchy() {
         for (index, day) in daysOfTheWeekList.enumerated() {
-            let dayLabel = UILabel().then {
+            let dayOfTheWeekLabel = UILabel().then {
                 $0.text = day
                 if index == 0 {
                     $0.textColor = .sundayText
@@ -48,7 +48,7 @@ private extension DaysOfTheWeekHStackView {
                 $0.textAlignment = .center
             }
             
-            self.addArrangedSubview(dayLabel)
+            self.addArrangedSubview(dayOfTheWeekLabel)
         }
     }
     
