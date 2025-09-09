@@ -17,11 +17,20 @@ final class HomeViewController: UIViewController {
     private let disposeBag = DisposeBag()
 
     private lazy var dataSource = RxTableViewSectionedAnimatedDataSource<HomeTableViewFirstSection>(animationConfiguration: AnimationConfiguration(deleteAnimation: .automatic)) { dataSource, tableView, indexPath, item in
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: WorkerWorkplaceCell.identifier, for: indexPath) as? WorkerWorkplaceCell else {
-            return UITableViewCell()
+        switch item {
+        case .owner:
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: OwnerWorkplaceCell.identifier, for: indexPath) as? OwnerWorkplaceCell else {
+                return UITableViewCell()
+            }
+            cell.update(item: item)
+            return cell
+        case .worker:
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: WorkerWorkplaceCell.identifier, for: indexPath) as? WorkerWorkplaceCell else {
+                return UITableViewCell()
+            }
+            cell.update(item: item)
+            return cell
         }
-        cell.update(item: item)
-        return cell
     }
 
 

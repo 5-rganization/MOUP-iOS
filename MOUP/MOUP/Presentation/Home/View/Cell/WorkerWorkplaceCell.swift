@@ -105,6 +105,7 @@ class WorkerWorkplaceCell: UITableViewCell {
             self.nameLabel.text = workerInfo.workplace.name
             self.untilPaydayLabel.text = "sdfdfs"
             self.totalEarnedLabel.text = "dsfdsf"
+            self.workplaceOfficialChip.isHidden = !workerInfo.isOfficial
         case .owner:
             break
         }
