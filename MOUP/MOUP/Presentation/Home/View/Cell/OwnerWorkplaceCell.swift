@@ -99,7 +99,7 @@ class OwnerWorkplaceCell: UITableViewCell {
     }
 
     // MARK: - Public Methods
-    func update(item: HomeSectionItem) {
+    func update(item: HomeSectionItem, menu: UIMenu) {
         switch item {
         case .worker:
             break
@@ -109,6 +109,7 @@ class OwnerWorkplaceCell: UITableViewCell {
             self.totalEarnedLabel.text = "dsfdsf"
             self.workplaceOfficialChip.isHidden = !ownerInfo.isOfficial
             self.secondSectionView.update(with: ownerInfo.workSummaries)
+            self.menuButton.menu = menu
         }
     }
 }
@@ -157,6 +158,7 @@ private extension OwnerWorkplaceCell {
     func setStyles() {
         stackView.layer.cornerRadius = 12
         secondSectionView.isHidden = !isExpanded
+        menuButton.showsMenuAsPrimaryAction = true
     }
 
     // MARK: - setConstraints

@@ -99,13 +99,14 @@ class WorkerWorkplaceCell: UITableViewCell {
     }
 
     // MARK: - Public Methods
-    func update(item: HomeSectionItem) {
+    func update(item: HomeSectionItem, menu: UIMenu) {
         switch item {
         case .worker(let workerInfo):
             self.nameLabel.text = workerInfo.workplace.name
             self.untilPaydayLabel.text = "sdfdfs"
             self.totalEarnedLabel.text = "dsfdsf"
             self.workplaceOfficialChip.isHidden = !workerInfo.isOfficial
+            self.menuButton.menu = menu
         case .owner:
             break
         }
@@ -157,6 +158,7 @@ private extension WorkerWorkplaceCell {
     func setStyles() {
         stackView.layer.cornerRadius = 12
         secondSectionView.isHidden = !isExpanded
+        menuButton.showsMenuAsPrimaryAction = true
     }
 
     // MARK: - setConstraints

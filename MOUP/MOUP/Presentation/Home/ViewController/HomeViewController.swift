@@ -22,13 +22,15 @@ final class HomeViewController: UIViewController {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: OwnerWorkplaceCell.identifier, for: indexPath) as? OwnerWorkplaceCell else {
                 return UITableViewCell()
             }
-            cell.update(item: item)
+            let menu = self.setMenu(role: .owner)
+            cell.update(item: item, menu: menu)
             return cell
         case .worker:
             guard let cell = tableView.dequeueReusableCell(withIdentifier: WorkerWorkplaceCell.identifier, for: indexPath) as? WorkerWorkplaceCell else {
                 return UITableViewCell()
             }
-            cell.update(item: item)
+            let menu = self.setMenu(role: .worker)
+            cell.update(item: item, menu: menu)
             return cell
         }
     }
@@ -91,5 +93,43 @@ private extension HomeViewController {
 
         homeView.setupTableView(section: output.firstSectionData, dataSource: dataSource)
             .disposed(by: disposeBag)
+    }
+}
+
+private extension HomeViewController {
+    // MARK: - UIMenu Methods
+    func setMenu(role: UserRole) -> UIMenu {
+        let children: [UIAction] = { [weak self] in
+            guard let self else { return [] }
+            switch role {
+            case .worker:
+                return [ edit(), delete() ]
+            case .owner:
+                return [ edit(), delete(), sendInvitationCode() ]
+            }
+        }()
+        let menu = UIMenu(title: "", children: children)
+        return menu
+    }
+
+    func edit() -> UIAction {
+        let action = UIAction(title: "수정하기") { _ in
+            print("수정하기")
+        }
+        return action
+    }
+
+    func delete() -> UIAction {
+        let action = UIAction(title: "삭제하기") { _ in
+            print("삭제하기")
+        }
+        return action
+    }
+
+    func sendInvitationCode() -> UIAction {
+        let action = UIAction(title: "초대 코드 보내기") { _ in
+            print("초대 코드 보내기")
+        }
+        return action
     }
 }
