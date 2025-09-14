@@ -6,24 +6,47 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
-class RoutineSelectionViewController: UIViewController {
+final class RoutineSelectionViewController: UIViewController {
+    
+    // MARK: - Properties
+    
+    private let routineSelectionView = RoutineSelectionView()
+    private let viewModel = RoutineSelectionViewModel()
+    private let disposeBag = DisposeBag()
+    
+    // MARK: - Lifecycle
+    
+    override func loadView() {
+        self.view = routineSelectionView
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        configure()
+    }
 
-        // Do any additional setup after loading the view.
+}
+
+private extension RoutineSelectionViewController {
+    // MARK: - configure
+    func configure() {
+        setBindings()
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    // MARK: - setBindings
+    func setBindings() {
+        let input = RoutineSelectionViewModel.Input(
+            viewDidLoad: Observable.just(())
+        )
+        
+        let output = viewModel.transform(input)
+        
+        routineSelectionView.rx
+            .bindItems(output.rows.asObservable())
+            .disposed(by: disposeBag)
     }
-    */
-
 }
