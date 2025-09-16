@@ -110,6 +110,26 @@ final class InfoRowView: UIView {
         guard case .labelWithButton = rowType else { return }
         actionButton.setTitle(title, for: .normal)
     }
+    
+    func updateAttributedTitle(to newTitle: String,
+                     font: UIFont = .headBold(18),
+                     textColor: UIColor = .gray900,
+                     asteriskColor: UIColor = .primary500) {
+        let attributed = NSMutableAttributedString(string: newTitle)
+
+        // 기본 스타일
+        attributed.addAttribute(.font, value: font, range: NSRange(location: 0, length: newTitle.count))
+        attributed.addAttribute(.foregroundColor, value: textColor, range: NSRange(location: 0, length: newTitle.count))
+
+        // 별(*) 색상만 변경
+        if let starRange = newTitle.range(of: "*") {
+            let nsRange = NSRange(starRange, in: newTitle)
+            attributed.addAttribute(.foregroundColor, value: asteriskColor, range: nsRange)
+        }
+
+        titleLabel.attributedText = attributed
+    }
+
 
     
     @objc private func didTapCheckBox() {

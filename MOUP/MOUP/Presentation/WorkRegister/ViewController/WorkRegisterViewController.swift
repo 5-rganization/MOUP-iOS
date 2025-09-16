@@ -187,19 +187,59 @@ private extension WorkRegisterViewController {
 
         // 휴게 시간
         workRegisterView.rx.lunchBreakTap
-            .bind(onNext: { print("휴게 버튼 클릭") })
+            .bind(onNext: { [weak self] in
+                guard let self else { return }
+
+                // 휴게 전용 VM + VC
+                let breakVM = WorkBreakPickerViewModel(initialIndex: 0)
+                let vc = WorkBreakPickerViewController(viewModel: breakVM)
+
+                // confirm 시 → UI 업데이트
+                breakVM.confirmSelectedBreak
+                    .map { minutes -> String in
+                        let hours = minutes / 60
+                        let mins = minutes % 60
+
+                        if hours > 0 && mins > 0 {
+                            return "\(hours)시간 \(mins)분"
+                        } else if hours > 0 {
+                            return "\(hours)시간"
+                        } else {
+                            return "\(mins)분"
+                        }
+                    }
+                    .observe(on: MainScheduler.instance)
+                    .take(until: vc.rx.deallocated)
+                    .bind(to: self.workRegisterView.rx.selectedLunchBreakTimeText)
+                    .disposed(by: self.disposeBag)
+
+                // confirm → dismiss
+                breakVM.confirmSelectedBreak
+                    .take(1)
+                    .take(until: vc.rx.deallocated)
+                    .bind(onNext: { [weak vc] _ in vc?.dismiss(animated: true) })
+                    .disposed(by: self.disposeBag)
+
+                // cancel → dismiss
+                breakVM.dismiss
+                    .take(until: vc.rx.deallocated)
+                    .bind(onNext: { [weak vc] in vc?.dismiss(animated: true) })
+                    .disposed(by: self.disposeBag)
+
+                self.present(vc, animated: true)
+            })
             .disposed(by: disposeBag)
-        
+
         // 루틴/컬러
         workRegisterView.rx.routinTap
             .bind(onNext: { print("루틴 추가 버튼 클릭") })
             .disposed(by: disposeBag)
 
-        workRegisterView.rx.colorTap
-            .bind(onNext: { [weak self] in
-                print("컬러 선택 버튼 클릭")
-                self?.coordinator?.showSelectColorLabel()
-            })
-            .disposed(by: disposeBag)
+//        workRegisterView.rx.colorTap
+//            .bind(onNext: { [weak self] in
+//                print("컬러 선택 버튼 클릭")
+//                self?.coordinator?.showSelectColorLabel()
+//            })
+//            .disposed(by: disposeBag)
     }
 }

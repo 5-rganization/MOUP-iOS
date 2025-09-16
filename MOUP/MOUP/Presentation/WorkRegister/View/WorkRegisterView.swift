@@ -20,7 +20,7 @@ final class WorkRegisterView: UIView {
     fileprivate let clockOutTapSubject = PublishSubject<Void>()
     fileprivate let lunchBreakTapSubject = PublishSubject<Void>()
     fileprivate let routinTapSubject = PublishSubject<Void>()
-    fileprivate let colorTapSubject = PublishSubject<Void>()
+//    fileprivate let colorTapSubject = PublishSubject<Void>()
     
     // MARK: - UI Components
     private let scrollView = UIScrollView()
@@ -32,11 +32,17 @@ final class WorkRegisterView: UIView {
         $0.distribution = .fill
     }
     
-    private let selectWorkplace = InfoRowView(title: "근무지 선택", type: .labelWithChevron(value: ""), frame: .zero)
+    private let selectWorkplace = InfoRowView(title: "근무지 선택 *", type: .labelWithChevron(value: ""), frame: .zero).then {
+        $0.updateAttributedTitle(to: "근무지 선택 *")
+    }
+    private let divider = UIView().then {
+        $0.backgroundColor = .gray400
+    }
+
     private let workDateContainerView = WorkDateContainerView()
     private let workTimeContainerView = WorkTimeContainerView()
     private let workRoutinContainerView = WorkRoutinContainerView()
-    private let colorLabelContainerView = ColorLabelContainerView()
+//    private let colorLabelContainerView = ColorLabelContainerView()
     private let memoContainerView = MemoContainerView()
     
     private let registerButton = BaseButton(title: "등록하기", isSecondary: true)
@@ -98,10 +104,11 @@ private extension WorkRegisterView {
         
         stackView.addArrangedSubviews(
             selectWorkplace,
+            divider,
             workDateContainerView,
             workTimeContainerView,
             workRoutinContainerView,
-            colorLabelContainerView,
+//            colorLabelContainerView,
             memoContainerView
         )
     }
@@ -125,6 +132,11 @@ private extension WorkRegisterView {
         stackView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(20)
             $0.horizontalEdges.equalToSuperview()
+        }
+        
+        divider.snp.makeConstraints {
+            $0.height.equalTo(1)
+            $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
         registerButton.snp.makeConstraints {
@@ -165,9 +177,9 @@ private extension WorkRegisterView {
             .bind(to: routinTapSubject)
             .disposed(by: disposeBag)
         
-        colorLabelContainerView.rx.colorLabelInfoRowTap
-            .bind(to: colorTapSubject)
-            .disposed(by: disposeBag)
+//        colorLabelContainerView.rx.colorLabelInfoRowTap
+//            .bind(to: colorTapSubject)
+//            .disposed(by: disposeBag)
         
     }
 }
@@ -201,9 +213,9 @@ extension Reactive where Base: WorkRegisterView {
         return ControlEvent(events: base.routinTapSubject.asObservable())
     }
     
-    var colorTap: ControlEvent<Void> {
-        return ControlEvent(events: base.colorTapSubject.asObservable())
-    }
+//    var colorTap: ControlEvent<Void> {
+//        return ControlEvent(events: base.colorTapSubject.asObservable())
+//    }
     
     var selectedWorkDateText: Binder<String> {
         Binder(base) { view, text in

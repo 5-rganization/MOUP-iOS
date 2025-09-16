@@ -19,8 +19,7 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
             coordinator: self,
             workDatePickerViewModel: WorkDatePickerViewModel(),
             clockInVM: WorkTimePickerViewModel(),
-            clockOutVM: WorkTimePickerViewModel(),
-            lunchVM: WorkTimePickerViewModel()
+            clockOutVM: WorkTimePickerViewModel()
         )
         
         navigationController.pushViewController(vc, animated: false)
