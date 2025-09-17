@@ -10,6 +10,19 @@ import Then
 import SnapKit
 
 final class AddRoutineView: UIView {
+    
+    // MARK: - Properties
+    
+    private var items: [TodoItem] = []
+    private enum Section { case main }
+    private lazy var dataSource = UITableViewDiffableDataSource<Section, TodoItem>(
+        tableView: tableView
+    ) { tableView, indexPath, item in
+        let cell = tableView.dequeueReusableCell(withIdentifier: TodoCell.id, for: indexPath) as! TodoCell
+        cell.todoTextField.text = item.text
+        return cell
+    }
+    private var isKeyboardVisible = false
 
     // MARK: - UI Components
     
@@ -67,9 +80,7 @@ final class AddRoutineView: UIView {
         $0.setImage(.plus, for: .normal)
     }
     
-    private let todoListStackView = UIStackView().then {
-        $0.axis = .vertical
-    }
+    private let tableView = UITableView()
     
     // MARK: - Initializer
     
@@ -91,6 +102,7 @@ private extension AddRoutineView {
         setStyles()
         setConstraints()
         setActions()
+        setKeyboardVisible()
     }
     
     // MARK: - setHierarchy
@@ -102,13 +114,31 @@ private extension AddRoutineView {
             alarmTimeButton,
             todoListTitleLabel,
             addTodoButton,
-            todoListStackView
+            tableView
         )
     }
     
     // MARK: - setStyles
     func setStyles() {
         backgroundColor = .white
+        
+        tableView.register(
+            TodoCell.self,
+            forCellReuseIdentifier: TodoCell.id
+        )
+        tableView.separatorStyle = .none
+        tableView.keyboardDismissMode = .onDrag
+        
+        tableView.isEditing = false
+        tableView.allowsSelection = false
+        
+        tableView.dataSource = dataSource
+        tableView.delegate = self
+        applySnapshot(animated: false)
+        
+        tableView.dragInteractionEnabled = true
+        tableView.dragDelegate = self
+        tableView.dropDelegate = self
     }
     
     // MARK: - setConstraints
@@ -145,14 +175,15 @@ private extension AddRoutineView {
             $0.size.equalTo(44)
         }
         
-        todoListStackView.snp.makeConstraints {
+        tableView.snp.makeConstraints {
             $0.top.equalTo(todoListTitleLabel.snp.bottom).offset(12)
-            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
-            $0.bottom.lessThanOrEqualTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalToSuperview()
+            $0.bottom.equalTo(safeAreaLayoutGuide)
         }
     }
     
     // MARK: - setActions
+    
     func setActions() {
         addTodoButton.addTarget(
             self,
@@ -162,24 +193,111 @@ private extension AddRoutineView {
     }
     
     @objc func addTodoDidTap() {
-        let todoTextField = UITextField().then {
-            let placeholder = "할 일"
-            $0.attributedPlaceholder = NSAttributedString(
-                string: placeholder,
-                attributes: [
-                    .foregroundColor: UIColor.gray400,
-                    .font: UIFont.fieldsRegular(16)
-                ]
-            )
-            $0.font = .bodyMedium(14)
+        endEditing(true)
+
+        items.append(TodoItem(text: ""))
+
+        applySnapshot(animated: !isKeyboardVisible)
+
+        let last = IndexPath(row: items.count - 1, section: 0)
+        tableView.scrollToRow(at: last, at: .bottom, animated: true)
+        DispatchQueue.main.async {
+            if let cell = self.tableView.cellForRow(at: last) as? TodoCell {
+                cell.todoTextField.becomeFirstResponder()
+            }
         }
-        
-        todoTextField.snp.makeConstraints {
-            $0.height.equalTo(45)
-        }
-        
-        todoListStackView.addArrangedSubview(todoTextField)
-        
-        todoTextField.becomeFirstResponder()
+    }
+    
+    func applySnapshot(animated: Bool = true) {
+        var snap = NSDiffableDataSourceSnapshot<Section, TodoItem>()
+        snap.appendSections([.main])
+        snap.appendItems(items, toSection: .main)
+        dataSource.apply(snap, animatingDifferences: animated)
+    }
+    
+    func setKeyboardVisible() {
+        NotificationCenter.default.addObserver(self, selector: #selector(kbWillShow),
+                                               name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(kbWillHide),
+                                               name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc private func kbWillShow(_ n: Notification) { isKeyboardVisible = true }
+    @objc private func kbWillHide(_ n: Notification) { isKeyboardVisible = false }
+}
+
+extension AddRoutineView: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard let cell = cell as? TodoCell else { return }
+        cell.todoTextField.tag = indexPath.row
+        cell.todoTextField.removeTarget(nil, action: nil, for: .editingChanged)
+        cell.todoTextField.addTarget(self, action: #selector(textChanged(_:)), for: .editingChanged)
+    }
+    
+    @objc private func textChanged(_ tf: UITextField) {
+        let row = tf.tag
+        guard items.indices.contains(row) else { return }
+        items[row].text = tf.text ?? ""
+    }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        .none
+    }
+    
+    func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+        false
+    }
+}
+
+@available(iOS 11.0, *)
+extension AddRoutineView: UITableViewDragDelegate {
+
+    func tableView(_ tableView: UITableView,
+                   itemsForBeginning session: UIDragSession,
+                   at indexPath: IndexPath) -> [UIDragItem] {
+        return makeDragItems(for: indexPath)
+    }
+
+    func tableView(_ tableView: UITableView,
+                   itemsForAddingTo session: UIDragSession,
+                   at indexPath: IndexPath,
+                   point: CGPoint) -> [UIDragItem] {
+        return makeDragItems(for: indexPath)
+    }
+
+    private func makeDragItems(for indexPath: IndexPath) -> [UIDragItem] {
+        let item = items[indexPath.row]
+        let provider = NSItemProvider(object: item.text as NSString)
+        let dragItem = UIDragItem(itemProvider: provider)
+        dragItem.localObject = item
+        return [dragItem]
+    }
+}
+
+@available(iOS 11.0, *)
+extension AddRoutineView: UITableViewDropDelegate {
+    func tableView(_ tableView: UITableView, canHandle session: UIDropSession) -> Bool {
+        session.localDragSession != nil
+    }
+
+    func tableView(_ tableView: UITableView,
+                   dropSessionDidUpdate session: UIDropSession,
+                   withDestinationIndexPath destinationIndexPath: IndexPath?) -> UITableViewDropProposal {
+        UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
+    }
+
+    func tableView(_ tableView: UITableView,
+                   performDropWith coordinator: UITableViewDropCoordinator) {
+        guard coordinator.proposal.operation == .move,
+              let first = coordinator.items.first,
+              let source = first.sourceIndexPath else { return }
+
+        let dest = coordinator.destinationIndexPath ?? IndexPath(row: items.count - 1, section: 0)
+
+        let moved = items.remove(at: source.row)
+        items.insert(moved, at: dest.row)
+        applySnapshot(animated: true)
+
+        coordinator.drop(first.dragItem, toRowAt: dest)
     }
 }

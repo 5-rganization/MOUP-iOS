@@ -6,3 +6,8 @@
 //
 
 import Foundation
+
+struct TodoItem: Hashable {
+    let id = UUID()
+    var text: String
+}
