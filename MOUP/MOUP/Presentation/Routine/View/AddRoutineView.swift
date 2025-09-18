@@ -183,7 +183,6 @@ private extension AddRoutineView {
     }
     
     // MARK: - setActions
-    
     func setActions() {
         addTodoButton.addTarget(
             self,
@@ -194,6 +193,12 @@ private extension AddRoutineView {
     
     @objc func addTodoDidTap() {
         endEditing(true)
+        tableView.setEditing(false, animated: false)
+        
+        if let last = items.last, last.text.isBlank {
+            focusRow(items.count - 1)
+            return
+        }
 
         items.append(TodoItem(text: ""))
 
@@ -224,6 +229,17 @@ private extension AddRoutineView {
     
     @objc private func kbWillShow(_ n: Notification) { isKeyboardVisible = true }
     @objc private func kbWillHide(_ n: Notification) { isKeyboardVisible = false }
+    
+    func focusRow(_ index: Int) {
+        let indexPath = IndexPath(row: index, section: 0)
+        tableView.layoutIfNeeded()
+        tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+        DispatchQueue.main.async {
+            if let cell = self.tableView.cellForRow(at: indexPath) as? TodoCell {
+                cell.todoTextField.becomeFirstResponder()
+            }
+        }
+    }
 }
 
 extension AddRoutineView: UITableViewDelegate {
