@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import GoogleSignIn
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -18,8 +17,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
         self.window = window
-        
-        let appCoordinator = AppCoordinator(window: window)
+
+        let isSignedIn = false // TODO: - 실제 액세스 토큰 유무 확인 로직 설계 필요
+
+        let appCoordinator = AppCoordinator(window: window, isSignedIn: isSignedIn)
         self.appCoordinator = appCoordinator
         appCoordinator.start()
     }
@@ -52,13 +53,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
 
-    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        if let url = URLContexts.first?.url {
-
-            if ((url.scheme?.contains("com.googleusercontent.apps")) != nil) {  //구글 링크인지
-                GIDSignIn.sharedInstance.handle(url)
-            }
-        }
-    }
 }
 

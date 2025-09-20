@@ -10,22 +10,38 @@ import UIKit
 final class AppCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     let window: UIWindow
-    var isSignedIn = false // TODO: - 실제 로그인 여부를 알 수 있도록 변경
+    var isSignedIn: Bool // TODO: - 실제 로그인 여부를 알 수 있도록 변경
 
-    init(window: UIWindow) {
+    private let authService: AuthServiceProtocol
+    private let authRepository: AuthRepositoryProtocol
+    private let authUseCase: AuthUseCaseProtocol
+
+    init(window: UIWindow, isSignedIn: Bool) {
         self.window = window
+        self.isSignedIn = isSignedIn
+        print("자동 로그인 가능 여부 : \(isSignedIn)")
+        self.authService = AuthService()
+        self.authRepository = AuthRepository(authService: authService)
+        self.authUseCase = AuthUseCase(authRepository: authRepository)
     }
 
     func start() {
         if isSignedIn {
-            let tabBarCoordinator = TabBarCoordinator(window: window)
+            let tabBarCoordinator = TabBarCoordinator(window: window, authUseCase: authUseCase)
             childCoordinators.append(tabBarCoordinator)
             tabBarCoordinator.start()
         } else {
-            let signInCoordinator = SignInCoordinator(window: window)
+            let signInCoordinator = SignInCoordinator(coordinator: self, window: window, authUseCase: authUseCase)
             childCoordinators.append(signInCoordinator)
             signInCoordinator.start()
         }
+    }
+
+    func moveToTabBar() {
+        childCoordinators.removeAll()
+        let tabBarCoordinator = TabBarCoordinator(window: window, authUseCase: authUseCase)
+        childCoordinators.append(tabBarCoordinator)
+        tabBarCoordinator.start()
     }
 }
 

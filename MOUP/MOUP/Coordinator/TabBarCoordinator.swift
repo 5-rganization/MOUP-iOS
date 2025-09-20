@@ -8,11 +8,14 @@ import UIKit
 
 final class TabBarCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
-    let window: UIWindow
-    let tabBarController = TabBarViewController()
+    private let window: UIWindow
+    private let tabBarViewModel: TabBarViewModel
+    private let tabBarController: TabBarViewController
 
-    init(window: UIWindow) {
+    init(window: UIWindow, authUseCase: AuthUseCaseProtocol) {
         self.window = window
+        self.tabBarViewModel = TabBarViewModel(authUseCase: authUseCase)
+        self.tabBarController = TabBarViewController(viewModel: tabBarViewModel)
     }
 
     func start() {

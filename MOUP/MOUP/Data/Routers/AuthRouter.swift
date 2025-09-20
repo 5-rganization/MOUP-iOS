@@ -8,11 +8,12 @@
 import Foundation
 import Alamofire
 
-enum GoogleAuthRouter {
-    case signIn(SignInRequestDTO)
+enum AuthRouter {
+    case signIn(LoginRequestDTO)
+    case signUp(RegisterRequestDTO)
 }
 
-extension GoogleAuthRouter: URLRequestConvertible {
+extension AuthRouter: URLRequestConvertible {
     var baseURL: URL {
         guard let url = URL(string: NetworkConstants.baseURL) else {
             fatalError("Invalid base URL")
@@ -24,29 +25,30 @@ extension GoogleAuthRouter: URLRequestConvertible {
         switch self {
         case .signIn:
             return "/auth/login"
+        case .signUp:
+            return "/auth/register"
         }
     }
 
     var method: HTTPMethod {
         switch self {
-        case .signIn:
+        case .signIn, .signUp:
             return .post
         }
     }
 
-    var parameters: Parameters? {
+    var requestBody: Encodable? {
         switch self {
         case .signIn(let signInRequestDTO):
-            return [
-                "provider": signInRequestDTO.provider,
-                "idToken": signInRequestDTO.idToken
-            ]
+            return signInRequestDTO
+        case .signUp(let signUpRequestDTO):
+            return signUpRequestDTO
         }
     }
 
     var encoding: ParameterEncoding {
         switch self {
-        case .signIn:
+        case .signIn, .signUp:
             return JSONEncoding.default
         }
     }
@@ -55,10 +57,16 @@ extension GoogleAuthRouter: URLRequestConvertible {
         let url = baseURL.appendingPathComponent(path)
         print("최종 url: \(url)")
         var request = try URLRequest(url: url, method: method)
-        request = try encoding.encode(request, with: parameters)
 
-        if let body = request.httpBody {
-            print(String(data: body, encoding: .utf8))
+        if let body = requestBody {
+            let encoder = JSONEncoder()
+            request.httpBody = try encoder.encode(body)
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+            if let httpBody = request.httpBody {
+                print("Request body: \(String(data: httpBody, encoding: .utf8) ?? "")")
+            }
+
         }
 
         return request

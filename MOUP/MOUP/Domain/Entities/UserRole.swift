@@ -8,7 +8,7 @@
 /// 사용자 역할 Enum
 /// - `worker`: 알바생
 /// - `owner`: 사장님
-enum UserRole: String {
-    case worker
-    case owner
+enum UserRole: String, Decodable {
+    case worker = "ROLE_WORKER"
+    case owner = "ROLE_OWNER"
 }
