@@ -13,8 +13,9 @@ final class RoutineSelectionViewController: UIViewController {
     
     // MARK: - Properties
     
+    weak var coordinator: RoutineSelectionCoordinator?
     private let routineSelectionView = RoutineSelectionView()
-    private let viewModel = RoutineSelectionViewModel()
+    private let viewModel: RoutineSelectionViewModel
     private let disposeBag = DisposeBag()
     
     // MARK: - Lifecycle
@@ -28,7 +29,17 @@ final class RoutineSelectionViewController: UIViewController {
         
         configure()
     }
-
+    
+    // MARK: - Initializer
+    
+    init(viewModel: RoutineSelectionViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }    
 }
 
 private extension RoutineSelectionViewController {
