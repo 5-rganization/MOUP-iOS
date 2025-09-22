@@ -50,6 +50,12 @@ private extension RoutineSelectionViewController {
     
     // MARK: - setBindings
     func setBindings() {
+        routineSelectionView.rx.plusButtonDidTap
+            .subscribe(onNext: { [weak self] in
+                self?.coordinator?.showAddRoutineViewController()
+            })
+            .disposed(by: disposeBag)
+        
         let input = RoutineSelectionViewModel.Input(
             viewDidLoad: Observable.just(())
         )

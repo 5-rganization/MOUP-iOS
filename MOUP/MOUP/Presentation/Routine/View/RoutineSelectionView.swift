@@ -15,7 +15,7 @@ final class RoutineSelectionView: UIView {
 
     // MARK: - UI Components
     
-    private let navigationBar = BaseNavigationBar(title: "루틴 선택").then {
+    fileprivate let navigationBar = BaseNavigationBar(title: "루틴 선택").then {
         $0.configureRightButton(icon: .plus, title: nil)
     }
     
@@ -98,6 +98,10 @@ private extension RoutineSelectionView {
 }
 
 extension Reactive where Base: RoutineSelectionView {
+    var plusButtonDidTap: ControlEvent<Void> {
+        return base.navigationBar.rx.rightBtnTapped
+    }
+    
     @discardableResult
     func bindItems(_ source: Observable<[DummyRoutine]>) -> Disposable {
         base.tableView.register(
