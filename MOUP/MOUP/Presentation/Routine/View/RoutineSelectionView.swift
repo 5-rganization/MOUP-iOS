@@ -126,4 +126,14 @@ extension Reactive where Base: RoutineSelectionView {
     var checkboxToggled: ControlEvent<(index: IndexPath, toggled: Bool)> {
         ControlEvent(events: base.checkboxToggleRelay.asObservable())
     }
+    
+    var itemSelected: ControlEvent<RoutineRowViewState> {
+        ControlEvent(events: base.tableView.rx.modelSelected(RoutineRowViewState.self))
+    }
+    
+    var deselectRow: Binder<IndexPath> {
+        Binder(base) { view, indexPath in
+            view.tableView.deselectRow(at: indexPath, animated: true)
+        }
+    }
 }

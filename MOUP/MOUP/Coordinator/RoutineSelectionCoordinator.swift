@@ -28,4 +28,22 @@ final class RoutineSelectionCoordinator: Coordinator {
         let addRoutineVC = AddRoutineViewController(viewModel: viewModel)
         navigationController.pushViewController(addRoutineVC, animated: true)
     }
+    
+    func showRoutineDetail(with state: RoutineRowViewState) {
+        let existingTitle = state.name
+        let existingTime = state.time
+        let existingTodos: [TodoItem] = [
+            TodoItem(text: "매장 오픈 준비"),
+            TodoItem(text: "발주 확인")
+        ]
+        
+        let vm = AddRoutineViewModel(mode: .edit(
+            id: state.id,
+            title: existingTitle,
+            time: existingTime,
+            items: existingTodos
+        ))
+        let vc = AddRoutineViewController(viewModel: vm)
+        navigationController.pushViewController(vc, animated: true)
+    }
 }

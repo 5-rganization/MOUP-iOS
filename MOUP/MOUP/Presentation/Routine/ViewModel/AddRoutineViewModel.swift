@@ -9,6 +9,11 @@ import Foundation
 import RxSwift
 import RxCocoa
 
+enum RoutineEditMode {
+    case create
+    case edit(id: String, title: String, time: String, items: [TodoItem])
+}
+
 struct TodoItem: Hashable {
     let id: UUID = UUID()
     var text: String
@@ -36,11 +41,19 @@ final class AddRoutineViewModel {
     struct Output {
         let items: Driver<[TodoItem]>
         let focusOnRow: Signal<Int>
+        let title: Driver<String>
     }
     
     // MARK: - Properties
     
     private let disposeBag = DisposeBag()
+    private let mode: RoutineEditMode
+    
+    // MARK: - Initializer
+    
+    init(mode: RoutineEditMode = .create) {
+        self.mode = mode
+    }
     
     // MARK: - Transform
     
@@ -48,6 +61,15 @@ final class AddRoutineViewModel {
         let itemsRelay = BehaviorRelay<[TodoItem]>(value: [TodoItem(text: "")])
         let titleRelay = BehaviorRelay<String>(value: "")
         let focusRelay = PublishRelay<Int>()
+        
+        switch mode {
+        case .create:
+            itemsRelay.accept([TodoItem(text: "")])
+            titleRelay.accept("")
+        case let .edit(_, title, _, items):
+            itemsRelay.accept(items.isEmpty ? [TodoItem(text: "")] : items)
+            titleRelay.accept(title)
+        }
         
         input.titleChanged
             .bind(to: titleRelay)
@@ -95,7 +117,8 @@ final class AddRoutineViewModel {
         
         return Output(
             items: itemsRelay.asDriver(),
-            focusOnRow: focusRelay.asSignal()
+            focusOnRow: focusRelay.asSignal(),
+            title: titleRelay.asDriver()
         )
     }
 }

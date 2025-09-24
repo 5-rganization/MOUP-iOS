@@ -71,5 +71,9 @@ private extension AddRoutineViewController {
         output.focusOnRow
             .emit(to: addRoutineView.rx.focusOnRow)
             .disposed(by: disposeBag)
+        
+        output.title
+            .drive(addRoutineView.rx.titleText)
+            .disposed(by: disposeBag)
     }
 }

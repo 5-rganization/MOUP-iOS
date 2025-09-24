@@ -74,5 +74,12 @@ private extension RoutineSelectionViewController {
         routineSelectionView.rx
             .bindItems(output.rows)
             .disposed(by: disposeBag)
+        
+        routineSelectionView.rx.itemSelected
+            .withUnretained(self)
+            .bind { owner, state in
+                owner.coordinator?.showRoutineDetail(with: state)
+            }
+            .disposed(by: disposeBag)
     }
 }
