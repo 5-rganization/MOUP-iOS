@@ -11,9 +11,14 @@ import RxCocoa
 import SnapKit
 import Then
 
+protocol OwnerWorkplaceCellDelegate: AnyObject {
+    func didTapAttendanceBtn()
+}
+
 class OwnerWorkplaceCell: UITableViewCell {
     // MARK: - Properties
     static let identifier = "OwnerWorkplaceCell"
+    weak var delegate: OwnerWorkplaceCellDelegate?
     private let disposeBag = DisposeBag()
     private var isExpanded: Bool = false
 
@@ -23,7 +28,7 @@ class OwnerWorkplaceCell: UITableViewCell {
         $0.axis = .vertical
         $0.distribution = .fill
         $0.spacing = 8
-        $0.isUserInteractionEnabled = false
+//        $0.isUserInteractionEnabled = false
     }
 
     // 첫 번째 섹션 뷰 - 기초 정보
@@ -59,17 +64,12 @@ class OwnerWorkplaceCell: UITableViewCell {
     // 세 번째 섹션 뷰 - 출퇴근 버튼
     private let thirdSectionView = UIView()
 
-    private let attendanceButtonStackView = UIStackView().then {
-        $0.axis = .horizontal
-        $0.spacing = 12
-    }
-
-    private let startWorkButton = BaseButton().then {
-        $0.update(title: "출근", isSecondary: false, fontSize: 16)
-    }
-
-    private let endWorkButton = BaseButton().then {
-        $0.update(title: "퇴근", isSecondary: true, fontSize: 16)
+    private let attendanceButton = UIButton().then {
+        $0.setTitle("근태 관리", for: .normal)
+        $0.titleLabel?.font = .buttonSemibold(16)
+        $0.backgroundColor = .primary100
+        $0.setTitleColor(.primary600, for: .normal)
+        $0.layer.cornerRadius = 12
     }
 
     // 네 번째 섹션 뷰
@@ -136,12 +136,8 @@ private extension OwnerWorkplaceCell {
             totalEarnedLabel,
             workplaceOfficialChip
         )
-        attendanceButtonStackView.addArrangedSubviews(
-            startWorkButton,
-            endWorkButton
-        )
         thirdSectionView.addSubviews(
-            attendanceButtonStackView
+            attendanceButton
         )
         fourthSectionView.addSubviews(
             chevronImageView
@@ -210,9 +206,9 @@ private extension OwnerWorkplaceCell {
         }
 
         // 세 번째 섹션
-        attendanceButtonStackView.snp.makeConstraints {
+        attendanceButton.snp.makeConstraints {
             $0.directionalVerticalEdges.equalToSuperview()
-            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(18)
             $0.height.equalTo(44)
         }
 
@@ -227,18 +223,33 @@ private extension OwnerWorkplaceCell {
     }
     
     func setBindings() {
-        containerView.rx.tap.subscribe(onNext: { [weak self] in
-            guard let self else { return }
-            isExpanded.toggle()
-            toggleSecondSection(isExpanded)
+        let stackTapGesture = UITapGestureRecognizer()
+        stackView.addGestureRecognizer(stackTapGesture)
+
+        containerView.rx.tap
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.isExpanded.toggle()
+                owner.toggleSecondSection(owner.isExpanded)
             print("containerView tapped")
         })
         .disposed(by: disposeBag)
 
-        menuButton.rx.tap.subscribe(onNext: {
-            print("메뉴버튼탭")
-        })
-        .disposed(by: disposeBag)
+        stackTapGesture.rx.event
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.isExpanded.toggle()
+                owner.toggleSecondSection(owner.isExpanded)
+                print("containerView tapped")
+            })
+            .disposed(by: disposeBag)
+
+        attendanceButton.rx.tap
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.delegate?.didTapAttendanceBtn()
+            })
+            .disposed(by: disposeBag)
     }
 
     func toggleSecondSection(_ expanded: Bool) {
