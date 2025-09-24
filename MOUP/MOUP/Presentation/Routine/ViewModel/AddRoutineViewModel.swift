@@ -55,17 +55,15 @@ final class AddRoutineViewModel {
         
         input.addTodoButtonTapped
             .withLatestFrom(itemsRelay)
-            .subscribe(onNext: { currentItems in
-                var newItems = currentItems
-                
-                if let lastItem = newItems.last, lastItem.text.isEmpty {
-                    focusRelay.accept(newItems.count - 1)
+            .subscribe(onNext: { current in
+                var items = current
+                if let last = items.last, last.text.isEmpty {
+                    focusRelay.accept(items.count - 1)
                     return
                 }
-                
-                newItems.append(TodoItem(text: ""))
-                itemsRelay.accept(newItems)
-                focusRelay.accept(newItems.count - 1)
+                items.append(TodoItem(text: ""))
+                itemsRelay.accept(items)
+                focusRelay.accept(items.count - 1)
             })
             .disposed(by: disposeBag)
         
@@ -82,12 +80,15 @@ final class AddRoutineViewModel {
             .disposed(by: disposeBag)
         
         input.itemMoved
-            .withLatestFrom(itemsRelay) { (move, currentItems) -> [TodoItem] in
-                var newItems = currentItems
-                let (source, destination) = move
-                let moveItem = newItems.remove(at: source)
-                newItems.insert(moveItem, at: destination)
-                return newItems
+            .withLatestFrom(itemsRelay) { (move, current) -> [TodoItem] in
+                var items = current
+                let (src, dst) = move
+                guard items.indices.contains(src),
+                      (0...items.count).contains(dst),
+                      src != dst else { return items }
+                let moving = items.remove(at: src)
+                items.insert(moving, at: dst)
+                return items
             }
             .bind(to: itemsRelay)
             .disposed(by: disposeBag)

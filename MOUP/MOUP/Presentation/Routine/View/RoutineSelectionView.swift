@@ -34,6 +34,8 @@ final class RoutineSelectionView: UIView {
     
     private let applyButton = BaseButton(title: "적용하기")
     
+    fileprivate let checkboxToggleRelay = PublishRelay<(index: IndexPath, toggled: Bool)>()
+    
     // MARK: - Initializer
     
     override init(frame: CGRect) {
@@ -103,16 +105,25 @@ extension Reactive where Base: RoutineSelectionView {
     }
     
     @discardableResult
-    func bindItems(_ source: Observable<[DummyRoutine]>) -> Disposable {
+    func bindItems(_ source: Driver<[RoutineRowViewState]>) -> Disposable {
         base.tableView.register(
             RoutineCell.self,
             forCellReuseIdentifier: RoutineCell.id
         )
-        return source.bind(to: base.tableView.rx.items(
-            cellIdentifier: RoutineCell.id,
-            cellType: RoutineCell.self
-        )) { _, element, cell in
-            cell.update(name: element.name, time: element.time)
-        }
+        return source
+            .drive(base.tableView.rx.items(
+                cellIdentifier: RoutineCell.id,
+                cellType: RoutineCell.self
+            )) { index, state, cell in
+                cell.set(name: state.name, time: state.time, isChecked: state.isChecked)
+                cell.rx.checkboxDidTap
+                    .map { _ in (IndexPath(row: index, section: 0), !state.isChecked) }
+                    .bind(to: base.checkboxToggleRelay)
+                    .disposed(by: cell.disposeBag)
+            }
+    }
+    
+    var checkboxToggled: ControlEvent<(index: IndexPath, toggled: Bool)> {
+        ControlEvent(events: base.checkboxToggleRelay.asObservable())
     }
 }

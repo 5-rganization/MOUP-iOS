@@ -49,6 +49,12 @@ private extension AddRoutineViewController {
     
     // MARK: - setBindings
     func setBindings() {
+        addRoutineView.rx.backButtonTap
+            .bind(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+        
         let input = AddRoutineViewModel.Input(
             titleChanged: addRoutineView.rx.titleText.orEmpty.asObservable(),
             addTodoButtonTapped: addRoutineView.rx.addButtonTap.asObservable(),

@@ -255,6 +255,10 @@ extension AddRoutineView: UITableViewDropDelegate {
 }
 
 extension Reactive where Base: AddRoutineView {
+    var backButtonTap: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
+    }
+    
     var addButtonTap: ControlEvent<Void> {
         return base.addTodoButton.rx.tap
     }

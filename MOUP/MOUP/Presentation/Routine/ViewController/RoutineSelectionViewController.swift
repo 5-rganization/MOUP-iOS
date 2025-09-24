@@ -45,25 +45,34 @@ final class RoutineSelectionViewController: UIViewController {
 private extension RoutineSelectionViewController {
     // MARK: - configure
     func configure() {
+        setStyles()
         setBindings()
+    }
+    
+    // MARK: - setStyles
+    func setStyles() {
+        navigationController?.isNavigationBarHidden = true
     }
     
     // MARK: - setBindings
     func setBindings() {
         routineSelectionView.rx.plusButtonDidTap
-            .subscribe(onNext: { [weak self] in
-                self?.coordinator?.showAddRoutineViewController()
-            })
+            .bind(with: self) { owner, _ in
+                owner.coordinator?.showAddRoutineViewController()
+            }
             .disposed(by: disposeBag)
         
         let input = RoutineSelectionViewModel.Input(
-            viewDidLoad: Observable.just(())
+            appear: self.rx.sentMessage(#selector(UIViewController.viewWillAppear(_:)))
+                .map { _ in () }
+                .take(1),
+            checkboxToggled: routineSelectionView.rx.checkboxToggled.asObservable()
         )
         
         let output = viewModel.transform(input)
         
         routineSelectionView.rx
-            .bindItems(output.rows.asObservable())
+            .bindItems(output.rows)
             .disposed(by: disposeBag)
     }
 }
