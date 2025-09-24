@@ -22,4 +22,18 @@ final class HomeCoordinator: Coordinator {
         )
         navigationController.pushViewController(homeVC, animated: false)
     }
+
+    func moveToRegisterWorkplace() {
+        let coordinator = WorkplaceRegisterCoordinator(navigationController: self.navigationController)
+        childCoordinators.append(coordinator)
+        DispatchQueue.main.async {
+            coordinator.start()
+        }
+    }
+    
+    func moveToManageAttendance() {
+        let viewModel = ManageAttendanceViewModel()
+        let vc = ManageAttendanceViewController(viewModel: viewModel)
+        navigationController.pushViewController(vc, animated: false)
+    }
 }
