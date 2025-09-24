@@ -24,6 +24,7 @@ final class HomeViewController: UIViewController {
             }
             let menu = self.setMenu(role: .owner)
             cell.update(item: item, menu: menu)
+            cell.delegate = self
             return cell
         case .worker:
             guard let cell = tableView.dequeueReusableCell(withIdentifier: WorkerWorkplaceCell.identifier, for: indexPath) as? WorkerWorkplaceCell else {
@@ -31,6 +32,7 @@ final class HomeViewController: UIViewController {
             }
             let menu = self.setMenu(role: .worker)
             cell.update(item: item, menu: menu)
+            cell.delegate = self
             return cell
         }
     }
@@ -86,8 +88,11 @@ private extension HomeViewController {
         })
         .disposed(by: disposeBag)
 
-        homeView.rx.plusButtonTap.subscribe(onNext: {
+        homeView.rx.plusButtonTap
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
             print("플러스 버튼 탭")
+            owner.coordinator?.moveToRegisterWorkplace()
         })
         .disposed(by: disposeBag)
 
@@ -131,5 +136,22 @@ private extension HomeViewController {
             print("초대 코드 보내기")
         }
         return action
+    }
+}
+
+extension HomeViewController: OwnerWorkplaceCellDelegate {
+    func didTapAttendanceBtn() {
+        print("근태 관리 탭")
+        coordinator?.moveToManageAttendance()
+    }
+}
+
+extension HomeViewController: WorkerWorkplaceCellDelegate {
+    func didTapStartBtn() {
+        print("시작 버튼 탭")
+    }
+
+    func didTapEndBtn() {
+        print("종료 버튼 탭")
     }
 }
