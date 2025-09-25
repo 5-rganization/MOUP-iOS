@@ -50,7 +50,7 @@ final class AddRoutineView: UIView {
         )
     }
     
-    private let alarmTimeButton = UIButton(configuration: .filled()).then {
+    fileprivate let alarmTimeButton = UIButton(configuration: .filled()).then {
         var config = $0.configuration
         config?.title = "알림시간"
         config?.baseForegroundColor = .gray900
@@ -300,5 +300,9 @@ extension Reactive where Base: AddRoutineView {
     
     var saveButtonTap: ControlEvent<Void> {
         return base.navigationBar.rx.rightBtnTapped
+    }
+    
+    var alarmTimeButtonTap: ControlEvent<Void> {
+        base.alarmTimeButton.rx.tap
     }
 }

@@ -55,6 +55,20 @@ private extension AddRoutineViewController {
             }
             .disposed(by: disposeBag)
         
+        addRoutineView.rx.alarmTimeButtonTap
+            .flatMapLatest { [weak self] _ -> Observable<DateComponents> in
+                guard let self else { return .empty() }
+                let sheet = TimePickerSheetViewController()
+                sheet.modalPresentationStyle = .overFullScreen
+                sheet.modalTransitionStyle = .crossDissolve
+                self.present(sheet, animated: false)
+                return sheet.selectedTimeEvent
+            }
+            .bind(with: self) { owner, comps in
+                print("선택한 시간: ", comps)
+            }
+            .disposed(by: disposeBag)
+        
         let input = AddRoutineViewModel.Input(
             titleChanged: addRoutineView.rx.titleText.orEmpty.asObservable(),
             addTodoButtonTapped: addRoutineView.rx.addButtonTap.asObservable(),
