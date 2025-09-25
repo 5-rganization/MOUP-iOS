@@ -7,12 +7,22 @@
 
 import UIKit
 import RxSwift
+import RxDataSources
 
 class ManageAttendanceViewController: UIViewController {
     // MARK: - Properties
     private let manageAttendanceView = ManageAttendanceView(title: "맥도날드 수유점") // TODO: - 실제 쓰는 네임으로 변경 필요.
     private let viewModel: ManageAttendanceViewModel
     private let disposeBag = DisposeBag()
+    
+    private let dataSource = RxTableViewSectionedReloadDataSource<AttendanceItem>(
+        configureCell: { dataSource, tableView, indexPath, item in
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: AttendanceCell.identifier, for: indexPath) as? AttendanceCell else {
+                return UITableViewCell()
+            }
+            cell.update(item: item)
+            return cell
+    })
     
     // MARK: - loadView
     override func loadView() {
@@ -54,7 +64,13 @@ private extension ManageAttendanceViewController {
     
     // MARK: - setBindings
     func setBindings() {
+        let input = ManageAttendanceViewModel.Input(viewDidLoad: .just(()))
+        let output = viewModel.transform(input: input)
+        
         manageAttendanceView.rx.setDelegate(self)
+            .disposed(by: disposeBag)
+        
+        manageAttendanceView.setupTableView(section: output.attendanceData, dataSource: dataSource)
             .disposed(by: disposeBag)
     }
 }

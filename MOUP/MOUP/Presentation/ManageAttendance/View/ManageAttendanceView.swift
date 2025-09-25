@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import RxDataSources
 import SnapKit
 import Then
 
@@ -27,9 +28,12 @@ final class ManageAttendanceView: UIView {
     }
     
     fileprivate let tableView = UITableView().then {
-        $0.estimatedRowHeight = 60
+        $0.rowHeight = 60
+        $0.separatorStyle = .none
+        $0.allowsSelection = false
         $0.sectionHeaderTopPadding = 0
         $0.register(ManageAttendanceTableHeaderView.self, forHeaderFooterViewReuseIdentifier: ManageAttendanceTableHeaderView.identifier)
+        $0.register(AttendanceCell.self, forCellReuseIdentifier: AttendanceCell.identifier)
     }
     
     // MARK: - Initializer
@@ -45,6 +49,12 @@ final class ManageAttendanceView: UIView {
     }
     
     // MARK: - Public Methods
+    func setupTableView(
+        section: Observable<[AttendanceItem]>,
+        dataSource: RxTableViewSectionedReloadDataSource<AttendanceItem>
+    ) -> Disposable {
+        return section.bind(to: tableView.rx.items(dataSource: dataSource))
+    }
 }
 
 private extension ManageAttendanceView {

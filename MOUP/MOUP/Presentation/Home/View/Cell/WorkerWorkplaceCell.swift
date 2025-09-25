@@ -11,9 +11,15 @@ import RxCocoa
 import SnapKit
 import Then
 
+protocol WorkerWorkplaceCellDelegate: AnyObject {
+    func didTapStartBtn()
+    func didTapEndBtn()
+}
+
 class WorkerWorkplaceCell: UITableViewCell {
     // MARK: - Properties
     static let identifier = "WorkerWorkplaceCell"
+    weak var delegate: WorkerWorkplaceCellDelegate?
     private let disposeBag = DisposeBag()
     private var isExpanded: Bool = false
 
@@ -232,11 +238,6 @@ private extension WorkerWorkplaceCell {
             isExpanded.toggle()
             toggleSecondSection(isExpanded)
             print("containerView tapped")
-        })
-        .disposed(by: disposeBag)
-
-        menuButton.rx.tap.subscribe(onNext: {
-            print("메뉴버튼탭")
         })
         .disposed(by: disposeBag)
     }
