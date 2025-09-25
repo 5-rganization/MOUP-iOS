@@ -58,14 +58,25 @@ private extension AddRoutineViewController {
         addRoutineView.rx.alarmTimeButtonTap
             .flatMapLatest { [weak self] _ -> Observable<DateComponents> in
                 guard let self else { return .empty() }
-                let sheet = TimePickerSheetViewController()
-                sheet.modalPresentationStyle = .overFullScreen
-                sheet.modalTransitionStyle = .crossDissolve
-                self.present(sheet, animated: false)
-                return sheet.selectedTimeEvent
+                
+                let timePickerVC = TimePickerSheetViewController()
+                
+                if let sheet = timePickerVC.sheetPresentationController {
+                    sheet.detents = [.medium()]
+                    sheet.prefersGrabberVisible = true
+                    sheet.prefersScrollingExpandsWhenScrolledToEdge = true
+                    sheet.preferredCornerRadius = 16
+                }
+                
+                self.present(timePickerVC, animated: true)
+                
+                return timePickerVC.selectedTimeEvent
             }
             .bind(with: self) { owner, comps in
-                print("선택한 시간: ", comps)
+                let hour = comps.hour ?? 0
+                let minute = comps.minute ?? 0
+                print("선택한 시간: \(hour)시 \(minute)분")
+
             }
             .disposed(by: disposeBag)
         
