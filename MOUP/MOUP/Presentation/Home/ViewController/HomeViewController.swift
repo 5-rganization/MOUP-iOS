@@ -108,7 +108,7 @@ private extension HomeViewController {
             guard let self else { return [] }
             switch role {
             case .worker:
-                return [ edit(), delete() ]
+                return [ edit(), delete(), attendanceHistory() ]
             case .owner:
                 return [ edit(), delete(), sendInvitationCode() ]
             }
@@ -137,10 +137,19 @@ private extension HomeViewController {
         }
         return action
     }
+    
+    func attendanceHistory() -> UIAction {
+        let action = UIAction(title: "출퇴근 기록") { [weak self] _ in
+            guard let self else { return }
+            print("출퇴근 기록 확인")
+            self.coordinator?.moveToAttendanceHistory(navTitle: "송눈섭") // TODO: - 알바 기준 UserDefault 등에 저장되어있는 닉네임 호출 필요
+        }
+        return action
+    }
 }
 
 extension HomeViewController: OwnerWorkplaceCellDelegate {
-    func didTapAttendanceBtn() {
+    func didTapAttendanceBtn(workplaceName: String) {
         print("근태 관리 탭")
         coordinator?.moveToManageAttendance()
     }

@@ -12,12 +12,13 @@ import SnapKit
 import Then
 
 protocol OwnerWorkplaceCellDelegate: AnyObject {
-    func didTapAttendanceBtn()
+    func didTapAttendanceBtn(workplaceName: String)
 }
 
 class OwnerWorkplaceCell: UITableViewCell {
     // MARK: - Properties
     static let identifier = "OwnerWorkplaceCell"
+    private var workplaceName: String = ""
     weak var delegate: OwnerWorkplaceCellDelegate?
     private let disposeBag = DisposeBag()
     private var isExpanded: Bool = false
@@ -105,6 +106,7 @@ class OwnerWorkplaceCell: UITableViewCell {
             break
         case .owner(let ownerInfo):
             self.nameLabel.text = ownerInfo.workplace.name
+            self.workplaceName = ownerInfo.workplace.name
             self.untilPaydayLabel.text = "sdfdfs"
             self.totalEarnedLabel.text = "dsfdsf"
             self.workplaceOfficialChip.isHidden = !ownerInfo.isOfficial
@@ -247,7 +249,7 @@ private extension OwnerWorkplaceCell {
         attendanceButton.rx.tap
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
-                owner.delegate?.didTapAttendanceBtn()
+                owner.delegate?.didTapAttendanceBtn(workplaceName: owner.workplaceName)
             })
             .disposed(by: disposeBag)
     }
