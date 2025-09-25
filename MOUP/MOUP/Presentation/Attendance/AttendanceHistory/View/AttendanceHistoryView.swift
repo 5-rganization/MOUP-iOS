@@ -12,12 +12,12 @@ import RxDataSources
 import SnapKit
 import Then
 
-final class ManageAttendanceView: UIView {
+final class AttendanceHistoryView: UIView {
     // MARK: - Properties
     private let title: String
     
     // MARK: - UI Components
-    private lazy var navigationBar = BaseNavigationBar(title: title)
+    fileprivate lazy var navigationBar = BaseNavigationBar(title: title)
     
     private let leftVerticalDivider = UIView().then {
         $0.backgroundColor = .gray400
@@ -32,7 +32,7 @@ final class ManageAttendanceView: UIView {
         $0.separatorStyle = .none
         $0.allowsSelection = false
         $0.sectionHeaderTopPadding = 0
-        $0.register(ManageAttendanceTableHeaderView.self, forHeaderFooterViewReuseIdentifier: ManageAttendanceTableHeaderView.identifier)
+        $0.register(AttendanceHistoryTableHeaderView.self, forHeaderFooterViewReuseIdentifier: AttendanceHistoryTableHeaderView.identifier)
         $0.register(AttendanceCell.self, forCellReuseIdentifier: AttendanceCell.identifier)
     }
     
@@ -57,7 +57,7 @@ final class ManageAttendanceView: UIView {
     }
 }
 
-private extension ManageAttendanceView {
+private extension AttendanceHistoryView {
     // MARK: - configure
     func configure() {
         setHierarchy()
@@ -110,8 +110,12 @@ private extension ManageAttendanceView {
     }
 }
 
-extension Reactive where Base: ManageAttendanceView {
+extension Reactive where Base: AttendanceHistoryView {
     func setDelegate(_ delegate: UITableViewDelegate) -> Disposable {
         return base.tableView.rx.setDelegate(delegate)
+    }
+    
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
     }
 }

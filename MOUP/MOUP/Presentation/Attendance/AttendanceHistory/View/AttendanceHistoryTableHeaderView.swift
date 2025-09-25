@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Then
 
-class ManageAttendanceTableHeaderView: UITableViewHeaderFooterView {
+class AttendanceHistoryTableHeaderView: UITableViewHeaderFooterView {
     // MARK: - Properties
     static let identifier = "ManageAttendanceTableHeaderView"
     
@@ -59,7 +59,7 @@ class ManageAttendanceTableHeaderView: UITableViewHeaderFooterView {
 
 }
 
-private extension ManageAttendanceTableHeaderView {
+private extension AttendanceHistoryTableHeaderView {
     func configure() {
         setHierarchy()
         setStyles()

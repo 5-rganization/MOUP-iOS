@@ -9,10 +9,11 @@ import UIKit
 import RxSwift
 import RxDataSources
 
-class ManageAttendanceViewController: UIViewController {
+class AttendanceHistoryViewController: UIViewController {
     // MARK: - Properties
-    private let manageAttendanceView = ManageAttendanceView(title: "맥도날드 수유점") // TODO: - 실제 쓰는 네임으로 변경 필요.
-    private let viewModel: ManageAttendanceViewModel
+    private let navTitle: String
+    private lazy var manageAttendanceView = AttendanceHistoryView(title: navTitle) // TODO: - 실제 쓰는 네임으로 변경 필요.
+    private let viewModel: AttendanceHistoryViewModel
     private let disposeBag = DisposeBag()
     
     private let dataSource = RxTableViewSectionedReloadDataSource<AttendanceItem>(
@@ -30,7 +31,8 @@ class ManageAttendanceViewController: UIViewController {
     }
     
     // MARK: - Initializer
-    init(viewModel: ManageAttendanceViewModel) {
+    init(viewModel: AttendanceHistoryViewModel, navTitle: String) {
+        self.navTitle = navTitle
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -49,7 +51,7 @@ class ManageAttendanceViewController: UIViewController {
 
 }
 
-private extension ManageAttendanceViewController {
+private extension AttendanceHistoryViewController {
     // MARK: - configure
     func configure() {
         setStyles()
@@ -64,7 +66,7 @@ private extension ManageAttendanceViewController {
     
     // MARK: - setBindings
     func setBindings() {
-        let input = ManageAttendanceViewModel.Input(viewDidLoad: .just(()))
+        let input = AttendanceHistoryViewModel.Input(viewDidLoad: .just(()))
         let output = viewModel.transform(input: input)
         
         manageAttendanceView.rx.setDelegate(self)
@@ -72,12 +74,18 @@ private extension ManageAttendanceViewController {
         
         manageAttendanceView.setupTableView(section: output.attendanceData, dataSource: dataSource)
             .disposed(by: disposeBag)
+        
+        manageAttendanceView.rx.navBackBtnTapped
+            .subscribe(onNext: {
+                self.navigationController?.popViewController(animated: true)
+            })
+            .disposed(by: disposeBag)
     }
 }
 
-extension ManageAttendanceViewController: UITableViewDelegate {
+extension AttendanceHistoryViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: ManageAttendanceTableHeaderView.identifier) as? ManageAttendanceTableHeaderView else {
+        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: AttendanceHistoryTableHeaderView.identifier) as? AttendanceHistoryTableHeaderView else {
             return UIView()
         }
         

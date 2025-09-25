@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 import RxRelay
 
-final class ManageAttendanceViewModel {
+final class AttendanceHistoryViewModel {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     private let mockAttendanceData = [
