@@ -19,12 +19,15 @@ final class AddRoutineView: UIView {
     fileprivate lazy var dataSource = UITableViewDiffableDataSource<Section, TodoItem>(
         tableView: tableView
     ) { tableView, indexPath, item in
-        let cell = tableView.dequeueReusableCell(withIdentifier: TodoCell.id, for: indexPath) as! TodoCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: TodoCell.id, for: indexPath) as? TodoCell else {
+            fatalError("TodoCell을 생성할 수 없습니다.")
+        }
         cell.todoTextField.text = item.text
         return cell
     }
     fileprivate let itemTextChangeRelay = PublishRelay<(index: Int, text: String)>()
     fileprivate let itemMovedRelay = PublishRelay<(source: Int, destination: Int)>()
+    fileprivate let itemDeleteRelay = PublishRelay<Int>()
 
     // MARK: - UI Components
     
@@ -238,6 +241,16 @@ extension AddRoutineView: UITableViewDelegate {
         itemTextChangeRelay.accept((index: tf.tag, text: tf.text ?? ""))
     }
     
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "삭제") { [weak self] _, _, completion in
+            self?.itemDeleteRelay.accept(indexPath.row)
+            
+            completion(true)
+        }
+        
+        return UISwipeActionsConfiguration(actions: [deleteAction])
+    }
+    
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
         .none
     }
@@ -286,15 +299,24 @@ extension AddRoutineView: UITableViewDropDelegate {
         UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
     }
 
-    func tableView(_ tableView: UITableView,
-                   performDropWith coordinator: UITableViewDropCoordinator) {
-        guard coordinator.proposal.operation == .move,
-              let first = coordinator.items.first,
-              let source = first.sourceIndexPath else { return }
-
-        let dest = coordinator.destinationIndexPath ?? IndexPath(row: tableView.numberOfRows(inSection: 0) - 1, section: 0)
-
-        itemMovedRelay.accept((source: source.row, destination: dest.row))
+    func tableView(
+        _ tableView: UITableView,
+        performDropWith coordinator: UITableViewDropCoordinator
+    ) {
+        let destinationIndexPath: IndexPath
+        if let indexPath = coordinator.destinationIndexPath {
+            destinationIndexPath = indexPath
+        } else {
+            let section = tableView.numberOfSections - 1
+            let row = tableView.numberOfRows(inSection: section)
+            destinationIndexPath = IndexPath(row: row, section: section)
+        }
+        
+        guard let sourceIndexPath = coordinator.items.first?.sourceIndexPath else { return }
+        
+        self.itemMovedRelay.accept(
+            (source: sourceIndexPath.row, destination: destinationIndexPath.row)
+        )
     }
 }
 
@@ -348,5 +370,9 @@ extension Reactive where Base: AddRoutineView {
     
     var alarmTimeButtonTap: ControlEvent<Void> {
         base.alarmTimeButton.rx.tap
+    }
+    
+    var itemDeleted: Observable<Int> {
+        return base.itemDeleteRelay.asObservable()
     }
 }

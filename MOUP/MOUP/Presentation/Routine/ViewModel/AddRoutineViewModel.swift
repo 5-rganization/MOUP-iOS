@@ -9,11 +9,6 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-enum RoutineEditMode {
-    case create
-    case edit(id: String, title: String, time: String, items: [TodoItem])
-}
-
 struct TodoItem: Hashable {
     let id: UUID = UUID()
     var text: String
@@ -28,15 +23,18 @@ struct TodoItem: Hashable {
 }
 
 final class AddRoutineViewModel {
+    
+    // MARK: - Input
+    
     struct Input {
         let titleChanged: Observable<String>
-//        let alarmTimeButtonTapped: Observable<Void>
-//        let saveButtonTapped: Observable<Void>
-        
         let addTodoButtonTapped: Observable<Void>
         let itemTextChanged: Observable<(index: Int, text: String)>
         let itemMoved: Observable<(source: Int, destination: Int)>
+        let itemDeleted: Observable<Int>
     }
+    
+    // MARK: - Output
     
     struct Output {
         let items: Driver<[TodoItem]>
@@ -47,29 +45,16 @@ final class AddRoutineViewModel {
     // MARK: - Properties
     
     private let disposeBag = DisposeBag()
-    private let mode: RoutineEditMode
     
-    // MARK: - Initializer
+    // MARK: - State
     
-    init(mode: RoutineEditMode = .create) {
-        self.mode = mode
-    }
+    private let itemsRelay = BehaviorRelay<[TodoItem]>(value: [TodoItem(text: "")])
+    private let titleRelay = BehaviorRelay<String>(value: "")
     
     // MARK: - Transform
     
     func transform(input: Input) -> Output {
-        let itemsRelay = BehaviorRelay<[TodoItem]>(value: [TodoItem(text: "")])
-        let titleRelay = BehaviorRelay<String>(value: "")
         let focusRelay = PublishRelay<Int>()
-        
-        switch mode {
-        case .create:
-            itemsRelay.accept([TodoItem(text: "")])
-            titleRelay.accept("")
-        case let .edit(_, title, _, items):
-            itemsRelay.accept(items.isEmpty ? [TodoItem(text: "")] : items)
-            titleRelay.accept(title)
-        }
         
         input.titleChanged
             .bind(to: titleRelay)
@@ -77,15 +62,19 @@ final class AddRoutineViewModel {
         
         input.addTodoButtonTapped
             .withLatestFrom(itemsRelay)
-            .subscribe(onNext: { current in
-                var items = current
-                if let last = items.last, last.text.isEmpty {
-                    focusRelay.accept(items.count - 1)
+            .subscribe(onNext: { [weak self] currentItems in
+                guard let self else { return }
+                
+                var newItems = currentItems
+                
+                if let lastItem = newItems.last, lastItem.text.isEmpty {
+                    focusRelay.accept(newItems.count - 1)
                     return
                 }
-                items.append(TodoItem(text: ""))
-                itemsRelay.accept(items)
-                focusRelay.accept(items.count - 1)
+                
+                newItems.append(TodoItem(text: ""))
+                self.itemsRelay.accept(newItems)
+                focusRelay.accept(newItems.count - 1)
             })
             .disposed(by: disposeBag)
         
@@ -102,15 +91,32 @@ final class AddRoutineViewModel {
             .disposed(by: disposeBag)
         
         input.itemMoved
-            .withLatestFrom(itemsRelay) { (move, current) -> [TodoItem] in
-                var items = current
-                let (src, dst) = move
-                guard items.indices.contains(src),
-                      (0...items.count).contains(dst),
-                      src != dst else { return items }
-                let moving = items.remove(at: src)
-                items.insert(moving, at: dst)
-                return items
+            .withLatestFrom(itemsRelay) { (move, currentItems) -> [TodoItem] in
+                var newItems = currentItems
+                let (sourceIndex, destinationIndex) = move
+                
+                guard newItems.indices.contains(sourceIndex),
+                      (0...newItems.count).contains(destinationIndex) else { return newItems }
+                
+                let itemToMove = newItems.remove(at: sourceIndex)
+                newItems.insert(itemToMove, at: destinationIndex)
+                return newItems
+            }
+            .bind(to: itemsRelay)
+            .disposed(by: disposeBag)
+        
+        input.itemDeleted
+            .withLatestFrom(itemsRelay) { (indexToDelete, currentItems) -> [TodoItem] in
+                var newItems = currentItems
+                guard newItems.indices.contains(indexToDelete) else { return newItems }
+                
+                newItems.remove(at: indexToDelete)
+                
+                if newItems.isEmpty {
+                    newItems.append(TodoItem(text: ""))
+                }
+                
+                return newItems
             }
             .bind(to: itemsRelay)
             .disposed(by: disposeBag)

@@ -37,12 +37,7 @@ final class RoutineSelectionCoordinator: Coordinator {
             TodoItem(text: "발주 확인")
         ]
         
-        let vm = AddRoutineViewModel(mode: .edit(
-            id: state.id,
-            title: existingTitle,
-            time: existingTime,
-            items: existingTodos
-        ))
+        let vm = AddRoutineViewModel()
         let vc = AddRoutineViewController(viewModel: vm)
         navigationController.pushViewController(vc, animated: true)
     }

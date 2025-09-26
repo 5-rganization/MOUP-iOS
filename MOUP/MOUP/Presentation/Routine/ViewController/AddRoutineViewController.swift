@@ -81,7 +81,8 @@ private extension AddRoutineViewController {
             titleChanged: addRoutineView.rx.titleText.orEmpty.asObservable(),
             addTodoButtonTapped: addRoutineView.rx.addButtonTap.asObservable(),
             itemTextChanged: addRoutineView.rx.itemTextChanged,
-            itemMoved: addRoutineView.rx.itemMoved
+            itemMoved: addRoutineView.rx.itemMoved,
+            itemDeleted: addRoutineView.rx.itemDeleted
         )
         
         let output = viewModel.transform(input: input)
