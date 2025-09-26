@@ -50,25 +50,31 @@ final class AddRoutineView: UIView {
         )
     }
     
-    fileprivate let alarmTimeButton = UIButton(configuration: .filled()).then {
-        var config = $0.configuration
-        config?.title = "알림시간"
-        config?.baseForegroundColor = .gray900
-        config?.baseBackgroundColor = .clear
-        config?.contentInsets = NSDirectionalEdgeInsets(
-            top: 12, leading: 16, bottom: 12, trailing: 16
-        )
-        var container = AttributeContainer()
-        container.font = UIFont.bodyMedium(16)
-        config?.attributedTitle = AttributedString(
-            "알림시간", attributes: container
-        )
-        $0.configuration = config
-        $0.contentHorizontalAlignment = .leading
+    fileprivate let alarmTimeButton = UIButton().then {
+        $0.backgroundColor = .clear
         $0.layer.cornerRadius = 12
         $0.layer.borderWidth = 1
         $0.layer.borderColor = UIColor.gray400.cgColor
         $0.clipsToBounds = true
+    }
+    
+    private let alarmTitleLabel = UILabel().then {
+        $0.text = "알림시간"
+        $0.font = .bodyMedium(16)
+        $0.textColor = .gray900
+        $0.setLineSpacing(.headBold)
+    }
+    
+    private let alarmTimeChipView = UIView().then {
+        $0.backgroundColor = .primary100
+        $0.layer.cornerRadius = 8
+        $0.isHidden = true
+    }
+    
+    private let alarmTimeChipLabel = UILabel().then {
+        $0.text = "00:00"
+        $0.textColor = .gray700
+        $0.font = .bodyMedium(16)
     }
     
     private let todoListTitleLabel = UILabel().then {
@@ -95,6 +101,20 @@ final class AddRoutineView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - Public Methods
+    
+    func updateAlarmTimeChip(with components: DateComponents) {
+        guard let hour = components.hour, let minute = components.minute else {
+            alarmTimeChipView.isHidden = true
+            return
+        }
+        
+        let timeString = String(format: "%d:%02d", hour, minute)
+        
+        alarmTimeChipLabel.text = timeString
+        alarmTimeChipView.isHidden = false
+    }
 }
 
 private extension AddRoutineView {
@@ -116,6 +136,13 @@ private extension AddRoutineView {
             addTodoButton,
             tableView
         )
+        
+        alarmTimeButton.addSubviews(
+            alarmTitleLabel,
+            alarmTimeChipView
+        )
+        
+        alarmTimeChipView.addSubview(alarmTimeChipLabel)
     }
     
     // MARK: - setStyles
@@ -161,6 +188,23 @@ private extension AddRoutineView {
             $0.top.equalTo(textfield.snp.bottom).offset(6)
             $0.directionalHorizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(48)
+        }
+        
+        alarmTitleLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(16)
+            $0.centerY.equalToSuperview()
+        }
+        
+        alarmTimeChipView.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalToSuperview().inset(16)
+        }
+        
+        alarmTimeChipLabel.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+                .inset(
+                    UIEdgeInsets(top: 2, left: 12, bottom: 2, right: 12)
+                )
         }
         
         todoListTitleLabel.snp.makeConstraints {

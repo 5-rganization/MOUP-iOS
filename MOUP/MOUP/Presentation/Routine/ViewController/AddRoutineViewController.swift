@@ -73,10 +73,7 @@ private extension AddRoutineViewController {
                 return timePickerVC.selectedTimeEvent
             }
             .bind(with: self) { owner, comps in
-                let hour = comps.hour ?? 0
-                let minute = comps.minute ?? 0
-                print("선택한 시간: \(hour)시 \(minute)분")
-
+                owner.addRoutineView.updateAlarmTimeChip(with: comps)
             }
             .disposed(by: disposeBag)
         
