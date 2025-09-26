@@ -7,12 +7,24 @@
 
 import UIKit
 import RxSwift
+import RxDataSources
 
 class ManageAttendanceViewController: UIViewController {
     // MARK: - Properties
     private let manageAttendanceView = ManageAttendanceView()
     private let viewModel: ManageAttendanceViewModel
     private let disposeBag = DisposeBag()
+    weak var coordinator: HomeCoordinator?
+    
+    private let dataSource = RxTableViewSectionedReloadDataSource<ManageAttendanceItem>(
+        configureCell: { dataSource, tableView, indexPath, item in
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ManageAttendanceCell.identifier, for: indexPath) as? ManageAttendanceCell else {
+                return UITableViewCell()
+            }
+            let color = LabelColorString.init(rawValue: item.labelColor)?.labelColor ?? .primary50
+            cell.update(color: color, name: item.name)
+            return cell
+    })
     
     // MARK: - loadView
     override func loadView() {
@@ -20,8 +32,9 @@ class ManageAttendanceViewController: UIViewController {
     }
     
     // MARK: - Initializer
-    init(viewModel: ManageAttendanceViewModel) {
+    init(viewModel: ManageAttendanceViewModel, coordinator: HomeCoordinator) {
         self.viewModel = viewModel
+        self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -53,6 +66,24 @@ private extension ManageAttendanceViewController {
     
     // MARK: - setBindings
     func setBindings() {
+        let input = ManageAttendanceViewModel.Input(viewDidLoad: .just(()))
+        let output = viewModel.transform(input: input)
         
+        manageAttendanceView.setupTableView(section: output.employees, dataSource: dataSource)
+            .disposed(by: disposeBag)
+        
+        manageAttendanceView.rx.navBackBtnTapped
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        manageAttendanceView.rx.modelSelected
+            .withUnretained(self)
+            .subscribe(onNext: { owner, model in
+                owner.coordinator?.moveToAttendanceHistory(navTitle: model.name)
+            })
+            .disposed(by: disposeBag)
     }
 }

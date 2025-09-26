@@ -33,7 +33,7 @@ final class HomeCoordinator: Coordinator {
     
     func moveToManageAttendance() {
         let viewModel = ManageAttendanceViewModel()
-        let vc = ManageAttendanceViewController(viewModel: viewModel)
+        let vc = ManageAttendanceViewController(viewModel: viewModel, coordinator: self)
         navigationController.pushViewController(vc, animated: true)
     }
     

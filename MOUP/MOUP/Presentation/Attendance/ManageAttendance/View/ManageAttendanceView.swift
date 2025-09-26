@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import RxDataSources
 import SnapKit
 import Then
 
@@ -17,13 +18,15 @@ final class ManageAttendanceView: UIView {
     // MARK: - UI Components
     fileprivate let navigationBar = BaseNavigationBar(title: "근태 관리")
     
-    private let tableView = UITableView().then {
+    fileprivate let tableView = UITableView().then {
         $0.rowHeight = 48
-        $0.isHidden = true
+        $0.isHidden = false
+        $0.separatorStyle = .none
+        $0.register(ManageAttendanceCell.self, forCellReuseIdentifier: ManageAttendanceCell.identifier)
     }
     
     private let emptyView = ManageAttendanceEmptyView().then {
-        $0.isHidden = false
+        $0.isHidden = true
     }
     
     // MARK: - Initializer
@@ -39,7 +42,12 @@ final class ManageAttendanceView: UIView {
     }
     
     // MARK: - Public Methods
-    
+    func setupTableView(
+        section: Observable<[ManageAttendanceItem]>,
+        dataSource: RxTableViewSectionedReloadDataSource<ManageAttendanceItem>
+    ) -> Disposable {
+        return section.bind(to: tableView.rx.items(dataSource: dataSource))
+    }
 }
 
 private extension ManageAttendanceView {
@@ -54,7 +62,8 @@ private extension ManageAttendanceView {
     func setHierarchy() {
         addSubviews(
             navigationBar,
-            emptyView
+            emptyView,
+            tableView
         )
     }
     
@@ -75,11 +84,25 @@ private extension ManageAttendanceView {
             $0.directionalHorizontalEdges.equalToSuperview()
             $0.bottom.equalTo(safeAreaLayoutGuide)
         }
+        
+        tableView.snp.makeConstraints {
+            $0.top.equalTo(navigationBar.snp.bottom)
+            $0.directionalHorizontalEdges.equalToSuperview()
+            $0.bottom.equalTo(safeAreaLayoutGuide)
+        }
     }
 }
 
 extension Reactive where Base: ManageAttendanceView {
     var navBackBtnTapped: ControlEvent<Void> {
         return base.navigationBar.rx.backBtnTapped
+    }
+    
+    var cellSelected: ControlEvent<IndexPath> {
+        return base.tableView.rx.itemSelected
+    }
+    
+    var modelSelected: ControlEvent<Employee> {
+        return base.tableView.rx.modelSelected(Employee.self)
     }
 }
