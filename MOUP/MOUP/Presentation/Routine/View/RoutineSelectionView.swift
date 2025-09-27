@@ -26,7 +26,7 @@ final class RoutineSelectionView: UIView {
         $0.setLineSpacing(.headBold)
     }
     
-    let tableView = UITableView().then {
+    fileprivate let routineTableView = UITableView().then {
         $0.separatorStyle = .none
         $0.showsVerticalScrollIndicator = false
         $0.backgroundColor = .clear
@@ -34,15 +34,9 @@ final class RoutineSelectionView: UIView {
     
     private let applyButton = BaseButton(title: "적용하기")
     
-    weak var dataSource: UITableViewDataSource? {
-        get { tableView.dataSource }
-        set { tableView.dataSource = newValue }
-    }
+    // MARK: - Getter
     
-    weak var delegate: UITableViewDelegate? {
-        get { tableView.delegate }
-        set { tableView.delegate = newValue }
-    }
+    var tableView: UITableView { routineTableView }
     
     // MARK: - Initializer
     

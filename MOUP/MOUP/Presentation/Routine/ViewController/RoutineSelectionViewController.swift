@@ -76,8 +76,8 @@ private extension RoutineSelectionViewController {
     
     // MARK: - setDataSourceAndDelegate
     func setDataSourceAndDelegate() {
-        routineSelectionView.dataSource = self.dataSource
-        routineSelectionView.delegate = self
+        routineSelectionView.tableView.dataSource = self.dataSource
+        routineSelectionView.tableView.delegate = self
     }
     
     // MARK: - setBindings
@@ -149,7 +149,9 @@ private extension RoutineSelectionViewController {
     }
     
     func makeDataSource() -> DataSource {
-        let dataSource = DataSource(tableView: routineSelectionView.tableView) { [weak self] tableView, indexPath, viewState in
+        let dataSource = DataSource(
+            tableView: routineSelectionView.tableView
+        ) { [weak self] tableView, indexPath, viewState in
             guard let self,
                   let cell = tableView.dequeueReusableCell(withIdentifier: RoutineCell.id, for: indexPath) as? RoutineCell else {
                 return UITableViewCell()

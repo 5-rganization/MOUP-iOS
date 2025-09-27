@@ -22,7 +22,7 @@ final class AddRoutineView: UIView {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: TodoCell.id, for: indexPath) as? TodoCell else {
             fatalError("TodoCell을 생성할 수 없습니다.")
         }
-        cell.todoTextField.text = item.text
+        cell.textField.text = item.text
         return cell
     }
     fileprivate let itemTextChangeRelay = PublishRelay<(index: Int, text: String)>()
@@ -250,9 +250,9 @@ private extension AddRoutineView {
 extension AddRoutineView: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         guard let cell = cell as? TodoCell else { return }
-        cell.todoTextField.tag = indexPath.row
-        cell.todoTextField.removeTarget(nil, action: nil, for: .editingChanged)
-        cell.todoTextField.addTarget(self, action: #selector(textChanged(_:)), for: .editingChanged)
+        cell.textField.tag = indexPath.row
+        cell.textField.removeTarget(nil, action: nil, for: .editingChanged)
+        cell.textField.addTarget(self, action: #selector(textChanged(_:)), for: .editingChanged)
     }
     
     @objc private func textChanged(_ tf: UITextField) {
@@ -372,7 +372,7 @@ extension Reactive where Base: AddRoutineView {
             view.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
             DispatchQueue.main.async {
                 if let cell = view.tableView.cellForRow(at: indexPath) as? TodoCell {
-                    cell.todoTextField.becomeFirstResponder()
+                    cell.textField.becomeFirstResponder()
                 }
             }
         }

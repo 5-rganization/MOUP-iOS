@@ -15,7 +15,7 @@ final class TodoCell: UITableViewCell {
 
     // MARK: - UI Components
     
-    let todoTextField = UITextField().then {
+    private let todoTextField = UITextField().then {
         let placeholder = "할 일"
         $0.attributedPlaceholder = NSAttributedString(
             string: placeholder,
@@ -33,6 +33,10 @@ final class TodoCell: UITableViewCell {
             for: .normal
         )
     }
+    
+    // MARK: - Getter
+    
+    var textField: UITextField { todoTextField }
     
     // MARK: - Initializer
     
