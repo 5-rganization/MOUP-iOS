@@ -16,6 +16,7 @@ final class AddRoutineViewController: UIViewController {
     private let addRoutineView = AddRoutineView()
     private let viewModel: AddRoutineViewModel
     private let disposeBag = DisposeBag()
+    var onSave: ((Routine) -> Void)?
     
     // MARK: - Lifecycle
     
@@ -119,7 +120,8 @@ private extension AddRoutineViewController {
             .disposed(by: disposeBag)
         
         output.saveCompleted
-            .emit(with: self, onNext: { owner, _ in
+            .emit(with: self, onNext: { owner, newRoutine in
+                owner.onSave?(newRoutine)
                 owner.navigationController?.popViewController(animated: true)
             })
             .disposed(by: disposeBag)

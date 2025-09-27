@@ -26,7 +26,7 @@ final class RoutineSelectionView: UIView {
         $0.setLineSpacing(.headBold)
     }
     
-    fileprivate let tableView = UITableView().then {
+    let tableView = UITableView().then {
         $0.separatorStyle = .none
         $0.showsVerticalScrollIndicator = false
         $0.backgroundColor = .clear
@@ -34,7 +34,15 @@ final class RoutineSelectionView: UIView {
     
     private let applyButton = BaseButton(title: "적용하기")
     
-    fileprivate let checkboxToggleRelay = PublishRelay<(index: IndexPath, toggled: Bool)>()
+    weak var dataSource: UITableViewDataSource? {
+        get { tableView.dataSource }
+        set { tableView.dataSource = newValue }
+    }
+    
+    weak var delegate: UITableViewDelegate? {
+        get { tableView.delegate }
+        set { tableView.delegate = newValue }
+    }
     
     // MARK: - Initializer
     
@@ -104,31 +112,8 @@ extension Reactive where Base: RoutineSelectionView {
         return base.navigationBar.rx.rightBtnTapped
     }
     
-    @discardableResult
-    func bindItems(_ source: Driver<[RoutineRowViewState]>) -> Disposable {
-        base.tableView.register(
-            RoutineCell.self,
-            forCellReuseIdentifier: RoutineCell.id
-        )
-        return source
-            .drive(base.tableView.rx.items(
-                cellIdentifier: RoutineCell.id,
-                cellType: RoutineCell.self
-            )) { index, state, cell in
-                cell.set(name: state.name, time: state.time, isChecked: state.isChecked)
-                cell.rx.checkboxDidTap
-                    .map { _ in (IndexPath(row: index, section: 0), !state.isChecked) }
-                    .bind(to: base.checkboxToggleRelay)
-                    .disposed(by: cell.disposeBag)
-            }
-    }
-    
-    var checkboxToggled: ControlEvent<(index: IndexPath, toggled: Bool)> {
-        ControlEvent(events: base.checkboxToggleRelay.asObservable())
-    }
-    
-    var itemSelected: ControlEvent<RoutineRowViewState> {
-        ControlEvent(events: base.tableView.rx.modelSelected(RoutineRowViewState.self))
+    var itemSelected: ControlEvent<IndexPath> {
+        return base.tableView.rx.itemSelected
     }
     
     var deselectRow: Binder<IndexPath> {

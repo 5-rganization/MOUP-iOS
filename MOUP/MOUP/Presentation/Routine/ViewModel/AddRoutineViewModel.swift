@@ -51,7 +51,7 @@ final class AddRoutineViewModel {
         
         let title: Driver<String>
         let validationFocus: Signal<ValidationFocusTarget>
-        let saveCompleted: Signal<Void>
+        let saveCompleted: Signal<Routine>
     }
     
     // MARK: - Properties
@@ -67,7 +67,7 @@ final class AddRoutineViewModel {
         
         let focusRelay = PublishRelay<Int>()
         let validationFocusRelay = PublishRelay<ValidationFocusTarget>()
-        let saveCompletedRelay = PublishRelay<Void>()
+        let saveCompletedRelay = PublishRelay<Routine>()
         
         input.titleChanged
             .bind(to: titleRelay)
@@ -79,9 +79,7 @@ final class AddRoutineViewModel {
         
         input.addTodoButtonTapped
             .withLatestFrom(itemsRelay)
-            .subscribe(onNext: { [weak self] currentItems in
-                guard let self else { return }
-                
+            .subscribe(onNext: { currentItems in                
                 var newItems = currentItems
                 
                 if let lastItem = newItems.last, lastItem.text.isEmpty {
@@ -161,9 +159,13 @@ final class AddRoutineViewModel {
                     return
                 }
                 
+                let newRoutine = Routine(
+                    id: UUID(), title: title, alarmTime: alarmTime, items: validItems
+                )
+                
                 // TODO: usecase 호출
-                print("저장 성공 Title: \(title), Time: \(String(describing: alarmTime)), Items: \(validItems)")
-                saveCompletedRelay.accept(())
+                print("저장 성공: \(newRoutine)")
+                saveCompletedRelay.accept(newRoutine)
             })
             .disposed(by: disposeBag)
         

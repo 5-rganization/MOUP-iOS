@@ -11,7 +11,7 @@ final class RoutineSelectionCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     let navigationController: UINavigationController
     
-    private lazy var viewModel = RoutineSelectionViewModel()
+    private let viewModel = RoutineSelectionViewModel()
     private lazy var routineSelectionVC = RoutineSelectionViewController(viewModel: viewModel)
     
     init(navigationController: UINavigationController) {
@@ -23,20 +23,14 @@ final class RoutineSelectionCoordinator: Coordinator {
         navigationController.pushViewController(routineSelectionVC, animated: true)
     }
     
-    func showAddRoutineViewController() {
+    func showAddRoutineViewController(onSave: @escaping (Routine) -> Void) {
         let viewModel = AddRoutineViewModel()
         let addRoutineVC = AddRoutineViewController(viewModel: viewModel)
+        addRoutineVC.onSave = onSave
         navigationController.pushViewController(addRoutineVC, animated: true)
     }
     
     func showRoutineDetail(with state: RoutineRowViewState) {
-        let existingTitle = state.name
-        let existingTime = state.time
-        let existingTodos: [TodoItem] = [
-            TodoItem(text: "매장 오픈 준비"),
-            TodoItem(text: "발주 확인")
-        ]
-        
         let vm = AddRoutineViewModel()
         let vc = AddRoutineViewController(viewModel: vm)
         navigationController.pushViewController(vc, animated: true)

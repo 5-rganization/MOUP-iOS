@@ -9,7 +9,10 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class RoutineSelectionViewController: UIViewController {
+final class RoutineSelectionViewController: UIViewController, UITableViewDelegate {
+    
+    typealias DataSource = UITableViewDiffableDataSource<Int, RoutineRowViewState>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Int, RoutineRowViewState>
     
     // MARK: - Properties
     
@@ -17,6 +20,11 @@ final class RoutineSelectionViewController: UIViewController {
     private let routineSelectionView = RoutineSelectionView()
     private let viewModel: RoutineSelectionViewModel
     private let disposeBag = DisposeBag()
+    
+    private let addNewRoutineRelay = PublishRelay<Routine>()
+    private let checkboxToggledRelay = PublishRelay<UUID>()
+    
+    private lazy var dataSource = makeDataSource()
     
     // MARK: - Lifecycle
     
@@ -46,6 +54,8 @@ private extension RoutineSelectionViewController {
     // MARK: - configure
     func configure() {
         setStyles()
+        setTableView()
+        setDataSourceAndDelegate()
         setBindings()
     }
     
@@ -54,11 +64,27 @@ private extension RoutineSelectionViewController {
         navigationController?.isNavigationBarHidden = true
     }
     
+    // MARK: - setTableView
+    func setTableView() {
+        routineSelectionView.tableView.register(
+            RoutineCell.self, forCellReuseIdentifier: RoutineCell.id
+        )
+    }
+    
+    // MARK: - setDataSourceAndDelegate
+    func setDataSourceAndDelegate() {
+        routineSelectionView.dataSource = self.dataSource
+        routineSelectionView.delegate = self
+    }
+    
     // MARK: - setBindings
     func setBindings() {
         routineSelectionView.rx.plusButtonDidTap
             .bind(with: self) { owner, _ in
-                owner.coordinator?.showAddRoutineViewController()
+                owner.coordinator?.showAddRoutineViewController(onSave: { newRoutine in
+                    owner.addNewRoutineRelay.accept(newRoutine)
+                })
+                
             }
             .disposed(by: disposeBag)
         
@@ -66,20 +92,52 @@ private extension RoutineSelectionViewController {
             appear: self.rx.sentMessage(#selector(UIViewController.viewWillAppear(_:)))
                 .map { _ in () }
                 .take(1),
-            checkboxToggled: routineSelectionView.rx.checkboxToggled.asObservable()
+            checkboxToggled: checkboxToggledRelay.asObservable(),
+            addNewRoutine: addNewRoutineRelay.asObservable()
         )
         
         let output = viewModel.transform(input)
         
-        routineSelectionView.rx
-            .bindItems(output.rows)
+        output.rows
+            .drive(onNext: { [weak self] rows in
+                self?.applySnapshot(with: rows, animated: true)
+            })
             .disposed(by: disposeBag)
         
-        routineSelectionView.rx.itemSelected
-            .withUnretained(self)
-            .bind { owner, state in
-                owner.coordinator?.showRoutineDetail(with: state)
-            }
+        output.toggledRow
+            .emit(onNext: { [weak self] toggledState in
+                guard let self else { return }
+                var currentSnapshot = self.dataSource.snapshot()
+                currentSnapshot.reconfigureItems([toggledState])
+                self.dataSource.apply(currentSnapshot, animatingDifferences: false)
+            })
             .disposed(by: disposeBag)
+    }
+    
+    func makeDataSource() -> DataSource {
+        let dataSource = DataSource(tableView: routineSelectionView.tableView) { [weak self] tableView, indexPath, viewState in
+            guard let self,
+                  let cell = tableView.dequeueReusableCell(withIdentifier: RoutineCell.id, for: indexPath) as? RoutineCell else {
+                return UITableViewCell()
+            }
+            
+            cell.disposeBag = DisposeBag()
+            cell.update(with: viewState)
+            cell.rx.checkboxDidTap
+                .map { viewState.routine.id }
+                .bind(to: self.checkboxToggledRelay)
+                .disposed(by: cell.disposeBag)
+            
+            return cell
+        }
+        return dataSource
+    }
+    
+    func applySnapshot(with rows: [RoutineRowViewState], animated: Bool) {
+        var snapshot = Snapshot()
+        snapshot.appendSections([0])
+        snapshot.appendItems(rows, toSection: 0)
+        snapshot.reloadItems(rows)
+        dataSource.apply(snapshot, animatingDifferences: animated)
     }
 }

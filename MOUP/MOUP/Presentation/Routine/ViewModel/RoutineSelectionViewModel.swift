@@ -9,67 +9,98 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-struct DummyRoutine {
-    let id: String
-    let name: String
-    let time: String
+struct Routine: Hashable {
+    let id: UUID
+    let title: String
+    let alarmTime: DateComponents?
+    let items: [TodoItem]
 }
 
 struct RoutineRowViewState: Hashable {
-    let id: String
-    let name: String
-    let time: String
-    let isChecked: Bool
+    let routine: Routine
+    var isChecked: Bool
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(routine.id)
+    }
+    
+    static func == (lhs: RoutineRowViewState, rhs: RoutineRowViewState) -> Bool {
+        lhs.routine.id == rhs.routine.id
+    }
 }
 
 final class RoutineSelectionViewModel {
     struct Input {
         let appear: Observable<Void>
-        let checkboxToggled: Observable<(index: IndexPath, toggled: Bool)>
+        let checkboxToggled: Observable<UUID>
+        let addNewRoutine: Observable<Routine>
     }
     
     struct Output {
         let rows: Driver<[RoutineRowViewState]>
+        let toggledRow: Signal<RoutineRowViewState>
     }
     
     // MARK: - Properties
     
-    private let rowsRelay = BehaviorRelay<[RoutineRowViewState]>(value: [])
+    private let routinesRelay = BehaviorRelay<[Routine]>(value: [])
+    private let checkedIDsRelay = BehaviorRelay<Set<UUID>>(value: [])
     private let disposeBag = DisposeBag()
     
     // MARK: - Transform
     
     func transform(_ input: Input) -> Output {
-        input.appear
-            .map { _ -> [DummyRoutine] in
-                return [
-                    DummyRoutine(id: "open", name: "오픈", time: "09 : 00"),
-                    DummyRoutine(id: "waste", name: "폐기", time: "15 : 00"),
-                    DummyRoutine(id: "close", name: "마감", time: "18 : 00")
-                ]
+        let toggledRowRelay = PublishRelay<RoutineRowViewState>()
+        
+        let initialRoutines = input.appear
+            .flatMapLatest { [unowned self] _ -> Observable<[Routine]> in
+                // TODO: usecase 호출
+                return .just(self.fetchDummyData())
             }
-            .map { routines in
-                routines.map {
-                    RoutineRowViewState(id: $0.id, name: $0.name, time: $0.time, isChecked: false)
-                }
+        
+        let newRoutineAdded = input.addNewRoutine
+            .withLatestFrom(routinesRelay) { newRoutine, currentRoutines in
+                return currentRoutines + [newRoutine]
             }
-            .bind(to: rowsRelay)
+        
+        Observable.merge(initialRoutines, newRoutineAdded)
+            .bind(to: routinesRelay)
             .disposed(by: disposeBag)
         
         input.checkboxToggled
-            .withLatestFrom(rowsRelay.asObservable()) { toggle, rows -> [RoutineRowViewState] in
-                var newRows = rows
-                if toggle.index.row < newRows.count {
-                    let old = newRows[toggle.index.row]
-                    newRows[toggle.index.row] = RoutineRowViewState(
-                        id: old.id, name: old.name, time: old.time, isChecked: toggle.toggled
-                    )
-                }
-                return newRows
+            .withLatestFrom(checkedIDsRelay) { toggledID, current -> (UUID, Set<UUID>) in
+                var next = current
+                if next.contains(toggledID) { next.remove(toggledID) } else { next.insert(toggledID) }
+                return (toggledID, next)
             }
-            .bind(to: rowsRelay)
+            .subscribe(onNext: { [weak self] toggledID, next in
+                guard let self else { return }
+                self.checkedIDsRelay.accept(next)
+                if let routine = self.routinesRelay.value.first(where: { $0.id == toggledID }) {
+                    let vs = RoutineRowViewState(routine: routine, isChecked: next.contains(toggledID))
+                    toggledRowRelay.accept(vs)
+                }
+            })
             .disposed(by: disposeBag)
         
-        return Output(rows: rowsRelay.asDriver())
+        let rows = Observable
+            .combineLatest(routinesRelay.asObservable(), checkedIDsRelay.asObservable())
+            .map { routines, checked in
+                routines.map { RoutineRowViewState(routine: $0, isChecked: checked.contains($0.id)) }
+            }
+            .asDriver(onErrorJustReturn: [])
+        
+        return Output(
+            rows: rows,
+            toggledRow: toggledRowRelay.asSignal()
+        )
+    }
+    
+    private func fetchDummyData() -> [Routine] {
+        return [
+            Routine(id: UUID(), title: "오픈", alarmTime: nil, items: []),
+            Routine(id: UUID(), title: "폐기", alarmTime: nil, items: []),
+            Routine(id: UUID(), title: "마감", alarmTime: nil, items: [])
+        ]
     }
 }
