@@ -55,7 +55,7 @@ private extension AddRoutineViewController {
             }
             .disposed(by: disposeBag)
         
-        addRoutineView.rx.alarmTimeButtonTap
+        let selectedTime = addRoutineView.rx.alarmTimeButtonTap
             .flatMapLatest { [weak self] _ -> Observable<DateComponents> in
                 guard let self else { return .empty() }
                 
@@ -72,6 +72,9 @@ private extension AddRoutineViewController {
                 
                 return timePickerVC.selectedTimeEvent
             }
+            .share()
+        
+        selectedTime
             .bind(with: self) { owner, comps in
                 owner.addRoutineView.updateAlarmTimeChip(with: comps)
             }
@@ -79,6 +82,8 @@ private extension AddRoutineViewController {
         
         let input = AddRoutineViewModel.Input(
             titleChanged: addRoutineView.rx.titleText.orEmpty.asObservable(),
+            alarmTimeChanged: selectedTime.map { Optional($0) }.asObservable(),
+            saveButtonTapped: addRoutineView.rx.saveButtonTap.asObservable(),
             addTodoButtonTapped: addRoutineView.rx.addButtonTap.asObservable(),
             itemTextChanged: addRoutineView.rx.itemTextChanged,
             itemMoved: addRoutineView.rx.itemMoved,
@@ -97,6 +102,26 @@ private extension AddRoutineViewController {
         
         output.title
             .drive(addRoutineView.rx.titleText)
+            .disposed(by: disposeBag)
+        
+        output.validationFocus
+            .emit(with: self, onNext: { owner, target in
+                switch target {
+                case .title:
+                    owner.addRoutineView.focusOnTitle()
+                case .alarmTime:
+                    owner.addRoutineView.shakeAlarmButton()
+                case .firstTodoItem:
+                    let focusBinder = owner.addRoutineView.rx.focusOnRow
+                    focusBinder.onNext(0)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        output.saveCompleted
+            .emit(with: self, onNext: { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            })
             .disposed(by: disposeBag)
     }
 }

@@ -9,6 +9,12 @@ import Foundation
 import RxSwift
 import RxCocoa
 
+enum ValidationFocusTarget {
+    case title
+    case alarmTime
+    case firstTodoItem
+}
+
 struct TodoItem: Hashable {
     let id: UUID = UUID()
     var text: String
@@ -28,6 +34,9 @@ final class AddRoutineViewModel {
     
     struct Input {
         let titleChanged: Observable<String>
+        let alarmTimeChanged: Observable<DateComponents?>
+        let saveButtonTapped: Observable<Void>
+        
         let addTodoButtonTapped: Observable<Void>
         let itemTextChanged: Observable<(index: Int, text: String)>
         let itemMoved: Observable<(source: Int, destination: Int)>
@@ -39,25 +48,33 @@ final class AddRoutineViewModel {
     struct Output {
         let items: Driver<[TodoItem]>
         let focusOnRow: Signal<Int>
+        
         let title: Driver<String>
+        let validationFocus: Signal<ValidationFocusTarget>
+        let saveCompleted: Signal<Void>
     }
     
     // MARK: - Properties
     
     private let disposeBag = DisposeBag()
     
-    // MARK: - State
-    
-    private let itemsRelay = BehaviorRelay<[TodoItem]>(value: [TodoItem(text: "")])
-    private let titleRelay = BehaviorRelay<String>(value: "")
-    
     // MARK: - Transform
     
     func transform(input: Input) -> Output {
+        let itemsRelay = BehaviorRelay<[TodoItem]>(value: [TodoItem(text: "")])
+        let titleRelay = BehaviorRelay<String>(value: "")
+        let alarmTimeRelay = BehaviorRelay<DateComponents?>(value: nil)
+        
         let focusRelay = PublishRelay<Int>()
+        let validationFocusRelay = PublishRelay<ValidationFocusTarget>()
+        let saveCompletedRelay = PublishRelay<Void>()
         
         input.titleChanged
             .bind(to: titleRelay)
+            .disposed(by: disposeBag)
+        
+        input.alarmTimeChanged
+            .bind(to: alarmTimeRelay)
             .disposed(by: disposeBag)
         
         input.addTodoButtonTapped
@@ -73,7 +90,7 @@ final class AddRoutineViewModel {
                 }
                 
                 newItems.append(TodoItem(text: ""))
-                self.itemsRelay.accept(newItems)
+                itemsRelay.accept(newItems)
                 focusRelay.accept(newItems.count - 1)
             })
             .disposed(by: disposeBag)
@@ -121,10 +138,41 @@ final class AddRoutineViewModel {
             .bind(to: itemsRelay)
             .disposed(by: disposeBag)
         
+        input.saveButtonTapped
+            .withLatestFrom(Observable.combineLatest(
+                titleRelay,
+                alarmTimeRelay,
+                itemsRelay
+            ))
+            .subscribe(onNext: { title, alarmTime, items in
+                if title.isEmpty {
+                    validationFocusRelay.accept(.title)
+                    return
+                }
+                
+                if alarmTime == nil {
+                    validationFocusRelay.accept(.alarmTime)
+                    return
+                }
+                
+                let validItems = items.filter { !$0.text.isBlank }
+                if validItems.isEmpty {
+                    validationFocusRelay.accept(.firstTodoItem)
+                    return
+                }
+                
+                // TODO: usecase 호출
+                print("저장 성공 Title: \(title), Time: \(String(describing: alarmTime)), Items: \(validItems)")
+                saveCompletedRelay.accept(())
+            })
+            .disposed(by: disposeBag)
+        
         return Output(
             items: itemsRelay.asDriver(),
             focusOnRow: focusRelay.asSignal(),
-            title: titleRelay.asDriver()
+            title: titleRelay.asDriver(),
+            validationFocus: validationFocusRelay.asSignal(),
+            saveCompleted: saveCompletedRelay.asSignal()
         )
     }
 }

@@ -118,6 +118,24 @@ final class AddRoutineView: UIView {
         alarmTimeChipLabel.text = timeString
         alarmTimeChipView.isHidden = false
     }
+    
+    func focusOnTitle() {
+        textfield.becomeFirstResponder()
+    }
+    
+    func shakeAlarmButton() {
+        let animation = CABasicAnimation(keyPath: "position")
+        animation.duration = 0.07
+        animation.repeatCount = 3
+        animation.autoreverses = true
+        animation.fromValue = NSValue(cgPoint: CGPoint(
+            x: alarmTimeButton.center.x - 5, y: alarmTimeButton.center.y
+        ))
+        animation.toValue = NSValue(cgPoint: CGPoint(
+            x: alarmTimeButton.center.x + 5, y: alarmTimeButton.center.y
+        ))
+        alarmTimeButton.layer.add(animation, forKey: "position")
+    }
 }
 
 private extension AddRoutineView {
