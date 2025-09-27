@@ -64,39 +64,63 @@ final class RoutineSelectionViewModel {
                 return currentRoutines + [newRoutine]
             }
         
-        Observable.merge(initialRoutines, newRoutineAdded)
+        let routineUpdated = input.routineUpdated
+            .withLatestFrom(routinesRelay) { updated, current -> [Routine] in
+                current.map { $0.id == updated.id ? updated : $0 }
+            }
+        
+        Observable.merge(initialRoutines, newRoutineAdded, routineUpdated)
             .bind(to: routinesRelay)
             .disposed(by: disposeBag)
         
-        input.checkboxToggled
-            .withLatestFrom(checkedIDsRelay) { toggledID, current -> (UUID, Set<UUID>) in
-                var next = current
-                if next.contains(toggledID) { next.remove(toggledID) } else { next.insert(toggledID) }
-                return (toggledID, next)
+        let checkboxToggleEvent = input.checkboxToggled
+            .withLatestFrom(checkedIDsRelay) { toggledID, currentIDs -> (toggledID: UUID, newIDs: Set<UUID>) in
+                let newCheckedIDs = currentIDs.symmetricDifference([toggledID])
+                return (toggledID, newCheckedIDs)
             }
-            .subscribe(onNext: { [weak self] toggledID, next in
-                guard let self else { return }
-                self.checkedIDsRelay.accept(next)
-                if let routine = self.routinesRelay.value.first(where: { $0.id == toggledID }) {
-                    let vs = RoutineRowViewState(routine: routine, isChecked: next.contains(toggledID))
-                    toggledRowRelay.accept(vs)
-                }
-            })
+            .share()
+        
+        checkboxToggleEvent
+            .map { $0.newIDs }
+            .bind(to: checkedIDsRelay)
             .disposed(by: disposeBag)
         
+        checkboxToggleEvent
+            .withLatestFrom(routinesRelay) { toggleInfo, routines -> RoutineRowViewState? in
+                guard let routine = routines.first(
+                    where: { $0.id == toggleInfo.toggledID }
+                ) else {
+                    return nil
+                }
+                let isChecked = toggleInfo.newIDs.contains(toggleInfo.toggledID)
+                return RoutineRowViewState(routine: routine, isChecked: isChecked)
+            }
+            .compactMap { $0 }
+            .bind(to: toggledRowRelay)
+            .disposed(by: disposeBag)
+        
+//        input.checkboxToggled
+//            .withLatestFrom(checkedIDsRelay) { toggledID, current -> (UUID, Set<UUID>) in
+//                var next = current
+//                if next.contains(toggledID) { next.remove(toggledID) } else { next.insert(toggledID) }
+//                return (toggledID, next)
+//            }
+//            .subscribe(onNext: { [weak self] toggledID, next in
+//                guard let self else { return }
+//                self.checkedIDsRelay.accept(next)
+//                if let routine = self.routinesRelay.value.first(where: { $0.id == toggledID }) {
+//                    let vs = RoutineRowViewState(routine: routine, isChecked: next.contains(toggledID))
+//                    toggledRowRelay.accept(vs)
+//                }
+//            })
+//            .disposed(by: disposeBag)
+        
         let rows = Observable
-            .combineLatest(routinesRelay.asObservable(), checkedIDsRelay.asObservable())
+            .combineLatest(routinesRelay, checkedIDsRelay)
             .map { routines, checked in
                 routines.map { RoutineRowViewState(routine: $0, isChecked: checked.contains($0.id)) }
             }
             .asDriver(onErrorJustReturn: [])
-        
-        input.routineUpdated
-            .withLatestFrom(routinesRelay) { updated, current -> [Routine] in
-                current.map { $0.id == updated.id ? updated : $0 }
-            }
-            .bind(to: routinesRelay)
-            .disposed(by: disposeBag)
         
         return Output(
             rows: rows,
