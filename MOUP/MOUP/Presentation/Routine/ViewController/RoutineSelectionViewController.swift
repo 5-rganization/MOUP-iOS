@@ -171,7 +171,6 @@ private extension RoutineSelectionViewController {
         var snapshot = Snapshot()
         snapshot.appendSections([0])
         snapshot.appendItems(rows, toSection: 0)
-        snapshot.reloadItems(rows)
         dataSource.apply(snapshot, animatingDifferences: animated)
     }
 }
