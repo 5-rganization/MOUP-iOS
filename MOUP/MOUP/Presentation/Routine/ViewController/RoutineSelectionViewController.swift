@@ -27,6 +27,8 @@ final class RoutineSelectionViewController: UIViewController, UITableViewDelegat
     
     private lazy var dataSource = makeDataSource()
     
+    private let latestRowsRelay = BehaviorRelay<[RoutineRowViewState]>(value: [])
+    
     // MARK: - Lifecycle
     
     override func loadView() {
@@ -102,7 +104,12 @@ private extension RoutineSelectionViewController {
         
         output.rows
             .drive(onNext: { [weak self] rows in
-                self?.applySnapshot(with: rows, animated: true)
+                self?.latestRowsRelay.accept(rows)
+                if let self,
+                   self.isViewLoaded,
+                   self.view.window != nil {
+                    self.applySnapshot(with: rows, animated: true)
+                }
             })
             .disposed(by: disposeBag)
         
@@ -129,6 +136,15 @@ private extension RoutineSelectionViewController {
         
         routineSelectionView.rx.itemSelected
             .bind(to: routineSelectionView.rx.deselectRow)
+            .disposed(by: disposeBag)
+        
+        self.rx.sentMessage(#selector(UIViewController.viewWillAppear(_:)))
+            .map { _ in () }
+            .withLatestFrom(latestRowsRelay.asObservable())
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, rows in
+                owner.applySnapshot(with: rows, animated: false)
+            }
             .disposed(by: disposeBag)
     }
     

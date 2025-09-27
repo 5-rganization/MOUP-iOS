@@ -131,8 +131,8 @@ private extension EditRoutineViewController {
             .disposed(by: disposeBag)
         
         output.editCompleted
-            .emit(with: self, onNext: { owner, newRoutine in
-                owner.onEdit?(newRoutine)
+            .emit(with: self, onNext: { owner, updated in
+                owner.onEdit?(updated)
                 owner.navigationController?.popViewController(animated: true)
             })
             .disposed(by: disposeBag)
