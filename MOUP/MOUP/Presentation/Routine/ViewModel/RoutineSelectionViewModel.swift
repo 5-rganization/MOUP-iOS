@@ -34,6 +34,7 @@ final class RoutineSelectionViewModel {
         let appear: Observable<Void>
         let checkboxToggled: Observable<UUID>
         let addNewRoutine: Observable<Routine>
+        let routineUpdated: Observable<Routine>
     }
     
     struct Output {
@@ -89,6 +90,13 @@ final class RoutineSelectionViewModel {
                 routines.map { RoutineRowViewState(routine: $0, isChecked: checked.contains($0.id)) }
             }
             .asDriver(onErrorJustReturn: [])
+        
+        input.routineUpdated
+            .withLatestFrom(routinesRelay) { updated, current -> [Routine] in
+                current.map { $0.id == updated.id ? updated : $0 }
+            }
+            .bind(to: routinesRelay)
+            .disposed(by: disposeBag)
         
         return Output(
             rows: rows,

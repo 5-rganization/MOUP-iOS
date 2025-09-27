@@ -23,6 +23,7 @@ final class RoutineSelectionViewController: UIViewController, UITableViewDelegat
     
     private let addNewRoutineRelay = PublishRelay<Routine>()
     private let checkboxToggledRelay = PublishRelay<UUID>()
+    private let routineUpdatedRelay = PublishRelay<Routine>()
     
     private lazy var dataSource = makeDataSource()
     
@@ -93,7 +94,8 @@ private extension RoutineSelectionViewController {
                 .map { _ in () }
                 .take(1),
             checkboxToggled: checkboxToggledRelay.asObservable(),
-            addNewRoutine: addNewRoutineRelay.asObservable()
+            addNewRoutine: addNewRoutineRelay.asObservable(),
+            routineUpdated: routineUpdatedRelay.asObservable()
         )
         
         let output = viewModel.transform(input)
@@ -111,6 +113,22 @@ private extension RoutineSelectionViewController {
                 currentSnapshot.reconfigureItems([toggledState])
                 self.dataSource.apply(currentSnapshot, animatingDifferences: false)
             })
+            .disposed(by: disposeBag)
+        
+        routineSelectionView.rx.itemSelected
+            .compactMap { [weak self] indexPath in
+                self?.dataSource.itemIdentifier(for: indexPath)
+            }
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind(with: self) { owner, viewState in
+                owner.coordinator?.showEditRoutineViewController(routine: viewState.routine) { updated in
+                    owner.routineUpdatedRelay.accept(updated)
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        routineSelectionView.rx.itemSelected
+            .bind(to: routineSelectionView.rx.deselectRow)
             .disposed(by: disposeBag)
     }
     

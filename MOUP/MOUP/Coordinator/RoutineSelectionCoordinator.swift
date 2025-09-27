@@ -30,9 +30,10 @@ final class RoutineSelectionCoordinator: Coordinator {
         navigationController.pushViewController(addRoutineVC, animated: true)
     }
     
-    func showRoutineDetail(with state: RoutineRowViewState) {
-        let vm = AddRoutineViewModel()
-        let vc = AddRoutineViewController(viewModel: vm)
+    func showEditRoutineViewController(routine: Routine, onEdit: @escaping (Routine) -> Void) {
+        let vm = EditRoutineViewModel(routine: routine)
+        let vc = EditRoutineViewController(viewModel: vm)
+        vc.onEdit = onEdit
         navigationController.pushViewController(vc, animated: true)
     }
 }
