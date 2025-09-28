@@ -11,7 +11,7 @@ import Then
 
 class AttendanceHistoryTableHeaderView: UITableViewHeaderFooterView {
     // MARK: - Properties
-    static let identifier = "ManageAttendanceTableHeaderView"
+    static let identifier = "AttendanceHistoryTableHeaderView"
     
     // MARK: - UI Components
     private let bottomLine = UIView().then {
@@ -100,7 +100,6 @@ private extension AttendanceHistoryTableHeaderView {
     func setConstraints() {
         dateTitleView.snp.makeConstraints {
             $0.top.leading.equalToSuperview()
-            $0.leading.equalToSuperview()
             $0.bottom.equalToSuperview().inset(6)
             $0.width.equalTo(85)
         }

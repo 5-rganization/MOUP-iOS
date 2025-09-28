@@ -12,7 +12,7 @@ import RxDataSources
 class AttendanceHistoryViewController: UIViewController {
     // MARK: - Properties
     private let navTitle: String
-    private lazy var manageAttendanceView = AttendanceHistoryView(title: navTitle) // TODO: - 실제 쓰는 네임으로 변경 필요.
+    private lazy var attendanceHistoryView = AttendanceHistoryView(title: navTitle) // TODO: - 실제 쓰는 네임으로 변경 필요.
     private let viewModel: AttendanceHistoryViewModel
     private let disposeBag = DisposeBag()
     
@@ -27,7 +27,7 @@ class AttendanceHistoryViewController: UIViewController {
     
     // MARK: - loadView
     override func loadView() {
-        view = manageAttendanceView
+        view = attendanceHistoryView
     }
     
     // MARK: - Initializer
@@ -69,15 +69,16 @@ private extension AttendanceHistoryViewController {
         let input = AttendanceHistoryViewModel.Input(viewDidLoad: .just(()))
         let output = viewModel.transform(input: input)
         
-        manageAttendanceView.rx.setDelegate(self)
+        attendanceHistoryView.rx.setDelegate(self)
             .disposed(by: disposeBag)
         
-        manageAttendanceView.setupTableView(section: output.attendanceData, dataSource: dataSource)
+        attendanceHistoryView.setupTableView(section: output.attendanceData, dataSource: dataSource)
             .disposed(by: disposeBag)
         
-        manageAttendanceView.rx.navBackBtnTapped
-            .subscribe(onNext: {
-                self.navigationController?.popViewController(animated: true)
+        attendanceHistoryView.rx.navBackBtnTapped
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
             })
             .disposed(by: disposeBag)
     }
@@ -93,6 +94,6 @@ extension AttendanceHistoryViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 51 // 하단 셀들 간의 간격이 12, 첫 번째 셀의 상단 constant 12이므로 6 별도로 제공. 60 + 6
+        return 51 // 하단 셀들 간의 간격이 12, 첫 번째 셀의 상단 constant 12이므로 6 별도로 제공. 45 + 6
     }
 }
