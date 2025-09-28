@@ -6,6 +6,10 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
+import SnapKit
+import Then
 
 final class ManageAttendanceEmptyView: UIView {
     // MARK: - UI Components
@@ -25,7 +29,7 @@ final class ManageAttendanceEmptyView: UIView {
         $0.numberOfLines = 0
     }
     
-    private let inviteButton = UIButton().then {
+    fileprivate let inviteButton = UIButton().then {
         var config = UIButton.Configuration.filled()
         var titleAttributes = AttributeContainer()
         titleAttributes.font = UIFont.buttonSemibold(16)
@@ -96,4 +100,8 @@ private extension ManageAttendanceEmptyView {
     }
 }
 
-
+extension Reactive where Base: ManageAttendanceEmptyView {
+    var inviteBtnTapped: ControlEvent<Void> {
+        return base.inviteButton.rx.tap
+    }
+}
