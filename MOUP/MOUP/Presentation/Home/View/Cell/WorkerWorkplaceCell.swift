@@ -233,13 +233,17 @@ private extension WorkerWorkplaceCell {
     }
 
     func setBindings() {
-        containerView.rx.tap.subscribe(onNext: { [weak self] in
-            guard let self else { return }
-            isExpanded.toggle()
-            toggleSecondSection(isExpanded)
-            print("containerView tapped")
-        })
-        .disposed(by: disposeBag)
+        let stackTapGesture = UITapGestureRecognizer()
+        stackView.addGestureRecognizer(stackTapGesture)
+        
+        stackTapGesture.rx.event
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.isExpanded.toggle()
+                owner.toggleSecondSection(owner.isExpanded)
+                print("containerView tapped")
+            })
+            .disposed(by: disposeBag)
     }
 
     func toggleSecondSection(_ expanded: Bool) {

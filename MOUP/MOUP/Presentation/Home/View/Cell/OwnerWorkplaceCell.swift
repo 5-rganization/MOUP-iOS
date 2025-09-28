@@ -228,15 +228,6 @@ private extension OwnerWorkplaceCell {
         let stackTapGesture = UITapGestureRecognizer()
         stackView.addGestureRecognizer(stackTapGesture)
 
-        containerView.rx.tap
-            .withUnretained(self)
-            .subscribe(onNext: { owner, _ in
-                owner.isExpanded.toggle()
-                owner.toggleSecondSection(owner.isExpanded)
-            print("containerView tapped")
-        })
-        .disposed(by: disposeBag)
-
         stackTapGesture.rx.event
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
