@@ -7,12 +7,27 @@
 
 import UIKit
 
-class AttendanceCell: UITableViewCell {
+final class AttendanceCell: UITableViewCell {
     // MARK: - Properties
     static let identifier = "AttendanceCell"
     
-    // MARK: - UI Components
+    // MARK: - UI Function
+    func createStackView() -> UIStackView {
+        let stackView = UIStackView().then { // 셀의 테두리 영역
+            $0.layer.cornerRadius = 12
+            $0.layer.borderWidth = 1
+            $0.layer.borderColor = UIColor.gray400.cgColor
+            $0.axis = .horizontal
+            $0.alignment = .fill
+            $0.distribution = .equalSpacing
+            $0.isLayoutMarginsRelativeArrangement = true
+            $0.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+        }
+        
+        return stackView
+    }
     
+    // MARK: - UI Components
     private let dateContainer = UIView()
     private let dateView = UIView().then {
         $0.layer.cornerRadius = 12
@@ -30,12 +45,7 @@ class AttendanceCell: UITableViewCell {
     }
     
     private let attendanceContainer = UIView()
-    private let attendanceView = UIView().then { // 셀의 테두리 영역
-        $0.layer.cornerRadius = 12
-        $0.layer.borderWidth = 1
-        $0.layer.borderColor = UIColor.gray400.cgColor
-    }
-    private let attendanceInternalView = UIView() // 레이블과 우측 화살표를 고정할 영역
+    private lazy var attendanceStackView = createStackView()
     private let attendanceLabel = UILabel().then {
         $0.font = .bodyMedium(16)
         $0.textColor = .gray900
@@ -46,12 +56,7 @@ class AttendanceCell: UITableViewCell {
     }
 
     private let leaveWorkContainer = UIView()
-    private let leaveWorkView = UIView().then { // 셀의 테두리 영역
-        $0.layer.cornerRadius = 12
-        $0.layer.borderWidth = 1
-        $0.layer.borderColor = UIColor.gray400.cgColor
-    }
-    private let leaveWorkInternalView = UIView() // 레이블과 우측 화살표를 고정할 영역
+    private lazy var leaveWorkStackView = createStackView()
     private let leaveWorkLabel = UILabel().then {
         $0.font = .bodyMedium(16)
         $0.textColor = .gray900
@@ -74,10 +79,12 @@ class AttendanceCell: UITableViewCell {
     }
 
     // MARK: - Public Methods
-    func update(item: AttendanceData) {
+    func update(item: AttendanceData, userRole: UserRole) {
         dateLabel.text = item.date
         attendanceLabel.text = item.attendanceTime
         leaveWorkLabel.text = item.leaveWorkTime
+        
+        applyUserRole(by: userRole)
     }
 }
 
@@ -110,27 +117,19 @@ private extension AttendanceCell {
         )
         
         attendanceContainer.addSubviews(
-            attendanceView
+            attendanceStackView
         )
         
-        attendanceView.addSubviews(
-            attendanceInternalView
-        )
-        
-        attendanceInternalView.addSubviews(
+        attendanceStackView.addArrangedSubviews(
             attendanceLabel,
             attendanceRightChevron
         )
         
         leaveWorkContainer.addSubviews(
-            leaveWorkView
+            leaveWorkStackView
         )
         
-        leaveWorkView.addSubviews(
-            leaveWorkInternalView
-        )
-        
-        leaveWorkInternalView.addSubviews(
+        leaveWorkStackView.addSubviews(
             leaveWorkLabel,
             leaveWorkRightChevron
         )
@@ -164,50 +163,40 @@ private extension AttendanceCell {
             $0.trailing.equalToSuperview()
         }
         
-        attendanceView.snp.makeConstraints {
+        attendanceStackView.snp.makeConstraints {
             $0.centerY.equalToSuperview()
             $0.directionalHorizontalEdges.equalToSuperview().inset(14.5)
             $0.height.equalTo(48)
-        }
-        
-        attendanceInternalView.snp.makeConstraints {
-            $0.center.equalToSuperview()
-            $0.width.equalTo(84)
-            $0.height.equalTo(24) // TODO: - 해당 프레임 size를 고정할지, 좌우 크기에 맞춰 넓힐지.
         }
         
         attendanceRightChevron.snp.makeConstraints {
-            $0.trailing.centerY.equalToSuperview()
             $0.width.equalTo(7)
             $0.height.equalTo(12)
         }
         
-        attendanceLabel.snp.makeConstraints {
-            $0.leading.centerY.equalToSuperview()
-            $0.trailing.lessThanOrEqualTo(attendanceRightChevron.snp.leading)
-        }
-        
-        leaveWorkView.snp.makeConstraints {
+        leaveWorkStackView.snp.makeConstraints {
             $0.centerY.equalToSuperview()
             $0.directionalHorizontalEdges.equalToSuperview().inset(14.5)
             $0.height.equalTo(48)
         }
         
-        leaveWorkInternalView.snp.makeConstraints {
-            $0.center.equalToSuperview()
-            $0.width.equalTo(84)
-            $0.height.equalTo(24)
-        }
-        
         leaveWorkRightChevron.snp.makeConstraints {
-            $0.trailing.centerY.equalToSuperview()
             $0.width.equalTo(7)
             $0.height.equalTo(12)
         }
-        
-        leaveWorkLabel.snp.makeConstraints {
-            $0.leading.centerY.equalToSuperview()
-            $0.trailing.lessThanOrEqualTo(leaveWorkRightChevron.snp.leading)
+    }
+}
+
+private extension AttendanceCell {
+    func applyUserRole(by role: UserRole) {
+        switch role {
+        case .worker:
+            [attendanceRightChevron, leaveWorkRightChevron].forEach {
+                $0.isHidden = true
+            }
+        case .owner:
+            // TODO: - stackView.addGesture를 통한 근무 내역 수정 페이지로 연결
+            break
         }
     }
 }
