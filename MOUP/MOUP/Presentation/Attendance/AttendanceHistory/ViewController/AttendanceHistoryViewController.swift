@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 import RxDataSources
 
-class AttendanceHistoryViewController: UIViewController {
+final class AttendanceHistoryViewController: UIViewController {
     // MARK: - Properties
     private let navTitle: String
     private lazy var attendanceHistoryView = AttendanceHistoryView(title: navTitle) // TODO: - 실제 쓰는 네임으로 변경 필요.
@@ -21,7 +21,7 @@ class AttendanceHistoryViewController: UIViewController {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: AttendanceCell.identifier, for: indexPath) as? AttendanceCell else {
                 return UITableViewCell()
             }
-            cell.update(item: item)
+            cell.update(item: item, userRole: .worker) // TODO: - 실제 사용중인 유저의 role를 대입 필요
             return cell
     })
     
