@@ -99,22 +99,6 @@ final class RoutineSelectionViewModel {
             .bind(to: toggledRowRelay)
             .disposed(by: disposeBag)
         
-//        input.checkboxToggled
-//            .withLatestFrom(checkedIDsRelay) { toggledID, current -> (UUID, Set<UUID>) in
-//                var next = current
-//                if next.contains(toggledID) { next.remove(toggledID) } else { next.insert(toggledID) }
-//                return (toggledID, next)
-//            }
-//            .subscribe(onNext: { [weak self] toggledID, next in
-//                guard let self else { return }
-//                self.checkedIDsRelay.accept(next)
-//                if let routine = self.routinesRelay.value.first(where: { $0.id == toggledID }) {
-//                    let vs = RoutineRowViewState(routine: routine, isChecked: next.contains(toggledID))
-//                    toggledRowRelay.accept(vs)
-//                }
-//            })
-//            .disposed(by: disposeBag)
-        
         let rows = Observable
             .combineLatest(routinesRelay, checkedIDsRelay)
             .map { routines, checked in

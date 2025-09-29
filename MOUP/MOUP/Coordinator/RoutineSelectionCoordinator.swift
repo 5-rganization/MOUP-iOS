@@ -23,53 +23,17 @@ final class RoutineSelectionCoordinator: Coordinator {
         navigationController.pushViewController(routineSelectionVC, animated: true)
     }
     
-//    func showAddRoutineViewController(onSave: @escaping (Routine) -> Void) {
-//        let viewModel = AddRoutineViewModel()
-//        let addRoutineVC = AddRoutineViewController(viewModel: viewModel)
-//        addRoutineVC.onSave = onSave
-//        navigationController.pushViewController(addRoutineVC, animated: true)
-//    }
-//    
-//    func showEditRoutineViewController(routine: Routine, onEdit: @escaping (Routine) -> Void) {
-//        let vm = EditRoutineViewModel(routine: routine)
-//        let vc = EditRoutineViewController(viewModel: vm)
-//        vc.onEdit = onEdit
-//        navigationController.pushViewController(vc, animated: true)
-//    }
-    
-    func showAddRoutineViewController(
-        onSave: @escaping (Routine) -> Void
-    ) {
-        let vc = makeRoutineEditor(
-            mode: .add,
-            saveStrategy: AddSaveStrategy(createRoutineUseCase: CreateRoutineUseCase())
-        )
-        vc.onSaved = onSave
-        navigationController.pushViewController(vc, animated: true)
+    func showAddRoutineViewController(onSave: @escaping (Routine) -> Void) {
+        let viewModel = AddRoutineViewModel()
+        let addRoutineVC = AddRoutineViewController(viewModel: viewModel)
+        addRoutineVC.onSave = onSave
+        navigationController.pushViewController(addRoutineVC, animated: true)
     }
     
-    func showEditRoutineViewController(
-        routine: Routine,
-        onEdit: @escaping (Routine) -> Void
-    ) {
-        let vc = makeRoutineEditor(
-            mode: .edit(initial: routine),
-            saveStrategy: EditSaveStrategy(
-                updateRoutineUseCase: UpdateRoutineUseCase(),
-                routineID: routine.id
-            )
-        )
-        vc.onSaved = onEdit
+    func showEditRoutineViewController(routine: Routine, onEdit: @escaping (Routine) -> Void) {
+        let vm = EditRoutineViewModel(routine: routine)
+        let vc = EditRoutineViewController(viewModel: vm)
+        vc.onEdit = onEdit
         navigationController.pushViewController(vc, animated: true)
-    }
-    
-    private func makeRoutineEditor(
-        mode: RoutineEditorViewModel.Mode,
-        saveStrategy: SaveStrategy
-    ) -> RoutineEditorViewController {
-        return RoutineEditorViewController(
-            mode: mode,
-            saveStratgy: saveStrategy
-        )
     }
 }
