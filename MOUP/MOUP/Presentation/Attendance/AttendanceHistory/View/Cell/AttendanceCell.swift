@@ -18,7 +18,7 @@ final class AttendanceCell: UITableViewCell {
             $0.layer.borderWidth = 1
             $0.layer.borderColor = UIColor.gray400.cgColor
             $0.axis = .horizontal
-            $0.alignment = .fill
+            $0.alignment = .center
             $0.distribution = .equalSpacing
             $0.isLayoutMarginsRelativeArrangement = true
             $0.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
@@ -49,6 +49,7 @@ final class AttendanceCell: UITableViewCell {
     private let attendanceLabel = UILabel().then {
         $0.font = .bodyMedium(16)
         $0.textColor = .gray900
+        $0.textAlignment = .center
     }
     private let attendanceRightChevron = UIImageView().then {
         $0.image = .attendanceRightChevron
@@ -60,6 +61,7 @@ final class AttendanceCell: UITableViewCell {
     private let leaveWorkLabel = UILabel().then {
         $0.font = .bodyMedium(16)
         $0.textColor = .gray900
+        $0.textAlignment = .center
     }
     private let leaveWorkRightChevron = UIImageView().then {
         $0.image = .attendanceRightChevron
@@ -129,7 +131,7 @@ private extension AttendanceCell {
             leaveWorkStackView
         )
         
-        leaveWorkStackView.addSubviews(
+        leaveWorkStackView.addArrangedSubviews(
             leaveWorkLabel,
             leaveWorkRightChevron
         )
@@ -191,8 +193,10 @@ private extension AttendanceCell {
     func applyUserRole(by role: UserRole) {
         switch role {
         case .worker:
+            attendanceStackView.removeArrangedSubview(attendanceRightChevron)
+            leaveWorkStackView.removeArrangedSubview(leaveWorkRightChevron)
             [attendanceRightChevron, leaveWorkRightChevron].forEach {
-                $0.isHidden = true
+                $0.removeFromSuperview()
             }
         case .owner:
             // TODO: - stackView.addGesture를 통한 근무 내역 수정 페이지로 연결

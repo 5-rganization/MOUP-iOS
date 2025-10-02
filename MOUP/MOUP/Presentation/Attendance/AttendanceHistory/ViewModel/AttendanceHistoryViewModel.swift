@@ -14,9 +14,9 @@ final class AttendanceHistoryViewModel {
     private let disposeBag = DisposeBag()
     private let mockAttendanceData = [
         AttendanceItem(items: [
-            AttendanceData(date: "7/8 월", attendanceTime: "09:00", leaveWorkTime: "09:00"),
-            AttendanceData(date: "7/9 화", attendanceTime: "12:00", leaveWorkTime: "15:00"),
-            AttendanceData(date: "7/10 수", attendanceTime: "09:00", leaveWorkTime: "12:00")
+            AttendanceData(date: "7/8 월", attendanceTime: "09 : 00", leaveWorkTime: "09 : 00"),
+            AttendanceData(date: "7/9 화", attendanceTime: "12 : 00", leaveWorkTime: "15 : 00"),
+            AttendanceData(date: "7/10 수", attendanceTime: "09 : 00", leaveWorkTime: "12 : 00")
         ])
     ]
     private lazy var attendanceDataRelay = BehaviorRelay<[AttendanceItem]>(value: mockAttendanceData)

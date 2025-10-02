@@ -29,7 +29,6 @@ class WorkerWorkplaceCell: UITableViewCell {
         $0.axis = .vertical
         $0.distribution = .fill
         $0.spacing = 8
-        $0.isUserInteractionEnabled = false
     }
 
     // 첫 번째 섹션 뷰 - 기초 정보
@@ -242,6 +241,20 @@ private extension WorkerWorkplaceCell {
                 owner.isExpanded.toggle()
                 owner.toggleSecondSection(owner.isExpanded)
                 print("containerView tapped")
+            })
+            .disposed(by: disposeBag)
+        
+        startWorkButton.rx.tap
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.delegate?.didTapStartBtn()
+            })
+            .disposed(by: disposeBag)
+        
+        endWorkButton.rx.tap
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.delegate?.didTapEndBtn()
             })
             .disposed(by: disposeBag)
     }
