@@ -59,4 +59,10 @@ final class HomeCoordinator: Coordinator {
         navigationController.present(vc, animated: true)
     }
     
+    func presentConfirmationModal() {
+        let vc = AttendanceConfirmModalViewController()
+        vc.modalPresentationStyle = .overFullScreen
+        vc.modalTransitionStyle = .crossDissolve
+        navigationController.present(vc, animated: true)
+    }
 }

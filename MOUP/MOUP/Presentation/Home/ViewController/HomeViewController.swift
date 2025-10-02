@@ -160,6 +160,7 @@ extension HomeViewController: OwnerWorkplaceCellDelegate {
 extension HomeViewController: WorkerWorkplaceCellDelegate {
     func didTapStartBtn() {
         print("시작 버튼 탭")
+        coordinator?.presentConfirmationModal()
     }
 
     func didTapEndBtn() {
