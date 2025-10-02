@@ -50,7 +50,7 @@ final class HomeViewModel {
     func transform(input: Input) -> Output {
         input.viewDidLoad.subscribe(onNext: { [weak self] in
             guard let self else { return }
-            mockFirstSectionDataRelay.accept(mockFirstSectionOwnerData)
+            mockFirstSectionDataRelay.accept(mockFirstSectionWorkerData)
         })
         .disposed(by: disposeBag)
 

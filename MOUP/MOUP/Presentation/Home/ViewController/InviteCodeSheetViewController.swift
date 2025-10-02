@@ -45,11 +45,26 @@ private extension InviteCodeSheetViewController {
     }
     
     func setBindings() {
+        let input = InviteCodeSheetViewModel.Input()
+        let output = viewModel.transform(input: input)
+        
         inviteCodeSheetView.rx.copyBtnTapped
+            .withLatestFrom(output.inviteCode)
             .withUnretained(self)
-            .subscribe(onNext: { owner, _ in
-                
+            .subscribe(onNext: { owner, code in
+                let result = owner.copyToClipboard(code)
             })
             .disposed(by: disposeBag)
+    }
+}
+
+private extension InviteCodeSheetViewController {
+    func copyToClipboard(_ text: String) -> Bool {
+        UIPasteboard.general.string = text
+        return UIPasteboard.general.string == text // 클립보드에 제대로 복사됐는지 검증
+    }
+    
+    func copySuccessed() {
+        
     }
 }

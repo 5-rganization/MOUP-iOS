@@ -54,6 +54,9 @@ final class InviteCodeSheetView: UIView {
     }
     
     // MARK: - Public Methods
+    func applyCopySuccessed() { // VC에서 클립보드 복사 성공 시 복사 버튼에 대한 콜백
+        
+    }
 }
 
 private extension InviteCodeSheetView {
