@@ -9,6 +9,8 @@ import UIKit
 import RxSwift
 import RxCocoa
 import RxDataSources
+import SnapKit
+import Then
 
 final class HomeView: UIView {
     // MARK: - Properties

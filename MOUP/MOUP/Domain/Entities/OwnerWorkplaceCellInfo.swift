@@ -10,6 +10,8 @@ import Differentiator
 
 struct OwnerWorkplaceCellInfo {
     let workplace: WorkplaceData
+    let isOfficial: Bool
+    let workSummaries: [EmployeeWorkSummary]
 }
 
 extension OwnerWorkplaceCellInfo: IdentifiableType, Equatable {

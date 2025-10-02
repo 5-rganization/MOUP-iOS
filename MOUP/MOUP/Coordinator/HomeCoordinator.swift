@@ -22,4 +22,25 @@ final class HomeCoordinator: Coordinator {
         )
         navigationController.pushViewController(homeVC, animated: false)
     }
+
+    func moveToRegisterWorkplace() {
+        let coordinator = WorkplaceRegisterCoordinator(navigationController: self.navigationController)
+        childCoordinators.append(coordinator)
+        DispatchQueue.main.async {
+            coordinator.start()
+        }
+    }
+    
+    func moveToManageAttendance() {
+        let viewModel = ManageAttendanceViewModel()
+        let vc = ManageAttendanceViewController(viewModel: viewModel, coordinator: self)
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func moveToAttendanceHistory(navTitle: String) {
+        let viewModel = AttendanceHistoryViewModel()
+        let vc = AttendanceHistoryViewController(viewModel: viewModel, navTitle: navTitle)
+        navigationController.pushViewController(vc, animated: true) // TODO: - 애니메이션 자연스러운지 다같이 확인해봐야함.
+    }
+    
 }

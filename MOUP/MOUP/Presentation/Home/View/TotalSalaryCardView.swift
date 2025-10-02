@@ -35,6 +35,8 @@ class TotalSalaryCardView: CardButton {
     // MARK: - LayoutSubviews
     override func layoutSubviews() {
         super.layoutSubviews()
+        containerView.backgroundColor = .clear
+        containerView.layer.cornerRadius = 12
 
         gradientLayer.frame = containerView.bounds
         gradientLayer.cornerRadius = 12
