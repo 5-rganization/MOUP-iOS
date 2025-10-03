@@ -8,7 +8,7 @@
 import UIKit
 import RxSwift
 
-class AttendanceConfirmModalViewController: UIViewController {
+final class AttendanceConfirmModalViewController: UIViewController {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     private let confirmModalView = ConfirmationModal()

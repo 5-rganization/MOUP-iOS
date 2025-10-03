@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class RoleConfirmationView: UIView { // TODO: - 공용 컴포넌트로 이전 필요
+final class RoleConfirmationView: UIView {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
 

@@ -193,11 +193,8 @@ private extension AttendanceCell {
     func applyUserRole(by role: UserRole) {
         switch role {
         case .worker:
-            attendanceStackView.removeArrangedSubview(attendanceRightChevron)
-            leaveWorkStackView.removeArrangedSubview(leaveWorkRightChevron)
-            [attendanceRightChevron, leaveWorkRightChevron].forEach {
-                $0.removeFromSuperview()
-            }
+            attendanceRightChevron.removeFromSuperview()
+            leaveWorkRightChevron.removeFromSuperview()
         case .owner:
             // TODO: - stackView.addGesture를 통한 근무 내역 수정 페이지로 연결
             break
