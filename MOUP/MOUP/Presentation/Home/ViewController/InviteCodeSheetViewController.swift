@@ -53,18 +53,26 @@ private extension InviteCodeSheetViewController {
             .withUnretained(self)
             .subscribe(onNext: { owner, code in
                 let result = owner.copyToClipboard(code)
+                if result { owner.copySuccessed() }
             })
             .disposed(by: disposeBag)
     }
 }
 
 private extension InviteCodeSheetViewController {
-    func copyToClipboard(_ text: String) -> Bool {
-        UIPasteboard.general.string = text
-        return UIPasteboard.general.string == text // 클립보드에 제대로 복사됐는지 검증
+    func copyToClipboard(_ inviteCode: String) -> Bool {
+        UIPasteboard.general.string = inviteCode
+        return UIPasteboard.general.string == inviteCode // 클립보드에 제대로 복사됐는지 검증
     }
     
     func copySuccessed() {
-        
+        inviteCodeSheetView.applyCopySuccessed()
+    }
+    
+    // 초대 코드 타 앱을 통한 공유 기능 추후 적용 예정
+    func shareInviteCode(_ inviteCode: String) {
+        let inviteText = "MOUP 앱에서 당신을 근무지에 초대합니다.\n초대 코드를 입력해 입장해주세요!\n초대 코드: \(inviteCode)"
+        let activityVC = UIActivityViewController(activityItems: [inviteText], applicationActivities: nil)
+        present(activityVC, animated: true)
     }
 }

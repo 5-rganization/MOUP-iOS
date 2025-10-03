@@ -38,6 +38,9 @@ final class InviteCodeSheetView: UIView {
         config.image = .copyButton
         config.contentInsets = NSDirectionalEdgeInsets(top: 13, leading: 14, bottom: 13, trailing: 14)
         config.baseBackgroundColor = .primaryBackground
+        config.background.backgroundColorTransformer = UIConfigurationColorTransformer({ _ in
+            return .primaryBackground
+        })
         $0.configuration = config
     } // TODO: - 클립보드 복사 성공 이후 버튼 image n초 간 전환 필요
     
@@ -54,8 +57,15 @@ final class InviteCodeSheetView: UIView {
     }
     
     // MARK: - Public Methods
-    func applyCopySuccessed() { // VC에서 클립보드 복사 성공 시 복사 버튼에 대한 콜백
+    func applyCopySuccessed() {
+        copyButton.configuration?.image = .check
+        copyButton.isEnabled = false
         
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+            guard let self else { return }
+            self.copyButton.configuration?.image = .copyButton
+            self.copyButton.isEnabled = true
+        }
     }
 }
 
