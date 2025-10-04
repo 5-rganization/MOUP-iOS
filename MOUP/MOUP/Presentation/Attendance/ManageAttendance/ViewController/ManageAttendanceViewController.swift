@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 import RxDataSources
 
-class ManageAttendanceViewController: UIViewController {
+final class ManageAttendanceViewController: UIViewController {
     // MARK: - Properties
     private let manageAttendanceView = ManageAttendanceView()
     private let viewModel: ManageAttendanceViewModel
@@ -83,6 +83,13 @@ private extension ManageAttendanceViewController {
             .withUnretained(self)
             .subscribe(onNext: { owner, model in
                 owner.coordinator?.moveToAttendanceHistory(navTitle: model.name)
+            })
+            .disposed(by: disposeBag)
+        
+        manageAttendanceView.rx.inviteBtnTapped
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.coordinator?.presentInviteCodeSheet()
             })
             .disposed(by: disposeBag)
     }

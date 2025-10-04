@@ -11,7 +11,7 @@ import RxCocoa
 import SnapKit
 import Then
 
-class ManageAttendanceCell: UITableViewCell {
+final class ManageAttendanceCell: UITableViewCell {
     // MARK: - Properties
     static let identifier = "ManageAttendanceCell"
 

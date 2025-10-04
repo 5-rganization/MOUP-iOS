@@ -43,4 +43,26 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(vc, animated: true) // TODO: - 애니메이션 자연스러운지 다같이 확인해봐야함.
     }
     
+    func presentInviteCodeSheet() {
+        let viewModel = InviteCodeSheetViewModel()
+        let vc = InviteCodeSheetViewController(viewModel: viewModel)
+        vc.modalPresentationStyle = .pageSheet
+        
+        if let sheet = vc.sheetPresentationController {
+            sheet.detents = [
+                .custom { _ in 250 }
+            ]
+            sheet.prefersGrabberVisible = true
+            sheet.preferredCornerRadius = 12
+        }
+        
+        navigationController.present(vc, animated: true)
+    }
+    
+    func presentConfirmationModal() {
+        let vc = AttendanceConfirmModalViewController()
+        vc.modalPresentationStyle = .overFullScreen
+        vc.modalTransitionStyle = .crossDissolve
+        navigationController.present(vc, animated: true)
+    }
 }

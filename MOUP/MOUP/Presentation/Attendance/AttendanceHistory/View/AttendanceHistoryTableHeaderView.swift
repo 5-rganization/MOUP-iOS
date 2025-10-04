@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Then
 
-class AttendanceHistoryTableHeaderView: UITableViewHeaderFooterView {
+final class AttendanceHistoryTableHeaderView: UITableViewHeaderFooterView {
     // MARK: - Properties
     static let identifier = "AttendanceHistoryTableHeaderView"
     

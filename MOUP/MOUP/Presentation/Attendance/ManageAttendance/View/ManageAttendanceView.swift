@@ -25,7 +25,7 @@ final class ManageAttendanceView: UIView {
         $0.register(ManageAttendanceCell.self, forCellReuseIdentifier: ManageAttendanceCell.identifier)
     }
     
-    private let emptyView = ManageAttendanceEmptyView().then {
+    fileprivate let emptyView = ManageAttendanceEmptyView().then {
         $0.isHidden = true
     }
     
@@ -104,5 +104,9 @@ extension Reactive where Base: ManageAttendanceView {
     
     var modelSelected: ControlEvent<Employee> {
         return base.tableView.rx.modelSelected(Employee.self)
+    }
+    
+    var inviteBtnTapped: ControlEvent<Void> {
+        return base.emptyView.rx.inviteBtnTapped
     }
 }

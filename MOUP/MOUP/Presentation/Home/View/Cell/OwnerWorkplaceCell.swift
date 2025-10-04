@@ -29,7 +29,6 @@ class OwnerWorkplaceCell: UITableViewCell {
         $0.axis = .vertical
         $0.distribution = .fill
         $0.spacing = 8
-//        $0.isUserInteractionEnabled = false
     }
 
     // 첫 번째 섹션 뷰 - 기초 정보
@@ -68,7 +67,7 @@ class OwnerWorkplaceCell: UITableViewCell {
     private let attendanceButton = UIButton().then {
         $0.setTitle("근태 관리", for: .normal)
         $0.titleLabel?.font = .buttonSemibold(16)
-        $0.backgroundColor = .primary100
+        $0.backgroundColor = .primary50
         $0.setTitleColor(.primary600, for: .normal)
         $0.layer.cornerRadius = 12
     }

@@ -132,8 +132,10 @@ private extension HomeViewController {
     }
 
     func sendInvitationCode() -> UIAction {
-        let action = UIAction(title: "초대 코드 보내기") { _ in
+        let action = UIAction(title: "초대 코드 보내기") { [weak self] _ in
+            guard let self else { return }
             print("초대 코드 보내기")
+            self.coordinator?.presentInviteCodeSheet()
         }
         return action
     }
@@ -158,6 +160,7 @@ extension HomeViewController: OwnerWorkplaceCellDelegate {
 extension HomeViewController: WorkerWorkplaceCellDelegate {
     func didTapStartBtn() {
         print("시작 버튼 탭")
+        coordinator?.presentConfirmationModal()
     }
 
     func didTapEndBtn() {
