@@ -23,12 +23,6 @@ final class TimePickerSheetViewController: UIViewController {
     
     private let container = UIView().then {
         $0.backgroundColor = .white
-        $0.layer.cornerRadius = 16
-        $0.layer.maskedCorners = [
-            .layerMinXMinYCorner,
-            .layerMaxXMinYCorner
-        ]
-        $0.clipsToBounds = true
     }
     private let datePicker = UIDatePicker().then {
         $0.datePickerMode = .time
