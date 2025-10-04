@@ -115,13 +115,13 @@ private extension RoutineCell {
     func setConstraints() {
         checkboxButton.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.leading.equalToSuperview().offset(16)
-            $0.size.equalTo(24)
+            $0.leading.equalToSuperview().offset(10)
+            $0.size.equalTo(40)
         }
         
         nameLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.leading.equalTo(checkboxButton.snp.trailing).offset(12)
+            $0.leading.equalTo(checkboxButton.snp.trailing).offset(4)
         }
         
         timeLabel.snp.makeConstraints {
