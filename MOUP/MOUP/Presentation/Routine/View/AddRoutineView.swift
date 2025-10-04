@@ -278,7 +278,6 @@ extension AddRoutineView: UITableViewDelegate {
     }
 }
 
-@available(iOS 11.0, *)
 extension AddRoutineView: UITableViewDragDelegate {
 
     func tableView(_ tableView: UITableView,
@@ -305,7 +304,6 @@ extension AddRoutineView: UITableViewDragDelegate {
     }
 }
 
-@available(iOS 11.0, *)
 extension AddRoutineView: UITableViewDropDelegate {
     func tableView(_ tableView: UITableView, canHandle session: UIDropSession) -> Bool {
         session.localDragSession != nil
