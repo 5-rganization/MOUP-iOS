@@ -9,13 +9,6 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-struct Routine: Hashable {
-    let id: UUID
-    let title: String
-    let alarmTime: DateComponents?
-    let items: [TodoItem]
-}
-
 struct RoutineRowViewState: Hashable {
     let routine: Routine
     var isChecked: Bool
