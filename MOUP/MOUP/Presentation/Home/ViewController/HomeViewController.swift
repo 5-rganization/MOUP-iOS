@@ -15,7 +15,7 @@ final class HomeViewController: UIViewController {
     private let homeViewModel: HomeViewModel
     private let homeView = HomeView()
     private let disposeBag = DisposeBag()
-
+    
     private lazy var dataSource = RxTableViewSectionedAnimatedDataSource<HomeTableViewFirstSection>(animationConfiguration: AnimationConfiguration(deleteAnimation: .automatic)) { dataSource, tableView, indexPath, item in
         switch item {
         case .owner:
@@ -36,32 +36,32 @@ final class HomeViewController: UIViewController {
             return cell
         }
     }
-
-
+    
+    
     // MARK: - loadView
     override func loadView() {
         view = homeView
     }
-
+    
     // MARK: - Initializer
     init(coordinator: HomeCoordinator? = nil, homeViewModel: HomeViewModel) {
         self.coordinator = coordinator
         self.homeViewModel = homeViewModel
-
+        
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented.")
     }
-
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         configure()
     }
-
+    
 }
 
 private extension HomeViewController {
@@ -69,33 +69,39 @@ private extension HomeViewController {
         setStyles()
         setBindings()
     }
-
+    
     func setStyles() {
         self.navigationController?.navigationBar.isHidden = true
     }
-
+    
     func setBindings() {
         let input = HomeViewModel.Input(viewDidLoad: Observable.just(()))
         let output = homeViewModel.transform(input: input)
-
-        homeView.rx.todayRoutineCardTap.subscribe(onNext: {
-            print("오늘의 루틴 탭")
-        })
-        .disposed(by: disposeBag)
-
-        homeView.rx.allRoutineCardTap.subscribe(onNext: {
-            print("모든 루틴 탭")
-        })
-        .disposed(by: disposeBag)
-
+        
+        homeView.rx.todayRoutineCardTap
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                print("오늘의 루틴 탭")
+                owner.coordinator?.moveToTodayRoutine()
+            })
+            .disposed(by: disposeBag)
+        
+        homeView.rx.allRoutineCardTap
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                print("모든 루틴 탭")
+                owner.coordinator?.moveToAllRoutine()
+            })
+            .disposed(by: disposeBag)
+        
         homeView.rx.plusButtonTap
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
-            print("플러스 버튼 탭")
-            owner.coordinator?.moveToRegisterWorkplace()
-        })
-        .disposed(by: disposeBag)
-
+                print("플러스 버튼 탭")
+                owner.coordinator?.moveToRegisterWorkplace()
+            })
+            .disposed(by: disposeBag)
+        
         homeView.setupTableView(section: output.firstSectionData, dataSource: dataSource)
             .disposed(by: disposeBag)
     }
@@ -116,21 +122,21 @@ private extension HomeViewController {
         let menu = UIMenu(title: "", children: children)
         return menu
     }
-
+    
     func edit() -> UIAction {
         let action = UIAction(title: "수정하기") { _ in
             print("수정하기")
         }
         return action
     }
-
+    
     func delete() -> UIAction {
         let action = UIAction(title: "삭제하기") { _ in
             print("삭제하기")
         }
         return action
     }
-
+    
     func sendInvitationCode() -> UIAction {
         let action = UIAction(title: "초대 코드 보내기") { [weak self] _ in
             guard let self else { return }
@@ -162,7 +168,7 @@ extension HomeViewController: WorkerWorkplaceCellDelegate {
         print("시작 버튼 탭")
         coordinator?.presentConfirmationModal()
     }
-
+    
     func didTapEndBtn() {
         print("종료 버튼 탭")
     }

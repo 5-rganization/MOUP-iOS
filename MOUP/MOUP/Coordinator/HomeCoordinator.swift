@@ -31,6 +31,18 @@ final class HomeCoordinator: Coordinator {
         }
     }
     
+    func moveToAllRoutine() {
+        let viewModel = AllRoutineViewModel()
+        let vc = AllRoutineViewController(viewModel: viewModel)
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func moveToTodayRoutine() {
+        let viewModel = TodayRoutineViewModel()
+        let vc = TodayRoutineViewController(viewModel: viewModel)
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
     func moveToManageAttendance() {
         let viewModel = ManageAttendanceViewModel()
         let vc = ManageAttendanceViewController(viewModel: viewModel, coordinator: self)
