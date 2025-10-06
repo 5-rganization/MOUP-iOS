@@ -1,5 +1,5 @@
 //
-//  AllRoutineCell.swift
+//  RoutineListCell.swift
 //  MOUP
 //
 //  Created by 송규섭 on 10/5/25.
@@ -9,9 +9,9 @@ import UIKit
 import SnapKit
 import Then
 
-class AllRoutineCell: UITableViewCell {
+class RoutineListCell: UITableViewCell {
     // MARK: - Properties
-    static let identifier = "AllRoutineCell"
+    static let identifier = "RoutineListCell"
     
     // MARK: - UI Components
     private let containerView = UIView().then {
@@ -55,7 +55,7 @@ class AllRoutineCell: UITableViewCell {
     
 }
 
-private extension AllRoutineCell {
+private extension RoutineListCell {
     func configure() {
         setHierarchy()
         setStyles()
@@ -76,6 +76,7 @@ private extension AllRoutineCell {
     
     func setStyles() {
         backgroundColor = .primaryBackground
+        selectionStyle = .none
     }
     
     func setConstraints() {
@@ -98,8 +99,6 @@ private extension AllRoutineCell {
         rightIcon.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
-//            $0.width.equalTo(7)
-//            $0.height.equalTo(12)
         }
     }
 }

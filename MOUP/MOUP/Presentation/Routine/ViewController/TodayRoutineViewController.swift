@@ -15,10 +15,14 @@ class TodayRoutineViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel: TodayRoutineViewModel
     private let todayRoutineView = TodayRoutineView()
+    weak var coordinator: HomeCoordinator?
     
     private let dataSources = RxTableViewSectionedReloadDataSource<TodayRoutineItem>(
         configureCell: { dataSource, tableView, indexPath, item in
-            let cell = tableView.dequeueReusableCell(withIdentifier: TodayRoutineCell.identifier, for: indexPath)
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: TodayRoutineCell.identifier, for: indexPath) as? TodayRoutineCell else {
+                return UITableViewCell()
+            }
+            cell.update(with: item)
             
             return cell
         })
@@ -61,5 +65,22 @@ private extension TodayRoutineViewController {
             dataSource: dataSources
         )
         .disposed(by: disposeBag)
+        
+        Observable.zip(
+            todayRoutineView.rx.itemSelected,
+            todayRoutineView.rx.modelSelected
+        )
+            .withUnretained(self)
+            .subscribe(onNext: { owner, result in
+                owner.coordinator?.moveToWorkplaceRoutineList(with: result.1)
+            })
+            .disposed(by: disposeBag)
+        
+        todayRoutineView.rx.navBackBtnTapped
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            })
+            .disposed(by: disposeBag)
     }
 }

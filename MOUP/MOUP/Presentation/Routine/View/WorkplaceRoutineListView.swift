@@ -1,8 +1,8 @@
 //
-//  AllRoutineView.swift
+//  WorkplaceRoutineListView.swift
 //  MOUP
 //
-//  Created by 송규섭 on 10/5/25.
+//  Created by 송규섭 on 10/6/25.
 //
 
 import UIKit
@@ -12,25 +12,24 @@ import RxDataSources
 import SnapKit
 import Then
 
-final class AllRoutineView: UIView {
+final class WorkplaceRoutineListView: UIView {
     // MARK: - Properties
-    private let disposeBag = DisposeBag()
+    private let workplaceName: String
     
     // MARK: - UI Components
-    fileprivate let navigationBar = BaseNavigationBar(title: "전체 루틴").then {
-        $0.configureRightButton(icon: .plus, title: nil)
-    }
+    fileprivate lazy var navigationBar = BaseNavigationBar(title: workplaceName)
     
     fileprivate let tableView = UITableView().then {
-        $0.rowHeight = 60 // 상하 각 6, 컨텐츠 48
-        $0.register(RoutineListCell.self, forCellReuseIdentifier: RoutineListCell.identifier)
+        $0.rowHeight = 60
         $0.contentInset = UIEdgeInsets(top: 14, left: 0, bottom: 14, right: 0)
         $0.separatorStyle = .none
+        $0.register(RoutineListCell.self, forCellReuseIdentifier: RoutineListCell.identifier)
     }
     
     // MARK: - Initializer
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(workplaceName: String) {
+        self.workplaceName = workplaceName
+        super.init(frame: .zero)
         
         configure()
     }
@@ -49,7 +48,7 @@ final class AllRoutineView: UIView {
     }
 }
 
-private extension AllRoutineView {
+private extension WorkplaceRoutineListView {
     // MARK: - configure
     func configure() {
         setHierarchy()
@@ -85,20 +84,16 @@ private extension AllRoutineView {
     }
 }
 
-extension Reactive where Base: AllRoutineView {
+extension Reactive where Base: WorkplaceRoutineListView {
     var itemSelected: ControlEvent<IndexPath> {
-        return base.tableView.rx.itemSelected
+        base.tableView.rx.itemSelected
     }
     
-    var modelSeleted: ControlEvent<Routine> {
-        return base.tableView.rx.modelSelected(Routine.self)
+    var modelSelected: ControlEvent<Routine> {
+        base.tableView.rx.modelSelected(Routine.self)
     }
     
     var navBackBtnTapped: ControlEvent<Void> {
         return base.navigationBar.rx.backBtnTapped
-    }
-    
-    var navRightBtnTapped: ControlEvent<Void> {
-        return base.navigationBar.rx.rightBtnTapped
     }
 }
