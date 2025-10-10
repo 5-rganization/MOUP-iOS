@@ -26,14 +26,16 @@ extension AuthRouter: URLRequestConvertible {
         case .signIn:
             return "/auth/login"
         case .signUp:
-            return "/auth/register"
+            return "/auth/login/register"
         }
     }
 
     var method: HTTPMethod {
         switch self {
-        case .signIn, .signUp:
+        case .signIn:
             return .post
+        case .signUp:
+            return .patch
         }
     }
 
