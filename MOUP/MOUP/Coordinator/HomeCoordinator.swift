@@ -40,6 +40,17 @@ final class HomeCoordinator: Coordinator {
     func moveToTodayRoutine() {
         let viewModel = TodayRoutineViewModel()
         let vc = TodayRoutineViewController(viewModel: viewModel)
+        vc.coordinator = self
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func moveToWorkplaceRoutineList(with todayRoutine: TodayRoutine) {
+        let viewModel = WorkplaceRoutineListViewModel()
+        let vc = WorkplaceRoutineListViewController(
+            viewModel: viewModel,
+            workplaceName: todayRoutine.workplaceName,
+            routines: todayRoutine.routines
+        )
         navigationController.pushViewController(vc, animated: true)
     }
     
@@ -77,4 +88,5 @@ final class HomeCoordinator: Coordinator {
         vc.modalTransitionStyle = .crossDissolve
         navigationController.present(vc, animated: true)
     }
+    
 }
