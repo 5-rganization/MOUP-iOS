@@ -8,6 +8,9 @@
 import UIKit
 
 extension String {
+    var trimmed: String { trimmingCharacters(in: .whitespacesAndNewlines) }
+    var isBlank: Bool { trimmed.isEmpty }
+    
     func toUIColor() -> UIColor {
         switch self {
         case "빨강색": return .labelRed

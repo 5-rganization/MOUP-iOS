@@ -7,7 +7,7 @@
 
 import UIKit
 
-class TotalSalaryCardView: CardButton {
+final class TotalSalaryCardView: CardButton {
     // MARK: - UI Components
     private let containerView = UIView().then {
         $0.clipsToBounds = true
@@ -35,6 +35,8 @@ class TotalSalaryCardView: CardButton {
     // MARK: - LayoutSubviews
     override func layoutSubviews() {
         super.layoutSubviews()
+        containerView.backgroundColor = .clear
+        containerView.layer.cornerRadius = 12
 
         gradientLayer.frame = containerView.bounds
         gradientLayer.cornerRadius = 12

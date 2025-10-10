@@ -11,9 +11,15 @@ import RxCocoa
 import SnapKit
 import Then
 
+protocol WorkerWorkplaceCellDelegate: AnyObject {
+    func didTapStartBtn()
+    func didTapEndBtn()
+}
+
 class WorkerWorkplaceCell: UITableViewCell {
     // MARK: - Properties
     static let identifier = "WorkerWorkplaceCell"
+    weak var delegate: WorkerWorkplaceCellDelegate?
     private let disposeBag = DisposeBag()
     private var isExpanded: Bool = false
 
@@ -23,7 +29,6 @@ class WorkerWorkplaceCell: UITableViewCell {
         $0.axis = .vertical
         $0.distribution = .fill
         $0.spacing = 8
-        $0.isUserInteractionEnabled = false
     }
 
     // 첫 번째 섹션 뷰 - 기초 정보
@@ -50,6 +55,8 @@ class WorkerWorkplaceCell: UITableViewCell {
         $0.font = .bodyMedium(14)
         $0.textColor = .gray900
     }
+
+    private let workplaceOfficialChip = WorkplaceOfficialChip()
 
     // 두 번째 섹션 뷰 - 가변 급여 상세 테이블
     private let secondSectionView = SalaryDetailView()
@@ -97,12 +104,14 @@ class WorkerWorkplaceCell: UITableViewCell {
     }
 
     // MARK: - Public Methods
-    func update(item: HomeSectionItem) {
+    func update(item: HomeSectionItem, menu: UIMenu) {
         switch item {
         case .worker(let workerInfo):
             self.nameLabel.text = workerInfo.workplace.name
             self.untilPaydayLabel.text = "sdfdfs"
             self.totalEarnedLabel.text = "dsfdsf"
+            self.workplaceOfficialChip.isHidden = !workerInfo.isOfficial
+            self.menuButton.menu = menu
         case .owner:
             break
         }
@@ -128,7 +137,8 @@ private extension WorkerWorkplaceCell {
         firstSectionView.addSubviews(
             nameLabel,
             untilPaydayLabel,
-            totalEarnedLabel
+            totalEarnedLabel,
+            workplaceOfficialChip
         )
         attendanceButtonStackView.addArrangedSubviews(
             startWorkButton,
@@ -153,6 +163,7 @@ private extension WorkerWorkplaceCell {
     func setStyles() {
         stackView.layer.cornerRadius = 12
         secondSectionView.isHidden = !isExpanded
+        menuButton.showsMenuAsPrimaryAction = true
     }
 
     // MARK: - setConstraints
@@ -193,6 +204,11 @@ private extension WorkerWorkplaceCell {
             $0.bottom.equalToSuperview()
         }
 
+        workplaceOfficialChip.snp.makeConstraints {
+            $0.leading.equalTo(nameLabel.snp.trailing).offset(4)
+            $0.top.equalToSuperview().inset(15)
+        }
+
         // 두 번째 섹션
         secondSectionView.snp.makeConstraints {
             $0.directionalHorizontalEdges.equalToSuperview()
@@ -216,18 +232,31 @@ private extension WorkerWorkplaceCell {
     }
 
     func setBindings() {
-        containerView.rx.tap.subscribe(onNext: { [weak self] in
-            guard let self else { return }
-            isExpanded.toggle()
-            toggleSecondSection(isExpanded)
-            print("containerView tapped")
-        })
-        .disposed(by: disposeBag)
-
-        menuButton.rx.tap.subscribe(onNext: {
-            print("메뉴버튼탭")
-        })
-        .disposed(by: disposeBag)
+        let stackTapGesture = UITapGestureRecognizer()
+        stackView.addGestureRecognizer(stackTapGesture)
+        
+        stackTapGesture.rx.event
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.isExpanded.toggle()
+                owner.toggleSecondSection(owner.isExpanded)
+                print("containerView tapped")
+            })
+            .disposed(by: disposeBag)
+        
+        startWorkButton.rx.tap
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.delegate?.didTapStartBtn()
+            })
+            .disposed(by: disposeBag)
+        
+        endWorkButton.rx.tap
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.delegate?.didTapEndBtn()
+            })
+            .disposed(by: disposeBag)
     }
 
     func toggleSecondSection(_ expanded: Bool) {
