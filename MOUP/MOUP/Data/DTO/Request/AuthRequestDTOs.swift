@@ -11,13 +11,11 @@ import Foundation
 struct LoginRequestDTO: Encodable {
     let provider: String
     let authCode: String
+    let username: String // TODO: - 빈문자열로 플랫폼 분기. google의 경우 username 빈 문자열로.
 }
 
 /// 회원가입 API 요청 DTO
 struct RegisterRequestDTO: Encodable {
-    let provider: String
-    let authCode: String
-    let username: String
     let nickname: String
     let role: String
 }
