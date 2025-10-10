@@ -46,6 +46,9 @@ final class SignInCoordinator: Coordinator {
 
     func moveToTabBar() {
         print("moveToTabBar")
-        appCoordinator?.moveToTabBar()
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.appCoordinator?.moveToTabBar()
+        }
     }
 }
