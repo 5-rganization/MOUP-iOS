@@ -8,6 +8,6 @@
 import Foundation
 
 protocol AuthRepositoryProtocol: AnyObject {
-    func signIn(requestDTO: LoginRequestDTO) async throws -> User
-    func signUp(requestDTO: RegisterRequestDTO) async throws -> User
+    func signIn(requestDTO: LoginRequestDTO) async throws -> SignInResult
+    func signUp(requestDTO: RegisterRequestDTO) async throws -> UserRole
 }
