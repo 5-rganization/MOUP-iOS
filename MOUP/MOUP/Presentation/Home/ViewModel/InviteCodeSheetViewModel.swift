@@ -12,6 +12,7 @@ import RxRelay
 final class InviteCodeSheetViewModel {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
+    private let inviteCodeRelay = BehaviorRelay<String>(value: "XC1234")
     
     // MARK: - Input, Output
     struct Input {
@@ -19,14 +20,14 @@ final class InviteCodeSheetViewModel {
     }
     
     struct Output {
-        
+        let inviteCode: Observable<String>
     }
     
     // MARK: - transform
     func transform(input: Input) -> Output {
         
         return Output(
-            
+            inviteCode: inviteCodeRelay.asObservable()
         )
     }
 }

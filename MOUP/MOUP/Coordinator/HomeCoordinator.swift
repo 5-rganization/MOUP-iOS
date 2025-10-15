@@ -31,6 +31,29 @@ final class HomeCoordinator: Coordinator {
         }
     }
     
+    func moveToAllRoutine() {
+        let viewModel = AllRoutineViewModel()
+        let vc = AllRoutineViewController(viewModel: viewModel)
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func moveToTodayRoutine() {
+        let viewModel = TodayRoutineViewModel()
+        let vc = TodayRoutineViewController(viewModel: viewModel)
+        vc.coordinator = self
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func moveToWorkplaceRoutineList(with todayRoutine: TodayRoutine) {
+        let viewModel = WorkplaceRoutineListViewModel()
+        let vc = WorkplaceRoutineListViewController(
+            viewModel: viewModel,
+            workplaceName: todayRoutine.workplaceName,
+            routines: todayRoutine.routines
+        )
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
     func moveToManageAttendance() {
         let viewModel = ManageAttendanceViewModel()
         let vc = ManageAttendanceViewController(viewModel: viewModel, coordinator: self)
@@ -65,4 +88,5 @@ final class HomeCoordinator: Coordinator {
         vc.modalTransitionStyle = .crossDissolve
         navigationController.present(vc, animated: true)
     }
+    
 }

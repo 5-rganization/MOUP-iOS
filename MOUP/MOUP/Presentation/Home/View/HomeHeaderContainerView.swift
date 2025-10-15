@@ -69,8 +69,8 @@ final class HomeHeaderContainerView: UIView {
         $0.font = .bodyMedium(16)
         $0.text = "오늘의 루틴"
     }
-    private let todayRoutineRightButton = UIButton().then {
-        $0.setImage(.chevronRightForCard, for: .normal)
+    private let todayRoutineRightImageView = UIImageView().then {
+        $0.image = .chevronRightForCard
         $0.tintColor = .gray700
     }
     private let todayRoutineCommentLabel = UILabel().then {
@@ -89,8 +89,8 @@ final class HomeHeaderContainerView: UIView {
         $0.font = .bodyMedium(16)
         $0.text = "전체 루틴"
     }
-    private let allRoutineRightButton = UIButton().then {
-        $0.setImage(.chevronRightForCard, for: .normal)
+    private let allRoutineRightImageView = UIImageView().then {
+        $0.image = .chevronRightForCard
         $0.tintColor = .gray700
     }
     private let allRoutineCommentLabel = UILabel().then {
@@ -159,12 +159,12 @@ private extension HomeHeaderContainerView {
         )
         todayRoutineCardView.addSubviews(
             todayRoutineTitleLabel,
-            todayRoutineRightButton,
+            todayRoutineRightImageView,
             todayRoutineCommentLabel
         )
         allRoutineCardView.addSubviews(
             allRoutineTitleLabel,
-            allRoutineRightButton,
+            allRoutineRightImageView,
             allRoutineCommentLabel
         )
     }
@@ -217,7 +217,7 @@ private extension HomeHeaderContainerView {
             $0.top.equalToSuperview().inset(12)
             $0.leading.equalToSuperview().inset(16)
         }
-        todayRoutineRightButton.snp.makeConstraints {
+        todayRoutineRightImageView.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalTo(todayRoutineTitleLabel)
             $0.width.equalTo(7)
@@ -233,7 +233,7 @@ private extension HomeHeaderContainerView {
             $0.top.equalToSuperview().inset(12)
             $0.leading.equalToSuperview().inset(16)
         }
-        allRoutineRightButton.snp.makeConstraints {
+        allRoutineRightImageView.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalTo(allRoutineTitleLabel)
             $0.width.equalTo(7)
