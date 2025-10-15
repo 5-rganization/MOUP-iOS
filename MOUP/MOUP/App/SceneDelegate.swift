@@ -18,7 +18,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         self.window = window
 
-        let isSignedIn = false // TODO: - 실제 액세스 토큰 유무 확인 로직 설계 필요
+        let token = KeychainManager.shared.read(key: "accessToken")
+        let isSignedIn = token != nil
 
         let appCoordinator = AppCoordinator(window: window, isSignedIn: isSignedIn)
         self.appCoordinator = appCoordinator
