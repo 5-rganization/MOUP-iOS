@@ -65,7 +65,11 @@ final class TabBarCoordinator: Coordinator {
         tabBarController.setViewControllers([homeNav, calendarNav, myPageNav], animated: false)
 
         // 루트 설정
-        window.rootViewController = tabBarController
+        UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: { [weak self] in
+            guard let self else { return }
+            window.rootViewController = tabBarController
+        })
+        
         window.makeKeyAndVisible()
     }
 }
