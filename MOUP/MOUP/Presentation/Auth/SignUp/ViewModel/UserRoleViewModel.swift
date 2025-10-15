@@ -88,9 +88,6 @@ private extension UserRoleViewModel {
             do {
                 try await authUseCase.signUp(
                     requestDTO: RegisterRequestDTO(
-                        provider: provider.rawValue,
-                        authCode: authorizationCode,
-                        username: "",
                         nickname: nickname,
                         role: userRole.rawValue
                     )

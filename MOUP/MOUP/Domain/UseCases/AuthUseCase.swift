@@ -16,20 +16,25 @@ final class AuthUseCase: AuthUseCaseProtocol {
 
     // MARK: - Methods
     func signIn(requestDTO: LoginRequestDTO) async throws {
-        let user = try await authRepository.signIn(requestDTO: requestDTO)
+        let result = try await authRepository.signIn(requestDTO: requestDTO)
 
-        UserDefaultsManager.shared.userId = user.userId
-        UserDefaultsManager.shared.userRole = user.role.rawValue
-        KeychainManager.shared.save(key: "accessToken", token: user.accessToken)
-        KeychainManager.shared.save(key: "refreshToken", token: user.refreshToken)
+        switch result {
+        case .signIn(let user):
+            UserDefaultsManager.shared.userId = user.userId
+            UserDefaultsManager.shared.userRole = user.role.rawValue
+            KeychainManager.shared.save(key: "accessToken", token: user.accessToken)
+            KeychainManager.shared.save(key: "refreshToken", token: user.refreshToken)
+        case .needsSignUp(let accessToken, let refreshToken):
+            KeychainManager.shared.save(key: "accessToken", token: accessToken)
+            KeychainManager.shared.save(key: "refreshToken", token: refreshToken)
+            throw AuthError.notMember
+        }
+        
     }
 
     func signUp(requestDTO: RegisterRequestDTO) async throws {
-        let user = try await authRepository.signUp(requestDTO: requestDTO)
+        let result = try await authRepository.signUp(requestDTO: requestDTO)
 
-        UserDefaultsManager.shared.userId = user.userId
-        UserDefaultsManager.shared.userRole = user.role.rawValue
-        KeychainManager.shared.save(key: "accessToken", token: user.accessToken)
-        KeychainManager.shared.save(key: "refreshToken", token: user.refreshToken)
+        UserDefaultsManager.shared.userRole = result.rawValue
     }
 }

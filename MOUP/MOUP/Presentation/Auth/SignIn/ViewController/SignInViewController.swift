@@ -8,7 +8,7 @@
 import UIKit
 import RxSwift
 import RxRelay
-import AppAuth
+import GoogleSignIn
 
 final class SignInViewController: UIViewController {
     
@@ -118,42 +118,57 @@ private extension SignInViewController {
     }
 
     // MARK: - signInGoogle
+//    func signInGoogle() {
+//        let config = OIDServiceConfiguration(
+//            authorizationEndpoint: URL(string: "https://accounts.google.com/o/oauth2/v2/auth")!,
+//            tokenEndpoint: URL(string: "https://oauth2.googleapis.com/token")!
+//        )
+//
+//        guard let redirectURI = Bundle.main.googleRedirectURI else {
+//            print("googleRedirectURI를 찾을 수 없음")
+//            return
+//        }
+//
+//        print("googleClientID: \(Bundle.main.googleClientID)\nredirectURI: \(redirectURI)")
+//
+//        let request = OIDAuthorizationRequest(
+//            configuration: config,
+//            clientId: Bundle.main.googleClientID,
+//            scopes: ["openid", "profile", "email"],
+//            redirectURL: URL(string: redirectURI)!,
+//            responseType: OIDResponseTypeCode,
+//            additionalParameters: nil
+//        )
+//
+//        if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
+//            appDelegate.currentAuthorizationFlow = OIDAuthorizationService.present(
+//                request,
+//                presenting: self,
+//                callback: { response, error in
+//                    if let code = response?.authorizationCode,
+//                       let codeVerifier = request.codeVerifier {
+//                        print("request... => \(codeVerifier) \(code)")
+//                        self.googleAuthCodeRelay.accept("\(codeVerifier) \(code)")
+//                    } else {
+//                        print("Authorization failed: \(error?.localizedDescription ?? "")")
+//                    }
+//                }
+//            )
+//        }
+//    }
+
     func signInGoogle() {
-        let config = OIDServiceConfiguration(
-            authorizationEndpoint: URL(string: "https://accounts.google.com/o/oauth2/v2/auth")!,
-            tokenEndpoint: URL(string: "https://oauth2.googleapis.com/token")!
-        )
+        GIDSignIn.sharedInstance.signIn(withPresenting: self) { result, error in
+            guard error == nil else {
+                // TODO: - 에러 핸들링 필요
+                return
+            }
 
-        guard let redirectURI = Bundle.main.googleRedirectURI else {
-            print("googleRedirectURI를 찾을 수 없음")
-            return
-        }
-
-        print("googleClientID: \(Bundle.main.googleClientID)\nredirectURI: \(redirectURI)")
-
-        let request = OIDAuthorizationRequest(
-            configuration: config,
-            clientId: Bundle.main.googleClientID,
-            scopes: ["openid", "profile", "email"],
-            redirectURL: URL(string: redirectURI)!,
-            responseType: OIDResponseTypeCode,
-            additionalParameters: nil
-        )
-
-        if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
-            appDelegate.currentAuthorizationFlow = OIDAuthorizationService.present(
-                request,
-                presenting: self,
-                callback: { response, error in
-                    if let code = response?.authorizationCode,
-                       let codeVerifier = request.codeVerifier {
-                        print("request... => \(codeVerifier) \(code)")
-                        self.googleAuthCodeRelay.accept("\(codeVerifier) \(code)")
-                    } else {
-                        print("Authorization failed: \(error?.localizedDescription ?? "")")
-                    }
-                }
-            )
+            if let serverAuthCode = result?.serverAuthCode {
+                self.googleAuthCodeRelay.accept(serverAuthCode)
+            } else {
+                assertionFailure("Authorization failed - serverAuthCode")
+            }
         }
     }
 }

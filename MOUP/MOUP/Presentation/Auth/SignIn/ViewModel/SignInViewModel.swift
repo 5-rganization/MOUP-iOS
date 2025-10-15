@@ -54,7 +54,7 @@ final class SignInViewModel {
             if code == "" { return }
             Task {
                 do {
-                    try await self.authUseCase.signIn(requestDTO: LoginRequestDTO(provider: LoginProvider.google.rawValue, authCode: code))
+                    try await self.authUseCase.signIn(requestDTO: LoginRequestDTO(provider: LoginProvider.google.rawValue, authCode: code, username: ""))
                     self.signInOutputEventRelay.accept(SignInOutputEvent.loginSuccessed)
                 } catch let error as NetworkError {
                     switch error {

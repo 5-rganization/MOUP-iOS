@@ -15,25 +15,24 @@ final class AuthRepository: AuthRepositoryProtocol {
     }
 
     // MARK: - Methods
-    func signIn(requestDTO: LoginRequestDTO) async throws -> User {
+    func signIn(requestDTO: LoginRequestDTO) async throws -> SignInResult {
         let response = try await authService.signIn(requestDTO: requestDTO)
-        let user = User(
-            userId: response.userId,
-            role: UserRole(rawValue: response.role) ?? .worker,
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken
-        )
-        return user
+        if let role = response.role, !role.isEmpty { // 회원 여부는 role이 제대로 저장되어있는지에 따라 분기됨.
+            let user = User(
+                userId: response.userId,
+                role: UserRole(rawValue: role) ?? .worker,
+                accessToken: response.accessToken,
+                refreshToken: response.refreshToken
+            )
+            return .signIn(user)
+        } else {
+            return .needsSignUp(accessToken: response.accessToken, refreshToken: response.refreshToken)
+        }
     }
 
-    func signUp(requestDTO: RegisterRequestDTO) async throws -> User {
+    func signUp(requestDTO: RegisterRequestDTO) async throws -> UserRole {
         let response = try await authService.signUp(requestDTO: requestDTO)
-        let user = User(
-            userId: response.userId,
-            role: response.role == "ROLE_WORKER" ? .worker : .owner,
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken
-        )
-        return user
+        let role: UserRole = response.role == "ROLE_WORKER" ? .worker : .owner
+        return role
     }
 }

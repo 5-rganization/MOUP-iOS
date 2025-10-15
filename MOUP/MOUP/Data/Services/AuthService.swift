@@ -21,19 +21,14 @@ final class AuthService: AuthServiceProtocol {
         print(response.value)
         print("statusCode: \(response.response?.statusCode)")
 
-        guard let statusCode = response.response?.statusCode else {
+        guard let statusCode = response.response?.statusCode,
+              let dto = response.value else {
             throw NetworkError.noResponse
         }
 
         switch statusCode {
-        case 200:
-            guard let dto = response.value else {
-                throw NetworkError.noResponse
-            }
+        case 200, 201, 202:
             return dto
-        case 404:
-            print(AuthError.notMember.debugDescription!)
-            throw AuthError.notMember
         default:
             print(NetworkError.serverError.debugDescription!)
             throw NetworkError.serverError
@@ -41,7 +36,8 @@ final class AuthService: AuthServiceProtocol {
     }
 
     func signUp(requestDTO: RegisterRequestDTO) async throws -> RegisterResponseDTO {
-        let request = AF.request(AuthRouter.signUp(requestDTO))
+        let session = NetworkManager.shared.session
+        let request = session.request(AuthRouter.signUp(requestDTO))
         let response = await request.serializingDecodable(RegisterResponseDTO.self).response
 
         print(response.value)
@@ -60,9 +56,6 @@ final class AuthService: AuthServiceProtocol {
         case 400:
             print(AuthError.invalidUserName.debugDescription!)
             throw AuthError.invalidUserName
-        case 409:
-            print(AuthError.duplicatedUser.debugDescription!)
-            throw AuthError.duplicatedUser
         default:
             print(NetworkError.serverError.debugDescription!)
             throw NetworkError.serverError
