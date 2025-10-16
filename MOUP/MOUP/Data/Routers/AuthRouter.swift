@@ -11,6 +11,7 @@ import Alamofire
 enum AuthRouter {
     case signIn(LoginRequestDTO)
     case signUp(RegisterRequestDTO)
+    case renewAccessToken(RefreshTokenRequestDTO)
 }
 
 extension AuthRouter: URLRequestConvertible {
@@ -27,6 +28,8 @@ extension AuthRouter: URLRequestConvertible {
             return "/auth/login"
         case .signUp:
             return "/auth/login/register"
+        case .renewAccessToken:
+            return "/auth/token/refresh"
         }
     }
 
@@ -36,6 +39,8 @@ extension AuthRouter: URLRequestConvertible {
             return .post
         case .signUp:
             return .patch
+        case .renewAccessToken:
+            return .post
         }
     }
 
@@ -45,12 +50,14 @@ extension AuthRouter: URLRequestConvertible {
             return signInRequestDTO
         case .signUp(let signUpRequestDTO):
             return signUpRequestDTO
+        case .renewAccessToken(let refreshAccessTokenRequestDTO):
+            return refreshAccessTokenRequestDTO
         }
     }
 
     var encoding: ParameterEncoding {
         switch self {
-        case .signIn, .signUp:
+        case .signIn, .signUp, .renewAccessToken:
             return JSONEncoding.default
         }
     }
