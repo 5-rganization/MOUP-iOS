@@ -7,12 +7,14 @@
 import UIKit
 
 final class TabBarCoordinator: Coordinator {
+    weak var coordinator: Coordinator?
     var childCoordinators = [Coordinator]()
     private let window: UIWindow
     private let tabBarViewModel: TabBarViewModel
     private let tabBarController: TabBarViewController
 
-    init(window: UIWindow, authUseCase: AuthUseCaseProtocol) {
+    init(coordinator: Coordinator, window: UIWindow, authUseCase: AuthUseCaseProtocol) {
+        self.coordinator = coordinator
         self.window = window
         self.tabBarViewModel = TabBarViewModel(authUseCase: authUseCase)
         self.tabBarController = TabBarViewController(viewModel: tabBarViewModel)

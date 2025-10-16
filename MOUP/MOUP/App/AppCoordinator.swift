@@ -27,21 +27,60 @@ final class AppCoordinator: Coordinator {
 
     func start() {
         if isSignedIn {
-            let tabBarCoordinator = TabBarCoordinator(window: window, authUseCase: authUseCase)
-            childCoordinators.append(tabBarCoordinator)
-            tabBarCoordinator.start()
+            showTabBar()
         } else {
-            let signInCoordinator = SignInCoordinator(coordinator: self, window: window, authUseCase: authUseCase)
-            childCoordinators.append(signInCoordinator)
-            signInCoordinator.start()
+            showSignIn()
         }
     }
 
-    func moveToTabBar() {
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleUnauthorizedAccess),
+            name: .unauthorizedAccessDetected,
+            object: nil
+        )
+    }
+    
+    @objc private func handleUnauthorizedAccess() {
+        KeychainManager.shared.delete(key: "accessToken")
+        KeychainManager.shared.delete(key: "refreshToken")
+        
+        showSignIn()
+    }
+    
+    private func showSignIn() {
         childCoordinators.removeAll()
-        let tabBarCoordinator = TabBarCoordinator(window: window, authUseCase: authUseCase)
+        
+        let signInCoordinator = SignInCoordinator(
+            coordinator: self,
+            window: window,
+            authUseCase: authUseCase
+        )
+        childCoordinators.append(signInCoordinator)
+        signInCoordinator.start()
+    }
+    
+    private func showTabBar() {
+        childCoordinators.removeAll()
+        
+        let tabBarCoordinator = TabBarCoordinator(
+            coordinator: self,
+            window: window,
+            authUseCase: authUseCase
+        )
         childCoordinators.append(tabBarCoordinator)
         tabBarCoordinator.start()
+    }
+    
+    // MARK: - Public Methods
+    
+    func moveToTabBar() {
+        showTabBar()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }
 

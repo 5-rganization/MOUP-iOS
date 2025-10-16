@@ -9,6 +9,12 @@ import Foundation
 import Alamofire
 
 final class AuthInterceptor: RequestInterceptor {
+    private let authRepository: AuthRepositoryProtocol // TODO: - thread safety 추가 후 sendable 채택 필요
+    
+    init(authRepository: AuthRepositoryProtocol) {
+        self.authRepository = authRepository
+    }
+    
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, any Error>) -> Void) {
         var urlRequest = urlRequest
         
@@ -16,5 +22,30 @@ final class AuthInterceptor: RequestInterceptor {
             urlRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         }
         completion(.success(urlRequest))
-    } // TODO: - 재발급, 만료 등 예외 처리 필요
+    }
+    
+    func retry(_ request: Request, for session: Session, dueTo error: any Error, completion: @escaping (RetryResult) -> Void) {
+        guard let response = request.task?.response as? HTTPURLResponse,
+              response.statusCode == 401 else {
+            completion(.doNotRetryWithError(error)) // TODO: - 로그인 Coordinator로 전환
+            return
+        }
+        
+        // TODO: - 재발급 요청
+        Task {
+            do {
+                try await authRepository.renewAccessToken() // 액세스 토큰 재발급
+                completion(.retry)
+            } catch {
+                completion(.doNotRetryWithError(error))
+                
+                await MainActor.run {
+                    NotificationCenter.default.post(
+                        name: .unauthorizedAccessDetected,
+                        object: nil
+                    )
+                }
+            }
+        }
+    }
 }
