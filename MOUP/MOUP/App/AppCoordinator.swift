@@ -23,6 +23,8 @@ final class AppCoordinator: Coordinator {
         self.authService = AuthService()
         self.authRepository = AuthRepository(authService: authService)
         self.authUseCase = AuthUseCase(authRepository: authRepository)
+        
+        setupNotifications()
     }
 
     func start() {
