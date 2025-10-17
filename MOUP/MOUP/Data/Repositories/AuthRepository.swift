@@ -33,14 +33,4 @@ final class AuthRepository: AuthRepositoryProtocol {
         let role: UserRole = response.role == "ROLE_WORKER" ? .worker : .owner
         return role
     }
-    
-    func renewAccessToken() async throws {
-        guard let requestToken = KeychainManager.shared.read(key: "refreshToken") else {
-            throw AuthError.invalidToken
-        }
-        let requestDTO = RefreshTokenRequestDTO(refreshToken: requestToken)
-        let response = try await authService.renewAccessToken(requestDTO: requestDTO)
-        KeychainManager.shared.save(key: "accessToken", token: response.accessToken)
-        KeychainManager.shared.save(key: "refreshToken", token: response.refreshToken)
-    }
 }

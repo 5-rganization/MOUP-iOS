@@ -10,10 +10,14 @@ import Alamofire
 
 final class NetworkManager {
     static let shared = NetworkManager()
+    private let tokenService: TokenServiceProtocol
+    private let tokenRepository: TokenRepositoryProtocol
     let session: Session
     
     private init() {
-        let interceptor = AuthInterceptor()
-        session = Session(interceptor: interceptor)
+        self.tokenService = TokenService()
+        self.tokenRepository = TokenRepository(tokenService: tokenService)
+        let interceptor = AuthInterceptor(tokenRepository: self.tokenRepository)
+        self.session = Session(interceptor: interceptor)
     }
 }

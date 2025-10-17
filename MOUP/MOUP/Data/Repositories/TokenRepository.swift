@@ -1,0 +1,26 @@
+//
+//  TokenRepository.swift
+//  MOUP
+//
+//  Created by 송규섭 on 10/17/25.
+//
+
+import Foundation
+
+final class TokenRepository: TokenRepositoryProtocol {
+    private let tokenService: TokenServiceProtocol
+    
+    init(tokenService: TokenServiceProtocol) {
+        self.tokenService = tokenService
+    }
+    
+    func renewAccessToken() async throws {
+        guard let requestToken = KeychainManager.shared.read(key: "refreshToken") else {
+            throw AuthError.invalidToken
+        }
+        let requestDTO = RefreshTokenRequestDTO(refreshToken: requestToken)
+        let response = try await tokenService.renewAccessToken(requestDTO: requestDTO)
+        KeychainManager.shared.save(key: "accessToken", token: response.accessToken)
+        KeychainManager.shared.save(key: "refreshToken", token: response.refreshToken)
+    }
+}
