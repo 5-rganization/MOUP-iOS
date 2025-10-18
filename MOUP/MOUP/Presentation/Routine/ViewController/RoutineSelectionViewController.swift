@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 import RxDataSources
 
-final class RoutineSelectionViewController: UIViewController, UITableViewDelegate {
+final class RoutineSelectionViewController: UIViewController {
     
     // MARK: - Properties
     
@@ -114,15 +114,17 @@ private extension RoutineSelectionViewController {
     func createDataSource() -> RxTableViewSectionedAnimatedDataSource<RoutineSectionModel> {
         return RxTableViewSectionedAnimatedDataSource<RoutineSectionModel>(
             configureCell: { [weak self] dataSource, tableView, indexPath, viewState in
-                guard let self,
-                      let cell = tableView.dequeueReusableCell(
+                guard let self else { return UITableViewCell() }
+                guard let cell = tableView.dequeueReusableCell(
                         withIdentifier: RoutineCell.id,
                         for: indexPath
                       ) as? RoutineCell else {
+                    assertionFailure("RoutineCell dequeue 실패")
                     return UITableViewCell()
                 }
                 
-                cell.disposeBag = DisposeBag()
+                cell.prepareForReuse()
+                
                 cell.update(with: viewState)
                 
                 cell.rx.checkboxDidTap
