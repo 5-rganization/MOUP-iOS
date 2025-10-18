@@ -51,7 +51,8 @@ final class RoutineSelectionViewModel {
     
     func transform(_ input: Input) -> Output {
         let initialRoutines = input.appear
-            .flatMapLatest { [unowned self] _ -> Observable<[Routine]> in
+            .flatMapLatest { [weak self] _ -> Observable<[Routine]> in
+                guard let self else { return .empty() }
                 // TODO: usecase 호출
                 return .just(self.fetchDummyData())
             }
