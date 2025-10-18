@@ -89,6 +89,7 @@ final class RoutineSelectionViewModel {
                 }
                 return [RoutineSectionModel(model: 0, items: viewStates)]
             }
+            .distinctUntilChanged()
             .asDriver(onErrorJustReturn: [])
         
         return Output(
