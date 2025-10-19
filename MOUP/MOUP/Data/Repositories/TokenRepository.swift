@@ -23,4 +23,9 @@ final class TokenRepository: TokenRepositoryProtocol {
         KeychainManager.shared.save(key: "accessToken", token: response.accessToken)
         KeychainManager.shared.save(key: "refreshToken", token: response.refreshToken)
     }
+    
+    func deleteTokens() {
+        KeychainManager.shared.delete(key: "accessToken")
+        KeychainManager.shared.delete(key: "refreshToken")
+    }
 }

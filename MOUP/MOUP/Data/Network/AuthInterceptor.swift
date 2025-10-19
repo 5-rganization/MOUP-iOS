@@ -9,10 +9,10 @@ import Foundation
 import Alamofire
 
 final class AuthInterceptor: RequestInterceptor {
-    private let tokenRepository: TokenRepositoryProtocol // TODO: - thread safety 추가 후 sendable 채택 필요
+    private let tokenUseCase: TokenUseCaseProtocol // TODO: - thread safety 추가 후 sendable 채택 필요
     
-    init(tokenRepository: TokenRepositoryProtocol) {
-        self.tokenRepository = tokenRepository
+    init(tokenUseCase: TokenUseCaseProtocol) {
+        self.tokenUseCase = tokenUseCase
     }
     
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, any Error>) -> Void) {
@@ -34,7 +34,7 @@ final class AuthInterceptor: RequestInterceptor {
         // TODO: - 재발급 요청
         Task {
             do {
-                try await tokenRepository.renewAccessToken() // 액세스 토큰 재발급
+                try await tokenUseCase.renewAccessToken() // 액세스 토큰 재발급
                 completion(.retry)
             } catch {
                 completion(.doNotRetryWithError(error))

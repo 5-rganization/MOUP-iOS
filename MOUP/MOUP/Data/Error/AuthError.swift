@@ -39,7 +39,7 @@ extension AuthError {
         case .invalidToken:
             "refreshToken - 400, 유효하지 않은 토큰"
         case .deletedUser:
-            "refreshToken - 409, 삭제 삭제된 유저"
+            "refreshToken - 409, 삭제된 유저"
         }
     }
 }

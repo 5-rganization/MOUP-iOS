@@ -9,4 +9,5 @@ import Foundation
 
 protocol TokenRepositoryProtocol: AnyObject {
     func renewAccessToken() async throws
+    func deleteTokens()
 }

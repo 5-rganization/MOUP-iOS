@@ -12,12 +12,14 @@ final class NetworkManager {
     static let shared = NetworkManager()
     private let tokenService: TokenServiceProtocol
     private let tokenRepository: TokenRepositoryProtocol
+    private let tokenUseCase: TokenUseCaseProtocol
     let session: Session
     
     private init() {
         self.tokenService = TokenService()
         self.tokenRepository = TokenRepository(tokenService: tokenService)
-        let interceptor = AuthInterceptor(tokenRepository: self.tokenRepository)
+        self.tokenUseCase = TokenUseCase(tokenRepository: tokenRepository)
+        let interceptor = AuthInterceptor(tokenUseCase: tokenUseCase)
         self.session = Session(interceptor: interceptor)
     }
 }

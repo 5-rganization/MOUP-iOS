@@ -15,6 +15,9 @@ final class AppCoordinator: Coordinator {
     private let authService: AuthServiceProtocol
     private let authRepository: AuthRepositoryProtocol
     private let authUseCase: AuthUseCaseProtocol
+    private let tokenService: TokenServiceProtocol
+    private let tokenRepository: TokenRepositoryProtocol
+    private let tokenUseCase: TokenUseCaseProtocol
 
     init(window: UIWindow, isSignedIn: Bool) {
         self.window = window
@@ -23,6 +26,9 @@ final class AppCoordinator: Coordinator {
         self.authService = AuthService()
         self.authRepository = AuthRepository(authService: authService)
         self.authUseCase = AuthUseCase(authRepository: authRepository)
+        self.tokenService = TokenService()
+        self.tokenRepository = TokenRepository(tokenService: tokenService)
+        self.tokenUseCase = TokenUseCase(tokenRepository: tokenRepository)
         
         setupNotifications()
     }
@@ -45,8 +51,7 @@ final class AppCoordinator: Coordinator {
     }
     
     @objc private func handleUnauthorizedAccess() {
-        KeychainManager.shared.delete(key: "accessToken")
-        KeychainManager.shared.delete(key: "refreshToken")
+        tokenUseCase.deleteTokens()
         
         showSignIn()
     }
