@@ -22,7 +22,7 @@ struct RegisterResponseDTO: Decodable {
 }
 
 /// 토큰 갱신 API 응답 DTO
-struct refreshTokenResponseDTO: Decodable {
+struct RefreshTokenResponseDTO: Decodable {
     let accessToken: String
     let refreshToken: String
 }

@@ -16,20 +16,7 @@ final class AuthUseCase: AuthUseCaseProtocol {
 
     // MARK: - Methods
     func signIn(requestDTO: LoginRequestDTO) async throws {
-        let result = try await authRepository.signIn(requestDTO: requestDTO)
-
-        switch result {
-        case .signIn(let user):
-            UserDefaultsManager.shared.userId = user.userId
-            UserDefaultsManager.shared.userRole = user.role.rawValue
-            KeychainManager.shared.save(key: "accessToken", token: user.accessToken)
-            KeychainManager.shared.save(key: "refreshToken", token: user.refreshToken)
-        case .needsSignUp(let accessToken, let refreshToken):
-            KeychainManager.shared.save(key: "accessToken", token: accessToken)
-            KeychainManager.shared.save(key: "refreshToken", token: refreshToken)
-            throw AuthError.notMember
-        }
-        
+        try await authRepository.signIn(requestDTO: requestDTO)
     }
 
     func signUp(requestDTO: RegisterRequestDTO) async throws {

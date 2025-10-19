@@ -7,12 +7,14 @@
 import UIKit
 
 final class TabBarCoordinator: Coordinator {
+    weak var coordinator: Coordinator?
     var childCoordinators = [Coordinator]()
     private let window: UIWindow
     private let tabBarViewModel: TabBarViewModel
     private let tabBarController: TabBarViewController
 
-    init(window: UIWindow, authUseCase: AuthUseCaseProtocol) {
+    init(coordinator: Coordinator, window: UIWindow, authUseCase: AuthUseCaseProtocol) {
+        self.coordinator = coordinator
         self.window = window
         self.tabBarViewModel = TabBarViewModel(authUseCase: authUseCase)
         self.tabBarController = TabBarViewController(viewModel: tabBarViewModel)
@@ -65,7 +67,11 @@ final class TabBarCoordinator: Coordinator {
         tabBarController.setViewControllers([homeNav, calendarNav, myPageNav], animated: false)
 
         // 루트 설정
-        window.rootViewController = tabBarController
+        UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: { [weak self] in
+            guard let self else { return }
+            window.rootViewController = tabBarController
+        })
+        
         window.makeKeyAndVisible()
     }
 }

@@ -21,6 +21,6 @@ struct RegisterRequestDTO: Encodable {
 }
 
 /// 토큰 갱신 API 요청 DTO
-struct refreshTokenRequestDTO: Encodable {
+struct RefreshTokenRequestDTO: Encodable {
     let refreshToken: String
 }
