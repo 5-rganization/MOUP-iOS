@@ -153,3 +153,4 @@ Secrets-Release.xcconfig
 credentials.plist
 GoogleConfig.xcconfig
 NetworkConfig.xcconfig
+GoogleService-Info.plist
