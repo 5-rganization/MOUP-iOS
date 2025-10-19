@@ -10,7 +10,8 @@ import UIKit
 final class WorkplaceRegisterSheetCoordinator: Coordinator {
     weak var coordinator: HomeCoordinator?
     var childCoordinators = [Coordinator]()
-    let navigationController: UINavigationController
+    private let navigationController: UINavigationController
+    private var sheetNav: UINavigationController?
     
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
@@ -18,20 +19,28 @@ final class WorkplaceRegisterSheetCoordinator: Coordinator {
     
     func start() {
         let vc = WorkplaceRegisterSheetViewController()
-        if let sheet = vc.sheetPresentationController {
+        vc.coordinator = self
+        let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .pageSheet
+        if let sheet = nav.sheetPresentationController {
             sheet.detents = [.custom {_ in return 227 }]
             sheet.prefersGrabberVisible = true
         }
-        vc.modalPresentationStyle = .pageSheet
-        navigationController.present(vc, animated: true)
+        sheetNav = nav
+        navigationController.present(nav, animated: true)
     }
     
     func moveToInviteCodeInput() {
-        
+        let inviteCodeInputCoordinator = InviteCodeInputCoordinator(navigationController: navigationController)
+        inviteCodeInputCoordinator.coordinator = self
+        childCoordinators.append(inviteCodeInputCoordinator)
+        inviteCodeInputCoordinator.start()
     }
 
     func moveToDirectRegistration() { // 직접 등록하기
-        let coordinator = WorkplaceRegisterCoordinator(navigationController: self.navigationController)
+        print("moveToDirectRegistration")
+        guard let sheetNav else { return }
+        let coordinator = WorkplaceRegisterCoordinator(navigationController: sheetNav)
         childCoordinators.append(coordinator)
         DispatchQueue.main.async {
             coordinator.start()
