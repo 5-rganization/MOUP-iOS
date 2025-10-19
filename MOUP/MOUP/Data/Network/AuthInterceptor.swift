@@ -18,7 +18,7 @@ final class AuthInterceptor: RequestInterceptor {
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, any Error>) -> Void) {
         var urlRequest = urlRequest
         
-        if let accessToken = KeychainManager.shared.read(key: "accessToken") {
+        if let accessToken = tokenUseCase.fetchAccessToken() {
             urlRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         }
         completion(.success(urlRequest))

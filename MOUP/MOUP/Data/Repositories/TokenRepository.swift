@@ -28,4 +28,17 @@ final class TokenRepository: TokenRepositoryProtocol {
         KeychainManager.shared.delete(key: "accessToken")
         KeychainManager.shared.delete(key: "refreshToken")
     }
+    
+    func checkSignedIn() -> Bool {
+        let token = KeychainManager.shared.read(key: "accessToken")
+        return token != nil
+    }
+    
+    func fetchAccessToken() -> String? {
+        KeychainManager.shared.read(key: "accessToken")
+    }
+    
+    func fetchRefreshToken() -> String? {
+        KeychainManager.shared.read(key: "refreshToken")
+    }
 }

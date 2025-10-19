@@ -21,4 +21,16 @@ final class TokenUseCase: TokenUseCaseProtocol {
     func deleteTokens() {
         tokenRepository.deleteTokens()
     }
+    
+    func checkSignedIn() -> Bool {
+        tokenRepository.checkSignedIn()
+    }
+    
+    func fetchAccessToken() -> String? {
+        tokenRepository.fetchAccessToken()
+    }
+    
+    func fetchRefreshToken() -> String? {
+        tokenRepository.fetchRefreshToken()
+    }
 }

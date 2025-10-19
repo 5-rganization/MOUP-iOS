@@ -10,7 +10,6 @@ import UIKit
 final class AppCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     let window: UIWindow
-    var isSignedIn: Bool // TODO: - 실제 로그인 여부를 알 수 있도록 변경
 
     private let authService: AuthServiceProtocol
     private let authRepository: AuthRepositoryProtocol
@@ -19,10 +18,8 @@ final class AppCoordinator: Coordinator {
     private let tokenRepository: TokenRepositoryProtocol
     private let tokenUseCase: TokenUseCaseProtocol
 
-    init(window: UIWindow, isSignedIn: Bool) {
+    init(window: UIWindow) {
         self.window = window
-        self.isSignedIn = isSignedIn
-        print("자동 로그인 가능 여부 : \(isSignedIn)")
         self.authService = AuthService()
         self.authRepository = AuthRepository(authService: authService)
         self.authUseCase = AuthUseCase(authRepository: authRepository)
@@ -34,7 +31,7 @@ final class AppCoordinator: Coordinator {
     }
 
     func start() {
-        if isSignedIn {
+        if tokenUseCase.checkSignedIn() {
             showTabBar()
         } else {
             showSignIn()
