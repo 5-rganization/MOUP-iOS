@@ -98,7 +98,7 @@ private extension HomeViewController {
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
                 print("플러스 버튼 탭")
-                owner.coordinator?.moveToDirectRegistration()
+                owner.coordinator?.presentWorkplaceRegistrationSheet()
             })
             .disposed(by: disposeBag)
         

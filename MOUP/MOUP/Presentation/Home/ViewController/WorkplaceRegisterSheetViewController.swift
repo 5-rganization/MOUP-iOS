@@ -25,12 +25,6 @@ class WorkplaceRegisterSheetViewController: UIViewController {
 
         configure()
     }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-        coordinator?.sheetDismissed()
-    }
 }
 
 private extension WorkplaceRegisterSheetViewController {
@@ -42,15 +36,27 @@ private extension WorkplaceRegisterSheetViewController {
         workplaceRegistrationSheetView.rx.inviteCodeRegisterBtnTapped
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
-                owner.coordinator?.moveToInviteCodeInput()
+                owner.dismiss(animated: true) { [weak self] in
+                    guard let self else { return }
+                    self.coordinator?.moveToInviteCodeInput()
+                }
             })
             .disposed(by: disposeBag)
         
         workplaceRegistrationSheetView.rx.directRegisterBtnTapped
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
-                owner.coordinator?.moveToDirectRegistration()
+                owner.dismiss(animated: true) { [weak self] in
+                    guard let self else { return }
+                    self.coordinator?.moveToDirectRegistration()
+                }
             })
             .disposed(by: disposeBag)
+    }
+}
+
+extension WorkplaceRegisterSheetViewController: UIAdaptivePresentationControllerDelegate {
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        coordinator?.sheetDismissed()
     }
 }
