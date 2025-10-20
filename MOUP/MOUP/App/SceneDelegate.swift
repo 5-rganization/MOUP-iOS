@@ -17,11 +17,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
         self.window = window
-
-        let token = KeychainManager.shared.read(key: "accessToken")
-        let isSignedIn = token != nil
-
-        let appCoordinator = AppCoordinator(window: window, isSignedIn: isSignedIn)
+        let appCoordinator = AppCoordinator(window: window)
         self.appCoordinator = appCoordinator
         appCoordinator.start()
     }

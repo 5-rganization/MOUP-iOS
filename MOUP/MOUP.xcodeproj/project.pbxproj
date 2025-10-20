@@ -12,16 +12,14 @@
 		5B3754642E2540C200B13805 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 5B3754632E2540C200B13805 /* GoogleSignIn */; };
 		5B5304D22E2251610083F7CA /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304D12E2251610083F7CA /* Then */; };
 		5B5304D52E22516A0083F7CA /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304D42E22516A0083F7CA /* SnapKit */; };
-		5B5304DA2E2251B00083F7CA /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304D92E2251B00083F7CA /* FirebaseAnalytics */; };
-		5B5304DC2E2251B00083F7CA /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304DB2E2251B00083F7CA /* FirebaseAnalyticsCore */; };
-		5B5304DE2E2251B00083F7CA /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304DD2E2251B00083F7CA /* FirebaseCore */; };
-		5B5304E02E2251B00083F7CA /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304DF2E2251B00083F7CA /* FirebaseCrashlytics */; };
 		5B5304E62E2251DD0083F7CA /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304E52E2251DD0083F7CA /* RxCocoa */; };
 		5B5304E82E2251DD0083F7CA /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304E72E2251DD0083F7CA /* RxRelay */; };
 		5B5304EA2E2251DD0083F7CA /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304E92E2251DD0083F7CA /* RxSwift */; };
 		5B5304ED2E2251FD0083F7CA /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304EC2E2251FD0083F7CA /* Differentiator */; };
 		5B5304EF2E2251FD0083F7CA /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304EE2E2251FD0083F7CA /* RxDataSources */; };
 		5B95F7042E22525900C29F0D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 5B95F7032E22525900C29F0D /* Alamofire */; };
+		95C6BC832EA6291900803C04 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 95C6BC822EA6291900803C04 /* FirebaseCore */; };
+		95C6BC852EA6291900803C04 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 95C6BC842EA6291900803C04 /* FirebaseMessaging */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,15 +60,13 @@
 				5B5304D22E2251610083F7CA /* Then in Frameworks */,
 				5B5304ED2E2251FD0083F7CA /* Differentiator in Frameworks */,
 				5B5304EA2E2251DD0083F7CA /* RxSwift in Frameworks */,
-				5B5304DE2E2251B00083F7CA /* FirebaseCore in Frameworks */,
 				5B5304D52E22516A0083F7CA /* SnapKit in Frameworks */,
-				5B5304E02E2251B00083F7CA /* FirebaseCrashlytics in Frameworks */,
-				5B5304DA2E2251B00083F7CA /* FirebaseAnalytics in Frameworks */,
 				5B5304EF2E2251FD0083F7CA /* RxDataSources in Frameworks */,
 				5B5304E62E2251DD0083F7CA /* RxCocoa in Frameworks */,
-				5B5304DC2E2251B00083F7CA /* FirebaseAnalyticsCore in Frameworks */,
+				95C6BC852EA6291900803C04 /* FirebaseMessaging in Frameworks */,
 				5B95F7042E22525900C29F0D /* Alamofire in Frameworks */,
 				5B3753CF2E24FBC900B13805 /* ReactorKit in Frameworks */,
+				95C6BC832EA6291900803C04 /* FirebaseCore in Frameworks */,
 				3358E2BCBB25C3FF60F4E1E7 /* libPods-MOUP.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -136,10 +132,6 @@
 			packageProductDependencies = (
 				5B5304D12E2251610083F7CA /* Then */,
 				5B5304D42E22516A0083F7CA /* SnapKit */,
-				5B5304D92E2251B00083F7CA /* FirebaseAnalytics */,
-				5B5304DB2E2251B00083F7CA /* FirebaseAnalyticsCore */,
-				5B5304DD2E2251B00083F7CA /* FirebaseCore */,
-				5B5304DF2E2251B00083F7CA /* FirebaseCrashlytics */,
 				5B5304E52E2251DD0083F7CA /* RxCocoa */,
 				5B5304E72E2251DD0083F7CA /* RxRelay */,
 				5B5304E92E2251DD0083F7CA /* RxSwift */,
@@ -148,6 +140,8 @@
 				5B95F7032E22525900C29F0D /* Alamofire */,
 				5B3753CE2E24FBC900B13805 /* ReactorKit */,
 				5B3754632E2540C200B13805 /* GoogleSignIn */,
+				95C6BC822EA6291900803C04 /* FirebaseCore */,
+				95C6BC842EA6291900803C04 /* FirebaseMessaging */,
 			);
 			productName = MOUP;
 			productReference = 5B53045F2E224D210083F7CA /* MOUP.app */;
@@ -180,12 +174,12 @@
 			packageReferences = (
 				5B5304D02E2251610083F7CA /* XCRemoteSwiftPackageReference "Then" */,
 				5B5304D32E22516A0083F7CA /* XCRemoteSwiftPackageReference "SnapKit" */,
-				5B5304D82E2251B00083F7CA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				5B5304E42E2251DD0083F7CA /* XCRemoteSwiftPackageReference "RxSwift" */,
 				5B5304EB2E2251FD0083F7CA /* XCRemoteSwiftPackageReference "RxDataSources" */,
 				5B95F7022E22525900C29F0D /* XCRemoteSwiftPackageReference "Alamofire" */,
 				5B3753CD2E24FBC900B13805 /* XCRemoteSwiftPackageReference "ReactorKit" */,
 				5B3754622E2540C200B13805 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				95C6BC812EA6291900803C04 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5B5304602E224D210083F7CA /* Products */;
@@ -292,7 +286,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = MOUP/Resources/MOUP.entitlements;
+				CODE_SIGN_ENTITLEMENTS = MOUP/MOUPRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
@@ -504,14 +498,6 @@
 				minimumVersion = 5.7.1;
 			};
 		};
-		5B5304D82E2251B00083F7CA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 11.15.0;
-			};
-		};
 		5B5304E42E2251DD0083F7CA /* XCRemoteSwiftPackageReference "RxSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReactiveX/RxSwift";
@@ -536,6 +522,14 @@
 				minimumVersion = 5.10.2;
 			};
 		};
+		95C6BC812EA6291900803C04 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.4.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -558,26 +552,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B5304D32E22516A0083F7CA /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
-		};
-		5B5304D92E2251B00083F7CA /* FirebaseAnalytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 5B5304D82E2251B00083F7CA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalytics;
-		};
-		5B5304DB2E2251B00083F7CA /* FirebaseAnalyticsCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 5B5304D82E2251B00083F7CA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalyticsCore;
-		};
-		5B5304DD2E2251B00083F7CA /* FirebaseCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 5B5304D82E2251B00083F7CA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseCore;
-		};
-		5B5304DF2E2251B00083F7CA /* FirebaseCrashlytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 5B5304D82E2251B00083F7CA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseCrashlytics;
 		};
 		5B5304E52E2251DD0083F7CA /* RxCocoa */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -608,6 +582,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B95F7022E22525900C29F0D /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		95C6BC822EA6291900803C04 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 95C6BC812EA6291900803C04 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		95C6BC842EA6291900803C04 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 95C6BC812EA6291900803C04 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
