@@ -11,13 +11,42 @@ final class UserDefaultsManager {
     static let shared = UserDefaultsManager()
     private init() {}
 
-    var userId: Int64? { // 로그인 후 받은 userId
-        get { UserDefaults.standard.object(forKey: "user_id") as? Int64 }
-        set { UserDefaults.standard.set(newValue, forKey: "user_id") }
-    }
-
     var userRole: String? {
         get { UserDefaults.standard.object(forKey: "user_role") as? String }
-        set { UserDefaults.standard.set(newValue, forKey: "user_role") }
+        set {
+            if let value = newValue {
+                UserDefaults.standard.set(value, forKey: "user_role")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "user_role")
+            }
+        }
+    }
+    
+    var fcmToken: String? {
+        get { UserDefaults.standard.string(forKey: "fcm_token") }
+        set {
+            if let value = newValue {
+                UserDefaults.standard.set(value, forKey: "fcm_token")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "fcm_token")
+            }
+        }
+    }
+    
+    func removeUserRole() {
+        UserDefaults.standard.removeObject(forKey: "user_role")
+    }
+    
+    func removeFCMToken() {
+        UserDefaults.standard.removeObject(forKey: "fcm_token")
+    }
+    
+    func clearUserData() {
+        removeUserRole()
+    }
+    
+    func clearAllData() {
+        removeUserRole()
+        removeFCMToken()
     }
 }
