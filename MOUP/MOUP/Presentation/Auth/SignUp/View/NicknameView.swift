@@ -112,7 +112,7 @@ private extension NicknameView {
 
         startButton.snp.makeConstraints {
             $0.directionalHorizontalEdges.equalTo(nicknameTitleLabel)
-            $0.bottom.equalTo(keyboardLayoutGuide).inset(24)
+            $0.bottom.equalTo(keyboardLayoutGuide.snp.top).offset(-12)
             $0.height.equalTo(44)
         }
     }
