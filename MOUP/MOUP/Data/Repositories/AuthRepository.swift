@@ -13,24 +13,23 @@ final class AuthRepository: AuthRepositoryProtocol {
     init(authService: AuthServiceProtocol) {
         self.authService = authService
     }
-
+    
     // MARK: - Methods
     func signIn(requestDTO: LoginRequestDTO) async throws {
         let response = try await authService.signIn(requestDTO: requestDTO)
-        if let role = response.role, !role.isEmpty { // 회원 여부는 role이 제대로 저장되어있는지에 따라 분기됨.
-            UserDefaultsManager.shared.userId = response.userId
+        KeychainManager.shared.save(key: "accessToken", token: response.accessToken)
+        KeychainManager.shared.save(key: "refreshToken", token: response.refreshToken)
+        
+        guard let role = response.role, !role.isEmpty else {
+            throw AuthError.notMember
+        }
+            
             UserDefaultsManager.shared.userRole = role
-            KeychainManager.shared.save(key: "accessToken", token: response.accessToken)
-            KeychainManager.shared.save(key: "refreshToken", token: response.refreshToken)
-        } else {
-            KeychainManager.shared.save(key: "accessToken", token: response.accessToken)
-            KeychainManager.shared.save(key: "refreshToken", token: response.refreshToken)
+        }
+        
+        func signUp(requestDTO: RegisterRequestDTO) async throws -> UserRole {
+            let response = try await authService.signUp(requestDTO: requestDTO)
+            let role: UserRole = response.role == "ROLE_WORKER" ? .worker : .owner
+            return role
         }
     }
-
-    func signUp(requestDTO: RegisterRequestDTO) async throws -> UserRole {
-        let response = try await authService.signUp(requestDTO: requestDTO)
-        let role: UserRole = response.role == "ROLE_WORKER" ? .worker : .owner
-        return role
-    }
-}

@@ -23,13 +23,13 @@ final class AuthService: AuthServiceProtocol {
         print(response.value)
         print("statusCode: \(response.response?.statusCode)")
 
-        guard let statusCode = response.response?.statusCode,
-              let dto = response.value else {
+        guard let statusCode = response.response?.statusCode else {
             throw NetworkError.noResponse
         }
 
         switch statusCode {
         case 200, 201, 202:
+            guard let dto = response.value else { throw NetworkError.noResponse }
             return dto
         default:
             print(NetworkError.serverError.debugDescription!)
