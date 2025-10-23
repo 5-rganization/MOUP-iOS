@@ -51,4 +51,10 @@ extension UIViewController {
         child.view.removeFromSuperview()
         child.removeFromParent()
     }
+    
+    func presentNoticeModal(title: String, comment: String) {
+        let vc = NoticeModalViewController(title: title, comment: comment)
+        vc.modalPresentationStyle = .overFullScreen
+        present(vc, animated: true)
+    }
 }
