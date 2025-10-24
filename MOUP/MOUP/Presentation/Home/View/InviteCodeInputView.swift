@@ -40,7 +40,7 @@ final class InviteCodeInputView: UIView {
     }
     
     fileprivate let searchButton = BaseButton(title: "조회하기", isSecondary: false).then {
-        $0.isUserInteractionEnabled = false
+        $0.isEnabled = false
     }
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -53,6 +53,11 @@ final class InviteCodeInputView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented.")
     }
+    
+    // MARK: - Public Methods
+    func setTextFieldDelegate(_ delegate: UITextFieldDelegate) {
+        self.codeInputTextField.delegate = delegate
+    }
 }
 
 private extension InviteCodeInputView {
@@ -61,6 +66,7 @@ private extension InviteCodeInputView {
         setHierarchy()
         setStyles()
         setConstraints()
+        setBindings()
     }
     
     // MARK: - setHierarchy
@@ -79,7 +85,7 @@ private extension InviteCodeInputView {
             string: "초대 코드",
             attributes: [
                 .font: UIFont.fieldsRegular(16),
-                .foregroundColor: UIColor.gray900
+                .foregroundColor: UIColor.gray400
             ]
         )
     }
@@ -104,9 +110,18 @@ private extension InviteCodeInputView {
         
         searchButton.snp.makeConstraints {
             $0.directionalHorizontalEdges.equalToSuperview().inset(16)
-            $0.bottom.equalTo(keyboardLayoutGuide).inset(12)
+            $0.bottom.equalTo(keyboardLayoutGuide.snp.top).offset(-12)
             $0.height.equalTo(45)
         }
+    }
+    
+    func setBindings() {
+        codeInputTextField.rx.text.orEmpty
+            .withUnretained(self)
+            .subscribe(onNext: { owner, text in
+                owner.searchButton.isEnabled = !text.isEmpty
+            })
+            .disposed(by: disposeBag)
     }
 }
 
@@ -118,7 +133,9 @@ extension Reactive where Base: InviteCodeInputView {
     var searchBtnTapped: ControlEvent<String> { // 버튼이 눌린 시점 텍스트필드의 값을 스트림으로 보냄
         let source = base.searchButton.rx.tap
             .withLatestFrom(base.codeInputTextField.rx.text.orEmpty)
+            .throttle(.milliseconds(500), scheduler: MainScheduler.instance)
             
         return ControlEvent(events: source)
     }
+    
 }

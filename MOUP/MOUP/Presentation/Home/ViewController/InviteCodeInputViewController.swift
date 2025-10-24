@@ -43,6 +43,7 @@ class InviteCodeInputViewController: UIViewController {
 private extension InviteCodeInputViewController {
     func configure() {
         setBindings()
+        setDelegate()
     }
     
     func setBindings() {
@@ -51,11 +52,37 @@ private extension InviteCodeInputViewController {
         )
         let output = viewModel.transform(input: input)
         
+        output.searchResult
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                
+            })
+            .disposed(by: disposeBag)
+        
+        output.errorMessage
+            .withUnretained(self)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { owner, message in
+                owner.presentNoticeModal(title: message.0, comment: message.1)
+            })
+            .disposed(by: disposeBag)
+        
         inviteCodeInputView.rx.navBackBtnTapped
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
                 owner.navigationController?.popViewController(animated: true)
             })
             .disposed(by: disposeBag)
+    }
+    
+    func setDelegate() {
+        inviteCodeInputView.setTextFieldDelegate(self)
+    }
+}
+
+extension InviteCodeInputViewController: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let allowedCharacters = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+        return string.rangeOfCharacter(from: allowedCharacters.inverted) == nil
     }
 }
