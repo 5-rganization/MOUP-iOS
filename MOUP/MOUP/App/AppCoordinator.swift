@@ -20,15 +20,15 @@ final class AppCoordinator: Coordinator {
 
     init(window: UIWindow) {
         self.window = window
-        self.authService = AuthService()
-        self.authRepository = AuthRepository(authService: authService)
-        self.authUseCase = AuthUseCase(authRepository: authRepository)
         self.tokenService = TokenService()
         self.tokenRepository = TokenRepository(tokenService: tokenService)
         self.tokenUseCase = TokenUseCase(tokenRepository: tokenRepository)
+        self.authService = AuthService()
+        self.authRepository = AuthRepository(authService: authService)
+        self.authUseCase = AuthUseCase(authRepository: authRepository)
         
-        setupNotifications()
         setupNetworkManager()
+        setupNotifications()
     }
 
     func start() {
@@ -54,7 +54,7 @@ final class AppCoordinator: Coordinator {
     
     @objc private func handleUnauthorizedAccess() {
         tokenUseCase.deleteTokens()
-        UserDefaultsManager.shared.clearUserData()
+        UserDefaultsManager.shared.removeUserRole()
         
         showSignIn()
     }

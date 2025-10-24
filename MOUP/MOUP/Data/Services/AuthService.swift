@@ -14,7 +14,7 @@ protocol AuthServiceProtocol {
 }
 
 final class AuthService: AuthServiceProtocol {
-    private let session = NetworkManager.shared.session
+    private lazy var session = NetworkManager.shared.session
     
     func signIn(requestDTO: LoginRequestDTO) async throws -> LoginResponseDTO {
         let request = AF.request(AuthRouter.signIn(requestDTO))
