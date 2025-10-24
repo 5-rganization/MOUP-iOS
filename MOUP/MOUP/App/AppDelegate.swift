@@ -5,6 +5,7 @@
 //  Created by 서동환 on 7/12/25.
 //
 
+import os
 import UIKit
 import FirebaseCore
 import FirebaseMessaging
@@ -12,6 +13,8 @@ import UserNotifications
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    
+    let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "AppDelegate")
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
@@ -23,9 +26,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
         UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { granted, error in
             if let error {
-                print("알림 권한 요청 실패: \(error.localizedDescription)")
+                self.logger.error("알림 권한 요청 실패: \(error.localizedDescription)")
             }
-            print("알림 권한: \(granted)")
+            self.logger.debug("알림 권한: \(granted)")
         }
         
         application.registerForRemoteNotifications()
@@ -38,7 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: any Error) {
-        print("APNs 등록 실패: \(error.localizedDescription)")
+        self.logger.error("APNs 등록 실패: \(error.localizedDescription)")
     }
 
     // MARK: UISceneSession Lifecycle
@@ -59,7 +62,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate: MessagingDelegate {
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        print("FCM token: \(fcmToken ?? "")")
+        self.logger.debug("FCM token: \(fcmToken ?? "")")
         
         if let token = fcmToken {
             UserDefaultsManager.shared.fcmToken = token
@@ -72,7 +75,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         let userInfo = notification.request.content.userInfo
-        print("포그라운드 알림: \(userInfo)")
+        self.logger.debug("포그라운드 알림: \(userInfo)")
         completionHandler([.banner, .sound, .badge])
     }
     
@@ -81,7 +84,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
-        print("알림 탭: \(userInfo)")
+        self.logger.debug("알림 탭: \(userInfo)")
         // TODO: - 알림 타입에 따라 화면 이동 구현 필요, userInfo["type"]을 통한 분기
         completionHandler()
     }
