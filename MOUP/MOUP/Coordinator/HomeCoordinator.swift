@@ -9,16 +9,20 @@ import UIKit
 final class HomeCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     let navigationController: UINavigationController
-
+    
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
     }
-
+    
     func start() {
+        guard let rawValue = UserDefaultsManager.shared.userRole,
+        let role = UserRole(rawValue: rawValue) else { return }
+        
         let homeVM = HomeViewModel()
         let homeVC = HomeViewController(
             coordinator: self,
-            homeViewModel: homeVM
+            homeViewModel: homeVM,
+            userRole: role
         )
         navigationController.pushViewController(homeVC, animated: false)
     }
