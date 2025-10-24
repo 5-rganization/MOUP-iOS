@@ -28,6 +28,7 @@ final class AppCoordinator: Coordinator {
         self.tokenUseCase = TokenUseCase(tokenRepository: tokenRepository)
         
         setupNotifications()
+        setupNetworkManager()
     }
 
     func start() {
@@ -36,6 +37,10 @@ final class AppCoordinator: Coordinator {
         } else {
             showSignIn()
         }
+    }
+    
+    private func setupNetworkManager() {
+        NetworkManager.configure(tokenUseCase: tokenUseCase)
     }
 
     private func setupNotifications() {
@@ -49,6 +54,7 @@ final class AppCoordinator: Coordinator {
     
     @objc private func handleUnauthorizedAccess() {
         tokenUseCase.deleteTokens()
+        UserDefaultsManager.shared.clearUserData()
         
         showSignIn()
     }
