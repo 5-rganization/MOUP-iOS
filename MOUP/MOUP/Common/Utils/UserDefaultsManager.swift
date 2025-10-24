@@ -41,10 +41,6 @@ final class UserDefaultsManager {
         UserDefaults.standard.removeObject(forKey: "fcm_token")
     }
     
-    func clearUserData() {
-        removeUserRole()
-    }
-    
     func clearAllData() {
         removeUserRole()
         removeFCMToken()

@@ -14,6 +14,7 @@ protocol TokenServiceProtocol: AnyObject {
 
 final class TokenService: TokenServiceProtocol {
     func renewAccessToken(requestDTO: RefreshTokenRequestDTO) async throws -> RefreshTokenResponseDTO {
+        // 토큰을 재발급 받기 위함이므로 Bearer 내 토큰 추가하지 않고 DTO에 추가하는 방식으로 진행. 따라서 기본값을 가지는 AF.request 사용
         let request = AF.request(AuthRouter.renewAccessToken(requestDTO))
         let response = await request.serializingDecodable(RefreshTokenResponseDTO.self).response
         

@@ -30,14 +30,14 @@ final class WorkplaceRegisterSheetCoordinator: Coordinator {
         navigationController.present(nav, animated: true)
     }
     
-    func moveToInviteCodeInput() {
+    func moveToInviteCodeInput() { // 초대 코드 등록
         let inviteCodeInputCoordinator = InviteCodeInputCoordinator(navigationController: navigationController)
         inviteCodeInputCoordinator.coordinator = self
         childCoordinators.append(inviteCodeInputCoordinator)
         inviteCodeInputCoordinator.start()
     }
 
-    func moveToDirectRegistration() { // 직접 등록하기
+    func moveToDirectRegistration() { // 직접 등록
         print("moveToDirectRegistration")
         guard let sheetNav else { return }
         let coordinator = WorkplaceRegisterCoordinator(navigationController: sheetNav)
