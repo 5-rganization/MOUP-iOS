@@ -23,13 +23,13 @@ final class AuthRepository: AuthRepositoryProtocol {
         guard let role = response.role, !role.isEmpty else {
             throw AuthError.notMember
         }
-            
-            UserDefaultsManager.shared.userRole = role
-        }
         
-        func signUp(requestDTO: RegisterRequestDTO) async throws -> UserRole {
-            let response = try await authService.signUp(requestDTO: requestDTO)
-            let role: UserRole = response.role == "ROLE_WORKER" ? .worker : .owner
-            return role
-        }
+        UserDefaultsManager.shared.userRole = role
     }
+    
+    func signUp(requestDTO: RegisterRequestDTO) async throws -> UserRole {
+        let response = try await authService.signUp(requestDTO: requestDTO)
+        let role: UserRole = response.role == "ROLE_WORKER" ? .worker : .owner
+        return role
+    }
+}
