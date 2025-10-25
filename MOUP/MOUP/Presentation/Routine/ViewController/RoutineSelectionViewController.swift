@@ -123,8 +123,6 @@ private extension RoutineSelectionViewController {
                     return UITableViewCell()
                 }
                 
-                cell.prepareForReuse()
-                
                 cell.update(with: viewState)
                 
                 cell.rx.checkboxDidTap
