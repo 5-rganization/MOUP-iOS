@@ -8,19 +8,26 @@
 import Foundation
 import RxSwift
 import RxCocoa
+import RxDataSources
 
-struct RoutineRowViewState: Hashable {
+struct RoutineRowViewState: IdentifiableType, Hashable {
     let routine: Routine
     var isChecked: Bool
+    
+    var identity: UUID {
+        return routine.id
+    }
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(routine.id)
     }
     
     static func == (lhs: RoutineRowViewState, rhs: RoutineRowViewState) -> Bool {
-        lhs.routine.id == rhs.routine.id
+        lhs.routine.id == rhs.routine.id && lhs.isChecked == rhs.isChecked
     }
 }
+
+typealias RoutineSectionModel = AnimatableSectionModel<Int, RoutineRowViewState>
 
 final class RoutineSelectionViewModel {
     struct Input {
@@ -31,8 +38,7 @@ final class RoutineSelectionViewModel {
     }
     
     struct Output {
-        let rows: Driver<[RoutineRowViewState]>
-        let toggledRow: Signal<RoutineRowViewState>
+        let rows: Driver<[RoutineSectionModel]>
     }
     
     // MARK: - Properties
@@ -44,10 +50,9 @@ final class RoutineSelectionViewModel {
     // MARK: - Transform
     
     func transform(_ input: Input) -> Output {
-        let toggledRowRelay = PublishRelay<RoutineRowViewState>()
-        
         let initialRoutines = input.appear
-            .flatMapLatest { [unowned self] _ -> Observable<[Routine]> in
+            .flatMapLatest { [weak self] _ -> Observable<[Routine]> in
+                guard let self else { return .empty() }
                 // TODO: usecase 호출
                 return .just(self.fetchDummyData())
             }
@@ -66,42 +71,29 @@ final class RoutineSelectionViewModel {
             .bind(to: routinesRelay)
             .disposed(by: disposeBag)
         
-        let checkboxToggleEvent = input.checkboxToggled
-            .withLatestFrom(checkedIDsRelay) { toggledID, currentIDs -> (toggledID: UUID, newIDs: Set<UUID>) in
-                let newCheckedIDs = currentIDs.symmetricDifference([toggledID])
-                return (toggledID, newCheckedIDs)
+        input.checkboxToggled
+            .withLatestFrom(checkedIDsRelay) { toggledID, currentIDs in
+                currentIDs.symmetricDifference([toggledID])
             }
-            .share()
-        
-        checkboxToggleEvent
-            .map { $0.newIDs }
             .bind(to: checkedIDsRelay)
-            .disposed(by: disposeBag)
-        
-        checkboxToggleEvent
-            .withLatestFrom(routinesRelay) { toggleInfo, routines -> RoutineRowViewState? in
-                guard let routine = routines.first(
-                    where: { $0.id == toggleInfo.toggledID }
-                ) else {
-                    return nil
-                }
-                let isChecked = toggleInfo.newIDs.contains(toggleInfo.toggledID)
-                return RoutineRowViewState(routine: routine, isChecked: isChecked)
-            }
-            .compactMap { $0 }
-            .bind(to: toggledRowRelay)
             .disposed(by: disposeBag)
         
         let rows = Observable
             .combineLatest(routinesRelay, checkedIDsRelay)
-            .map { routines, checked in
-                routines.map { RoutineRowViewState(routine: $0, isChecked: checked.contains($0.id)) }
+            .map { routines, checkedIDs -> [RoutineSectionModel] in
+                let viewStates = routines.map {
+                    RoutineRowViewState(
+                        routine: $0,
+                        isChecked: checkedIDs.contains($0.id)
+                    )
+                }
+                return [RoutineSectionModel(model: 0, items: viewStates)]
             }
+            .distinctUntilChanged()
             .asDriver(onErrorJustReturn: [])
         
         return Output(
-            rows: rows,
-            toggledRow: toggledRowRelay.asSignal()
+            rows: rows
         )
     }
     

@@ -8,11 +8,9 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import RxDataSources
 
-final class RoutineSelectionViewController: UIViewController, UITableViewDelegate {
-    
-    typealias DataSource = UITableViewDiffableDataSource<Int, RoutineRowViewState>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Int, RoutineRowViewState>
+final class RoutineSelectionViewController: UIViewController {
     
     // MARK: - Properties
     
@@ -24,10 +22,6 @@ final class RoutineSelectionViewController: UIViewController, UITableViewDelegat
     private let addNewRoutineRelay = PublishRelay<Routine>()
     private let checkboxToggledRelay = PublishRelay<UUID>()
     private let routineUpdatedRelay = PublishRelay<Routine>()
-    
-    private lazy var dataSource = makeDataSource()
-    
-    private let latestRowsRelay = BehaviorRelay<[RoutineRowViewState]>(value: [])
     
     // MARK: - Lifecycle
     
@@ -58,7 +52,6 @@ private extension RoutineSelectionViewController {
     func configure() {
         setStyles()
         setTableView()
-        setDataSourceAndDelegate()
         setBindings()
     }
     
@@ -74,14 +67,10 @@ private extension RoutineSelectionViewController {
         )
     }
     
-    // MARK: - setDataSourceAndDelegate
-    func setDataSourceAndDelegate() {
-        routineSelectionView.tableView.dataSource = self.dataSource
-        routineSelectionView.tableView.delegate = self
-    }
-    
     // MARK: - setBindings
     func setBindings() {
+        let dataSource = createDataSource()
+        
         routineSelectionView.rx.plusButtonDidTap
             .bind(with: self) { owner, _ in
                 owner.coordinator?.showAddRoutineViewController(onSave: { newRoutine in
@@ -103,32 +92,15 @@ private extension RoutineSelectionViewController {
         let output = viewModel.transform(input)
         
         output.rows
-            .drive(onNext: { [weak self] rows in
-                self?.latestRowsRelay.accept(rows)
-                if let self,
-                   self.isViewLoaded,
-                   self.view.window != nil {
-                    self.applySnapshot(with: rows, animated: true)
-                }
-            })
+            .drive(routineSelectionView.tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
-        output.toggledRow
-            .emit(onNext: { [weak self] toggledState in
-                guard let self else { return }
-                var currentSnapshot = self.dataSource.snapshot()
-                currentSnapshot.reconfigureItems([toggledState])
-                self.dataSource.apply(currentSnapshot, animatingDifferences: false)
-            })
-            .disposed(by: disposeBag)
-        
-        routineSelectionView.rx.itemSelected
-            .compactMap { [weak self] indexPath in
-                self?.dataSource.itemIdentifier(for: indexPath)
-            }
+        routineSelectionView.tableView.rx.modelSelected(RoutineRowViewState.self)
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, viewState in
-                owner.coordinator?.showEditRoutineViewController(routine: viewState.routine) { updated in
+                owner.coordinator?.showEditRoutineViewController(
+                    routine: viewState.routine
+                ) { updated in
                     owner.routineUpdatedRelay.accept(updated)
                 }
             }
@@ -137,42 +109,29 @@ private extension RoutineSelectionViewController {
         routineSelectionView.rx.itemSelected
             .bind(to: routineSelectionView.rx.deselectRow)
             .disposed(by: disposeBag)
-        
-        self.rx.sentMessage(#selector(UIViewController.viewWillAppear(_:)))
-            .map { _ in () }
-            .withLatestFrom(latestRowsRelay.asObservable())
-            .observe(on: MainScheduler.instance)
-            .bind(with: self) { owner, rows in
-                owner.applySnapshot(with: rows, animated: false)
-            }
-            .disposed(by: disposeBag)
     }
     
-    func makeDataSource() -> DataSource {
-        let dataSource = DataSource(
-            tableView: routineSelectionView.tableView
-        ) { [weak self] tableView, indexPath, viewState in
-            guard let self,
-                  let cell = tableView.dequeueReusableCell(withIdentifier: RoutineCell.id, for: indexPath) as? RoutineCell else {
-                return UITableViewCell()
+    func createDataSource() -> RxTableViewSectionedAnimatedDataSource<RoutineSectionModel> {
+        return RxTableViewSectionedAnimatedDataSource<RoutineSectionModel>(
+            configureCell: { [weak self] dataSource, tableView, indexPath, viewState in
+                guard let self else { return UITableViewCell() }
+                guard let cell = tableView.dequeueReusableCell(
+                        withIdentifier: RoutineCell.id,
+                        for: indexPath
+                      ) as? RoutineCell else {
+                    assertionFailure("RoutineCell dequeue 실패")
+                    return UITableViewCell()
+                }
+                
+                cell.update(with: viewState)
+                
+                cell.rx.checkboxDidTap
+                    .map { viewState.routine.id }
+                    .bind(to: self.checkboxToggledRelay)
+                    .disposed(by: cell.disposeBag)
+                
+                return cell
             }
-            
-            cell.disposeBag = DisposeBag()
-            cell.update(with: viewState)
-            cell.rx.checkboxDidTap
-                .map { viewState.routine.id }
-                .bind(to: self.checkboxToggledRelay)
-                .disposed(by: cell.disposeBag)
-            
-            return cell
-        }
-        return dataSource
-    }
-    
-    func applySnapshot(with rows: [RoutineRowViewState], animated: Bool) {
-        var snapshot = Snapshot()
-        snapshot.appendSections([0])
-        snapshot.appendItems(rows, toSection: 0)
-        dataSource.apply(snapshot, animatingDifferences: animated)
+        )
     }
 }
