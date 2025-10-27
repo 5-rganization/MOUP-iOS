@@ -13,5 +13,5 @@ struct SalarySummary {
     let hourlyRate: Int?
     let fixedRate: Int?
     let salaryDate: Int?
-    let salaryDay: Int?
+    let salaryDay: String?
 }

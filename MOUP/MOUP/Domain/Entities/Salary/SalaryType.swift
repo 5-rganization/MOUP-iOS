@@ -8,6 +8,20 @@
 import Foundation
 
 enum SalaryType: String {
-    case monthly = "월급"
-    case hourly = "시급"
+    case monthly
+    case weekly
+    case daily
+    
+    init?(rawValue: String) {
+        switch rawValue {
+        case "SALARY_MONTHLY":
+            self = .monthly
+        case "SALARY_WEEKLY":
+            self = .weekly
+        case "SALARY_DAILY":
+            self = .daily
+        default:
+            self = .monthly
+        }
+    }
 }

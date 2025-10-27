@@ -10,6 +10,7 @@ import Foundation
 struct HomeOwnerSummary {
     let month: Int
     let totalSalary: Int
+    let prevMonthSalaryDiff: Int
     let todayRoutineCount: Int
     let workplaces: [OwnerMonthlyWorkplaceSummary]
 }
