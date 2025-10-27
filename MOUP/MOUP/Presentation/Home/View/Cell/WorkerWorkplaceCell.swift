@@ -107,10 +107,10 @@ class WorkerWorkplaceCell: UITableViewCell {
     func update(item: HomeSectionItem, menu: UIMenu) {
         switch item {
         case .worker(let workerInfo):
-            self.nameLabel.text = workerInfo.workplace.name
+            self.nameLabel.text = workerInfo.homeWorkplace.workplace.name
             self.untilPaydayLabel.text = "sdfdfs"
             self.totalEarnedLabel.text = "dsfdsf"
-            self.workplaceOfficialChip.isHidden = !workerInfo.workplace.isShared
+            self.workplaceOfficialChip.isHidden = !workerInfo.homeWorkplace.workplace.isShared
             self.menuButton.menu = menu
         case .owner:
             break

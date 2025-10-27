@@ -11,10 +11,13 @@ struct HomeMapper {
     func mapToWorkerSummary(_ dto: HomeWorkerResponseDTO) -> HomeWorkerSummary {
         let workplaces = dto.workerMonthlyWorkplaceSummaryInfoList.map { item in
             WorkplaceMonthSummary(
-                workplace: WorkplaceSummary(
-                    id: item.workplaceSummaryInfo.workplaceId,
-                    name: item.workplaceSummaryInfo.workplaceName,
-                    isShared: item.workplaceSummaryInfo.isShared
+                homeWorkplace: HomeWorkplaceSummary(
+                    workplace: WorkplaceSummary(
+                        id: item.homeWorkplaceSummaryInfo.workplaceSummaryInfo.workplaceId,
+                        name: item.homeWorkplaceSummaryInfo.workplaceSummaryInfo.workplaceName,
+                        isShared: item.homeWorkplaceSummaryInfo.workplaceSummaryInfo.isShared
+                    ),
+                    isNowWorking: item.homeWorkplaceSummaryInfo.isNowWorking
                 ),
                 salary: SalarySummary(
                     type: SalaryType(rawValue: item.salarySummaryInfo.salaryType) ?? .monthly,
@@ -42,6 +45,7 @@ struct HomeMapper {
         let summary = HomeWorkerSummary(
             month: dto.nowMonth,
             totalSalary: dto.totalSalary,
+            prevMonthSalaryDiff: dto.prevMonthSalaryDiff,
             todayRoutineCount: dto.todayRoutineCounts,
             workplaces: workplaces
         )
@@ -72,6 +76,7 @@ struct HomeMapper {
         let summary = HomeOwnerSummary(
             month: dto.nowMonth,
             totalSalary: dto.totalSalary,
+            prevMonthSalaryDiff: dto.prevMonthSalaryDiff,
             todayRoutineCount: dto.todayRoutineCounts,
             workplaces: workplaces
         )

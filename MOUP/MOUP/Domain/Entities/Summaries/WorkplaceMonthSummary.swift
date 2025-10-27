@@ -10,7 +10,7 @@ import Differentiator
 
 /// Worker 기준 근무지에 관한 정보
 struct WorkplaceMonthSummary {
-    let workplace: WorkplaceSummary
+    let homeWorkplace: HomeWorkplaceSummary
     let salary: SalarySummary
     let totalWorkMinutes: Int
     let dayTimeMinutes: Int
@@ -28,10 +28,10 @@ struct WorkplaceMonthSummary {
 
 extension WorkplaceMonthSummary: IdentifiableType, Equatable {
     var identity: Int {
-        return workplace.id
+        return homeWorkplace.workplace.id
     }
     
     static func == (lhs: WorkplaceMonthSummary, rhs: WorkplaceMonthSummary) -> Bool {
-        return lhs.workplace.id == rhs.workplace.id
+        return lhs.homeWorkplace.workplace.id == rhs.homeWorkplace.workplace.id
     }
 }
