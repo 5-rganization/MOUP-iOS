@@ -10,9 +10,6 @@ import SnapKit
 import Then
 
 final class WorkersSalaryView: UIView {
-    // MARK: - Properties
-    private let workSummaries: [EmployeeWorkSummary]
-
     // MARK: - UI Components
     private let stackView = UIStackView().then {
         $0.axis = .vertical
@@ -28,8 +25,7 @@ final class WorkersSalaryView: UIView {
     )
 
     // MARK: - Initializer
-    init(workSummaries: [EmployeeWorkSummary]) {
-        self.workSummaries = workSummaries
+    init() {
         super.init(frame: .zero)
 
         configure()
@@ -41,20 +37,31 @@ final class WorkersSalaryView: UIView {
     }
 
     // MARK: - Public Methods
-    func update(with workSummaries: [EmployeeWorkSummary]) {
+    func update(with workSummaries: [MonthlyWorkerSummary]) {
+        var totalWorkMinutes = 0
+        var totalAmount = 0
         stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         stackView.addArrangedSubview(firstRow)
         workSummaries.enumerated().forEach { index, summary in
+            totalWorkMinutes += summary.totalWorkMinutes
+            totalAmount += summary.netIncome
             let isLastRow = index == workSummaries.count - 1
             let row = SalaryDetailRowView(
-                title: summary.name,
-                time: summary.workedDuration,
-                amount: summary.wage,
+                title: summary.nickname,
+                time: summary.totalWorkMinutes.timeString,
+                amount: summary.netIncome,
                 isSection: false,
                 showsBottomLine: !isLastRow
             )
             stackView.addArrangedSubview(row)
         }
+        firstRow.update(
+            title: "총 인건비",
+            time: totalWorkMinutes.timeString,
+            amount: totalAmount,
+            isSection: true,
+            showsBottomLine: true
+        )
     }
 }
 

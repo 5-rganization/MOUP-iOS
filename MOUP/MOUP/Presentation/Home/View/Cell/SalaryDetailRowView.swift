@@ -57,6 +57,23 @@ final class SalaryDetailRowView: UIView {
     }
 
     // MARK: - Public Methods
+    func update(title: String, time: String?, amount: Int?, isSection: Bool, showsBottomLine: Bool, showsTime: Bool = true) {
+        titleLabel.text = title
+        timeLabel.text = time ?? "-"
+        if let amount {
+            amountLabel.text = NumberFormatter.formattedWon(from: String(amount))
+        } else {
+            amountLabel.text = "-"
+        }
+        bottomLine.isHidden = !showsBottomLine
+        timeLabel.isHidden = !showsTime
+        if isSection {
+            [titleLabel, timeLabel, amountLabel].forEach {
+                $0.font = .headBold(12)
+            }
+            bottomLine.backgroundColor = .gray700
+        }
+    }
 }
 
 private extension SalaryDetailRowView {

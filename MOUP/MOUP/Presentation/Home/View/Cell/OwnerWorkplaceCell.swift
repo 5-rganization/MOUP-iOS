@@ -39,11 +39,6 @@ class OwnerWorkplaceCell: UITableViewCell {
         $0.textColor = .gray900
     }
 
-    private let untilPaydayLabel = UILabel().then {
-        $0.font = .bodyMedium(12)
-        $0.textColor = .gray700
-    }
-
     fileprivate let menuButton = UIButton().then {
         var config = UIButton.Configuration.plain()
         config.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5)
@@ -59,7 +54,7 @@ class OwnerWorkplaceCell: UITableViewCell {
     private let workplaceOfficialChip = WorkplaceOfficialChip()
 
     // 두 번째 섹션 뷰 - 가변 급여 상세 테이블
-    private let secondSectionView = WorkersSalaryView(workSummaries: [])
+    private let secondSectionView = WorkersSalaryView()
 
     // 세 번째 섹션 뷰 - 출퇴근 버튼
     private let thirdSectionView = UIView()
@@ -106,10 +101,15 @@ class OwnerWorkplaceCell: UITableViewCell {
         case .owner(let ownerInfo):
             self.nameLabel.text = ownerInfo.workplace.name
             self.workplaceName = ownerInfo.workplace.name
-            self.untilPaydayLabel.text = "sdfdfs"
-            self.totalEarnedLabel.text = "dsfdsf"
-            self.workplaceOfficialChip.isHidden = !ownerInfo.isOfficial
-            self.secondSectionView.update(with: ownerInfo.workSummaries)
+            self.totalEarnedLabel.text = {
+                var total = 0
+                ownerInfo.workers.forEach {
+                    total += $0.grossIncome
+                }
+                return "현재까지 \(total)원"
+            }()
+            self.workplaceOfficialChip.isHidden = !ownerInfo.workplace.isShared
+            self.secondSectionView.update(with: ownerInfo.workers)
             self.menuButton.menu = menu
         }
     }
@@ -133,7 +133,6 @@ private extension OwnerWorkplaceCell {
         )
         firstSectionView.addSubviews(
             nameLabel,
-            untilPaydayLabel,
             totalEarnedLabel,
             workplaceOfficialChip
         )
@@ -175,12 +174,6 @@ private extension OwnerWorkplaceCell {
             $0.top.equalToSuperview().inset(12)
             $0.leading.equalToSuperview().inset(16)
             $0.height.equalTo(24)
-        }
-
-        untilPaydayLabel.snp.makeConstraints {
-            $0.top.equalTo(nameLabel.snp.bottom)
-            $0.leading.equalToSuperview().inset(16)
-            $0.height.equalTo(18)
         }
 
         menuButton.snp.makeConstraints {
