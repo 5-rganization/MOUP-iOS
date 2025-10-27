@@ -12,6 +12,7 @@ struct LoginRequestDTO: Encodable {
     let provider: String
     let authCode: String
     let username: String // TODO: - 빈문자열로 플랫폼 분기. google의 경우 username 빈 문자열로.
+    let fcmToken: String
 }
 
 /// 회원가입 API 요청 DTO

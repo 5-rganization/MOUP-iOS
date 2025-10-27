@@ -1,0 +1,130 @@
+//
+//  NoticeModalViewController.swift
+//  MOUP
+//
+//  Created by 송규섭 on 10/20/25.
+//
+
+import UIKit
+import RxSwift
+import RxCocoa
+import SnapKit
+import Then
+
+class NoticeModalViewController: UIViewController {
+    // MARK: - Properties
+    private let disposeBag = DisposeBag()
+    private let noticeTitle: String
+    private let comment: String
+    
+    // MARK: - UI Components
+    private let dimmedView = UIView().then {
+        $0.backgroundColor = .gray900.withAlphaComponent(0.5)
+    }
+    
+    private let containerView = UIView().then {
+        $0.backgroundColor = .white
+        $0.layer.cornerRadius = 12
+    }
+    
+    private let noticeTitleLabel = UILabel().then {
+        $0.textColor = .gray900
+        $0.font = .headBold(18)
+        $0.textAlignment = .left
+        $0.lineBreakMode = .byWordWrapping
+        $0.numberOfLines = 1
+    }
+    
+    private let commentLabel = UILabel().then {
+        $0.textColor = .gray700
+        $0.font = .bodyMedium(14)
+        $0.textAlignment = .left
+        $0.lineBreakMode = .byWordWrapping
+        $0.numberOfLines = 2
+    }
+    
+    private let confirmButton = BaseButton(title: "확인", isSecondary: false)
+    
+    // MARK: - Initializer
+    init(title: String, comment: String) {
+        self.noticeTitle = title
+        self.comment = comment
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable, message: "storyboard is not supported.")
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented.")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        configure()
+    }
+
+}
+
+private extension NoticeModalViewController {
+    func configure() {
+        setHierarchy()
+        setStyles()
+        setConstraints()
+        setBindings()
+    }
+    
+    func setHierarchy() {
+        view.addSubviews(
+            dimmedView,
+            containerView
+        )
+        
+        containerView.addSubviews(
+            noticeTitleLabel,
+            commentLabel,
+            confirmButton
+        )
+    }
+    
+    func setStyles() {
+        noticeTitleLabel.text = noticeTitle
+        commentLabel.text = comment
+    }
+    
+    func setConstraints() {
+        dimmedView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        containerView.snp.makeConstraints {
+            $0.directionalHorizontalEdges.equalToSuperview().inset(24)
+            $0.centerY.equalToSuperview()
+            $0.height.equalTo(210)
+        }
+        
+        noticeTitleLabel.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(20)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
+        }
+        
+        commentLabel.snp.makeConstraints {
+            $0.top.equalTo(noticeTitleLabel.snp.bottom).offset(20)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
+        }
+        
+        confirmButton.snp.makeConstraints {
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
+            $0.bottom.equalToSuperview().inset(20)
+            $0.height.equalTo(45)
+        }
+    }
+    
+    func setBindings() {
+        confirmButton.rx.tap
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                self.dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
+    }
+}

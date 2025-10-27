@@ -9,16 +9,16 @@ import Foundation
 import Alamofire
 
 final class AuthInterceptor: RequestInterceptor {
-    private let authRepository: AuthRepositoryProtocol // TODO: - thread safety 추가 후 sendable 채택 필요
+    private let tokenUseCase: TokenUseCaseProtocol // TODO: - thread safety 추가 후 sendable 채택 필요
     
-    init(authRepository: AuthRepositoryProtocol) {
-        self.authRepository = authRepository
+    init(tokenUseCase: TokenUseCaseProtocol) {
+        self.tokenUseCase = tokenUseCase
     }
     
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, any Error>) -> Void) {
         var urlRequest = urlRequest
         
-        if let accessToken = KeychainManager.shared.read(key: "accessToken") {
+        if let accessToken = tokenUseCase.fetchAccessToken() {
             urlRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         }
         completion(.success(urlRequest))
@@ -34,7 +34,7 @@ final class AuthInterceptor: RequestInterceptor {
         // TODO: - 재발급 요청
         Task {
             do {
-                try await authRepository.renewAccessToken() // 액세스 토큰 재발급
+                try await tokenUseCase.renewAccessToken() // 액세스 토큰 재발급
                 completion(.retry)
             } catch {
                 completion(.doNotRetryWithError(error))

@@ -113,7 +113,7 @@ private extension HomeView {
         tableView.snp.makeConstraints {
             $0.top.equalTo(topBar.snp.bottom)
             $0.directionalHorizontalEdges.equalToSuperview()
-            $0.bottom.equalTo(safeAreaLayoutGuide).inset(20)
+            $0.bottom.equalTo(safeAreaLayoutGuide)
         }
     }
 

@@ -50,15 +50,25 @@ final class SignInViewModel {
         })
         .disposed(by: disposeBag)
 
-        input.googleAuthCode.subscribe(onNext: { code in
-            if code == "" { return }
-            Task {
-                do {
-                    try await self.authUseCase.signIn(requestDTO: LoginRequestDTO(provider: LoginProvider.google.rawValue, authCode: code, username: ""))
-                    self.signInOutputEventRelay.accept(SignInOutputEvent.loginSuccessed)
-                } catch let error as NetworkError {
-                    switch error {
-                    case .serverError, .noResponse, .invalidResponse(_):
+        input.googleAuthCode.subscribe(
+            onNext: { code in
+                if code == "" { return }
+                Task {
+                    do {
+                        try await self.authUseCase.signIn(
+                            requestDTO: LoginRequestDTO(
+                                provider: LoginProvider.google.rawValue,
+                                authCode: code,
+                                username: "",
+                                fcmToken: UserDefaultsManager.shared.fcmToken ?? ""
+                            )
+                        )
+                        self.signInOutputEventRelay.accept(SignInOutputEvent.loginSuccessed)
+                    } catch let error as NetworkError {
+                        switch error {
+                        case .serverError,
+                                .noResponse,
+                                .invalidResponse(_):
                         self.signInOutputEventRelay.accept(SignInOutputEvent.showAlert(error))
                     }
                 } catch let error as AuthError {

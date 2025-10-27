@@ -9,11 +9,17 @@ import Foundation
 import Alamofire
 
 final class NetworkManager {
-    static let shared = NetworkManager()
+    static private(set) var shared: NetworkManager!
+    
     let session: Session
     
-    private init() {
-        let interceptor = AuthInterceptor()
-        session = Session(interceptor: interceptor)
+    init(session: Session) {
+        self.session = session
+    }
+    
+    static func configure(tokenUseCase: TokenUseCaseProtocol) {
+        let interceptor = AuthInterceptor(tokenUseCase: tokenUseCase)
+        let session = Session(interceptor: interceptor)
+        shared = NetworkManager(session: session)
     }
 }

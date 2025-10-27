@@ -22,13 +22,12 @@ final class HomeCoordinator: Coordinator {
         )
         navigationController.pushViewController(homeVC, animated: false)
     }
-
-    func moveToRegisterWorkplace() {
-        let coordinator = WorkplaceRegisterCoordinator(navigationController: self.navigationController)
+    
+    func presentWorkplaceRegistrationSheet() {
+        let coordinator = WorkplaceRegisterSheetCoordinator(navigationController: navigationController)
+        coordinator.coordinator = self
         childCoordinators.append(coordinator)
-        DispatchQueue.main.async {
-            coordinator.start()
-        }
+        coordinator.start()
     }
     
     func moveToAllRoutine() {
@@ -89,4 +88,7 @@ final class HomeCoordinator: Coordinator {
         navigationController.present(vc, animated: true)
     }
     
+    func removeChildCoordinator(_ coordinator: Coordinator) {
+        childCoordinators.removeAll { $0 === coordinator }
+    }
 }
