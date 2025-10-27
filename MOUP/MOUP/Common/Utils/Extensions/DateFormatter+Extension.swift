@@ -87,4 +87,11 @@ extension DateFormatter {
         
         return (calculatedHours, calculatedMinutes, workHourStr, workHourDecimalForCalc)
     }
+    
+    /// 한국어 12시간제 시:분 포매터 (예: "오전 9:30")
+    static let ko12hTimeFormatter = DateFormatter().then {
+        $0.dateFormat = "a h:mm"
+        $0.locale = Locale(identifier: "ko_KR")
+        $0.timeZone = TimeZone(identifier: "Asia/Seoul")
+    }
 }

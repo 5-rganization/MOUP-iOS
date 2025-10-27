@@ -120,11 +120,6 @@ private extension MemoContainerView {
             $0.leading.equalToSuperview().inset(16)
         }
         
-        counterLabel.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(16)
-            $0.bottom.equalToSuperview().inset(10)
-        }
-        
         self.snp.makeConstraints {
             $0.bottom.equalTo(container.snp.bottom)
         }
