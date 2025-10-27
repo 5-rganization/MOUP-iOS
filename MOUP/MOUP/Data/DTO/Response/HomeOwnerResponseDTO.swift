@@ -10,6 +10,7 @@ import Foundation
 struct HomeOwnerResponseDTO: Codable {
     let nowMonth: Int
     let totalSalary: Int
+    let prevMonthSalaryDiff: Int
     let todayRoutineCounts: Int
     let ownerMonthlyWorkplaceSummaryInfoList: [OwnerMonthlyWorkplaceSummaryInfoDTO]
 }

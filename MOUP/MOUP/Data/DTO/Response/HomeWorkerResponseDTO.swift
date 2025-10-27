@@ -10,6 +10,7 @@ import Foundation
 struct HomeWorkerResponseDTO: Codable {
     let nowMonth: Int
     let totalSalary: Int
+    let prevMonthSalaryDiff: Int
     let todayRoutineCounts: Int
     let workerMonthlyWorkplaceSummaryInfoList: [WorkerMonthlyWorkplaceSummaryInfoDTO]
 }
@@ -43,5 +44,5 @@ struct SalarySummaryInfoDTO: Codable {
     let hourlyRate: Int?
     let fixedRate: Int?
     let salaryDate: Int?
-    let salaryDay: Int?
+    let salaryDay: String?
 }
