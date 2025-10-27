@@ -110,6 +110,26 @@ final class InfoRowView: UIView {
         guard case .labelWithButton = rowType else { return }
         actionButton.setTitle(title, for: .normal)
     }
+    
+    func updateAttributedTitle(to newTitle: String,
+                     font: UIFont = .headBold(18),
+                     textColor: UIColor = .gray900,
+                     asteriskColor: UIColor = .primary500) {
+        let attributed = NSMutableAttributedString(string: newTitle)
+
+        // 기본 스타일
+        attributed.addAttribute(.font, value: font, range: NSRange(location: 0, length: newTitle.count))
+        attributed.addAttribute(.foregroundColor, value: textColor, range: NSRange(location: 0, length: newTitle.count))
+
+        // 별(*) 색상만 변경
+        if let starRange = newTitle.range(of: "*") {
+            let nsRange = NSRange(starRange, in: newTitle)
+            attributed.addAttribute(.foregroundColor, value: asteriskColor, range: nsRange)
+        }
+
+        titleLabel.attributedText = attributed
+    }
+
 
     
     @objc private func didTapCheckBox() {
@@ -176,7 +196,7 @@ private extension InfoRowView {
         case .checkBox:
             titleLabel.snp.makeConstraints {
                 $0.top.equalToSuperview().offset(12)
-                $0.leading.equalToSuperview().offset(12)
+                $0.leading.equalToSuperview().offset(16)
                 $0.bottom.equalToSuperview().inset(12)
             }
             
@@ -188,7 +208,7 @@ private extension InfoRowView {
         case .labelWithChevron:
             titleLabel.snp.makeConstraints {
                 $0.top.equalToSuperview().offset(12)
-                $0.leading.equalToSuperview().offset(12)
+                $0.leading.equalToSuperview().offset(16)
                 $0.bottom.equalToSuperview().inset(12)
             }
             
@@ -199,13 +219,13 @@ private extension InfoRowView {
             
             chevronButton.snp.makeConstraints {
                 $0.centerY.equalTo(titleLabel)
-                $0.trailing.equalToSuperview().inset(16)
+                $0.trailing.equalToSuperview().inset(16)	
             }
             
         case .labelWithButton:
             titleLabel.snp.makeConstraints {
                 $0.top.equalToSuperview().offset(12)
-                $0.leading.equalToSuperview().offset(12)
+                $0.leading.equalToSuperview().offset(16)
                 $0.bottom.equalToSuperview().inset(12)
             }
             

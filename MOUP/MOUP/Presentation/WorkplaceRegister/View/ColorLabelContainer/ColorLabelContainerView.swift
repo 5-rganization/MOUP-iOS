@@ -7,17 +7,25 @@
 import UIKit
 import SnapKit
 import Then
+import RxSwift
+import RxCocoa
 
 final class ColorLabelContainerView: UIView {
     // MARK: - Properties
     private let container = ContainerView()
+    private let disposeBag = DisposeBag()
+    fileprivate let colorLabelInfoRowSubject = PublishSubject<Void>()
+    
+    var colorLabelInfoRowTapObservable: Observable<Void> {
+        return colorLabelInfoRowSubject.asObservable()
+    }
     
     // MARK: - UI Components
-    private let colorLabelInfoRow = InfoRowView(title: "", type: .colorWithChevron(color: .labelRed, title: "빨강색"), frame: .zero)
+    private let colorLabelInfoRow = InfoRowView(title: "", type: .colorWithChevron(color: .labelRed, title: "빨간색"), frame: .zero)
     
     // MARK: - 라벨 타이틀
     private let colorLabelTitle = UILabel().then {
-        let fullText = "라벨 *"
+        let fullText = "라벨"
         let attributed = NSMutableAttributedString(string: fullText)
 
         attributed.addAttribute(.font, value: UIFont.headBold(18), range: NSRange(location: 0, length: fullText.count))
@@ -55,6 +63,7 @@ private extension ColorLabelContainerView {
         setHierarchy()
         setStyles()
         setConstraints()
+        setBindings()
     }
     
     // MARK: - setHierarchy
@@ -100,5 +109,16 @@ private extension ColorLabelContainerView {
             $0.bottom.equalTo(container.snp.bottom).offset(0)
         }
     }
+    // MARK: - setBindings
+    func setBindings() {
+        colorLabelInfoRow.rx.tap
+            .bind(to: colorLabelInfoRowSubject)
+            .disposed(by: disposeBag)
+    }
 }
 
+extension Reactive where Base: ColorLabelContainerView {
+    var colorLabelInfoRowTap: ControlEvent<Void> {
+        return ControlEvent(events: base.colorLabelInfoRowSubject.asObservable())
+    }
+}
