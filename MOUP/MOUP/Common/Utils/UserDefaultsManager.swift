@@ -10,6 +10,17 @@ import Foundation
 final class UserDefaultsManager {
     static let shared = UserDefaultsManager()
     private init() {}
+    
+    var hasLaunchedBefore: Bool? {
+        get { UserDefaults.standard.bool(forKey: "has_launched_before") }
+        set {
+            if let value = newValue {
+                UserDefaults.standard.set(value, forKey: "has_launched_before")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "has_launched_before")
+            }
+        }
+    }
 
     var userRole: String? {
         get { UserDefaults.standard.object(forKey: "user_role") as? String }

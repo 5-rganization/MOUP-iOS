@@ -68,6 +68,4 @@ final class AuthService: AuthServiceProtocol {
             throw NetworkError.serverError
         }
     }
-    
-    
 }
