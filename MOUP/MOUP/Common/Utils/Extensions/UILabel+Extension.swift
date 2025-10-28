@@ -36,7 +36,7 @@ extension UILabel {
                 string: text,
                 attributes: [
                     .font: font,
-                    .foregroundColor: self.textColor!
+                    .foregroundColor: self.textColor ?? .gray900
                 ]
             )
         }

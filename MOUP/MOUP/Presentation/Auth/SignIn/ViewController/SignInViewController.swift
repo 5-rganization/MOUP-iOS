@@ -217,5 +217,8 @@ private extension SignInViewController {
 
 // MARK: - ASAuthorizationControllerPresentationContextProviding
 extension SignInViewController: ASAuthorizationControllerPresentationContextProviding {
-    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor { self.view.window! }
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        guard let window = self.view.window else { fatalError("View is not in a window hierarchy") }
+        return window
+    }
 }
