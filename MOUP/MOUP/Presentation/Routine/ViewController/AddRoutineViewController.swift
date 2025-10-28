@@ -96,13 +96,14 @@ private extension AddRoutineViewController {
         )
         
         let input = AddRoutineViewModel.Input(
-            titleChanged: addRoutineView.rx.titleText.orEmpty.asObservable(),
-            alarmTimeChanged: selectedTime.map { Optional($0) }.asObservable(),
+            titleChanged: titleChanged,
+            alarmTimeChanged: alarmTimeChanged,
             saveButtonTapped: addRoutineView.rx.saveButtonTap.asObservable(),
             addTodoButtonTapped: addRoutineView.rx.addButtonTap.asObservable(),
             itemTextChanged: addRoutineView.rx.itemTextChanged,
             itemMoved: addRoutineView.rx.itemMoved,
-            itemDeleted: addRoutineView.rx.itemDeleted
+            itemDeleted: addRoutineView.rx.itemDeleted,
+            itemsLoaded: itemsInputSubject.asObservable()
         )
         
         let output = viewModel.transform(input: input)
@@ -180,6 +181,10 @@ private extension AddRoutineViewController {
         
         if let alarmTime = draft.alarmTime {
             alarmTimeInputSubject.onNext(alarmTime)
+        }
+        
+        if !draft.items.isEmpty {
+            itemsInputSubject.onNext(draft.items)
         }
     }
 }

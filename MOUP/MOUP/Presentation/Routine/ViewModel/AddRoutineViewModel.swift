@@ -28,6 +28,8 @@ final class AddRoutineViewModel {
         let itemTextChanged: Observable<(index: Int, text: String)>
         let itemMoved: Observable<(source: Int, destination: Int)>
         let itemDeleted: Observable<Int>
+        
+        let itemsLoaded: Observable<[TodoItem]>?
     }
     
     // MARK: - Output
@@ -70,6 +72,12 @@ final class AddRoutineViewModel {
         input.alarmTimeChanged
             .bind(to: alarmTimeRelay)
             .disposed(by: disposeBag)
+        
+        if let itemsLoaded = input.itemsLoaded {
+            itemsLoaded
+                .bind(to: itemsRelay)
+                .disposed(by: disposeBag)
+        }
         
         input.addTodoButtonTapped
             .withLatestFrom(itemsRelay)
