@@ -54,7 +54,13 @@ final class AuthService: AuthServiceProtocol {
                 throw NetworkError.noResponse
             }
             return dto
-        case 400:
+        case 404:
+            print(AuthError.notMember.debugDescription!)
+            throw AuthError.notMember
+        case 409:
+            print(AuthError.alreadySignUp.debugDescription!)
+            throw AuthError.alreadySignUp
+        case 422:
             print(AuthError.invalidUserName.debugDescription!)
             throw AuthError.invalidUserName
         default:

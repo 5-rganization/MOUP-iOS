@@ -8,10 +8,11 @@
 import Foundation
 
 enum AuthError: LocalizedError {
-    case notMember // login·refreshToken, 404
-    case invalidUserName // register, 400
+    case notMember // login·register·refreshToken, 404
+    case invalidUserName // register, 422
     case invalidToken // refreshToken, 400
     case deletedUser // refreshToken, 409
+    case alreadySignUp // register, 409
 }
 
 extension AuthError {
@@ -26,6 +27,8 @@ extension AuthError {
             return "로그인 정보가 만료되었습니다. 다시 로그인해주세요."
         case .deletedUser:
             return "탈퇴 처리된 계정입니다. 신규 회원으로 가입해주세요."
+        case .alreadySignUp:
+            return "이미 회원가입이 완료된 유저입니다. 로그인해주세요."
         }
     }
 
@@ -35,11 +38,13 @@ extension AuthError {
         case .notMember:
             "login - 201·202, 회원이 아닌 유저"
         case .invalidUserName:
-            "register - 400, 잘못된 유저 이름"
+            "register - 422, 잘못된 유저 이름"
         case .invalidToken:
             "refreshToken - 400, 유효하지 않은 토큰"
         case .deletedUser:
             "refreshToken - 409, 삭제된 유저"
+        case .alreadySignUp:
+            "register - 409, 이미 회원가입이 완료된 유저"
         }
     }
 }
