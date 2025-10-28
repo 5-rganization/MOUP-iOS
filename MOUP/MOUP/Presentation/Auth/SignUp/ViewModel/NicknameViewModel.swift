@@ -90,18 +90,6 @@ private extension NicknameViewModel {
             return false
         }
         
-        if trimmed.range(of: "^[ㄱ-ㅎ]+$", options: .regularExpression) != nil {
-            let message = "자음만 사용할 수 없어요"
-            logger.info("닉네임 검증 실패: \(message)")
-            return false
-        }
-        
-        if trimmed.range(of: "^[ㅏ-ㅣ]+$", options: .regularExpression) != nil {
-            let message = "모음만 사용할 수 없어요"
-            logger.info("닉네임 검증 실패: \(message)")
-            return false
-        }
-        
         if trimmed.range(of: "[ㄱ-ㅎㅏ-ㅣ]", options: .regularExpression) != nil {
             let message = "정확한 글자를 입력해주세요"
             logger.info("닉네임 검증 실패: \(message)")
