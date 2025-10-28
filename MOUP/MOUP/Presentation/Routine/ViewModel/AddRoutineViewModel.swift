@@ -44,6 +44,13 @@ final class AddRoutineViewModel {
     // MARK: - Properties
     
     private let disposeBag = DisposeBag()
+    private let storage: DraftRoutineStorageProtocol
+    
+    // MARK: - Initializer
+    
+    init(storage: DraftRoutineStorageProtocol = DraftRoutineStorage.shared) {
+        self.storage = storage
+    }
     
     // MARK: - Transform
     
@@ -121,6 +128,28 @@ final class AddRoutineViewModel {
                 return newItems
             }
             .bind(to: itemsRelay)
+            .disposed(by: disposeBag)
+        
+        Observable.combineLatest(titleRelay, alarmTimeRelay, itemsRelay)
+            .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
+            .map { title, alarmTime, items in
+                DraftRoutine(
+                    title: title,
+                    alarmTime: alarmTime,
+                    items: items,
+                    savedAt: Date()
+                )
+            }
+            .withUnretained(self)
+            .subscribe(onNext: { owner, draft in
+                owner.storage.saveDraft(draft)
+            })
+            .disposed(by: disposeBag)
+        
+        saveCompletedRelay
+            .subscribe(onNext: { [weak self] _ in
+                self?.storage.deleteDraft()
+            })
             .disposed(by: disposeBag)
         
         input.saveButtonTapped

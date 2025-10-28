@@ -107,6 +107,10 @@ final class AddRoutineView: UIView {
     
     // MARK: - Public Methods
     
+    func updateRoutineTitleLabel(with title: String) {
+        textfield.text = title
+    }
+    
     func updateAlarmTimeChip(with components: DateComponents) {
         guard let hour = components.hour, let minute = components.minute else {
             alarmTimeChipView.isHidden = true
@@ -135,6 +139,15 @@ final class AddRoutineView: UIView {
             x: alarmTimeButton.center.x + 5, y: alarmTimeButton.center.y
         ))
         alarmTimeButton.layer.add(animation, forKey: "position")
+    }
+    
+    func restoreItems(_ items: [TodoItem]) {
+        let validItems = items.isEmpty ? [TodoItem(text: "")] : items
+        
+        var snapshot = NSDiffableDataSourceSnapshot<Section, TodoItem>()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(validItems, toSection: .main)
+        dataSource.apply(snapshot, animatingDifferences: false)
     }
 }
 

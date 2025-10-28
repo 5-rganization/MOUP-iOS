@@ -7,9 +7,14 @@
 
 import Foundation
 
-struct TodoItem: Hashable {
-    let id: UUID = UUID()
+struct TodoItem: Hashable, Codable {
+    let id: UUID
     var text: String
+    
+    init(text: String) {
+        self.id = UUID()
+        self.text = text
+    }
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)

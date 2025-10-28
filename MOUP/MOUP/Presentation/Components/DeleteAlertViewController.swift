@@ -17,6 +17,7 @@ final class DeleteAlertViewController: UIViewController {
     private let alertTitle: String
     private let alertMessage: String
     var onDeleteConfirmed: (() -> Void)?
+    var onCancelConfirmed: (() -> Void)?
     private let disposeBag = DisposeBag()
     private let deleteButtonTitle: String
     
@@ -148,6 +149,7 @@ private extension DeleteAlertViewController {
     func setActions() {
         cancelButton.rx.tap
             .bind(with: self) { owner, _ in
+                owner.onCancelConfirmed?()
                 owner.dismiss(animated: true)
             }
             .disposed(by: disposeBag)
