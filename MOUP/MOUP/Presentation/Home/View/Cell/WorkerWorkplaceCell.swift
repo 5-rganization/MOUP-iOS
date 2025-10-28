@@ -108,8 +108,8 @@ class WorkerWorkplaceCell: UITableViewCell {
         switch item {
         case .worker(let workerInfo):
             self.nameLabel.text = workerInfo.homeWorkplace.workplace.name
-            self.untilPaydayLabel.text = "sdfdfs"
-            self.totalEarnedLabel.text = "dsfdsf"
+            self.untilPaydayLabel.text = "급여일까지 D-\(workerInfo.daysUntilPayday)"
+            setTotalEarnedLabel(workerInfo.netIncome)
             self.workplaceOfficialChip.isHidden = !workerInfo.homeWorkplace.workplace.isShared
             self.menuButton.menu = menu
         case .owner:
@@ -270,4 +270,25 @@ private extension WorkerWorkplaceCell {
     }
 }
 
-
+private extension WorkerWorkplaceCell {
+    func setTotalEarnedLabel(_ netIncome: Int) {
+        let total = netIncome // 받는 입장이므로 세금 적용
+        let fullText = "현재까지 \(total)원"
+        let attributed = NSMutableAttributedString(string: fullText, attributes: [
+            .font : UIFont.bodyMedium(14),
+            .foregroundColor : UIColor.gray900
+        ])
+        
+        if let range = fullText.range(of: "\(total)원") {
+            let nsRange = NSRange(range, in: fullText)
+            attributed.addAttributes([
+                .foregroundColor : UIColor.gray900,
+                .font : UIFont.headBold(16)
+            ], range: nsRange)
+        }
+        
+        totalEarnedLabel.attributedText = attributed
+    }
+    
+    
+}

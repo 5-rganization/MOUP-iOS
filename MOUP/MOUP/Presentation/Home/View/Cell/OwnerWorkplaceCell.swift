@@ -101,15 +101,9 @@ class OwnerWorkplaceCell: UITableViewCell {
         case .owner(let ownerInfo):
             self.nameLabel.text = ownerInfo.workplace.name
             self.workplaceName = ownerInfo.workplace.name
-            self.totalEarnedLabel.text = {
-                var total = 0
-                ownerInfo.workers.forEach {
-                    total += $0.grossIncome
-                }
-                return "현재까지 \(total)원"
-            }()
+            setTotalEarnedLabel(ownerInfo.workerSummaries)
             self.workplaceOfficialChip.isHidden = !ownerInfo.workplace.isShared
-            self.secondSectionView.update(with: ownerInfo.workers)
+            self.secondSectionView.update(with: ownerInfo.workerSummaries)
             self.menuButton.menu = menu
         }
     }
@@ -245,5 +239,29 @@ private extension OwnerWorkplaceCell {
             self.contentView.layoutIfNeeded()
             tableView.endUpdates()
         }
+    }
+}
+
+private extension OwnerWorkplaceCell {
+    func setTotalEarnedLabel(_ workers: [MonthlyWorkerSummary]) {
+        var total = 0
+        workers.forEach {
+            total += $0.grossIncome // 지불해야 하는 입장이므로 세금 포함
+        }
+        let fullText = "현재까지 \(total)원"
+        let attributed = NSMutableAttributedString(string: fullText, attributes: [
+            .font : UIFont.bodyMedium(14),
+            .foregroundColor : UIColor.gray900
+        ])
+        
+        if let range = fullText.range(of: "\(total)원") {
+            let nsRange = NSRange(range, in: fullText)
+            attributed.addAttributes([
+                .foregroundColor : UIColor.gray900,
+                .font : UIFont.headBold(16)
+            ], range: nsRange)
+        }
+        
+        totalEarnedLabel.attributedText = attributed
     }
 }

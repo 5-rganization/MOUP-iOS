@@ -28,6 +28,10 @@ final class SalaryDetailView: UIView {
     }
 
     // MARK: - Public Methods
+    func update(with data: WorkplaceMonthSummary) {
+        salaryDetailRows[0].update(title: "총 근무", time: data.totalWorkMinutes.timeString, amount: data.grossIncome, isSection: true, showsBottomLine: true)
+//        salaryDetailRows[1].update(title: "주간", time: data.dayTimeMinutes.timeString, amount: data.day, isSection: <#T##Bool#>, showsBottomLine: <#T##Bool#>)
+    }
 }
 
 private extension SalaryDetailView {
