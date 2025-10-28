@@ -17,7 +17,7 @@ struct HomeWorkerResponseDTO: Codable {
 
 struct WorkerMonthlyWorkplaceSummaryInfoDTO: Codable {
     let homeWorkplaceSummaryInfo: HomeWorkplaceSummaryInfoDTO
-    let salarySummaryInfo: SalarySummaryInfoDTO
+    let daysUntilPayday: Int
     let totalWorkMinutes: Int
     let dayTimeMinutes: Int
     let nightTimeMinutes: Int
@@ -41,13 +41,4 @@ struct WorkplaceSummaryInfoDTO: Codable {
     let workplaceId: Int
     let workplaceName: String
     let isShared: Bool
-}
-
-struct SalarySummaryInfoDTO: Codable {
-    let salaryType: String
-    let salaryCalculation: String
-    let hourlyRate: Int?
-    let fixedRate: Int?
-    let salaryDate: Int?
-    let salaryDay: String?
 }

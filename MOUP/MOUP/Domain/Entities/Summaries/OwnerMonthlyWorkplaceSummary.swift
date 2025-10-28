@@ -11,7 +11,7 @@ import Differentiator
 /// Owner 기준 근무지에 관한 정보
 struct OwnerMonthlyWorkplaceSummary {
     let workplace: WorkplaceSummary
-    let workers: [MonthlyWorkerSummary]
+    let workerSummaries: [MonthlyWorkerSummary]
 }
 
 extension OwnerMonthlyWorkplaceSummary: IdentifiableType, Equatable {

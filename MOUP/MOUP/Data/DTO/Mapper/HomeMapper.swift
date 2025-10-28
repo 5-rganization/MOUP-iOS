@@ -19,14 +19,7 @@ struct HomeMapper {
                     ),
                     isNowWorking: item.homeWorkplaceSummaryInfo.isNowWorking
                 ),
-                salary: SalarySummary(
-                    type: SalaryType(rawValue: item.salarySummaryInfo.salaryType) ?? .monthly,
-                    calculation: SalaryCalculation(rawValue: item.salarySummaryInfo.salaryCalculation) ?? .hourly,
-                    hourlyRate: item.salarySummaryInfo.hourlyRate,
-                    fixedRate: item.salarySummaryInfo.fixedRate,
-                    salaryDate: item.salarySummaryInfo.salaryDate,
-                    salaryDay: item.salarySummaryInfo.salaryDay
-                ),
+                daysUntilPayday: item.daysUntilPayday,
                 totalWorkMinutes: item.totalWorkMinutes,
                 dayTimeMinutes: item.dayTimeMinutes,
                 nightTimeMinutes: item.nightTimeMinutes,
@@ -61,7 +54,7 @@ struct HomeMapper {
                     name: item.workplaceSummaryInfo.workplaceName,
                     isShared: item.workplaceSummaryInfo.isShared
                 ),
-                workers: item.monthlyWorkerSummaryInfoList.map(
+                workerSummaries: item.monthlyWorkerSummaryInfoList.map(
                     { dto in
                         MonthlyWorkerSummary(
                             nickname: dto.nickname,
