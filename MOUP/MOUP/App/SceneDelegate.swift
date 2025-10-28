@@ -14,11 +14,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var appCoordinator: Coordinator?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        let hasLaunchedBefore = UserDefaultsManager.shared.hasLaunchedBefore ?? false
-        if !hasLaunchedBefore {
+        let hasSignIn = UserDefaultsManager.shared.hasSignIn ?? false
+        if !hasSignIn {
             KeychainManager.shared.delete(key: "accessToken")
             KeychainManager.shared.delete(key: "refreshToken")
-            UserDefaultsManager.shared.hasLaunchedBefore = true
         }
         
         guard let windowScene = (scene as? UIWindowScene) else { return }

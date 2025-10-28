@@ -11,13 +11,13 @@ final class UserDefaultsManager {
     static let shared = UserDefaultsManager()
     private init() {}
     
-    var hasLaunchedBefore: Bool? {
-        get { UserDefaults.standard.bool(forKey: "has_launched_before") }
+    var hasSignIn: Bool? {
+        get { UserDefaults.standard.bool(forKey: "has_sign_in") }
         set {
             if let value = newValue {
-                UserDefaults.standard.set(value, forKey: "has_launched_before")
+                UserDefaults.standard.set(value, forKey: "has_sign_in")
             } else {
-                UserDefaults.standard.removeObject(forKey: "has_launched_before")
+                UserDefaults.standard.removeObject(forKey: "has_sign_in")
             }
         }
     }
