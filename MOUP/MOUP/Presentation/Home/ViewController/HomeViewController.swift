@@ -107,6 +107,14 @@ private extension HomeViewController {
         
         homeView.setupTableView(section: output.firstSectionData, dataSource: dataSource)
             .disposed(by: disposeBag)
+        
+        output.homeHeaderData
+            .withUnretained(self)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { owner, data in
+                owner.homeView.updateHomeHeader(headerData: data)
+            })
+            .disposed(by: disposeBag)
     }
 }
 

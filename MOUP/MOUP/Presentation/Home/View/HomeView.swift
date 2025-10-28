@@ -70,6 +70,10 @@ final class HomeView: UIView {
     ) -> Disposable {
         return section.bind(to: tableView.rx.items(dataSource: dataSource))
     }
+    
+    func updateHomeHeader(headerData: HomeHeaderData) {
+        tableHeaderView.update(data: headerData)
+    }
 }
 
 private extension HomeView {

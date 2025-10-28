@@ -37,11 +37,12 @@ final class HomeViewModel {
 
     // MARK: - Input, Output
     struct Input {
-        var viewDidLoad: Observable<Void>
+        let viewDidLoad: Observable<Void>
     }
 
     struct Output {
-        var firstSectionData: Observable<[HomeTableViewFirstSection]>
+        let firstSectionData: Observable<[HomeTableViewFirstSection]>
+        let homeHeaderData: Observable<HomeHeaderData>
     }
 
     // MARK: - transform
@@ -58,7 +59,8 @@ final class HomeViewModel {
         .disposed(by: disposeBag)
 
         return Output(
-            firstSectionData: firstSectionDataRelay.asObservable()
+            firstSectionData: firstSectionDataRelay.asObservable(),
+            homeHeaderData: homeHeaderDataRelay.asObservable()
         )
     }
 
