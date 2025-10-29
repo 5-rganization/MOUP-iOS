@@ -6,6 +6,9 @@
 //
 
 import UIKit
+import AuthenticationServices
+import OSLog
+
 import RxSwift
 import RxRelay
 import GoogleSignIn
@@ -13,12 +16,14 @@ import GoogleSignIn
 final class SignInViewController: UIViewController {
     
     // MARK: - Properties
+    private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
+    
     private let signInVM: SignInViewModel
     private let signInView = SignInView()
     private let disposeBag = DisposeBag()
     weak var coordinator: SignInCoordinator?
 
-    private let googleAuthCodeRelay = BehaviorRelay<String>(value: "")
+    private let authResultRelay = BehaviorRelay<(provider: LoginProvider?, username: String, authCode: String)>(value: (provider: nil, username: "", authCode: ""))
 
     // MARK: - Lifecycle
     
@@ -75,7 +80,8 @@ private extension SignInViewController {
     func setBinding() {
         let input = SignInViewModel.Input(
             googleLoginTap: signInView.rx.googleLoginTap.asObservable(),
-            googleAuthCode: googleAuthCodeRelay.asObservable()
+            appleLoginTap: signInView.rx.appleLoginTap.asObservable(),
+            authResult: authResultRelay.asObservable()
         )
 
         let output = signInVM.transform(input: input)
@@ -86,6 +92,11 @@ private extension SignInViewController {
                 owner.signInGoogle()
             }
             .disposed(by: disposeBag)
+        
+        output.startAppleLogin
+            .subscribe(with: self) { owner, _ in
+                owner.signInApple()
+            }.disposed(by: disposeBag)
 
         Observable.combineLatest(output.signInResult, output.loginProvider)
             .withUnretained(self)
@@ -106,15 +117,13 @@ private extension SignInViewController {
                         }
                         owner.coordinator?.moveToSignUp(
                             provider: provider,
-                            authorizationCode: owner.googleAuthCodeRelay.value
+                            authorizationCode: owner.authResultRelay.value.authCode
                         )
                     case .showAlert(let error):
                         print("로그인 실패 : \(error.localizedDescription)")
                 }
             })
             .disposed(by: disposeBag)
-
-
     }
 
     // MARK: - signInGoogle
@@ -165,10 +174,51 @@ private extension SignInViewController {
             }
 
             if let serverAuthCode = result?.serverAuthCode {
-                self.googleAuthCodeRelay.accept(serverAuthCode)
+                self.authResultRelay.accept((provider: .google, username: "", authCode: serverAuthCode))
             } else {
                 assertionFailure("Authorization failed - serverAuthCode")
             }
         }
+    }
+    
+    // MARK: - signInApple
+    func signInApple() {
+        let request = ASAuthorizationAppleIDProvider().createRequest()
+        request.requestedScopes = [.fullName]
+        
+        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+        authorizationController.rx.authorizationResult
+            .subscribe(with: self) { owner, result in
+                switch result {
+                case .success(let authorization):
+                    guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else { return }
+                    let username = appleIDCredential.fullName?.formatted() ?? ""
+                    
+                    guard let authCode = appleIDCredential.authorizationCode else {
+                        owner.logger.error("애플 로그인 실패) authCode를 가져오는 데에 실패함")
+                        return
+                    }
+                    guard let authCodeStr = String(data: authCode, encoding: .utf8) else {
+                        owner.logger.error("애플 로그인 실패) authCode(Data)를 authCodeStr(String)로 변환하는 데에 실패함: \(authCode.debugDescription)")
+                        return
+                    }
+                    
+                    owner.authResultRelay.accept((provider: .apple, username: username, authCode: authCodeStr))
+                    
+                case .failure(let error):
+                    owner.logger.error("애플 로그인 실패) \(error.localizedDescription)")
+                }
+            }.disposed(by: disposeBag)
+        
+        authorizationController.presentationContextProvider = self
+        authorizationController.performRequests()
+    }
+}
+
+// MARK: - ASAuthorizationControllerPresentationContextProviding
+extension SignInViewController: ASAuthorizationControllerPresentationContextProviding {
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        guard let window = self.view.window else { fatalError("View is not in a window hierarchy") }
+        return window
     }
 }

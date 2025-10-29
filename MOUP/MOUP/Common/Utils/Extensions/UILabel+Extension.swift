@@ -26,14 +26,28 @@ extension UILabel {
     }
     
     func setLineSpacing(_ lineSpacing: LineSpacing) {
+        let attributedString: NSMutableAttributedString
+        
+        if let currentAttributedText = self.attributedText {
+            attributedString = NSMutableAttributedString(attributedString: currentAttributedText)
+        } else {
+            guard let text = self.text, let font = self.font else { return }
+            attributedString = NSMutableAttributedString(
+                string: text,
+                attributes: [
+                    .font: font,
+                    .foregroundColor: self.textColor ?? .gray900
+                ]
+            )
+        }
+        
         let style = NSMutableParagraphStyle()
-        let lineheight = self.font.pointSize * lineSpacing.ratio  // font size * ratio(Double)
+        let lineheight = self.font.pointSize * lineSpacing.ratio // font size * ratio(Double)
         style.minimumLineHeight = lineheight
         style.maximumLineHeight = lineheight
         
-        self.attributedText = NSAttributedString(
-            string: self.text ?? "", attributes: [
-                .paragraphStyle: style
-            ])
+        let fullRange = NSRange(location: 0, length: attributedString.length)
+        attributedString.addAttributes([.paragraphStyle: style], range: fullRange)
+        self.attributedText = attributedString
     }
 }

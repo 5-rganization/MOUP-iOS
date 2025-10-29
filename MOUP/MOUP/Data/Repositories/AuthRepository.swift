@@ -25,11 +25,13 @@ final class AuthRepository: AuthRepositoryProtocol {
         }
         
         UserDefaultsManager.shared.userRole = role
+        UserDefaultsManager.shared.hasSignIn = true
     }
     
     func signUp(requestDTO: RegisterRequestDTO) async throws -> UserRole {
         let response = try await authService.signUp(requestDTO: requestDTO)
         let role: UserRole = response.role == "ROLE_WORKER" ? .worker : .owner
+        UserDefaultsManager.shared.hasSignIn = true
         return role
     }
 }
