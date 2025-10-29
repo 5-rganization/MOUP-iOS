@@ -15,7 +15,8 @@ struct WorkplaceMonthSummary {
     let totalWorkMinutes: Int
     let dayTimeMinutes: Int
     let nightTimeMinutes: Int
-    let restTimeMinutes: Int
+    let restTimeMinutes: Int // 휴게 시간
+    let dayTimeIncome: Int
     let totalHolidayAllowance: Int
     let totalNightAllowance: Int
     let grossIncome: Int

@@ -24,6 +24,7 @@ struct HomeMapper {
                 dayTimeMinutes: item.dayTimeMinutes,
                 nightTimeMinutes: item.nightTimeMinutes,
                 restTimeMinutes: item.restTimeMinutes,
+                dayTimeIncome: item.dayTimeIncome,
                 totalHolidayAllowance: item.totalHolidayAllowance,
                 totalNightAllowance: item.totalNightAllowance,
                 grossIncome: item.grossIncome,
@@ -62,7 +63,7 @@ struct HomeMapper {
                             grossIncome: dto.grossIncome,
                             netIncome: dto.netIncome
                         )
-                })
+                    })
             )
         }
         

@@ -22,6 +22,7 @@ struct WorkerMonthlyWorkplaceSummaryInfoDTO: Codable {
     let dayTimeMinutes: Int
     let nightTimeMinutes: Int
     let restTimeMinutes: Int
+    let dayTimeIncome: Int
     let totalHolidayAllowance: Int
     let totalNightAllowance: Int
     let grossIncome: Int
