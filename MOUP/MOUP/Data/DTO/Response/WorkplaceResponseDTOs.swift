@@ -15,3 +15,9 @@ struct InviteCodeWorkplaceResponseDTO: Decodable {
     let latitude: Double?
     let longitude: Double?
 }
+
+struct WorkplaceSummaryResponseDTO: Decodable {
+    let workplaceId: Int
+    let workplaceName: String
+    let isShared: Bool
+}
