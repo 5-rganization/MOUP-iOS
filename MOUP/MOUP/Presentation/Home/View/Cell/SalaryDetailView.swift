@@ -29,8 +29,12 @@ final class SalaryDetailView: UIView {
 
     // MARK: - Public Methods
     func update(with data: WorkplaceMonthSummary) {
-        salaryDetailRows[0].update(title: "총 근무", time: data.totalWorkMinutes.timeString, amount: data.grossIncome, isSection: true, showsBottomLine: true)
-//        salaryDetailRows[1].update(title: "주간", time: data.dayTimeMinutes.timeString, amount: data.day, isSection: <#T##Bool#>, showsBottomLine: <#T##Bool#>)
+        salaryDetailRows[0].update(title: "총 근무", time: data.totalWorkMinutes.timeString, amount: data.netIncome, isSection: true, showsBottomLine: true)
+        salaryDetailRows[1].update(title: "주간", time: data.dayTimeMinutes.timeString, amount: data.dayTimeIncome, isSection: false, showsBottomLine: false)
+        salaryDetailRows[2].update(title: "야간", time: data.nightTimeMinutes.timeString, amount: data.totalNightAllowance, isSection: false, showsBottomLine: true)
+        salaryDetailRows[3].update(title: "주휴 수당", time: nil, amount: data.totalHolidayAllowance, isSection: true, showsBottomLine: true)
+        salaryDetailRows[4].update(title: "4대 보험", time: nil, amount: calculateInsurances(data: data), isSection: true, showsBottomLine: false, showsTime: false)
+        salaryDetailRows[5].update(title: "소득세", time: nil, amount: data.incomeTax, isSection: false, showsBottomLine: false)
     }
 }
 
@@ -81,12 +85,14 @@ private extension SalaryDetailView {
             .init(title: "총 근무", time: "25시간 07분", amount: 252000, isSection: true, showsBottomLine: true),
             .init(title: "주간", time: "20시간 00분", amount: 200600, isSection: false, showsBottomLine: false),
             .init(title: "야간", time: nil, amount: nil, isSection: false, showsBottomLine: true),
-            .init(title: "대타 근무", time: "05시간 07분", amount: 51344, isSection: true, showsBottomLine: false),
-            .init(title: "주간", time: "05시간 07분", amount: 51344, isSection: false, showsBottomLine: false),
-            .init(title: "야간", time: nil, amount: nil, isSection: false, showsBottomLine: true),
             .init(title: "주휴 수당", time: nil, amount: nil, isSection: true, showsBottomLine: true),
             .init(title: "4대 보험", time: nil, amount: 24947, isSection: true, showsBottomLine: false, showsTime: false),
             .init(title: "소득세", time: nil, amount: 3528, isSection: true, showsBottomLine: false, showsTime: false)
         ]
+    }
+
+    /// 4대 보험 세 합산 메서드, 산재보험의 경우 업장마다 달라 조율 필요
+    func calculateInsurances(data: WorkplaceMonthSummary) -> Int {
+        return data.nationalPension + data.healthInsurance + data.employmentInsurance
     }
 }
