@@ -110,6 +110,7 @@ extension WorkRouter: URLRequestConvertible {
         
         if let body = requestBody {
             let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
             request.httpBody = try encoder.encode(body)
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             
