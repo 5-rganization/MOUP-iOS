@@ -28,6 +28,8 @@ final class AddRoutineViewModel {
         let itemTextChanged: Observable<(index: Int, text: String)>
         let itemMoved: Observable<(source: Int, destination: Int)>
         let itemDeleted: Observable<Int>
+        
+        let itemsLoaded: Observable<[TodoItem]>?
     }
     
     // MARK: - Output
@@ -44,6 +46,13 @@ final class AddRoutineViewModel {
     // MARK: - Properties
     
     private let disposeBag = DisposeBag()
+    private let storage: DraftRoutineStorageProtocol
+    
+    // MARK: - Initializer
+    
+    init(storage: DraftRoutineStorageProtocol = DraftRoutineStorage.shared) {
+        self.storage = storage
+    }
     
     // MARK: - Transform
     
@@ -63,6 +72,12 @@ final class AddRoutineViewModel {
         input.alarmTimeChanged
             .bind(to: alarmTimeRelay)
             .disposed(by: disposeBag)
+        
+        if let itemsLoaded = input.itemsLoaded {
+            itemsLoaded
+                .bind(to: itemsRelay)
+                .disposed(by: disposeBag)
+        }
         
         input.addTodoButtonTapped
             .withLatestFrom(itemsRelay)
@@ -121,6 +136,28 @@ final class AddRoutineViewModel {
                 return newItems
             }
             .bind(to: itemsRelay)
+            .disposed(by: disposeBag)
+        
+        Observable.combineLatest(titleRelay, alarmTimeRelay, itemsRelay)
+            .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
+            .map { title, alarmTime, items in
+                DraftRoutine(
+                    title: title,
+                    alarmTime: alarmTime,
+                    items: items,
+                    savedAt: Date()
+                )
+            }
+            .withUnretained(self)
+            .subscribe(onNext: { owner, draft in
+                owner.storage.saveDraft(draft)
+            })
+            .disposed(by: disposeBag)
+        
+        saveCompletedRelay
+            .subscribe(onNext: { [weak self] _ in
+                self?.storage.deleteDraft()
+            })
             .disposed(by: disposeBag)
         
         input.saveButtonTapped
