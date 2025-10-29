@@ -94,12 +94,12 @@ extension WorkRouter: URLRequestConvertible {
         }
     }
     
-    var encoding: ParameterEncoding {
+    var parameters: Parameters? {
         switch self {
-        case .createMyWork, .createWorkerWork, .updateMyWork, .updateWorkerWork:
-            return JSONEncoding.default
-        case .fetchWork, .fetchAllMyWorkList, .fetchWorkplaceMyWorkList, .fetchWorkplaceAllWorkList, .deleteWork, .deleteRecurringWork:
-            return URLEncoding.default
+        case .fetchAllMyWorkList(let baseYearMonth), .fetchWorkplaceMyWorkList(_, let baseYearMonth), .fetchWorkplaceAllWorkList(_, let baseYearMonth):
+            return ["baseYearMonth": baseYearMonth]
+        default:
+            return nil
         }
     }
     
@@ -108,15 +108,19 @@ extension WorkRouter: URLRequestConvertible {
         Self.logger.info("최종 url: \(url)")
         var request = try URLRequest(url: url, method: method)
         
-        if let body = requestBody {
+        if let requestBody {
             let encoder = JSONEncoder()
             encoder.dateEncodingStrategy = .iso8601
-            request.httpBody = try encoder.encode(body)
+            request.httpBody = try encoder.encode(requestBody)
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             
             if let httpBody = request.httpBody {
                 Self.logger.info("Request body: \(String(data: httpBody, encoding: .utf8) ?? "")")
             }
+        }
+        
+        if let parameters {
+            request = try URLEncoding.default.encode(request, with: parameters)
         }
         
         return request
