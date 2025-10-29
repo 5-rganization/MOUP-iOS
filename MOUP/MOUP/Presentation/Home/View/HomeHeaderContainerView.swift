@@ -271,11 +271,11 @@ private extension HomeHeaderContainerView {
         let displayCount = abs(diff)
         switch diff {
         case 1...:
-            comparisonDescriptionLabel.text = isWorker ? "지난 달 대비 \(diff)만원 더 벌었어요!" : "지난 달 대비 \(diff)만원 더 나갔어요!"
+            comparisonDescriptionLabel.text = isWorker ? "지난 달 대비 \(displayCount)만원 더 벌었어요!" : "지난 달 대비 \(displayCount)만원 더 나갔어요!"
         case 0:
             comparisonDescriptionLabel.text = "지난달과 동일해요"
         case ..<0:
-            comparisonDescriptionLabel.text = isWorker ? "지난 달 대비 \(diff)만원 덜 받았어요" : "지난 달 대비 \(diff)만원 덜 나갔어요"
+            comparisonDescriptionLabel.text = isWorker ? "지난 달 대비 \(displayCount)만원 덜 받았어요" : "지난 달 대비 \(displayCount)만원 덜 나갔어요"
         default:
             comparisonDescriptionLabel.text = "지난 달 급여에 대한 정보가 없어요"
         }

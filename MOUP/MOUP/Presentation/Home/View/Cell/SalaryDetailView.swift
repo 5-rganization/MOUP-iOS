@@ -93,6 +93,6 @@ private extension SalaryDetailView {
 
     /// 4대 보험 세 합산 메서드, 산재보험의 경우 업장마다 달라 조율 필요
     func calculateInsurances(data: WorkplaceMonthSummary) -> Int {
-        return data.nationalPension + data.healthInsurance + data.employmentInsurance
+        return (data.nationalPension ?? 0) + (data.healthInsurance ?? 0) + (data.employmentInsurance ?? 0)
     }
 }
