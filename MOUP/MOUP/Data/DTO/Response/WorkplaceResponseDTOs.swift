@@ -16,6 +16,7 @@ struct InviteCodeWorkplaceResponseDTO: Decodable {
     let longitude: Double?
 }
 
+/// 근무지 요약 정보 응답 DTO
 struct WorkplaceSummaryResponseDTO: Decodable {
     let workplaceId: Int
     let workplaceName: String

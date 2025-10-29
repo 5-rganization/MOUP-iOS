@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// 근무 상세 정보 응답 DTO
 struct WorkDetailResponseDTO: Decodable {
     let workId: Int
     let workerSummaryInfo: WorkerSummaryResponseDTO
@@ -26,6 +27,7 @@ struct WorkDetailResponseDTO: Decodable {
     let isEditable: Bool
 }
 
+/// 근무 요약 정보 응답 DTO
 struct WorkSummaryResponseDTO: Decodable {
     let workId: Int
     let workerSummaryInfo: WorkerSummaryResponseDTO
@@ -42,6 +44,7 @@ struct WorkSummaryResponseDTO: Decodable {
     let isEditable: Bool
 }
 
+/// 캘린더용 근무 정보 응답 DTO
 struct WorkCalendarListResponseDTO: Decodable {
     let workSummaryInfoList: [WorkSummaryResponseDTO]
 }
