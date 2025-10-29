@@ -17,19 +17,19 @@ struct HomeWorkerResponseDTO: Codable {
 
 struct WorkerMonthlyWorkplaceSummaryInfoDTO: Codable {
     let homeWorkplaceSummaryInfo: HomeWorkplaceSummaryInfoDTO
-    let daysUntilPayday: Int
+    let daysUntilPayday: Int?
     let totalWorkMinutes: Int
     let dayTimeMinutes: Int
     let nightTimeMinutes: Int
     let restTimeMinutes: Int
     let dayTimeIncome: Int
-    let totalHolidayAllowance: Int
-    let totalNightAllowance: Int
+    let totalHolidayAllowance: Int?
+    let totalNightAllowance: Int?
     let grossIncome: Int
-    let nationalPension: Int
-    let healthInsurance: Int
-    let employmentInsurance: Int
-    let incomeTax: Int
+    let nationalPension: Int?
+    let healthInsurance: Int?
+    let employmentInsurance: Int?
+    let incomeTax: Int?
     let netIncome: Int
 }
 

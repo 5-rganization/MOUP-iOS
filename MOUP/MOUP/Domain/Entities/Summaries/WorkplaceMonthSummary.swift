@@ -11,19 +11,19 @@ import Differentiator
 /// Worker 기준 근무지에 관한 정보
 struct WorkplaceMonthSummary {
     let homeWorkplace: HomeWorkplaceSummary
-    let daysUntilPayday: Int
+    let daysUntilPayday: Int?
     let totalWorkMinutes: Int
     let dayTimeMinutes: Int
     let nightTimeMinutes: Int
     let restTimeMinutes: Int // 휴게 시간
     let dayTimeIncome: Int
-    let totalHolidayAllowance: Int
-    let totalNightAllowance: Int
+    let totalHolidayAllowance: Int?
+    let totalNightAllowance: Int?
     let grossIncome: Int
-    let nationalPension: Int
-    let healthInsurance: Int
-    let employmentInsurance: Int
-    let incomeTax: Int
+    let nationalPension: Int?
+    let healthInsurance: Int?
+    let employmentInsurance: Int?
+    let incomeTax: Int?
     let netIncome: Int
 }
 
