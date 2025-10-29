@@ -27,7 +27,7 @@ enum WorkRouter {
     case fetchAllMyWorkList(baseYearMonth: String)
     case fetchWorkplaceMyWorkList(workplaceId: Int, baseYearMonth: String)
     case fetchWorkplaceAllWorkList(workplaceId: Int, baseYearMonth: String)
-    case updateMyWork(workId: Int, myWorkUpdateRequestDTO: MyWorkUpdateRequestDTO)
+    case updateMyWork(workId: Int, dto: MyWorkUpdateRequestDTO)
     case updateWorkerWork(workplaceId: Int, workerId: Int, workId: Int, dto: WorkerWorkUpdateRequestDTO)
     case deleteWork(workId: Int)
     case deleteRecurringWork(workId: Int)
