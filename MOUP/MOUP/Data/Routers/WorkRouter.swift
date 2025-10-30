@@ -28,7 +28,7 @@ enum WorkRouter {
     case createMyWork(workplaceId: Int, dto: MyWorkCreateRequestDTO)
     case createWorkerWork(workplaceId: Int, workerId: Int, dto: WorkerWorkCreateRequestDTO)
     
-    case fetchWork(workId: Int)
+    case fetchWork(workId: Int, viewQueryType: ViewQuery)
     case fetchAllMyWorkList(baseYearMonth: String)
     case fetchWorkplaceMyWorkList(workplaceId: Int, baseYearMonth: String)
     case fetchWorkplaceAllWorkList(workplaceId: Int, baseYearMonth: String)
@@ -58,7 +58,7 @@ extension WorkRouter: URLRequestConvertible {
         case .createWorkerWork(let workplaceId, let workerId, _):
             return "/workplaces/\(workplaceId)/workers/\(workerId)/works"
             
-        case .fetchWork(let workId):
+        case .fetchWork(let workId, _):
             return "/works/\(workId)"
         case .fetchAllMyWorkList:
             return "/works"
@@ -118,6 +118,8 @@ extension WorkRouter: URLRequestConvertible {
     
     var parameters: Parameters? {
         switch self {
+        case .fetchWork(_, let viewQueryType):
+            return ["view": viewQueryType.rawValue]
         case .fetchAllMyWorkList(let baseYearMonth), .fetchWorkplaceMyWorkList(_, let baseYearMonth), .fetchWorkplaceAllWorkList(_, let baseYearMonth):
             return ["baseYearMonth": baseYearMonth]
         default:
