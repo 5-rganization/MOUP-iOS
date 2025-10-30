@@ -15,7 +15,9 @@ import Alamofire
 /// - `fetchWork`: 근무 조회
 /// - `fetchAllMyWorkList`: 사용자의 모든 근무 범위 조회
 /// - `fetchWorkplaceMyWorkList`: 특정 근무지(매장)에서 사용자 근무 범위 조회
+///   - `baseYearMonth` 형식: `yyyy-MM`
 /// - `fetchWorkplaceAllWorkList`: 특정 근무지(매장)의 모든 근무 범위 조회
+///   - `baseYearMonth` 형식: `yyyy-MM`
 /// - `updateMyWork`: 사용자 근무 업데이트
 /// - `updateWorkerWork`: 근무자 근무 업데이트 (사장님 전용)
 /// - `deleteWork`: 근무 삭제
