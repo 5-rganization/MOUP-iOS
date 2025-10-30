@@ -8,10 +8,10 @@
 protocol WorkRepositoryProtocol: AnyObject {
     
     /// 사용자 근무 생성 API를 호출합니다.
-    /// - Returns: 생성된 근무의 ID(workId)
+    /// - Returns: 생성된 근무의 ID 배열 `[Int]`
     func createMyWork(workplaceId: Int, requestDTO: MyWorkCreateRequestDTO) async throws -> [Int]
     /// 근무자 근무 생성 API를 호출합니다. (사장님 전용)
-    /// - Returns: 생성된 근무의 ID(workId)
+    /// - Returns: 생성된 근무의 ID 배열 `[Int]`
     func createWorkerWork(workplaceId: Int, workerId: Int, requestDTO: WorkerWorkCreateRequestDTO) async throws -> [Int]
     
     /// 근무 상세 조회 API를 호출합니다.
@@ -40,7 +40,7 @@ protocol WorkRepositoryProtocol: AnyObject {
     func deleteRecurringWork(workId: Int) async throws
     
     /// 출근 API를 호출합니다.
-    /// - Returns: 신규 근무 생성(201) 시 `workId`,
+    /// - Returns: 신규 근무 생성(201) 시 생성된 근무의 ID 배열(단일 항목) `[Int]`,
     ///            기존 근무 업데이트(204) 시 `nil`
     func startWork(workplaceId: Int) async throws -> [Int]?
     /// 퇴근 API를 호출합니다.
