@@ -15,7 +15,7 @@ import Then
 final class HomeView: UIView {
     // MARK: - Properties
     private let userRole: UserRole
-    private var isTableHeaderViewConfigured = false
+    private var didConfigureTableHeaderView = false
     
     // MARK: - UI Components
     private let topBar = UIView()
@@ -62,9 +62,9 @@ final class HomeView: UIView {
         super.layoutSubviews()
         
         // viewDidLoad, init에서 호출 시 제약조건 충돌 발생으로 인해 플래그 사용
-        if !isTableHeaderViewConfigured && bounds.width > 0 {
+        if !didConfigureTableHeaderView && bounds.width > 0 {
             setTableHeaderView()
-            isTableHeaderViewConfigured = true
+            didConfigureTableHeaderView = true
         }
     }
     
