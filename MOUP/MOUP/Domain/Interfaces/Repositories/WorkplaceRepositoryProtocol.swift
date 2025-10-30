@@ -9,4 +9,5 @@ import Foundation
 
 protocol WorkplaceRepositoryProtocol: AnyObject {
     func fetchWorkplaceByInviteCode(inviteCode: String) async throws -> InviteCodeWorkplace
+    func createWorkplace(request: WorkplaceCreateRequestDTO) async throws -> WorkplaceCreate
 }
