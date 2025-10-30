@@ -35,7 +35,7 @@ struct WorkerMonthlyWorkplaceSummaryInfoDTO: Codable {
 
 struct HomeWorkplaceSummaryInfoDTO: Codable {
     let workplaceSummaryInfo: WorkplaceSummaryInfoDTO
-    let isNowWorking: Bool
+    let isNowWorking: Bool?
 }
 
 struct WorkplaceSummaryInfoDTO: Codable {

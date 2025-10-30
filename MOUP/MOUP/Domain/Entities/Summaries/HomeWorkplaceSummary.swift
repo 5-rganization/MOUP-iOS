@@ -9,5 +9,5 @@ import Foundation
 
 struct HomeWorkplaceSummary {
     let workplace: WorkplaceSummary
-    let isNowWorking: Bool
+    let isNowWorking: Bool?
 }
