@@ -9,6 +9,29 @@ import OSLog
 
 import Alamofire
 
+/// 근무 관련 엔드포인트 라우터
+///
+/// - `createMyWork` (POST /workplaces/{id}/workers/me/works): 근무지(매장)에 사용자 근무 생성
+/// - `createWorkerWork` (POST /workplaces/{id}/workers/{id}/works): 근무자에게 근무 생성 (사장님 전용)
+///
+/// - `fetchWorkDetail` (GET /works/{id}?view=detail): 근무 상세 조회
+/// - `fetchWorkSummary` (GET /works/{id}?view=summary): 근무 요약 조회
+/// - `fetchAllMyWorkList` (GET /works): 사용자의 모든 근무 범위 조회
+///   - `baseYearMonth` 형식: `yyyy-MM`
+/// - `fetchWorkplaceMyWorkList` (GET /workplaces/{id}/workers/me/works): 특정 근무지(매장)에서 사용자 근무 범위 조회
+///   - `baseYearMonth` 형식: `yyyy-MM`
+/// - `fetchWorkplaceAllWorkList` (GET /workplaces/{id}/works): 특정 근무지(매장)의 모든 근무 범위 조회
+///   - `baseYearMonth` 형식: `yyyy-MM`
+///
+/// - `updateMyWork` (PATCH /works/{id}): 사용자 근무 업데이트
+/// - `updateWorkerWork` (PATCH /workplaces/{id}/workers/{id}/works/{id}): 근무자 근무 업데이트 (사장님 전용)
+///
+/// - `deleteWork` (DELETE /works/{id}): 근무 삭제
+/// - `deleteRecurringWork` (DELETE /works/recurring/{id}): 반복 근무 삭제
+///
+/// - `startWork` (POST /workplaces/{id}/workers/me/works/start): 근무 출근 (알바생 전용)
+/// - `endWork` (PATCH /workplaces/{id}/workers/me/works/end): 근무 퇴근 (알바생 전용)
+///
 enum WorkRouter {
     case createMyWork(workplaceId: Int, dto: MyWorkCreateRequestDTO)
     case createWorkerWork(workplaceId: Int, workerId: Int, dto: WorkerWorkCreateRequestDTO)
