@@ -21,6 +21,7 @@ extension WorkError {
         switch self {
         case .invalidPermission: "해당 근무에 접근할 권한이 없습니다.\n다시 한번 확인해 주세요!"
         case .notFound: "해당하는 근무를 찾을 수 없어요.\n다시 한번 확인해 주세요!"
+        case .alreadyStarted: "이미 근무중인 상태예요.\n다시 한번 확인해 주세요!"
         default: "오류가 발생하였습니다."
         }
     }
