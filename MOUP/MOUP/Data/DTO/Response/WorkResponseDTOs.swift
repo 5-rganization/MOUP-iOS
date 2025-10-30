@@ -7,6 +7,11 @@
 
 import Foundation
 
+/// 근무 생성 응답 DTO
+struct WorkCreateResponseDTO: Decodable {
+    let workId: [Int]
+}
+
 /// 근무 상세 정보 응답 DTO
 struct WorkDetailResponseDTO: Decodable {
     let workId: Int
