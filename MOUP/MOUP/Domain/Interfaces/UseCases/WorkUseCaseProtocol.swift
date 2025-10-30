@@ -15,8 +15,10 @@ protocol WorkUseCaseProtocol: AnyObject {
     /// - Returns: 생성된 근무의 ID 배열 `[Int]`
     func createWorkerWork(workplaceId: Int, workerId: Int, requestDTO: WorkerWorkCreateRequestDTO) async throws -> [Int]
     
-    /// 근무의 상세 정보를 조회합니다.
-    func fetchWorkDetail(workId: Int) async throws -> WorkData
+    /// 내 근무의 상세 정보를 조회합니다.
+    func fetchMyWorkDetail(workId: Int) async throws -> MyWorkData
+    /// 근무자 근무의 상세 정보를 조회합니다. (사장님 전용)
+    func fetchWorkerWorkDetail(workId: Int) async throws -> WorkerWorkData
     /// 근무의 요약 정보를 조회합니다.
     func fetchWorkSummary(workId: Int) async throws -> WorkSummary
     
