@@ -26,11 +26,11 @@ protocol WorkRepositoryProtocol: AnyObject {
     /// 사용자 근무 업데이트 API를 호출합니다.
     /// - Returns: 반복 근무가 업데이트되어 데이터가 반환(200 OK)되면 `WorkCreateResponseDTO`,
     ///            단일 근무만 업데이트되어 데이터가 없는 성공(204 No Content) 시 `nil`을 반환합니다.
-    func updateMyWork(workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO?
+    func updateMyWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO?
     /// 근무자 근무 업데이트 API를 호출합니다. (사장님 전용)
     /// - Returns: 반복 근무가 업데이트되어 데이터가 반환(200 OK)되면 `WorkCreateResponseDTO`,
     ///            단일 근무만 업데이트되어 데이터가 없는 성공(204 No Content) 시 `nil`을 반환합니다.
-    func updateWorkerWork(workplaceId: Int, workerId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO?
+    func updateWorkerWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO?
     
     /// 단일 근무 삭제 API를 호출합니다.
     func deleteWork(workId: Int) async throws

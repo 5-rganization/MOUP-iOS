@@ -33,7 +33,7 @@ protocol WorkUseCaseProtocol: AnyObject {
     /// 내 근무를 업데이트합니다.
     /// - Returns: 반복 근무가 수정되어 데이터가 반환되면 `WorkCreateResponseDTO`,
     ///            단일 근무만 수정되어 데이터가 없는 성공 시 `nil`을 반환합니다.
-    func updateMyWork(workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO?
+    func updateMyWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO?
     
     /// 근무자의 근무를 업데이트합니다. (사장님 전용)
     /// - Returns: 반복 근무가 수정되어 데이터가 반환되면 `WorkCreateResponseDTO`,
