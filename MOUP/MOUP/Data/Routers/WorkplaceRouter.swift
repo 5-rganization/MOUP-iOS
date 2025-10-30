@@ -10,6 +10,7 @@ import Alamofire
 
 enum WorkplaceRouter {
     case fetchWorkplaceByInviteCode(inviteCode: String)
+    case createWorkplace(request: WorkplaceCreateRequestDTO)
 }
 
 extension WorkplaceRouter: URLRequestConvertible {
@@ -24,6 +25,8 @@ extension WorkplaceRouter: URLRequestConvertible {
         switch self {
         case .fetchWorkplaceByInviteCode(let inviteCode):
             return "/workplaces/invite-codes/\(inviteCode)"
+        case .createWorkplace:
+            return "/workplaces"
         }
     }
 
@@ -31,6 +34,8 @@ extension WorkplaceRouter: URLRequestConvertible {
         switch self {
         case .fetchWorkplaceByInviteCode:
             return .get
+        case .createWorkplace:
+            return .post
         }
     }
 
@@ -38,6 +43,8 @@ extension WorkplaceRouter: URLRequestConvertible {
         switch self {
         case .fetchWorkplaceByInviteCode:
             return nil
+        case .createWorkplace(let request):
+            return request
         }
     }
 
@@ -45,6 +52,8 @@ extension WorkplaceRouter: URLRequestConvertible {
         switch self {
         case .fetchWorkplaceByInviteCode:
             return URLEncoding.default
+        case .createWorkplace:
+            return JSONEncoding.default
         }
     }
 
@@ -61,7 +70,6 @@ extension WorkplaceRouter: URLRequestConvertible {
             if let httpBody = request.httpBody {
                 print("Request body: \(String(data: httpBody, encoding: .utf8) ?? "")")
             }
-
         }
 
         return request
