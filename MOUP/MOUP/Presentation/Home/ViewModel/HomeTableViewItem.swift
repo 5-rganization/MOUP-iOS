@@ -9,10 +9,10 @@ import Foundation
 import RxDataSources
 
 enum HomeSectionItem: Equatable, IdentifiableType {
-    case worker(WorkerWorkplaceCellInfo)
-    case owner(OwnerWorkplaceCellInfo)
+    case worker(WorkplaceMonthSummary)
+    case owner(OwnerMonthlyWorkplaceSummary)
 
-    var identity: String {
+    var identity: Int {
         switch self {
         case .worker(let info):
             return info.identity

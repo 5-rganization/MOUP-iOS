@@ -127,6 +127,12 @@ final class HomeHeaderContainerView: UIView {
     }
 
     // MARK: - Public Methods
+    func update(data: HomeHeaderData) {
+        summaryTitleLabel.text = userRole == .worker ? "\(data.nowMonth)월 총 급여" : "\(data.nowMonth)월 총 인건비"
+        amountLabel.text = "\(data.totalSalary.formattedWithSeparator)원"
+        setComparisionDescriptionLabel(difference: data.prevMonthSalaryDiff)
+        setTodayRoutineCount(count: data.todayRoutineCounts)
+    }
 }
 
 private extension HomeHeaderContainerView {
@@ -255,6 +261,45 @@ private extension HomeHeaderContainerView {
             $0.centerY.equalTo(myWorkplaceSectionTitleLabel)
             $0.size.equalTo(44)
         }
+    }
+}
+
+private extension HomeHeaderContainerView {
+    func setComparisionDescriptionLabel(difference: Int) {
+        let diff = difference / 10000 // 만원 단위 표현
+        let isWorker = userRole == .worker
+        let displayCount = abs(diff)
+        switch diff {
+        case 1...:
+            comparisonDescriptionLabel.text = isWorker ? "지난 달 대비 \(displayCount)만원 더 벌었어요!" : "지난 달 대비 \(displayCount)만원 더 나갔어요!"
+        case 0:
+            comparisonDescriptionLabel.text = "지난달과 동일해요"
+        case ..<0:
+            comparisonDescriptionLabel.text = isWorker ? "지난 달 대비 \(displayCount)만원 덜 받았어요" : "지난 달 대비 \(displayCount)만원 덜 나갔어요"
+        default:
+            comparisonDescriptionLabel.text = "지난 달 급여에 대한 정보가 없어요"
+        }
+    }
+    
+    func setTodayRoutineCount(count: Int) {
+        let fullText = "오늘 루틴 총 \(count)개 있어요!"
+        let attributed = NSMutableAttributedString(
+            string: fullText,
+            attributes: [
+                .font: UIFont.bodyMedium(12),
+                .foregroundColor: UIColor.gray700
+            ]
+        )
+        
+        if let range = fullText.range(of: "\(count)") {
+            let nsRange = NSRange(range, in: fullText)
+            attributed.addAttributes([
+                .foregroundColor: UIColor.primary600,
+                .font: UIFont.headBold(12)
+            ], range: nsRange)
+        }
+        
+        todayRoutineCommentLabel.attributedText = attributed
     }
 }
 

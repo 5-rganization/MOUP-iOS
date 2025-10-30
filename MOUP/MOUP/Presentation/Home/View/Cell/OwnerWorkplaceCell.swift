@@ -39,11 +39,6 @@ class OwnerWorkplaceCell: UITableViewCell {
         $0.textColor = .gray900
     }
 
-    private let untilPaydayLabel = UILabel().then {
-        $0.font = .bodyMedium(12)
-        $0.textColor = .gray700
-    }
-
     fileprivate let menuButton = UIButton().then {
         var config = UIButton.Configuration.plain()
         config.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5)
@@ -59,7 +54,7 @@ class OwnerWorkplaceCell: UITableViewCell {
     private let workplaceOfficialChip = WorkplaceOfficialChip()
 
     // 두 번째 섹션 뷰 - 가변 급여 상세 테이블
-    private let secondSectionView = WorkersSalaryView(workSummaries: [])
+    private let secondSectionView = WorkersSalaryView()
 
     // 세 번째 섹션 뷰 - 출퇴근 버튼
     private let thirdSectionView = UIView()
@@ -106,10 +101,9 @@ class OwnerWorkplaceCell: UITableViewCell {
         case .owner(let ownerInfo):
             self.nameLabel.text = ownerInfo.workplace.name
             self.workplaceName = ownerInfo.workplace.name
-            self.untilPaydayLabel.text = "sdfdfs"
-            self.totalEarnedLabel.text = "dsfdsf"
-            self.workplaceOfficialChip.isHidden = !ownerInfo.isOfficial
-            self.secondSectionView.update(with: ownerInfo.workSummaries)
+            setTotalEarnedLabel(ownerInfo.workerSummaries)
+            self.workplaceOfficialChip.isHidden = !ownerInfo.workplace.isShared
+            self.secondSectionView.update(with: ownerInfo.workerSummaries)
             self.menuButton.menu = menu
         }
     }
@@ -133,7 +127,6 @@ private extension OwnerWorkplaceCell {
         )
         firstSectionView.addSubviews(
             nameLabel,
-            untilPaydayLabel,
             totalEarnedLabel,
             workplaceOfficialChip
         )
@@ -177,12 +170,6 @@ private extension OwnerWorkplaceCell {
             $0.height.equalTo(24)
         }
 
-        untilPaydayLabel.snp.makeConstraints {
-            $0.top.equalTo(nameLabel.snp.bottom)
-            $0.leading.equalToSuperview().inset(16)
-            $0.height.equalTo(18)
-        }
-
         menuButton.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.trailing.equalToSuperview().inset(6)
@@ -209,7 +196,7 @@ private extension OwnerWorkplaceCell {
         // 세 번째 섹션
         attendanceButton.snp.makeConstraints {
             $0.directionalVerticalEdges.equalToSuperview()
-            $0.directionalHorizontalEdges.equalToSuperview().inset(18)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(44)
         }
 
@@ -252,5 +239,29 @@ private extension OwnerWorkplaceCell {
             self.contentView.layoutIfNeeded()
             tableView.endUpdates()
         }
+    }
+}
+
+private extension OwnerWorkplaceCell {
+    func setTotalEarnedLabel(_ workers: [MonthlyWorkerSummary]) {
+        var total = 0
+        workers.forEach {
+            total += $0.grossIncome // 지불해야 하는 입장이므로 세금 포함
+        }
+        let fullText = "현재까지 \(total.formattedWithSeparator)원"
+        let attributed = NSMutableAttributedString(string: fullText, attributes: [
+            .font : UIFont.bodyMedium(14),
+            .foregroundColor : UIColor.gray900
+        ])
+        
+        if let range = fullText.range(of: "\(total.formattedWithSeparator)원") {
+            let nsRange = NSRange(range, in: fullText)
+            attributed.addAttributes([
+                .foregroundColor : UIColor.gray900,
+                .font : UIFont.headBold(16)
+            ], range: nsRange)
+        }
+        
+        totalEarnedLabel.attributedText = attributed
     }
 }

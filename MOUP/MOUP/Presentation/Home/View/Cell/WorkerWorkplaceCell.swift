@@ -107,10 +107,11 @@ class WorkerWorkplaceCell: UITableViewCell {
     func update(item: HomeSectionItem, menu: UIMenu) {
         switch item {
         case .worker(let workerInfo):
-            self.nameLabel.text = workerInfo.workplace.name
-            self.untilPaydayLabel.text = "sdfdfs"
-            self.totalEarnedLabel.text = "dsfdsf"
-            self.workplaceOfficialChip.isHidden = !workerInfo.isOfficial
+            self.nameLabel.text = workerInfo.homeWorkplace.workplace.name
+            setDaysUntilPayday(workerInfo.daysUntilPayday)
+            setTotalEarnedLabel(workerInfo.netIncome)
+            secondSectionView.update(with: workerInfo)
+            self.workplaceOfficialChip.isHidden = !workerInfo.homeWorkplace.workplace.isShared
             self.menuButton.menu = menu
         case .owner:
             break
@@ -270,4 +271,31 @@ private extension WorkerWorkplaceCell {
     }
 }
 
-
+private extension WorkerWorkplaceCell {
+    func setTotalEarnedLabel(_ netIncome: Int) {
+        let total = netIncome // 받는 입장이므로 세금 적용
+        let fullText = "현재까지 \(total.formattedWithSeparator)원"
+        let attributed = NSMutableAttributedString(string: fullText, attributes: [
+            .font : UIFont.bodyMedium(14),
+            .foregroundColor : UIColor.gray900
+        ])
+        
+        if let range = fullText.range(of: "\(total.formattedWithSeparator)원") {
+            let nsRange = NSRange(range, in: fullText)
+            attributed.addAttributes([
+                .foregroundColor : UIColor.gray900,
+                .font : UIFont.headBold(16)
+            ], range: nsRange)
+        }
+        
+        totalEarnedLabel.attributedText = attributed
+    }
+    
+    func setDaysUntilPayday(_ day: Int?) {
+        var text = ""
+        if let day {
+            text = "급여일까지 D-\(day)일"
+        }
+        self.untilPaydayLabel.text = text
+    }
+}

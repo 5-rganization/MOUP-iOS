@@ -9,16 +9,29 @@ import UIKit
 final class HomeCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     let navigationController: UINavigationController
-
+    private let homeUseCase: HomeUseCaseProtocol
+    private let homeRepository: HomeRepositoryProtocol
+    private let homeService: HomeServiceProtocol
+    
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
+        self.homeService = HomeService()
+        self.homeRepository = HomeRepository(homeService: homeService)
+        self.homeUseCase = HomeUseCase(homeRepository: homeRepository)
     }
-
+    
     func start() {
-        let homeVM = HomeViewModel()
+        guard let rawValue = UserDefaultsManager.shared.userRole,
+        let role = UserRole(rawValue: rawValue) else { return }
+        
+        let homeVM = HomeViewModel(
+            userRole: role,
+            useCase: homeUseCase
+        )
         let homeVC = HomeViewController(
             coordinator: self,
-            homeViewModel: homeVM
+            homeViewModel: homeVM,
+            userRole: role
         )
         navigationController.pushViewController(homeVC, animated: false)
     }

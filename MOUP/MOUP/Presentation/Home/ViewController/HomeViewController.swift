@@ -13,7 +13,8 @@ final class HomeViewController: UIViewController {
     // MARK: - Properties
     weak var coordinator: HomeCoordinator?
     private let homeViewModel: HomeViewModel
-    private let homeView = HomeView()
+    private let homeView: HomeView
+    private let userRole: UserRole
     private let disposeBag = DisposeBag()
     
     private lazy var dataSource = RxTableViewSectionedAnimatedDataSource<HomeTableViewFirstSection>(animationConfiguration: AnimationConfiguration(deleteAnimation: .automatic)) { dataSource, tableView, indexPath, item in
@@ -44,9 +45,11 @@ final class HomeViewController: UIViewController {
     }
     
     // MARK: - Initializer
-    init(coordinator: HomeCoordinator? = nil, homeViewModel: HomeViewModel) {
+    init(coordinator: HomeCoordinator? = nil, homeViewModel: HomeViewModel, userRole: UserRole) {
         self.coordinator = coordinator
         self.homeViewModel = homeViewModel
+        self.userRole = userRole
+        self.homeView = HomeView(userRole: userRole)
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -103,6 +106,14 @@ private extension HomeViewController {
             .disposed(by: disposeBag)
         
         homeView.setupTableView(section: output.firstSectionData, dataSource: dataSource)
+            .disposed(by: disposeBag)
+        
+        output.homeHeaderData
+            .withUnretained(self)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { owner, data in
+                owner.homeView.updateHomeHeader(headerData: data)
+            })
             .disposed(by: disposeBag)
     }
 }
