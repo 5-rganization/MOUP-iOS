@@ -60,7 +60,7 @@ final class HomeView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        setTableHeaderView()
+        
     }
     
     // MARK: - Public Methods
@@ -82,6 +82,7 @@ private extension HomeView {
         setHierarchy()
         setStyles()
         setConstraints()
+        setTableHeaderView()
     }
     
     // MARK: - setHierarchy
