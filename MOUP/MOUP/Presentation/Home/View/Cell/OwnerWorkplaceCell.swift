@@ -196,7 +196,7 @@ private extension OwnerWorkplaceCell {
         // 세 번째 섹션
         attendanceButton.snp.makeConstraints {
             $0.directionalVerticalEdges.equalToSuperview()
-            $0.directionalHorizontalEdges.equalToSuperview().inset(18)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(44)
         }
 
@@ -248,13 +248,13 @@ private extension OwnerWorkplaceCell {
         workers.forEach {
             total += $0.grossIncome // 지불해야 하는 입장이므로 세금 포함
         }
-        let fullText = "현재까지 \(total)원"
+        let fullText = "현재까지 \(total.formattedWithSeparator)원"
         let attributed = NSMutableAttributedString(string: fullText, attributes: [
             .font : UIFont.bodyMedium(14),
             .foregroundColor : UIColor.gray900
         ])
         
-        if let range = fullText.range(of: "\(total)원") {
+        if let range = fullText.range(of: "\(total.formattedWithSeparator)원") {
             let nsRange = NSRange(range, in: fullText)
             attributed.addAttributes([
                 .foregroundColor : UIColor.gray900,

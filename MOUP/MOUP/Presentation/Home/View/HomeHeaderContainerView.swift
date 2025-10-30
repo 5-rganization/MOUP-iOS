@@ -129,7 +129,7 @@ final class HomeHeaderContainerView: UIView {
     // MARK: - Public Methods
     func update(data: HomeHeaderData) {
         summaryTitleLabel.text = userRole == .worker ? "\(data.nowMonth)월 총 급여" : "\(data.nowMonth)월 총 인건비"
-        amountLabel.text = "\(data.totalSalary)원"
+        amountLabel.text = "\(data.totalSalary.formattedWithSeparator)원"
         setComparisionDescriptionLabel(difference: data.prevMonthSalaryDiff)
         setTodayRoutineCount(count: data.todayRoutineCounts)
     }
