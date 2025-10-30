@@ -14,8 +14,8 @@ final class WorkRepository: WorkRepositoryProtocol {
         try await workService.createMyWork(workplaceId: workplaceId, requestDTO: requestDTO).workIdList
     }
     
-    func createWorkerWork(workplaceId: Int, workerId: Int, requestDTO: WorkerWorkCreateRequestDTO) async throws -> [Int] {
-        try await workService.createWorkerWork(workplaceId: workplaceId, workerId: workerId, requestDTO: requestDTO).workIdList
+    func createWorkersWork(workplaceId: Int, requestDTO: WorkersWorkCreateRequestDTO) async throws -> [FailedWorkerInfo]{
+        try await workService.createWorkersWork(workplaceId: workplaceId, requestDTO: requestDTO).failedWorkerInfoList.map { $0.toDomain() }
     }
     
     func fetchWorkDetail(workId: Int) async throws -> WorkData {

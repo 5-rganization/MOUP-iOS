@@ -12,7 +12,7 @@ import Alamofire
 /// 근무 관련 엔드포인트 라우터
 ///
 /// - `createMyWork` (POST /workplaces/{id}/workers/me/works): 근무지(매장)에 사용자 근무 생성
-/// - `createWorkerWork` (POST /workplaces/{id}/workers/{id}/works): 근무자에게 근무 생성 (사장님 전용)
+/// - `createWorkersWork` (POST /workplaces/{id}/works/batch): 근무자들에게 근무 생성 (사장님 전용)
 ///
 /// - `fetchWorkDetail` (GET /works/{id}?view=detail): 근무 상세 조회
 /// - `fetchWorkSummary` (GET /works/{id}?view=summary): 근무 요약 조회
@@ -34,7 +34,7 @@ import Alamofire
 ///
 enum WorkRouter {
     case createMyWork(workplaceId: Int, dto: MyWorkCreateRequestDTO)
-    case createWorkerWork(workplaceId: Int, workerId: Int, dto: WorkerWorkCreateRequestDTO)
+    case createWorkersWork(workplaceId: Int, dto: WorkersWorkCreateRequestDTO)
     
     case fetchWork(workId: Int, viewQueryType: ViewQuery)
     case fetchAllMyWorkList(baseYearMonth: String)
@@ -63,8 +63,8 @@ extension WorkRouter: URLRequestConvertible {
         switch self {
         case .createMyWork(let workplaceId, _):
             return "/workplaces/\(workplaceId)/workers/me/works"
-        case .createWorkerWork(let workplaceId, let workerId, _):
-            return "/workplaces/\(workplaceId)/workers/\(workerId)/works"
+        case .createWorkersWork(let workplaceId, _):
+            return "/workplaces/\(workplaceId)/works/batch"
             
         case .fetchWork(let workId, _):
             return "/works/\(workId)"
@@ -94,7 +94,7 @@ extension WorkRouter: URLRequestConvertible {
     
     var method: HTTPMethod {
         switch self {
-        case .createMyWork, .createWorkerWork, .startWork:
+        case .createMyWork, .createWorkersWork, .startWork:
             return .post
         case .fetchWork, .fetchAllMyWorkList, .fetchWorkplaceMyWorkList, .fetchWorkplaceAllWorkList:
             return .get
@@ -109,7 +109,7 @@ extension WorkRouter: URLRequestConvertible {
         switch self {
         case .createMyWork(_, let dto):
             return dto
-        case .createWorkerWork(_, _, let dto):
+        case .createWorkersWork(_, let dto):
             return dto
             
         case .updateMyWork(_, let dto):

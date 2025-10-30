@@ -12,7 +12,7 @@ import Then
 
 protocol WorkServiceProtocol {
     func createMyWork(workplaceId: Int, requestDTO: MyWorkCreateRequestDTO) async throws -> WorkCreateResponseDTO
-    func createWorkerWork(workplaceId: Int, workerId: Int, requestDTO: WorkerWorkCreateRequestDTO) async throws -> WorkCreateResponseDTO
+    func createWorkersWork(workplaceId: Int, requestDTO: WorkersWorkCreateRequestDTO) async throws -> WorkersWorkCreateResponseDTO
     
     func fetchWorkDetail(workId: Int) async throws -> WorkDetailResponseDTO
     func fetchWorkSummary(workId: Int) async throws -> WorkSummaryResponseDTO
@@ -52,15 +52,15 @@ final class WorkService: WorkServiceProtocol {
         }
     }
     
-    func createWorkerWork(workplaceId: Int, workerId: Int, requestDTO: WorkerWorkCreateRequestDTO) async throws -> WorkCreateResponseDTO {
-        let request = AF.request(WorkRouter.createWorkerWork(workplaceId: workplaceId, workerId: workerId, dto: requestDTO))
-        let response = await request.serializingDecodable(WorkCreateResponseDTO.self).response
+    func createWorkersWork(workplaceId: Int, requestDTO: WorkersWorkCreateRequestDTO) async throws -> WorkersWorkCreateResponseDTO {
+        let request = AF.request(WorkRouter.createWorkersWork(workplaceId: workplaceId, dto: requestDTO))
+        let response = await request.serializingDecodable(WorkersWorkCreateResponseDTO.self).response
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
         
         switch statusCode {
-        case 201:
+        case 200, 201:
             guard let dto = response.value else { throw NetworkError.noResponse }
             return dto
         default:
@@ -156,7 +156,7 @@ final class WorkService: WorkServiceProtocol {
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
         
         switch statusCode {
-        case 201:
+        case 200:
             guard let dto = response.value else { throw NetworkError.noResponse }
             return dto
         case 204:
@@ -174,7 +174,7 @@ final class WorkService: WorkServiceProtocol {
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
         
         switch statusCode {
-        case 201:
+        case 200:
             guard let dto = response.value else { throw NetworkError.noResponse }
             return dto
         case 204:

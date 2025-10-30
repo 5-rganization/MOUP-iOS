@@ -14,8 +14,8 @@ final class WorkUseCase: WorkUseCaseProtocol {
         try await workRepository.createMyWork(workplaceId: workplaceId, requestDTO: requestDTO)
     }
     
-    func createWorkerWork(workplaceId: Int, workerId: Int, requestDTO: WorkerWorkCreateRequestDTO) async throws -> [Int] {
-        try await workRepository.createWorkerWork(workplaceId: workplaceId, workerId: workerId, requestDTO: requestDTO)
+    func createWorkersWork(workplaceId: Int, requestDTO: WorkersWorkCreateRequestDTO) async throws -> [FailedWorkerInfo] {
+        try await workRepository.createWorkersWork(workplaceId: workplaceId, requestDTO: requestDTO)
     }
     
     func fetchMyWorkDetail(workId: Int) async throws -> MyWorkData {

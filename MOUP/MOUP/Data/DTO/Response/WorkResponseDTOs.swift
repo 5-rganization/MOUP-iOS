@@ -12,6 +12,25 @@ struct WorkCreateResponseDTO: Decodable {
     let workIdList: [Int]
 }
 
+/// 근무자들에 대한 근무 생성 응답 DTO
+struct WorkersWorkCreateResponseDTO: Decodable {
+    let successWorkIdList: [Int]
+    let failedWorkerInfoList: [FailedWorkerInfoDTO]
+}
+
+/// 근무 생성에 실패한 근무자 정보 DTO
+struct FailedWorkerInfoDTO: Decodable {
+    let workerId: Int
+    let nickname: String
+    let reason: String
+}
+
+extension FailedWorkerInfoDTO {
+    func toDomain() -> FailedWorkerInfo {
+        FailedWorkerInfo(nickname: nickname, reason: reason)
+    }
+}
+
 /// 근무 상세 정보 응답 DTO
 struct WorkDetailResponseDTO: Decodable {
     let workId: Int
