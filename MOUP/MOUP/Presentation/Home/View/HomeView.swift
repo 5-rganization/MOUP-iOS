@@ -132,7 +132,6 @@ private extension HomeView {
         // TODO: - 테이블뷰 셀 상단 영역 8을 그림자를 위해 남겨놨으니 설정 필요
         guard let rawValue = UserDefaultsManager.shared.userRole,
         let role = UserRole(rawValue: rawValue) else { return }
-        self.tableHeaderView = HomeHeaderContainerView(userRole: role)
         tableHeaderView.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 332)
         tableView.tableHeaderView = tableHeaderView
     }
