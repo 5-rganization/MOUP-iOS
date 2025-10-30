@@ -8,6 +8,7 @@
 import OSLog
 
 import Alamofire
+import Then
 
 protocol WorkServiceProtocol {
     func createMyWork(workplaceId: Int, requestDTO: MyWorkCreateRequestDTO) async throws -> WorkCreateResponseDTO
@@ -33,6 +34,7 @@ final class WorkService: WorkServiceProtocol {
     private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     
     private let session = NetworkManager.shared.session
+    private let isoDecoder = JSONDecoder().then { $0.dateDecodingStrategy = .iso8601 }
     
     func createMyWork(workplaceId: Int, requestDTO: MyWorkCreateRequestDTO) async throws -> WorkCreateResponseDTO {
         let request = AF.request(WorkRouter.createMyWork(workplaceId: workplaceId, dto: requestDTO))
@@ -68,7 +70,7 @@ final class WorkService: WorkServiceProtocol {
     
     func fetchWorkDetail(workId: Int) async throws -> WorkDetailResponseDTO {
         let request = AF.request(WorkRouter.fetchWork(workId: workId, viewQueryType: .detail))
-        let response = await request.serializingDecodable(WorkDetailResponseDTO.self).response
+        let response = await request.serializingDecodable(WorkDetailResponseDTO.self, decoder: isoDecoder).response
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -84,7 +86,7 @@ final class WorkService: WorkServiceProtocol {
     
     func fetchWorkSummary(workId: Int) async throws -> WorkSummaryResponseDTO {
         let request = AF.request(WorkRouter.fetchWork(workId: workId, viewQueryType: .summary))
-        let response = await request.serializingDecodable(WorkSummaryResponseDTO.self).response
+        let response = await request.serializingDecodable(WorkSummaryResponseDTO.self, decoder: isoDecoder).response
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -100,7 +102,7 @@ final class WorkService: WorkServiceProtocol {
     
     func fetchAllMyWorkList(baseYearMonth: String) async throws -> WorkCalendarListResponseDTO {
         let request = AF.request(WorkRouter.fetchAllMyWorkList(baseYearMonth: baseYearMonth))
-        let response = await request.serializingDecodable(WorkCalendarListResponseDTO.self).response
+        let response = await request.serializingDecodable(WorkCalendarListResponseDTO.self, decoder: isoDecoder).response
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -116,7 +118,7 @@ final class WorkService: WorkServiceProtocol {
     
     func fetchWorkplaceMyWorkList(workplaceId: Int, baseYearMonth: String) async throws -> WorkCalendarListResponseDTO {
         let request = AF.request(WorkRouter.fetchWorkplaceMyWorkList(workplaceId: workplaceId, baseYearMonth: baseYearMonth))
-        let response = await request.serializingDecodable(WorkCalendarListResponseDTO.self).response
+        let response = await request.serializingDecodable(WorkCalendarListResponseDTO.self, decoder: isoDecoder).response
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -132,7 +134,7 @@ final class WorkService: WorkServiceProtocol {
     
     func fetchWorkplaceAllWorkList(workplaceId: Int, baseYearMonth: String) async throws -> WorkCalendarListResponseDTO {
         let request = AF.request(WorkRouter.fetchWorkplaceAllWorkList(workplaceId: workplaceId, baseYearMonth: baseYearMonth))
-        let response = await request.serializingDecodable(WorkCalendarListResponseDTO.self).response
+        let response = await request.serializingDecodable(WorkCalendarListResponseDTO.self, decoder: isoDecoder).response
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
