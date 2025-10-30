@@ -69,6 +69,10 @@ final class PayContainerViewModel: PayContainerViewModelInput, PayContainerViewM
         self.salaryTypeTitleOutput = selectPayCalculationViewModel.confirmedPayCalculation
             .asDriver(onErrorJustReturn: "")
         self.salaryOutput = inputSalaryTypeViewModel.confirmedSalary
+            .map { value in
+                // "10,030원" → "10030"
+                value.replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression)
+            }
             .asDriver(onErrorJustReturn: "")
         self.payDayOutput = payDayPickerViewModel.confirmSelectedDay
             .map { "\($0)일" }

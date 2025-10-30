@@ -50,6 +50,10 @@ final class InviteCodeInputViewModel {
                             errorTitle = "이미 등록된 근무지입니다." // TODO: - 에러 별 title, message 재확인 필요
                         case .invalidRole:
                             errorTitle = "유효하지 않은 접근입니다."
+                        case .invalidField:
+                            errorTitle = "입력값이 올바르지 않습니다."
+                        case .serverError:
+                            errorTitle = "서버 오류가 발생했습니다."
                         }
                         errorMessage = error.localizedDescription.description
                         owner.errorMessageRelay.accept((errorTitle, errorMessage))

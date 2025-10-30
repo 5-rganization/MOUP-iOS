@@ -114,10 +114,16 @@ private extension WorkplaceRegisterViewController {
 
         viewModel.didCompleteRegister
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { data in
-                print("등록된 근무지 데이터: \(data)")
-                // TODO: 등록 완료 후 화면 종료나 다음 화면 이동 처리
+            .subscribe(onNext: { workplaceId in
+                print("근무지 등록 성공 - workplaceId: \(workplaceId)")
+            }, onError: { error in
+                if let workplaceError = error as? WorkplaceError {
+                    print("근무지 등록 실패 - \(workplaceError.debugDescription ?? "알 수 없는 에러")")
+                } else {
+                    print("근무지 등록 실패 - 네트워크 오류 또는 알 수 없는 오류: \(error.localizedDescription)")
+                }
             })
             .disposed(by: disposeBag)
+
     }
 }
