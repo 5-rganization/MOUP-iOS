@@ -31,6 +31,7 @@ extension WorkError {
         case .invalidVariableOrParameter: "works - 400, 유효하지 않은 경로/매개변수 (상세 내용은 응답 메세지 참고)"
         case .invalidPermission: "works - 403, 권한이 없는 접근"
         case .notFound: "works - 404, 요청한 정보를 찾을 수 없음 (상세 내용은 응답 메세지 참고)"
+        case .alreadyStarted: "works - 409, 근무자가 이미 근무중인 상태"
         case .invalidFieldValue: "works - 422, 유효하지 않은 필드값 (상세 내용은 응답 메세지 참고)"
         }
     }

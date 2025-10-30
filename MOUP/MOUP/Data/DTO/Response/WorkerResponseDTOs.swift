@@ -13,3 +13,13 @@ struct WorkerSummaryResponseDTO: Decodable {
     let nickname: String
     let profileImg: String?
 }
+
+extension WorkerSummaryResponseDTO {
+    func toDomain() -> WorkerSummary {
+        WorkerSummary(id: workerId,
+                      workerBasedLabelColorStr: workerBasedLabelColor,
+                      ownerBasedLabelColorStr: ownerBasedLabelColor,
+                      nickname: nickname,
+                      profileImg: profileImg)
+    }
+}
