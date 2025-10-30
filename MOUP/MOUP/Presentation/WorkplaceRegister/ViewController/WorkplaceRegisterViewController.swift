@@ -116,6 +116,8 @@ private extension WorkplaceRegisterViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { workplaceId in
                 print("근무지 등록 성공 - workplaceId: \(workplaceId)")
+                
+                self.navigationController?.popViewController(animated: true)
             }, onError: { error in
                 if let workplaceError = error as? WorkplaceError {
                     print("근무지 등록 실패 - \(workplaceError.debugDescription ?? "알 수 없는 에러")")
