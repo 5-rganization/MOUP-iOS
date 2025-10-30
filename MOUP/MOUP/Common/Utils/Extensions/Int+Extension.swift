@@ -14,4 +14,10 @@ extension Int {
         let minutes = self % 60
         return "\(hours)시간 \(minutes)분"
     }
+    
+    var formattedWithSeparator: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.string(from: NSNumber(value: self)) ?? "\(self)"
+    }
 }
