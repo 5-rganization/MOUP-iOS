@@ -19,9 +19,6 @@ final class UserService: UserServiceProtocol {
         let request = session.request(UserRouter.fetchProfile)
         let response = await request.serializingDecodable(UserProfileResponseDTO.self).response
         
-//        print(response.value)
-//        print("statusCode: \(response.response?.statusCode)")
-        
         guard let statusCode = response.response?.statusCode else  {
             throw NetworkError.noResponse
         }

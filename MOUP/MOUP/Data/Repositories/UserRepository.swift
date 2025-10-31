@@ -30,7 +30,7 @@ final class UserRepository: UserRepositoryProtocol {
             userId: dto.userId,
             username: dto.username,
             nickname: dto.nickname,
-            profileImageURL: dto.profileImg.isEmpty ? nil : dto.profileImg,
+            profileImageURL: dto.profileImg,
             role: role,
             createdAt: createdDate
         )

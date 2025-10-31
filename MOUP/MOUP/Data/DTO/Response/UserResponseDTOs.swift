@@ -11,7 +11,7 @@ struct UserProfileResponseDTO: Decodable {
     let userId: Int
     let username: String
     let nickname: String
-    let profileImg: String
+    let profileImg: String?
     let role: String
     let createdAt: String
 }
