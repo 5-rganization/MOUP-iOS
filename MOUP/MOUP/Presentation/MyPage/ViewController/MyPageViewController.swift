@@ -19,6 +19,8 @@ final class MyPageViewController: UIViewController {
     private let viewModel: MyPageViewModel
     private let disposeBag = DisposeBag()
     
+    private let viewDidLoadSubject = PublishSubject<Void>()
+    
     // MARK: - Lifecycle
     
     override func loadView() {
@@ -29,6 +31,7 @@ final class MyPageViewController: UIViewController {
         super.viewDidLoad()
         
         configure()
+        viewDidLoadSubject.onNext(())
     }
     
     // MARK: - Initializer
@@ -90,13 +93,23 @@ private extension MyPageViewController {
             }
             .share()
         
-        let input = MyPageViewModel.Input(logoutConfirmed: logoutConfirmed)
+        let input = MyPageViewModel.Input(
+            viewDidLoad: viewDidLoadSubject.asObservable(),
+            logoutConfirmed: logoutConfirmed
+        )
         let output = viewModel.transform(input)
+        
+        output.profile
+            .compactMap { $0 }
+            .drive(with: self) { owner, profile in
+                owner.mypageView.updateProfile(profile)
+            }
+            .disposed(by: disposeBag)
         
         output.isLoading
             .skip(1)
             .drive(with: self) { _, isLoading in
-                print(isLoading ? "로그아웃 중입니다." : "로그아웃 완료")
+                print(isLoading ? "로딩 중입니다." : "로딩 완료")
             }
             .disposed(by: disposeBag)
         

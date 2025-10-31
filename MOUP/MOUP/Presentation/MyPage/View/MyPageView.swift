@@ -107,6 +107,11 @@ final class MyPageView: UIView {
     
     // MARK: - Public Methods
     
+    func updateProfile(_ profile: UserProfile) {
+        nicknameLabel.text = profile.nickname
+        roleLabel.text = profile.role == .worker ? "알바생" : "사장님"
+    }
+    
     func updateNickname(_ nickname: String) {
         nicknameLabel.text = nickname
     }

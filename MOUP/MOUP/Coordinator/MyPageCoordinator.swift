@@ -11,11 +11,22 @@ final class MyPageCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     let navigationController: UINavigationController
     
-    private lazy var viewModel = MyPageViewModel()
-    private lazy var myPageVC = MyPageViewController(viewModel: viewModel)
+    private let userService: UserServiceProtocol
+    private let userRepository: UserRepositoryProtocol
+    private let userUseCase: UserUseCaseProtocol
+    
+    private lazy var myPageVC: MyPageViewController = {
+        let viewModel = MyPageViewModel(userUseCase: userUseCase)
+        let vc = MyPageViewController(viewModel: viewModel)
+        return vc
+    }()
 
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
+        
+        self.userService = UserService()
+        self.userRepository = UserRepository(userService: userService)
+        self.userUseCase = UserUseCase(userRepository: userRepository)
     }
 
     func start() {
