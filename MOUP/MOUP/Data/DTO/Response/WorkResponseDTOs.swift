@@ -56,7 +56,7 @@ extension WorkDetailResponseDTO {
         WorkData(id: workId,
                  workplaceSummary: WorkplaceSummary(id: workplaceSummaryInfo.workplaceId, name: workplaceSummaryInfo.workplaceName, isShared: workplaceSummaryInfo.isShared),
                  workerSummary: workerSummaryInfo.toDomain(),
-                 routineSummaryList: routineSummaryInfoList.map { $0.toDomain() },
+                 routineSummaryList: routineSummaryInfoList.map { RoutineSummary(routineId: $0.routineId, routineName: $0.routineName, alarmTime: $0.alarmTime) },
                  workDate: workDate,
                  startTime: startTime,
                  actualStartTime: actualStartTime,
