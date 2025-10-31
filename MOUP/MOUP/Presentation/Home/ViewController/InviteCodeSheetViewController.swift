@@ -13,6 +13,7 @@ final class InviteCodeSheetViewController: UIViewController {
     private let inviteCodeSheetView = InviteCodeSheetView()
     private let viewModel: InviteCodeSheetViewModel
     private let disposeBag = DisposeBag()
+    private let workplaceId: Int
     
     // MARK: - loadView
     override func loadView() {
@@ -20,8 +21,9 @@ final class InviteCodeSheetViewController: UIViewController {
     }
     
     // MARK: - Initializer
-    init(viewModel: InviteCodeSheetViewModel) {
+    init(viewModel: InviteCodeSheetViewModel, workplaceId: Int) {
         self.viewModel = viewModel
+        self.workplaceId = workplaceId
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -45,8 +47,15 @@ private extension InviteCodeSheetViewController {
     }
     
     func setBindings() {
-        let input = InviteCodeSheetViewModel.Input()
+        let input = InviteCodeSheetViewModel.Input(workplaceId: .just(workplaceId))
         let output = viewModel.transform(input: input)
+        
+        output.inviteCode
+            .withUnretained(self)
+            .subscribe(onNext: { owner, code in
+                owner.inviteCodeSheetView.update(with: code)
+            })
+            .disposed(by: disposeBag)
         
         inviteCodeSheetView.rx.copyBtnTapped
             .withLatestFrom(output.inviteCode)
