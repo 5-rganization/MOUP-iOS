@@ -10,23 +10,31 @@ import OSLog
 import Alamofire
 
 /// 근무 관련 엔드포인트 라우터
-/// - `createMyWork`: 근무지(매장)에 사용자 근무 생성
-/// - `createWorkerWork`: 근무자에게 근무 생성 (사장님 전용)
-/// - `fetchWork`: 근무 조회
-/// - `fetchAllMyWorkList`: 사용자의 모든 근무 범위 조회
-/// - `fetchWorkplaceMyWorkList`: 특정 근무지(매장)에서 사용자 근무 범위 조회
+///
+/// - `createMyWork` (POST /workplaces/{id}/workers/me/works): 근무지(매장)에 사용자 근무 생성
+/// - `createWorkersWork` (POST /workplaces/{id}/works/batch): 근무자들에게 근무 생성 (사장님 전용)
+///
+/// - `fetchWorkDetail` (GET /works/{id}?view=detail): 근무 상세 조회
+/// - `fetchWorkSummary` (GET /works/{id}?view=summary): 근무 요약 조회
+/// - `fetchAllMyWorkList` (GET /works): 사용자의 모든 근무 범위 조회
 ///   - `baseYearMonth` 형식: `yyyy-MM`
-/// - `fetchWorkplaceAllWorkList`: 특정 근무지(매장)의 모든 근무 범위 조회
+/// - `fetchWorkplaceMyWorkList` (GET /workplaces/{id}/workers/me/works): 특정 근무지(매장)에서 사용자 근무 범위 조회
 ///   - `baseYearMonth` 형식: `yyyy-MM`
-/// - `updateMyWork`: 사용자 근무 업데이트
-/// - `updateWorkerWork`: 근무자 근무 업데이트 (사장님 전용)
-/// - `deleteWork`: 근무 삭제
-/// - `deleteRecurringWork`: 반복 근무 삭제
-/// - `startWork`: 근무 출근 (알바생 전용)
-/// - `endWork`: 근무 퇴근 (알바생 전용)
+/// - `fetchWorkplaceAllWorkList` (GET /workplaces/{id}/works): 특정 근무지(매장)의 모든 근무 범위 조회
+///   - `baseYearMonth` 형식: `yyyy-MM`
+///
+/// - `updateMyWork` (PATCH /works/{id}): 사용자 근무 업데이트
+/// - `updateWorkerWork` (PATCH /workplaces/{id}/workers/{id}/works/{id}): 근무자 근무 업데이트 (사장님 전용)
+///
+/// - `deleteWork` (DELETE /works/{id}): 근무 삭제
+/// - `deleteRecurringWork` (DELETE /works/recurring/{id}): 반복 근무 삭제
+///
+/// - `startWork` (POST /workplaces/{id}/workers/me/works/start): 근무 출근 (알바생 전용)
+/// - `endWork` (PATCH /workplaces/{id}/workers/me/works/end): 근무 퇴근 (알바생 전용)
+///
 enum WorkRouter {
     case createMyWork(workplaceId: Int, dto: MyWorkCreateRequestDTO)
-    case createWorkerWork(workplaceId: Int, workerId: Int, dto: WorkerWorkCreateRequestDTO)
+    case createWorkersWork(workplaceId: Int, dto: WorkersWorkCreateRequestDTO)
     
     case fetchWork(workId: Int, viewQueryType: ViewQuery)
     case fetchAllMyWorkList(baseYearMonth: String)
@@ -55,8 +63,8 @@ extension WorkRouter: URLRequestConvertible {
         switch self {
         case .createMyWork(let workplaceId, _):
             return "/workplaces/\(workplaceId)/workers/me/works"
-        case .createWorkerWork(let workplaceId, let workerId, _):
-            return "/workplaces/\(workplaceId)/workers/\(workerId)/works"
+        case .createWorkersWork(let workplaceId, _):
+            return "/workplaces/\(workplaceId)/works/batch"
             
         case .fetchWork(let workId, _):
             return "/works/\(workId)"
@@ -86,7 +94,7 @@ extension WorkRouter: URLRequestConvertible {
     
     var method: HTTPMethod {
         switch self {
-        case .createMyWork, .createWorkerWork, .startWork:
+        case .createMyWork, .createWorkersWork, .startWork:
             return .post
         case .fetchWork, .fetchAllMyWorkList, .fetchWorkplaceMyWorkList, .fetchWorkplaceAllWorkList:
             return .get
@@ -101,7 +109,7 @@ extension WorkRouter: URLRequestConvertible {
         switch self {
         case .createMyWork(_, let dto):
             return dto
-        case .createWorkerWork(_, _, let dto):
+        case .createWorkersWork(_, let dto):
             return dto
             
         case .updateMyWork(_, let dto):

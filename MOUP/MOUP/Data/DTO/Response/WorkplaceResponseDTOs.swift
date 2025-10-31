@@ -22,3 +22,9 @@ struct WorkplaceSummaryResponseDTO: Decodable {
     let workplaceName: String
     let isShared: Bool
 }
+
+extension WorkplaceSummaryResponseDTO {
+    func toDomain() -> WorkplaceSummary {
+        WorkplaceSummary(id: workplaceId, name: workplaceName, isShared: isShared)
+    }
+}
