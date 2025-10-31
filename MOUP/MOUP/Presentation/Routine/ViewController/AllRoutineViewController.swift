@@ -64,6 +64,15 @@ private extension AllRoutineViewController {
         allRoutineView.setupTableView(section: output.allRoutines, dataSource: dataSources)
             .disposed(by: disposeBag)
         
+        output.errorMessage
+            .withUnretained(self)
+            .subscribe(onNext: { owner, error in
+                owner.presentNoticeModal(title: error.title, comment: error.message) {
+                    owner.navigationController?.popViewController(animated: true)
+                }
+            })
+            .disposed(by: disposeBag)
+        
         Observable.zip(
             allRoutineView.rx.itemSelected,
             allRoutineView.rx.modelSeleted

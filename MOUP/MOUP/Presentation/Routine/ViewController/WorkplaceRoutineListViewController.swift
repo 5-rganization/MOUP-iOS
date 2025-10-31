@@ -14,7 +14,7 @@ class WorkplaceRoutineListViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel: WorkplaceRoutineListViewModel
     private let workplaceRoutineListView: WorkplaceRoutineListView
-    private let routines: [Routine]
+    private let workId: Int
     private let dataSource = RxTableViewSectionedReloadDataSource<RoutineItem>(
         configureCell: { dataSource, tableView, indexPath, item in
             guard let cell = tableView.dequeueReusableCell(withIdentifier: RoutineListCell.identifier, for: indexPath) as? RoutineListCell else {
@@ -31,10 +31,10 @@ class WorkplaceRoutineListViewController: UIViewController {
     }
     
     // MARK: - Initializer
-    init(viewModel: WorkplaceRoutineListViewModel, workplaceName: String, routines: [Routine]) {
+    init(viewModel: WorkplaceRoutineListViewModel, workplaceName: String, workId: Int) {
         self.viewModel = viewModel
         self.workplaceRoutineListView = WorkplaceRoutineListView(workplaceName: workplaceName)
-        self.routines = routines
+        self.workId = workId
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -58,13 +58,22 @@ private extension WorkplaceRoutineListViewController {
     }
     
     func setBindings() {
-        let input = WorkplaceRoutineListViewModel.Input(routines: Observable.just(routines))
+        let input = WorkplaceRoutineListViewModel.Input(workId: Observable.just(workId))
         let output = viewModel.transform(input: input)
         
         workplaceRoutineListView.setupTableView(
             section: output.routineItem,
             dataSource: dataSource
         )
+            .disposed(by: disposeBag)
+        
+        output.errorMessage
+            .withUnretained(self)
+            .subscribe(onNext: { owner, error in
+                owner.presentNoticeModal(title: error.title, comment: error.message) {
+                    owner.navigationController?.popViewController(animated: true)
+                }
+            })
             .disposed(by: disposeBag)
         
         workplaceRoutineListView.rx.navBackBtnTapped

@@ -13,9 +13,9 @@ struct RoutineItem {
 }
 
 extension RoutineItem: SectionModelType {
-    typealias Item = Routine
+    typealias Item = RoutineSummary
     
-    init(original: RoutineItem, items: [Routine]) {
+    init(original: RoutineItem, items: [RoutineSummary]) {
         self = original
         self.items = items
     }

@@ -12,12 +12,18 @@ final class HomeCoordinator: Coordinator {
     private let homeUseCase: HomeUseCaseProtocol
     private let homeRepository: HomeRepositoryProtocol
     private let homeService: HomeServiceProtocol
+    private let routineUseCase: RoutineUseCaseProtocol
+    private let routineRepository: RoutineRepositoryProtocol
+    private let routineService: RoutineServiceProtocol
     
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
         self.homeService = HomeService()
         self.homeRepository = HomeRepository(homeService: homeService)
         self.homeUseCase = HomeUseCase(homeRepository: homeRepository)
+        self.routineService = RoutineService()
+        self.routineRepository = RoutineRepository(routineService: routineService)
+        self.routineUseCase = RoutineUseCase(routineRepository: routineRepository)
     }
     
     func start() {
@@ -44,24 +50,24 @@ final class HomeCoordinator: Coordinator {
     }
     
     func moveToAllRoutine() {
-        let viewModel = AllRoutineViewModel()
+        let viewModel = AllRoutineViewModel(routineUseCase: routineUseCase)
         let vc = AllRoutineViewController(viewModel: viewModel)
         navigationController.pushViewController(vc, animated: true)
     }
     
     func moveToTodayRoutine() {
-        let viewModel = TodayRoutineViewModel()
+        let viewModel = TodayRoutineViewModel(routineUseCase: routineUseCase)
         let vc = TodayRoutineViewController(viewModel: viewModel)
         vc.coordinator = self
         navigationController.pushViewController(vc, animated: true)
     }
     
     func moveToWorkplaceRoutineList(with todayRoutine: TodayRoutine) {
-        let viewModel = WorkplaceRoutineListViewModel()
+        let viewModel = WorkplaceRoutineListViewModel(routineUseCase: routineUseCase)
         let vc = WorkplaceRoutineListViewController(
             viewModel: viewModel,
-            workplaceName: todayRoutine.workplaceName,
-            routines: todayRoutine.routines
+            workplaceName: todayRoutine.workplaceSummary.name,
+            workId: todayRoutine.workId
         )
         navigationController.pushViewController(vc, animated: true)
     }

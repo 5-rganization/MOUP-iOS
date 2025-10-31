@@ -15,6 +15,7 @@ import Then
 final class HomeView: UIView {
     // MARK: - Properties
     private let userRole: UserRole
+    private var didConfigureTableHeaderView = false
     
     // MARK: - UI Components
     private let topBar = UIView()
@@ -60,7 +61,11 @@ final class HomeView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        
+        // viewDidLoad, init에서 호출 시 제약조건 충돌 발생으로 인해 플래그 사용
+        if !didConfigureTableHeaderView && bounds.width > 0 {
+            setTableHeaderView()
+            didConfigureTableHeaderView = true
+        }
     }
     
     // MARK: - Public Methods
@@ -82,7 +87,6 @@ private extension HomeView {
         setHierarchy()
         setStyles()
         setConstraints()
-        setTableHeaderView()
     }
     
     // MARK: - setHierarchy
@@ -128,7 +132,6 @@ private extension HomeView {
         // TODO: - 테이블뷰 셀 상단 영역 8을 그림자를 위해 남겨놨으니 설정 필요
         guard let rawValue = UserDefaultsManager.shared.userRole,
         let role = UserRole(rawValue: rawValue) else { return }
-        self.tableHeaderView = HomeHeaderContainerView(userRole: role)
         tableHeaderView.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 332)
         tableView.tableHeaderView = tableHeaderView
     }

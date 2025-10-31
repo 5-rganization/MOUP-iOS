@@ -48,9 +48,9 @@ class TodayRoutineCell: UITableViewCell {
     }
     
     // MARK: - Public Methods
-    func update(with routines: TodayRoutine) {
-        workplaceNameLabel.text = routines.workplaceName
-        routineCountLabel.text = "+ \(routines.routines.count)"
+    func update(with routine: TodayRoutine) {
+        workplaceNameLabel.text = routine.workplaceSummary.name
+        routineCountLabel.text = "+ \(routine.routineCount)"
     }
 }
 

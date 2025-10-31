@@ -66,6 +66,20 @@ private extension TodayRoutineViewController {
         )
         .disposed(by: disposeBag)
         
+        output.errorMessage
+            .withUnretained(self)
+            .subscribe(
+                onNext: {
+                    owner,
+                    error in
+                    owner.presentNoticeModal(
+                        title: error.title,
+                        comment: error.message) {
+                            owner.navigationController?.popViewController(animated: true)
+                        }
+            })
+            .disposed(by: disposeBag)
+        
         Observable.zip(
             todayRoutineView.rx.itemSelected,
             todayRoutineView.rx.modelSelected

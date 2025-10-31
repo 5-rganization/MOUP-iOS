@@ -8,6 +8,10 @@
 import Foundation
 
 struct TodayRoutine {
-    let workplaceName: String
-    let routines: [Routine]
+    let workId: Int
+    let workplaceSummary: WorkplaceSummary
+    let startTime: String
+    let endTime: String
+    let workMinutes: Int
+    let routineCount: Int
 }

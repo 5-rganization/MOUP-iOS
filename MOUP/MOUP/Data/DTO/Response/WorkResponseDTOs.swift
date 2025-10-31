@@ -36,7 +36,7 @@ struct WorkDetailResponseDTO: Decodable {
     let workId: Int
     let workerSummaryInfo: WorkerSummaryResponseDTO
     let workplaceSummaryInfo: WorkplaceSummaryResponseDTO
-    let routineSummaryInfoList: [RoutineSummaryResponseDTO]
+    let routineSummaryInfoList: [RoutineSummaryDTO]
     let workDate: String
     let startTime: Date
     let actualStartTime: Date?

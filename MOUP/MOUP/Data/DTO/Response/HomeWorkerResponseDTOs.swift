@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct HomeWorkerResponseDTO: Codable {
+struct HomeWorkerResponseDTO: Decodable {
     let nowMonth: Int
     let totalSalary: Int
     let prevMonthSalaryDiff: Int
@@ -15,7 +15,7 @@ struct HomeWorkerResponseDTO: Codable {
     let workerMonthlyWorkplaceSummaryInfoList: [WorkerMonthlyWorkplaceSummaryInfoDTO]
 }
 
-struct WorkerMonthlyWorkplaceSummaryInfoDTO: Codable {
+struct WorkerMonthlyWorkplaceSummaryInfoDTO: Decodable {
     let homeWorkplaceSummaryInfo: HomeWorkplaceSummaryInfoDTO
     let daysUntilPayday: Int?
     let totalWorkMinutes: Int
@@ -33,12 +33,12 @@ struct WorkerMonthlyWorkplaceSummaryInfoDTO: Codable {
     let netIncome: Int
 }
 
-struct HomeWorkplaceSummaryInfoDTO: Codable {
+struct HomeWorkplaceSummaryInfoDTO: Decodable {
     let workplaceSummaryInfo: WorkplaceSummaryInfoDTO
     let isNowWorking: Bool?
 }
 
-struct WorkplaceSummaryInfoDTO: Codable {
+struct WorkplaceSummaryInfoDTO: Decodable {
     let workplaceId: Int
     let workplaceName: String
     let isShared: Bool
