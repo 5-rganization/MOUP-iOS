@@ -29,8 +29,15 @@ struct AllRoutineResponseDTO: Decodable {
     let routineSummaryInfoList: [RoutineSummaryDTO]
 }
 
+/// 루틴 요약 정보 리스트 응답 DTO
+struct RoutineSummaryListResponseDTO: Decodable {
+    let routineSummaryInfoList: [RoutineSummaryDTO]
+}
+
 struct RoutineSummaryDTO: Decodable {
     let routineId: Int
     let routineName: String
     let alarmTime: String?
 }
+
+
