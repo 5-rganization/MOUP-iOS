@@ -56,7 +56,7 @@ private extension WorkplaceRoutineListViewModel {
                     RoutineItem(items: routines)
                 ])
             } catch {
-                errorMessageRelay.accept(("루틴 불러오기 실패", "오늘의 루틴을 불러오지 못했습니다.\n잠시 후 다시 시도해주세요."))
+                errorMessageRelay.accept(("루틴 불러오기 실패", "루틴을 불러오지 못했습니다.\n잠시 후 다시 시도해주세요."))
             }
         }
     }
