@@ -14,6 +14,11 @@ final class WorkplaceRepository: WorkplaceRepositoryProtocol {
         self.workplaceService = workplaceService
     }
     
+    func fetchWorkplaceList(isSharedOnly: Bool) async throws -> [WorkplaceSummary] {
+        let response = try await workplaceService.fetchWorkplaceList(isSharedOnly: isSharedOnly)
+        return response.workplaceSummaryInfoList.map { WorkplaceSummary(id: $0.workplaceId, name: $0.workplaceName, isShared: $0.isShared) }
+    }
+    
     func fetchWorkplaceByInviteCode(inviteCode: String) async throws -> InviteCodeWorkplace {
         let response = try await workplaceService.fetchWorkplaceByInviteCode(inviteCode: inviteCode)
         return InviteCodeWorkplace(
