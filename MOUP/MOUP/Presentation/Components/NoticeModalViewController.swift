@@ -16,6 +16,7 @@ class NoticeModalViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private let noticeTitle: String
     private let comment: String
+    var onConfirm: (() -> Void)?
     
     // MARK: - UI Components
     private let dimmedView = UIView().then {
@@ -46,9 +47,10 @@ class NoticeModalViewController: UIViewController {
     private let confirmButton = BaseButton(title: "확인", isSecondary: false)
     
     // MARK: - Initializer
-    init(title: String, comment: String) {
+    init(title: String, comment: String, onConfirm: (() -> Void)? = nil) {
         self.noticeTitle = title
         self.comment = comment
+        self.onConfirm = onConfirm
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -123,7 +125,9 @@ private extension NoticeModalViewController {
         confirmButton.rx.tap
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
-                self.dismiss(animated: true)
+                owner.dismiss(animated: true) {
+                    owner.onConfirm?()
+                }
             })
             .disposed(by: disposeBag)
     }
