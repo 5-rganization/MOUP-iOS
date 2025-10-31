@@ -15,6 +15,9 @@ final class HomeCoordinator: Coordinator {
     private let routineUseCase: RoutineUseCaseProtocol
     private let routineRepository: RoutineRepositoryProtocol
     private let routineService: RoutineServiceProtocol
+    private let workplaceService: WorkplaceServiceProtocol
+    private let workplaceRepository: WorkplaceRepositoryProtocol
+    private let workplaceUseCase: WorkplaceUseCaseProtocol
     
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
@@ -24,6 +27,9 @@ final class HomeCoordinator: Coordinator {
         self.routineService = RoutineService()
         self.routineRepository = RoutineRepository(routineService: routineService)
         self.routineUseCase = RoutineUseCase(routineRepository: routineRepository)
+        self.workplaceService = WorkplaceService()
+        self.workplaceRepository = WorkplaceRepository(workplaceService: workplaceService)
+        self.workplaceUseCase = WorkplaceUseCase(workplaceRepository: workplaceRepository)
     }
     
     func start() {
@@ -43,7 +49,10 @@ final class HomeCoordinator: Coordinator {
     }
     
     func presentWorkplaceRegistrationSheet() {
-        let coordinator = WorkplaceRegisterSheetCoordinator(navigationController: navigationController)
+        let coordinator = WorkplaceRegisterSheetCoordinator(
+            navigationController: navigationController,
+            workplaceUseCase: workplaceUseCase
+        )
         coordinator.coordinator = self
         childCoordinators.append(coordinator)
         coordinator.start()
@@ -93,9 +102,12 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(vc, animated: true) // TODO: - 애니메이션 자연스러운지 다같이 확인해봐야함.
     }
     
-    func presentInviteCodeSheet() {
-        let viewModel = InviteCodeSheetViewModel()
-        let vc = InviteCodeSheetViewController(viewModel: viewModel)
+    func presentInviteCodeSheet(workplaceId: Int) {
+        let viewModel = InviteCodeSheetViewModel(workplaceUseCase: workplaceUseCase)
+        let vc = InviteCodeSheetViewController(
+            viewModel: viewModel,
+            workplaceId: <#Int#>
+        )
         vc.modalPresentationStyle = .pageSheet
         
         if let sheet = vc.sheetPresentationController {

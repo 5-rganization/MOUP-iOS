@@ -10,11 +10,16 @@ import UIKit
 final class WorkplaceRegisterSheetCoordinator: Coordinator {
     weak var coordinator: HomeCoordinator?
     var childCoordinators = [Coordinator]()
+    private let workplaceUseCase: WorkplaceUseCaseProtocol
     private let navigationController: UINavigationController
     private var sheetNav: UINavigationController?
     
-    init(navigationController: UINavigationController) {
+    init(
+        navigationController: UINavigationController,
+        workplaceUseCase: WorkplaceUseCaseProtocol
+    ) {
         self.navigationController = navigationController
+        self.workplaceUseCase = workplaceUseCase
     }
     
     func start() {
@@ -31,7 +36,10 @@ final class WorkplaceRegisterSheetCoordinator: Coordinator {
     }
     
     func moveToInviteCodeInput() { // 초대 코드 등록
-        let inviteCodeInputCoordinator = InviteCodeInputCoordinator(navigationController: navigationController)
+        let inviteCodeInputCoordinator = InviteCodeInputCoordinator(
+            navigationController: navigationController,
+            workplaceUseCase: workplaceUseCase
+        )
         inviteCodeInputCoordinator.coordinator = self
         childCoordinators.append(inviteCodeInputCoordinator)
         inviteCodeInputCoordinator.start()
