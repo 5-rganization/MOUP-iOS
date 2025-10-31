@@ -49,6 +49,15 @@ final class HomeCoordinator: Coordinator {
         coordinator.start()
     }
     
+    func moveToDirectRegistration() { // 직접 등록
+        print("moveToDirectRegistration")
+        let coordinator = WorkplaceRegisterCoordinator(navigationController: navigationController)
+        childCoordinators.append(coordinator)
+        DispatchQueue.main.async {
+            coordinator.start()
+        }
+    }
+    
     func moveToAllRoutine() {
         let viewModel = AllRoutineViewModel(routineUseCase: routineUseCase)
         let vc = AllRoutineViewController(viewModel: viewModel)

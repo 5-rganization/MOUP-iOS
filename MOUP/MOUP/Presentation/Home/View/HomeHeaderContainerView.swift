@@ -100,8 +100,8 @@ final class HomeHeaderContainerView: UIView {
         $0.textAlignment = .left
     }
 
-    private let myWorkplaceSectionTitleLabel = UILabel().then {
-        $0.text = "나의 근무지"
+    private lazy var myWorkplaceSectionTitleLabel = UILabel().then {
+        $0.text = userRole == .worker ? "나의 근무지" : "나의 매장"
         $0.font = .headBold(18)
     }
 
