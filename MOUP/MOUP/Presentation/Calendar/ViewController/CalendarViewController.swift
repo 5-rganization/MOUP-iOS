@@ -285,7 +285,7 @@ extension CalendarViewController: JTACMonthViewDelegate {
         visibleDate = date
         updateDataSource()
         
-        let dateStr = DateFormatter.yearMonthDateFormatter.string(from: date)
+        let dateStr = DateFormatter.presentaionYearMonthDateFormatter.string(from: date)
         calendarView.getCalendarHeaderView.update(dateStr: dateStr)
     }
     

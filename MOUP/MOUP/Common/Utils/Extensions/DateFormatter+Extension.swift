@@ -10,12 +10,22 @@ import Foundation
 import Then
 
 extension DateFormatter {
-    /// `CalendarHeaderView`에서 `yearMonthLabel`의 연/월 형식을 만들기 위한 `DateFormatter`
+    /// Presentation 계층에서 연/월 형식을 만들기 위한 `DateFormatter`
     /// - `dateFormat`: `"yyyy. MM"`
     /// - `locale`: `"ko_KR"`
     /// - `timeZone`: `"Asia/Seoul"`
-    static let yearMonthDateFormatter = DateFormatter().then {
+    static let presentaionYearMonthDateFormatter = DateFormatter().then {
         $0.dateFormat = "yyyy. MM"
+        $0.locale = Locale(identifier: "ko_KR")
+        $0.timeZone = TimeZone(identifier: "Asia/Seoul")
+    }
+    
+    /// Data 계층에서 연/월 형식을 만들기 위한 `DateFormatter`
+    /// - `dateFormat`: `"yyyy-MM"`
+    /// - `locale`: `"ko_KR"`
+    /// - `timeZone`: `"Asia/Seoul"`
+    static let dataYearMonthDateFormatter = DateFormatter().then {
+        $0.dateFormat = "yyyy-MM"
         $0.locale = Locale(identifier: "ko_KR")
         $0.timeZone = TimeZone(identifier: "Asia/Seoul")
     }
