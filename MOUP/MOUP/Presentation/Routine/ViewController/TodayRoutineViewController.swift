@@ -75,7 +75,7 @@ private extension TodayRoutineViewController {
                     owner.presentNoticeModal(
                         title: error.title,
                         comment: error.message) {
-                            owner.dismiss(animated: true)
+                            owner.navigationController?.popViewController(animated: true)
                         }
             })
             .disposed(by: disposeBag)

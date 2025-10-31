@@ -70,7 +70,9 @@ private extension WorkplaceRoutineListViewController {
         output.errorMessage
             .withUnretained(self)
             .subscribe(onNext: { owner, error in
-                owner.presentNoticeModal(title: error.title, comment: error.message)
+                owner.presentNoticeModal(title: error.title, comment: error.message) {
+                    owner.navigationController?.popViewController(animated: true)
+                }
             })
             .disposed(by: disposeBag)
         
