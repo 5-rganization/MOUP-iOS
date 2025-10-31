@@ -57,6 +57,10 @@ final class InviteCodeSheetView: UIView {
     }
     
     // MARK: - Public Methods
+    func update(with code: String) {
+        inviteCodeLabel.text = code
+    }
+    
     func applyCopySuccessed() {
         copyButton.configuration?.image = .check
         copyButton.isEnabled = false
