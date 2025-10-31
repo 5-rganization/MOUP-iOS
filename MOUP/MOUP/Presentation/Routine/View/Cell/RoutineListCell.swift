@@ -48,9 +48,9 @@ class RoutineListCell: UITableViewCell {
     }
     
     // MARK: - Public Methods
-    func update(with routine: Routine) {
-        titleLabel.text = routine.title
-        alarmTimeLabel.text = String(format: "%02d : %02d", routine.alarmTime?.hour ?? 0, routine.alarmTime?.minute ?? 0)
+    func update(with routine: RoutineSummary) {
+        titleLabel.text = routine.routineName
+        alarmTimeLabel.text = routine.alarmTime
     }
     
 }
