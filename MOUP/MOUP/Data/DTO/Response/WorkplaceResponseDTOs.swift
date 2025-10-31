@@ -23,6 +23,11 @@ struct WorkplaceSummaryResponseDTO: Decodable {
     let isShared: Bool
 }
 
+/// 사장님의 근무지 초대 코드 조회에 대한 응답 DTO
+struct InviteCodeResponseDTO: Decodable {
+    let inviteCode: String
+    let returnAlreadyExists: Bool?
+
 extension WorkplaceSummaryResponseDTO {
     func toDomain() -> WorkplaceSummary {
         WorkplaceSummary(id: workplaceId, name: workplaceName, isShared: isShared)
