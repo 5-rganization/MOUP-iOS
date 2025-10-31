@@ -50,7 +50,7 @@ class RoutineListCell: UITableViewCell {
     // MARK: - Public Methods
     func update(with routine: RoutineSummary) {
         titleLabel.text = routine.routineName
-        alarmTimeLabel.text = routine.alarmTime
+        alarmTimeLabel.text = routine.alarmTime ?? ""
     }
     
 }

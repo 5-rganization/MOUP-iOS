@@ -10,5 +10,5 @@ import Foundation
 struct RoutineSummary {
     let routineId: Int
     let routineName: String
-    let alarmTime: String
+    let alarmTime: String?
 }
