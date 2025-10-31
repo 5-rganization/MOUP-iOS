@@ -12,18 +12,14 @@ import RxRelay
 final class AllRoutineViewModel {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    private let mockAllRoutines = [RoutineItem(items: [
-        Routine(id: UUID(), title: "폐기", alarmTime: DateComponents(hour: 13, minute: 30), items: [
-            TodoItem(text: "pp 매대 유통기한 검수"),
-            TodoItem(text: "빵 라인 유통기한 검수")
-        ]),
-        Routine(id: UUID(), title: "치킨", alarmTime: DateComponents(hour: 10, minute: 0), items: [
-            TodoItem(text: "바삭통다리 2개"),
-            TodoItem(text: "더큰지파이 2개"),
-            TodoItem(text: "치즈볼 3개")
-        ])
-    ])]
+    private let routineUseCase: RoutineUseCaseProtocol
     private let allRoutinesRelay = BehaviorRelay<[RoutineItem]>(value: [])
+    private let errorMessageRelay = PublishRelay<(title: String, message: String)>()
+    
+    // MARK: - Initializer
+    init(routineUseCase: RoutineUseCaseProtocol) {
+        self.routineUseCase = routineUseCase
+    }
     
     // MARK: - Input, Output
     struct Input {
@@ -32,6 +28,7 @@ final class AllRoutineViewModel {
     
     struct Output {
         let allRoutines: Observable<[RoutineItem]>
+        let errorMessage: Observable<(title: String, message: String)>
     }
     
     // MARK: - transform
@@ -39,13 +36,27 @@ final class AllRoutineViewModel {
         input.viewDidLoad
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
-                owner.allRoutinesRelay.accept(owner.mockAllRoutines)
+                owner.fetchAllRoutines()
             })
             .disposed(by: disposeBag)
         
         return Output(
-            allRoutines: allRoutinesRelay.asObservable()
+            allRoutines: allRoutinesRelay.asObservable(),
+            errorMessage: errorMessageRelay.asObservable()
         )
     }
     
+}
+
+private extension AllRoutineViewModel {
+    func fetchAllRoutines() {
+        Task {
+            do {
+                let routines = try await routineUseCase.fetchAllRoutines()
+                allRoutinesRelay.accept([RoutineItem(items: routines)])
+            } catch {
+                errorMessageRelay.accept(("루틴 불러오기 실패", "오늘의 루틴을 불러오지 못했습니다.\n잠시 후 다시 시도해주세요."))
+            }
+        }
+    }
 }

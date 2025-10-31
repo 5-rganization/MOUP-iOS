@@ -12,35 +12,13 @@ import RxRelay
 final class TodayRoutineViewModel {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
+    private let routineUseCase: RoutineUseCaseProtocol
     private let todayRoutineRelay = BehaviorRelay<[TodayRoutineItem]>(value: [])
-    private let mockTodayRoutines = [
-        TodayRoutineItem(
-            items: [
-                TodayRoutine(
-                    workplaceName: "GS25 한신점",
-                    routines: [Routine(
-                        id: UUID(),
-                        title: "치킨",
-                        alarmTime: DateComponents(hour: 10, minute: 0),
-                        items: [
-                            TodoItem(text: "바삭통다리 2개"),
-                            TodoItem(text: "매운바삭치킨 2개")
-                        ]
-                    ),
-                               Routine(
-                                id: UUID(),
-                                title: "청소",
-                                alarmTime: DateComponents(hour: 14, minute: 30),
-                                items: [
-                                    TodoItem(text: "내부 테이블 정리"),
-                                    TodoItem(text: "외부 테라스 분리수거")
-                                ]
-                               )
-                    ]
-                )
-            ]
-        )
-    ]
+    private let errorMessageRelay = PublishRelay<(title: String, message: String)>()
+    
+    init(routineUseCase: RoutineUseCaseProtocol) {
+        self.routineUseCase = routineUseCase
+    }
     
     // MARK: - Input, Output
     struct Input {
@@ -49,6 +27,7 @@ final class TodayRoutineViewModel {
     
     struct Output {
         let todayRoutine: Observable<[TodayRoutineItem]>
+        let errorMessage: Observable<(title: String, message: String)>
     }
     
     // MARK: - transform
@@ -56,13 +35,28 @@ final class TodayRoutineViewModel {
         input.viewDidLoad
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
-                owner.todayRoutineRelay.accept(owner.mockTodayRoutines)
+                owner.fetchTodayRoutines()
             })
             .disposed(by: disposeBag)
         
         return Output(
-            todayRoutine: todayRoutineRelay.asObservable()
+            todayRoutine: todayRoutineRelay.asObservable(),
+            errorMessage: errorMessageRelay.asObservable()
         )
     }
     
+}
+
+private extension TodayRoutineViewModel {
+    func fetchTodayRoutines() {
+        Task {
+            do {
+                let todayRoutines = try await routineUseCase.fetchTodayRoutines()
+                let todayRoutineItem = TodayRoutineItem(items: todayRoutines)
+                todayRoutineRelay.accept([todayRoutineItem])
+            } catch {
+                errorMessageRelay.accept(("루틴 불러오기 실패", "오늘의 루틴을 불러오지 못했습니다.\n잠시 후 다시 시도해주세요."))
+            }
+        }
+    }
 }
