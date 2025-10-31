@@ -19,20 +19,20 @@ final class HomeViewController: UIViewController {
     
     private lazy var dataSource = RxTableViewSectionedAnimatedDataSource<HomeTableViewFirstSection>(animationConfiguration: AnimationConfiguration(deleteAnimation: .automatic)) { dataSource, tableView, indexPath, item in
         switch item {
-        case .owner:
+        case .owner(let ownerInfo):
             guard let cell = tableView.dequeueReusableCell(withIdentifier: OwnerWorkplaceCell.identifier, for: indexPath) as? OwnerWorkplaceCell else {
                 return UITableViewCell()
             }
-            let menu = self.setMenu(role: .owner)
-            cell.update(item: item, menu: menu)
+            let menu = self.setMenu(role: .owner, workplaceId: ownerInfo.workplace.id)
+            cell.update(info: ownerInfo, menu: menu)
             cell.delegate = self
             return cell
-        case .worker:
+        case .worker(let workerInfo):
             guard let cell = tableView.dequeueReusableCell(withIdentifier: WorkerWorkplaceCell.identifier, for: indexPath) as? WorkerWorkplaceCell else {
                 return UITableViewCell()
             }
-            let menu = self.setMenu(role: .worker)
-            cell.update(item: item, menu: menu)
+            let menu = self.setMenu(role: .worker, workplaceId: workerInfo.homeWorkplace.workplace.id)
+            cell.update(info: workerInfo, menu: menu)
             cell.delegate = self
             return cell
         }
@@ -125,44 +125,52 @@ private extension HomeViewController {
 
 private extension HomeViewController {
     // MARK: - UIMenu Methods
-    func setMenu(role: UserRole) -> UIMenu {
+    func setMenu(role: UserRole, workplaceId: Int) -> UIMenu {
         let children: [UIAction] = { [weak self] in
             guard let self else { return [] }
             switch role {
             case .worker:
-                return [ edit(), delete(), attendanceHistory() ]
+                return [
+                    edit(id: workplaceId),
+                    delete(id: workplaceId),
+                    attendanceHistory(id: workplaceId)
+                ]
             case .owner:
-                return [ edit(), delete(), sendInvitationCode() ]
+                return [
+                    edit(id: workplaceId),
+                    delete(id: workplaceId),
+                    sendInvitationCode(id: workplaceId)
+                ]
             }
         }()
         let menu = UIMenu(title: "", children: children)
         return menu
     }
     
-    func edit() -> UIAction {
+    func edit(id workplaceId: Int) -> UIAction {
         let action = UIAction(title: "수정하기") { _ in
             print("수정하기")
         }
         return action
     }
     
-    func delete() -> UIAction {
+    func delete(id workplaceId: Int) -> UIAction {
         let action = UIAction(title: "삭제하기") { _ in
             print("삭제하기")
         }
         return action
     }
     
-    func sendInvitationCode() -> UIAction {
+    func sendInvitationCode(id workplaceId: Int) -> UIAction {
         let action = UIAction(title: "초대 코드 보내기") { [weak self] _ in
             guard let self else { return }
             print("초대 코드 보내기")
-            self.coordinator?.presentInviteCodeSheet()
+            self.coordinator?.presentInviteCodeSheet(workplaceId: workplaceId)
         }
         return action
     }
     
-    func attendanceHistory() -> UIAction {
+    func attendanceHistory(id workplaceId: Int) -> UIAction {
         let action = UIAction(title: "출퇴근 기록") { [weak self] _ in
             guard let self else { return }
             print("출퇴근 기록 확인")

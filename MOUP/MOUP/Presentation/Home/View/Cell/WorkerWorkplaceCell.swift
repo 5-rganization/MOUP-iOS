@@ -104,18 +104,13 @@ class WorkerWorkplaceCell: UITableViewCell {
     }
 
     // MARK: - Public Methods
-    func update(item: HomeSectionItem, menu: UIMenu) {
-        switch item {
-        case .worker(let workerInfo):
-            self.nameLabel.text = workerInfo.homeWorkplace.workplace.name
-            setDaysUntilPayday(workerInfo.daysUntilPayday)
-            setTotalEarnedLabel(workerInfo.netIncome)
-            secondSectionView.update(with: workerInfo)
-            self.workplaceOfficialChip.isHidden = !workerInfo.homeWorkplace.workplace.isShared
-            self.menuButton.menu = menu
-        case .owner:
-            break
-        }
+    func update(info: WorkplaceMonthSummary, menu: UIMenu) {
+        self.nameLabel.text = info.homeWorkplace.workplace.name
+        setDaysUntilPayday(info.daysUntilPayday)
+        setTotalEarnedLabel(info.netIncome)
+        secondSectionView.update(with: info)
+        self.workplaceOfficialChip.isHidden = !info.homeWorkplace.workplace.isShared
+        self.menuButton.menu = menu
     }
 }
 
