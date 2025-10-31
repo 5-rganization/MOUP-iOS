@@ -33,8 +33,9 @@ struct MyWorkUpdateRequestDTO: Encodable {
     let repeatEndDate: String?
 }
 
-/// 근무자 근무 생성 요청 DTO (사장님 전용)
-struct WorkerWorkCreateRequestDTO: Encodable {
+/// 여러 근무자에게 근무 생성 요청 DTO (사장님 전용)
+struct WorkersWorkCreateRequestDTO: Encodable {
+    let workerIdList: [Int]
     let startTime: Date
     let actualStartTime: Date?
     let endTime: Date
