@@ -16,6 +16,8 @@ final class UserService: UserServiceProtocol {
     private lazy var session = NetworkManager.shared.session
     
     func fetchProfile() async throws -> UserProfileResponseDTO {
+        try await Task.sleep(nanoseconds: 500_000_000)
+        
         let request = session.request(UserRouter.fetchProfile)
         let response = await request.serializingDecodable(UserProfileResponseDTO.self).response
         

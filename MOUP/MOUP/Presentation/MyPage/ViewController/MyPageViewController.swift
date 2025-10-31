@@ -31,6 +31,7 @@ final class MyPageViewController: UIViewController {
         super.viewDidLoad()
         
         configure()
+        
         viewDidLoadSubject.onNext(())
     }
     
@@ -99,17 +100,20 @@ private extension MyPageViewController {
         )
         let output = viewModel.transform(input)
         
+        output.isLoading
+            .drive(with: self) { owner, isLoading in
+                if isLoading {
+                    owner.mypageView.showLoading()
+                } else {
+                    owner.mypageView.hideLoading()
+                }
+            }
+            .disposed(by: disposeBag)
+        
         output.profile
             .compactMap { $0 }
             .drive(with: self) { owner, profile in
                 owner.mypageView.updateProfile(profile)
-            }
-            .disposed(by: disposeBag)
-        
-        output.isLoading
-            .skip(1)
-            .drive(with: self) { _, isLoading in
-                print(isLoading ? "로딩 중입니다." : "로딩 완료")
             }
             .disposed(by: disposeBag)
         
