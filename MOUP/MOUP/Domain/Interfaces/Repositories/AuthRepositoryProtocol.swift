@@ -10,4 +10,5 @@ import Foundation
 protocol AuthRepositoryProtocol: AnyObject {
     func signIn(requestDTO: LoginRequestDTO) async throws
     func signUp(requestDTO: RegisterRequestDTO) async throws -> UserRole
+    func updateFCMToken(_ token: String) async throws
 }

@@ -66,6 +66,7 @@ extension AppDelegate: MessagingDelegate {
         
         if let token = fcmToken {
             UserDefaultsManager.shared.fcmToken = token
+            FCMTokenManager.shared.syncTokenToServer()
         }
     }
 }

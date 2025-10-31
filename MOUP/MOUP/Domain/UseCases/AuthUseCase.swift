@@ -24,4 +24,8 @@ final class AuthUseCase: AuthUseCaseProtocol {
 
         UserDefaultsManager.shared.userRole = result.rawValue
     }
+    
+    func updateFCMToken(_ token: String) async throws {
+        try await authRepository.updateFCMToken(token)
+    }
 }

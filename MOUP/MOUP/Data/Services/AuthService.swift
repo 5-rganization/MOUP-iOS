@@ -11,6 +11,7 @@ import Alamofire
 protocol AuthServiceProtocol {
     func signIn(requestDTO: LoginRequestDTO) async throws -> LoginResponseDTO
     func signUp(requestDTO: RegisterRequestDTO) async throws -> RegisterResponseDTO
+    func updateFCMToken(requestDTO: UpdateFCMTokenRequestDTO) async throws -> UpdateFCMTokenResponseDTO
 }
 
 final class AuthService: AuthServiceProtocol {
@@ -63,6 +64,40 @@ final class AuthService: AuthServiceProtocol {
         case 422:
             print(AuthError.invalidUserName.debugDescription!)
             throw AuthError.invalidUserName
+        default:
+            print(NetworkError.serverError.debugDescription!)
+            throw NetworkError.serverError
+        }
+    }
+    
+    func updateFCMToken(requestDTO: UpdateFCMTokenRequestDTO) async throws -> UpdateFCMTokenResponseDTO {
+        let request = session.request(AuthRouter.updateFCMToken(requestDTO))
+        let response = await request
+            .serializingDecodable(UpdateFCMTokenResponseDTO.self)
+            .response
+        
+        print(response.value)
+        print("statusCode: \(response.response?.statusCode)")
+        
+        guard let statusCode = response.response?.statusCode else {
+            throw NetworkError.noResponse
+        }
+        
+        switch statusCode {
+        case 200:
+            guard let dto = response.value else {
+                throw NetworkError.noResponse
+            }
+            return dto
+        case 401:
+            print("FCM 토큰 업데이트 실패: 인증 실패")
+            throw NetworkError.serverError
+        case 404:
+            print(AuthError.notMember.debugDescription!)
+            throw AuthError.notMember
+        case 409:
+            print(AuthError.deletedUser.debugDescription!)
+            throw AuthError.deletedUser
         default:
             print(NetworkError.serverError.debugDescription!)
             throw NetworkError.serverError

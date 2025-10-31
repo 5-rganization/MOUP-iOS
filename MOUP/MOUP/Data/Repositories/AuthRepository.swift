@@ -34,4 +34,9 @@ final class AuthRepository: AuthRepositoryProtocol {
         UserDefaultsManager.shared.hasSignIn = true
         return role
     }
+    
+    func updateFCMToken(_ token: String) async throws {
+        let requestDTO = UpdateFCMTokenRequestDTO(fcmToken: token)
+        _ = try await authService.updateFCMToken(requestDTO: requestDTO)
+    }
 }

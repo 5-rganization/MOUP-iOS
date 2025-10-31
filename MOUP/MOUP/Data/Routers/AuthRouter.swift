@@ -12,6 +12,7 @@ enum AuthRouter {
     case signIn(LoginRequestDTO)
     case signUp(RegisterRequestDTO)
     case renewAccessToken(RefreshTokenRequestDTO)
+    case updateFCMToken(UpdateFCMTokenRequestDTO)
 }
 
 extension AuthRouter: URLRequestConvertible {
@@ -30,6 +31,8 @@ extension AuthRouter: URLRequestConvertible {
             return "/auth/login/register"
         case .renewAccessToken:
             return "/auth/token/refresh"
+        case .updateFCMToken:
+            return "/users/fcm-token"
         }
     }
 
@@ -41,6 +44,8 @@ extension AuthRouter: URLRequestConvertible {
             return .patch
         case .renewAccessToken:
             return .post
+        case .updateFCMToken:
+            return .patch
         }
     }
 
@@ -52,12 +57,14 @@ extension AuthRouter: URLRequestConvertible {
             return signUpRequestDTO
         case .renewAccessToken(let refreshAccessTokenRequestDTO):
             return refreshAccessTokenRequestDTO
+        case .updateFCMToken(let updateFCMTokenRequestDTO):
+            return updateFCMTokenRequestDTO
         }
     }
 
     var encoding: ParameterEncoding {
         switch self {
-        case .signIn, .signUp, .renewAccessToken:
+        case .signIn, .signUp, .renewAccessToken, .updateFCMToken:
             return JSONEncoding.default
         }
     }

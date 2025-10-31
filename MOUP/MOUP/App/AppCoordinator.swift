@@ -29,6 +29,8 @@ final class AppCoordinator: Coordinator {
         print("AccessToken: \(KeychainManager.shared.read(key: "accessToken"))")
         setupNetworkManager()
         setupNotifications()
+        
+        FCMTokenManager.shared.configure(authUseCase: authUseCase)
     }
 
     func start() {
