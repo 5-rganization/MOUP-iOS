@@ -16,6 +16,8 @@ final class DeleteAccountModalViewController: UIViewController {
     private let viewModel: DeleteAccountViewModel
     private let disposeBag = DisposeBag()
     
+    private let viewDidLoadSubject = PublishSubject<Void>()
+    
     // MARK: - UI Components
     
     private let deleteAccountModal = DeleteAccountModal().then {
@@ -33,6 +35,8 @@ final class DeleteAccountModalViewController: UIViewController {
         super.viewDidLoad()
 
         configure()
+        
+        viewDidLoadSubject.onNext(())
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -106,10 +110,18 @@ private extension DeleteAccountModalViewController {
             .disposed(by: disposeBag)
         
         let input = DeleteAccountViewModel.Input(
+            viewDidLoad: viewDidLoadSubject.asObservable(),
             deleteTap: deleteAccountModal.rx.deleteAccountButtonTapped.asObservable()
         )
         
         let output = viewModel.transform(input)
+        
+        output.nickname
+            .filter { !$0.isEmpty }
+            .drive(with: self) { owner, nickname in
+                owner.deleteAccountModal.updateNickname(nickname)
+            }
+            .disposed(by: disposeBag)
         
         output.deleteSuccess
             .withUnretained(self)

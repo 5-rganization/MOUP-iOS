@@ -13,12 +13,14 @@ final class DeleteAccountViewModel {
     // MARK: - Input
     
     struct Input {
+        let viewDidLoad: Observable<Void>
         let deleteTap: Observable<Void>
     }
     
     // MARK: - Output
     
     struct Output {
+        let nickname: Driver<String>
         let isDeleting: Driver<Bool>
         let deleteSuccess: Signal<Void>
         let errorMessage: Signal<String>
@@ -27,6 +29,7 @@ final class DeleteAccountViewModel {
     // MARK: - Properties
     
     private let userUseCase: UserUseCaseProtocol
+    private let nicknameRelay = BehaviorRelay<String>(value: "")
     private let isDeletingRelay = BehaviorRelay<Bool>(value: false)
     private let disposeBag = DisposeBag()
     
@@ -41,6 +44,28 @@ final class DeleteAccountViewModel {
     func transform(_ input: Input) -> Output {
         let successRelay = PublishRelay<Void>()
         let errorRelay = PublishRelay<String>()
+        
+        input.viewDidLoad
+            .flatMapLatest { [weak self] _ -> Observable<String> in
+                guard let self else { return .just("") }
+                
+                return Observable.create { observer in
+                    Task {
+                        do {
+                            let profile = try await self.userUseCase.fetchProfile()
+                            observer.onNext(profile.nickname)
+                            observer.onCompleted()
+                        } catch {
+                            print("❌ 프로필 조회 실패: \(error.localizedDescription)")
+                            observer.onNext("회원")
+                            observer.onCompleted()
+                        }
+                    }
+                    return Disposables.create()
+                }
+            }
+            .bind(to: nicknameRelay)
+            .disposed(by: disposeBag)
         
         input.deleteTap
             .do(onNext: { [weak self] _ in
@@ -76,6 +101,7 @@ final class DeleteAccountViewModel {
             .disposed(by: disposeBag)
         
         return Output(
+            nickname: nicknameRelay.asDriver(),
             isDeleting: isDeletingRelay.asDriver(),
             deleteSuccess: successRelay.asSignal(),
             errorMessage: errorRelay.asSignal()
