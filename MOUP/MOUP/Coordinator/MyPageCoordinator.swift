@@ -15,8 +15,15 @@ final class MyPageCoordinator: Coordinator {
     private let userRepository: UserRepositoryProtocol
     private let userUseCase: UserUseCaseProtocol
     
+    private let authService: AuthServiceProtocol
+    private let authRepository: AuthRepositoryProtocol
+    private let authUseCase: AuthUseCaseProtocol
+    
     private lazy var myPageVC: MyPageViewController = {
-        let viewModel = MyPageViewModel(userUseCase: userUseCase)
+        let viewModel = MyPageViewModel(
+            userUseCase: userUseCase,
+            authUseCase: authUseCase
+        )
         let vc = MyPageViewController(viewModel: viewModel)
         return vc
     }()
@@ -27,6 +34,10 @@ final class MyPageCoordinator: Coordinator {
         self.userService = UserService()
         self.userRepository = UserRepository(userService: userService)
         self.userUseCase = UserUseCase(userRepository: userRepository)
+        
+        self.authService = AuthService()
+        self.authRepository = AuthRepository(authService: authService)
+        self.authUseCase = AuthUseCase(authRepository: authRepository)
     }
 
     func start() {

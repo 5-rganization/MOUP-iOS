@@ -11,7 +11,10 @@ import Alamofire
 protocol AuthServiceProtocol {
     func signIn(requestDTO: LoginRequestDTO) async throws -> LoginResponseDTO
     func signUp(requestDTO: RegisterRequestDTO) async throws -> RegisterResponseDTO
-    func updateFCMToken(requestDTO: UpdateFCMTokenRequestDTO) async throws -> UpdateFCMTokenResponseDTO
+    func updateFCMToken(
+        requestDTO: UpdateFCMTokenRequestDTO
+    ) async throws -> UpdateFCMTokenResponseDTO
+    func logout() async throws -> LogoutResponseDTO
 }
 
 final class AuthService: AuthServiceProtocol {
@@ -70,7 +73,9 @@ final class AuthService: AuthServiceProtocol {
         }
     }
     
-    func updateFCMToken(requestDTO: UpdateFCMTokenRequestDTO) async throws -> UpdateFCMTokenResponseDTO {
+    func updateFCMToken(
+        requestDTO: UpdateFCMTokenRequestDTO
+    ) async throws -> UpdateFCMTokenResponseDTO {
         let request = session.request(AuthRouter.updateFCMToken(requestDTO))
         let response = await request
             .serializingDecodable(UpdateFCMTokenResponseDTO.self)
@@ -91,6 +96,47 @@ final class AuthService: AuthServiceProtocol {
             return dto
         case 401:
             print("FCM 토큰 업데이트 실패: 인증 실패")
+            throw NetworkError.serverError
+        case 404:
+            print(AuthError.notMember.debugDescription!)
+            throw AuthError.notMember
+        case 409:
+            print(AuthError.deletedUser.debugDescription!)
+            throw AuthError.deletedUser
+        default:
+            print(NetworkError.serverError.debugDescription!)
+            throw NetworkError.serverError
+        }
+    }
+    
+    func logout() async throws -> LogoutResponseDTO {
+        let request = session.request(AuthRouter.logout)
+        let response = await request.serializingDecodable(LogoutResponseDTO.self).response
+        
+        print("========== 로그아웃 ==========")
+        print("statusCode: \(response.response?.statusCode ?? -1)")
+        
+        if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
+            print("응답: \(jsonString)")
+        }
+        
+        if let dto = response.value {
+            print("✅ 로그아웃 성공: userId \(dto.userId)")
+        }
+        print("============================")
+        
+        guard let statusCode = response.response?.statusCode else {
+            throw NetworkError.noResponse
+        }
+        
+        switch statusCode {
+        case 200:
+            guard let dto = response.value else {
+                throw NetworkError.noResponse
+            }
+            return dto
+        case 401:
+            print("로그아웃 실패: 인증 실패")
             throw NetworkError.serverError
         case 404:
             print(AuthError.notMember.debugDescription!)

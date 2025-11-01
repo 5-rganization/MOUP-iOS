@@ -30,12 +30,16 @@ final class MyPageViewModel {
     // MARK: - Properties
     
     private let userUseCase: UserUseCaseProtocol
+    private let authUseCase: AuthUseCaseProtocol
     private let disposeBag = DisposeBag()
     
     // MARK: - Initializer
     
-    init(userUseCase: UserUseCaseProtocol) {
+    init(
+        userUseCase: UserUseCaseProtocol,
+        authUseCase: AuthUseCaseProtocol) {
         self.userUseCase = userUseCase
+        self.authUseCase = authUseCase
     }
     
     // MARK: - Transform
@@ -72,29 +76,34 @@ final class MyPageViewModel {
             .disposed(by: disposeBag)
         
         input.logoutConfirmed
-            .flatMapLatest {
-                // TODO: - usecase 연결
-                Observable<Void>.create { observer in
-                    loadingRelay.accept(true)
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        observer.onNext(())
-                        observer.onCompleted()
+            .do(onNext: { _ in
+                loadingRelay.accept(true)
+            })
+            .flatMapLatest { [weak self] _ -> Observable<Result<Void, Error>> in
+                guard let self else { return .empty() }
+                
+                return Observable.create { observer in
+                    Task {
+                        do {
+                            try await self.authUseCase.logout()
+                            observer.onNext(.success(()))
+                            observer.onCompleted()
+                        } catch {
+                            observer.onNext(.failure(error))
+                            observer.onCompleted()
+                        }
                         loadingRelay.accept(false)
                     }
-                    
                     return Disposables.create()
                 }
-                .materialize()
             }
-            .subscribe(onNext: { event in
-                switch event {
-                case .next:
+            .subscribe(onNext: { result in
+                switch result {
+                case .success:
                     successRelay.accept(())
-                case .error(let error):
-                    errorRelay.accept(error.localizedDescription)
-                case .completed:
-                    break
+                case .failure(let error):
+                    errorRelay.accept("로그아웃에 실패했습니다. 잠시 후 다시 시도해주세요.")
+                    print("로그아웃 에러: \(error.localizedDescription)")
                 }
             })
             .disposed(by: disposeBag)

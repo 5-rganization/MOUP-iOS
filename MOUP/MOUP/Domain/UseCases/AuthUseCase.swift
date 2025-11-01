@@ -28,4 +28,8 @@ final class AuthUseCase: AuthUseCaseProtocol {
     func updateFCMToken(_ token: String) async throws {
         try await authRepository.updateFCMToken(token)
     }
+    
+    func logout() async throws {
+        try await authRepository.logout()
+    }
 }

@@ -118,18 +118,26 @@ private extension MyPageViewController {
             .disposed(by: disposeBag)
         
         output.logoutSuccess
-            .emit(onNext: {
-                print("로그아웃 성공. 로그인 화면으로 이동")
-                // TODO: - 로그인 화면으로 전환
-            })
+            .emit(with: self) { owner, _ in
+                print("로그아웃 성공")
+                
+                NotificationCenter.default.post(
+                    name: .logoutSuccess,
+                    object: nil
+                )
+            }
             .disposed(by: disposeBag)
         
         output.error
             .emit(with: self) { owner, message in
-                owner.coordinator?.showLogoutFail(from: owner) {
-                    owner.dismiss(animated: false)
-                    print(message)
+                if message.contains("로그아웃") {
+                    owner.coordinator?.showLogoutFail(from: owner) {
+                        owner.dismiss(animated: false)
+                    }
+                } else {
+                    print("에러: \(message)")
                 }
+                
             }
             .disposed(by: disposeBag)
     }

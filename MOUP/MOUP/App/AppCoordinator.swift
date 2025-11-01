@@ -57,12 +57,24 @@ final class AppCoordinator: Coordinator {
             name: .unauthorizedAccessDetected,
             object: nil
         )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleLogoutSuccess),
+            name: .logoutSuccess,
+            object: nil
+        )
     }
     
     @objc private func handleUnauthorizedAccess() {
         tokenUseCase.deleteTokens()
         UserDefaultsManager.shared.removeUserRole()
         
+        showSignIn()
+    }
+    
+    @objc private func handleLogoutSuccess() {
+        print("로그아웃 성공, 로그인 화면으로 이동")
         showSignIn()
     }
     

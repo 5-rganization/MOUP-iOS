@@ -29,3 +29,8 @@ struct RefreshTokenResponseDTO: Decodable {
 struct UpdateFCMTokenResponseDTO: Decodable {
     let userId: Int
 }
+
+/// 로그아웃 API 응답 DTO
+struct LogoutResponseDTO: Decodable {
+    let userId: Int
+}
