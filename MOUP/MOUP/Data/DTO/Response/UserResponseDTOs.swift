@@ -20,3 +20,9 @@ struct UpdateNicknameResponseDTO: Decodable {
     let userId: Int
     let nickname: String
 }
+
+struct DeleteAccountResponseDTO: Decodable {
+    let userId: Int
+    let deletedAt: String
+    let deleted: Bool
+}

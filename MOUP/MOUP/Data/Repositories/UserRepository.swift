@@ -40,4 +40,19 @@ final class UserRepository: UserRepositoryProtocol {
         let dto = try await userService.updateNickname(nickname)
         return dto.nickname
     }
+    
+    func deleteAccount() async throws {
+        _ = try await userService.deleteAccount()
+        
+        clearLocalData()
+    }
+    
+    private func clearLocalData() {
+        KeychainManager.shared.delete(key: "accessToken")
+        KeychainManager.shared.delete(key: "refreshToken")
+        
+        UserDefaultsManager.shared.clearAllData()
+        
+        print("🗑️ 로컬 데이터 정리 완료 (회원 탈퇴)")
+    }
 }

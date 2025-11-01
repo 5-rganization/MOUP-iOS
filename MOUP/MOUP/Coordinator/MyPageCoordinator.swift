@@ -64,7 +64,7 @@ final class MyPageCoordinator: Coordinator {
     }
     
     func showDeleteAccountModal() {
-        let viewModel = DeleteAccountViewModel()
+        let viewModel = DeleteAccountViewModel(userUseCase: userUseCase)
         let deleteAccountModalVC = DeleteAccountModalViewController(viewModel: viewModel)
         deleteAccountModalVC.modalPresentationStyle = .overFullScreen
         navigationController.present(deleteAccountModalVC, animated: false)

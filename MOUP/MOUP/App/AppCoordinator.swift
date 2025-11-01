@@ -64,6 +64,13 @@ final class AppCoordinator: Coordinator {
             name: .logoutSuccess,
             object: nil
         )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleDeleteAccountSuccess),
+            name: .deleteAccountSuccess,
+            object: nil
+        )
     }
     
     @objc private func handleUnauthorizedAccess() {
@@ -75,6 +82,11 @@ final class AppCoordinator: Coordinator {
     
     @objc private func handleLogoutSuccess() {
         print("로그아웃 성공, 로그인 화면으로 이동")
+        showSignIn()
+    }
+    
+    @objc private func handleDeleteAccountSuccess() {
+        print("🔄 회원 탈퇴 성공, 로그인 화면으로 이동")
         showSignIn()
     }
     

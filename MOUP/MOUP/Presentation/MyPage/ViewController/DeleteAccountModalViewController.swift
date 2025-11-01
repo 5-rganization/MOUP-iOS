@@ -114,19 +114,35 @@ private extension DeleteAccountModalViewController {
         output.deleteSuccess
             .withUnretained(self)
             .emit(onNext: { owner, _ in
+                print("✅ 회원 탈퇴 성공")
                 owner.animateModalOut {
-                    print("회원탈퇴 성공")
-                    // TODO: - 로그인 화면으로 이동
-                    owner.dismiss(animated: false)
+                    owner.dismiss(animated: false) {
+                        NotificationCenter.default.post(
+                            name: .deleteAccountSuccess,
+                            object: nil
+                        )
+                    }
                 }
             })
             .disposed(by: disposeBag)
         
         output.errorMessage
             .withUnretained(self)
-            .emit(onNext: { owner, _ in
-                print("회원탈퇴 실패")
+            .emit(onNext: { owner, errorMessage in
+                print("❌ 회원 탈퇴 실패: \(errorMessage)")
+                
+                let alert = NoticeModalViewController(
+                    title: "회원 탈퇴 실패",
+                    comment: errorMessage
+                )
+                owner.present(alert, animated: false)
             })
+            .disposed(by: disposeBag)
+        
+        output.isDeleting
+            .drive(with: self) { owner, isDeleting in
+                print(isDeleting ? "회원 탈퇴 중..." : "처리 완료")
+            }
             .disposed(by: disposeBag)
     }
     

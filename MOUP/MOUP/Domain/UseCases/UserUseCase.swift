@@ -21,4 +21,8 @@ final class UserUseCase: UserUseCaseProtocol {
     func updateNickname(_ nickname: String) async throws -> String {
         try await userRepository.updateNickname(nickname)
     }
+    
+    func deleteAccount() async throws {
+        try await userRepository.deleteAccount()
+    }
 }

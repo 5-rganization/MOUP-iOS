@@ -9,9 +9,14 @@ import RxSwift
 import RxCocoa
 
 final class DeleteAccountViewModel {
+    
+    // MARK: - Input
+    
     struct Input {
         let deleteTap: Observable<Void>
     }
+    
+    // MARK: - Output
     
     struct Output {
         let isDeleting: Driver<Bool>
@@ -21,34 +26,51 @@ final class DeleteAccountViewModel {
     
     // MARK: - Properties
     
+    private let userUseCase: UserUseCaseProtocol
     private let isDeletingRelay = BehaviorRelay<Bool>(value: false)
     private let disposeBag = DisposeBag()
+    
+    // MARK: - Initializer
+    
+    init(userUseCase: UserUseCaseProtocol) {
+        self.userUseCase = userUseCase
+    }
+    
+    // MARK: - Transform
     
     func transform(_ input: Input) -> Output {
         let successRelay = PublishRelay<Void>()
         let errorRelay = PublishRelay<String>()
         
         input.deleteTap
-            .flatMapLatest { [weak self] in
-                guard let self else { return Observable<Event<Void>>.empty() }
-                // TODO: - usecase 연결
-                return Observable.just(())
-                    .delay(.milliseconds(800), scheduler: MainScheduler.instance)
-                    .do(onSubscribe: {
-                        self.isDeletingRelay.accept(true)
-                    }, onDispose: {
+            .do(onNext: { [weak self] _ in
+                self?.isDeletingRelay.accept(true)
+            })
+            .flatMapLatest { [weak self] _ -> Observable<Result<Void, Error>> in
+                guard let self else { return .empty() }
+                
+                return Observable.create { observer in
+                    Task {
+                        do {
+                            try await self.userUseCase.deleteAccount()
+                            observer.onNext(.success(()))
+                            observer.onCompleted()
+                        } catch {
+                            observer.onNext(.failure(error))
+                            observer.onCompleted()
+                        }
                         self.isDeletingRelay.accept(false)
-                    })
-                    .materialize()
+                    }
+                    return Disposables.create()
+                }
             }
-            .subscribe(onNext: { event in
-                switch event {
-                case .next:
-                    break
-                case .completed:
+            .subscribe(onNext: { result in
+                switch result {
+                case .success:
                     successRelay.accept(())
-                case .error(let error):
-                    errorRelay.accept(error.localizedDescription)
+                case .failure(let error):
+                    errorRelay.accept("회원 탈퇴에 실패했습니다. 잠시 후 다시 시도해주세요.")
+                    print("❌ 회원 탈퇴 에러: \(error.localizedDescription)")
                 }
             })
             .disposed(by: disposeBag)

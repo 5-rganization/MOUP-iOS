@@ -11,6 +11,7 @@ import Alamofire
 enum UserRouter {
     case fetchProfile
     case updateNickname(UpdateNicknameRequestDTO)
+    case deleteAccount
 }
 
 extension UserRouter: URLRequestConvertible {
@@ -27,6 +28,8 @@ extension UserRouter: URLRequestConvertible {
             return "/users/profiles"
         case .updateNickname:
             return "/users/nickname"
+        case .deleteAccount:
+            return "/users"
         }
     }
     
@@ -36,6 +39,8 @@ extension UserRouter: URLRequestConvertible {
             return .get
         case .updateNickname:
             return .patch
+        case .deleteAccount:
+            return .delete
         }
     }
     
@@ -45,6 +50,8 @@ extension UserRouter: URLRequestConvertible {
             return nil
         case .updateNickname(let dto):
             return dto
+        case .deleteAccount:
+            return nil
         }
     }
     
@@ -54,6 +61,8 @@ extension UserRouter: URLRequestConvertible {
             return URLEncoding.default
         case .updateNickname:
             return JSONEncoding.default
+        case .deleteAccount:
+            return URLEncoding.default
         }
     }
     
