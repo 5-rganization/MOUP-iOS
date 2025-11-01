@@ -79,6 +79,8 @@ private extension MyPageViewController {
                 switch menu {
                 case .account:
                     owner.coordinator?.showAccountViewController()
+                case .notice:
+                    owner.coordinator?.showNoticeList()
                 case .contact:
                     owner.presentContactMailComposer()
                 case .info:

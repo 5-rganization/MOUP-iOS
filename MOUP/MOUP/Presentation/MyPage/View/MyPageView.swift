@@ -13,6 +13,7 @@ import RxCocoa
 
 enum MyPageMenu: String, CaseIterable {
     case account = "계정"
+    case notice = "공지사항"
     case contact = "문의하기"
     case info = "정보"
 }

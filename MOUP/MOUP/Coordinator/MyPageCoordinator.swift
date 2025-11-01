@@ -19,6 +19,10 @@ final class MyPageCoordinator: Coordinator {
     private let authRepository: AuthRepositoryProtocol
     private let authUseCase: AuthUseCaseProtocol
     
+    private let noticeService: NoticeServiceProtocol
+    private let noticeRepository: NoticeRepositoryProtocol
+    private let noticeUseCase: NoticeUseCaseProtocol
+    
     private lazy var myPageVC: MyPageViewController = {
         let viewModel = MyPageViewModel(
             userUseCase: userUseCase,
@@ -38,6 +42,10 @@ final class MyPageCoordinator: Coordinator {
         self.authService = AuthService()
         self.authRepository = AuthRepository(authService: authService)
         self.authUseCase = AuthUseCase(authRepository: authRepository)
+        
+        self.noticeService = NoticeService()
+        self.noticeRepository = NoticeRepository(noticeService: noticeService)
+        self.noticeUseCase = NoticeUseCase(noticeRepository: noticeRepository)
     }
 
     func start() {
@@ -68,6 +76,19 @@ final class MyPageCoordinator: Coordinator {
         let deleteAccountModalVC = DeleteAccountModalViewController(viewModel: viewModel)
         deleteAccountModalVC.modalPresentationStyle = .overFullScreen
         navigationController.present(deleteAccountModalVC, animated: false)
+    }
+    
+    func showNoticeList() {
+        let viewModel = NoticeListViewModel(noticeUseCase: noticeUseCase)
+        let noticeListVC = NoticeListViewController(viewModel: viewModel)
+        noticeListVC.coordinator = self
+        navigationController.pushViewController(noticeListVC, animated: true)
+    }
+    
+    func showNoticeDetail(_ notice: Notice) {
+        let noticeDetailVC = NoticeDetailViewController(notice: notice)
+        noticeDetailVC.coordinator = self
+        navigationController.pushViewController(noticeDetailVC, animated: true)
     }
     
     func showInfoViewController() {
