@@ -10,6 +10,7 @@ import Alamofire
 
 enum UserRouter {
     case fetchProfile
+    case updateNickname(UpdateNicknameRequestDTO)
 }
 
 extension UserRouter: URLRequestConvertible {
@@ -24,6 +25,8 @@ extension UserRouter: URLRequestConvertible {
         switch self {
         case .fetchProfile:
             return "/users/profiles"
+        case .updateNickname:
+            return "/users/nickname"
         }
     }
     
@@ -31,6 +34,8 @@ extension UserRouter: URLRequestConvertible {
         switch self {
         case .fetchProfile:
             return .get
+        case .updateNickname:
+            return .patch
         }
     }
     
@@ -38,6 +43,8 @@ extension UserRouter: URLRequestConvertible {
         switch self {
         case .fetchProfile:
             return nil
+        case .updateNickname(let dto):
+            return dto
         }
     }
     
@@ -45,6 +52,8 @@ extension UserRouter: URLRequestConvertible {
         switch self {
         case .fetchProfile:
             return URLEncoding.default
+        case .updateNickname:
+            return JSONEncoding.default
         }
     }
     

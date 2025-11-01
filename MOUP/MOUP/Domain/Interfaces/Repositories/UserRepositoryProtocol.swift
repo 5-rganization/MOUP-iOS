@@ -9,4 +9,5 @@ import Foundation
 
 protocol UserRepositoryProtocol: AnyObject {
     func fetchProfile() async throws -> UserProfile
+    func updateNickname(_ nickname: String) async throws -> String
 }

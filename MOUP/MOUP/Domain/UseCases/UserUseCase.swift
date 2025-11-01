@@ -17,4 +17,8 @@ final class UserUseCase: UserUseCaseProtocol {
     func fetchProfile() async throws -> UserProfile {
         try await userRepository.fetchProfile()
     }
+    
+    func updateNickname(_ nickname: String) async throws -> String {
+        try await userRepository.updateNickname(nickname)
+    }
 }

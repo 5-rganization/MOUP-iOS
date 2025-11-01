@@ -35,4 +35,9 @@ final class UserRepository: UserRepositoryProtocol {
             createdAt: createdDate
         )
     }
+    
+    func updateNickname(_ nickname: String) async throws -> String {
+        let dto = try await userService.updateNickname(nickname)
+        return dto.nickname
+    }
 }

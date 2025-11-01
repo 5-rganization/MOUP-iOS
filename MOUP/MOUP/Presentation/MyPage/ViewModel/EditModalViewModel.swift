@@ -15,21 +15,33 @@ enum ValidationViewState: Equatable {
 }
 
 final class EditModalViewModel {
+    
+    // MARK: - Input
+    
     struct Input {
         let text: Observable<String>
         let saveTap: Observable<Void>
     }
     
+    // MARK: - Output
+    
     struct Output {
         let viewState: Driver<ValidationViewState>
         let isSaveEnabled: Driver<Bool>
         let saveSuccess: Signal<String>
-//        let saveError: Signal<String>
+        let saveError: Signal<String>
     }
     
     // MARK: - Properties
     
     private let initialMessage = "특수문자 제외 8자 이하로 입력해주세요"
+    private let userUseCase: UserUseCaseProtocol
+    
+    // MARK: - Initializer
+    
+    init(userUseCase: UserUseCaseProtocol) {
+        self.userUseCase = userUseCase
+    }
     
     func transform(_ input: Input) -> Output {
         let text = input.text
@@ -75,21 +87,48 @@ final class EditModalViewModel {
                 validation.isValid && !validation.isEmpty
             }
             .map { nickname, _ in nickname }
-            .flatMapLatest { nickname in
-                // TODO: - usecase 연결
-                Observable.just(nickname)
+            .flatMapLatest { [weak self] nickname -> Observable<Result<String, Error>> in
+                guard let self else { return .empty() }
+                
+                return Observable.create { observer in
+                    Task {
+                        do {
+                            let updatedNickname = try await self.userUseCase.updateNickname(nickname)
+                            observer.onNext(.success(updatedNickname))
+                            observer.onCompleted()
+                        } catch {
+                            observer.onNext(.failure(error))
+                            observer.onCompleted()
+                        }
+                    }
+                    return Disposables.create()
+                }
             }
             .share(replay: 1, scope: .whileConnected)
         
         let saveSuccess = saveResult
+            .compactMap { result -> String? in
+                if case .success(let nickname) = result {
+                    return nickname
+                }
+                return nil
+            }
             .asSignal(onErrorSignalWith: .empty())
         
-        // TODO: - saveError일 경우 처리
+        let saveError = saveResult
+            .compactMap { result -> String? in
+                if case .failure(let error) = result {
+                    return error.localizedDescription
+                }
+                return nil
+            }
+            .asSignal(onErrorSignalWith: .empty())
         
         return Output(
             viewState: viewState,
             isSaveEnabled: isSaveEnabled,
-            saveSuccess: saveSuccess
+            saveSuccess: saveSuccess,
+            saveError: saveError
         )
     }
     

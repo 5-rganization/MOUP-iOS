@@ -15,3 +15,8 @@ struct UserProfileResponseDTO: Decodable {
     let role: String
     let createdAt: String
 }
+
+struct UpdateNicknameResponseDTO: Decodable {
+    let userId: Int
+    let nickname: String
+}

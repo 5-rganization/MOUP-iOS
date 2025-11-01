@@ -152,8 +152,21 @@ private extension EditModalViewController {
         
         output.saveSuccess
             .emit(with: self) { owner, nickname in
+                print("닉네임 수정 성공: \(nickname)")
                 owner.onNicknameSaved?(nickname)
                 owner.dismiss(animated: false)
+            }
+            .disposed(by: disposeBag)
+        
+        output.saveError
+            .emit(with: self) { owner, errorMessage in
+                print("닉네임 수정 실패: \(errorMessage)")
+                
+                let alert = NoticeModalViewController(
+                    title: "닉네임 수정 실패",
+                    comment: errorMessage
+                )
+                owner.present(alert, animated: false)
             }
             .disposed(by: disposeBag)
         
