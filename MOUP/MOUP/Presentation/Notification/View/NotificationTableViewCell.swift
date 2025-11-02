@@ -51,19 +51,31 @@ final class NotificationTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        backgroundColor = .white
+        statusIcon.image = .readNotification
+        titleLabel.text = nil
+        contentLabel.text = nil
+        timeLabel.text = nil
+    }
+    
     // MARK: - Public Methods
     
     func configure(with notification: UserNotification) {
         titleLabel.text = notification.title
         contentLabel.text = notification.content
         
-        statusIcon.image = notification.isRead ? .readNotification : .unReadNotification
-        
-        timeLabel.text = formatTimeAgo(notification.sentAt)
-        
-        if !notification.isRead {
+        if notification.isRead {
+            statusIcon.image = .readNotification
+            backgroundColor = .white
+        } else {
+            statusIcon.image = .unReadNotification
             backgroundColor = .primary50
         }
+        
+        timeLabel.text = formatTimeAgo(notification.sentAt)
     }
     
     private func formatTimeAgo(_ date: Date) -> String {

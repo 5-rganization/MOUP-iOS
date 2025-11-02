@@ -64,7 +64,10 @@ final class NotificationListViewModel {
                     Task {
                         do {
                             let notifications = try await self.notificationUseCase.fetchNotifications()
-                            observer.onNext(notifications)
+                            
+                            let sortedNotification = notifications.sorted { $0.sentAt > $1.sentAt }
+                            
+                            observer.onNext(sortedNotification)
                             observer.onCompleted()
                         } catch {
                             errorRelay.accept("알림을 불러오는데 실패했습니다.")
@@ -81,14 +84,16 @@ final class NotificationListViewModel {
         
         input.notificationTapped
             .filter { !$0.isRead }
-            .flatMapLatest { [weak self] notification -> Observable<Void> in
+            .flatMapLatest { [weak self] tappedNotification -> Observable<Int> in
                 guard let self else { return .empty() }
                 
                 return Observable.create { observer in
                     Task {
                         do {
-                            try await self.notificationUseCase.markAsRead(id: notification.id)
-                            observer.onNext(())
+                            try await self.notificationUseCase.markAsRead(
+                                id: tappedNotification.id
+                            )
+                            observer.onNext(tappedNotification.id)
                             observer.onCompleted()
                         } catch {
                             print("읽음 처리 실패: \(error)")
@@ -98,11 +103,10 @@ final class NotificationListViewModel {
                     return Disposables.create()
                 }
             }
-            .withLatestFrom(notificationsRelay) { _, notifications -> [UserNotification] in
+            .withLatestFrom(notificationsRelay) { tappedNotificationId, notifications -> [UserNotification] in
                 return notifications.map { notification in
-                    var updated = notification
-                    if !notification.isRead {
-                        updated = UserNotification(
+                    if notification.id == tappedNotificationId && !notification.isRead {
+                        return UserNotification(
                             id: notification.id,
                             senderId: notification.senderId,
                             receiverId: notification.receiverId,
@@ -112,7 +116,7 @@ final class NotificationListViewModel {
                             readAt: Date()
                         )
                     }
-                    return updated
+                    return notification
                 }
             }
             .bind(to: notificationsRelay)
