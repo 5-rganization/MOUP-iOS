@@ -16,7 +16,7 @@ final class AddRoutineViewController: UIViewController {
     private let addRoutineView = AddRoutineView()
     private let viewModel: AddRoutineViewModel
     private let disposeBag = DisposeBag()
-    var onSave: ((Routine) -> Void)?
+    var onSave: ((RoutineSummary) -> Void)?
     private let titleInputSubject = PublishSubject<String>()
     private let alarmTimeInputSubject = PublishSubject<DateComponents?>()
     private let itemsInputSubject = PublishSubject<[TodoItem]>()
@@ -135,10 +135,23 @@ private extension AddRoutineViewController {
             .disposed(by: disposeBag)
         
         output.saveCompleted
-            .emit(with: self, onNext: { owner, newRoutine in
-                owner.onSave?(newRoutine)
+            .emit(with: self, onNext: { owner, routineSummary in
+                owner.onSave?(routineSummary)
                 owner.navigationController?.popViewController(animated: true)
             })
+            .disposed(by: disposeBag)
+        
+        output.error
+            .emit(with: self) { owner, message in
+                print("에러: \(message)")
+                
+                let alert = NoticeModalViewController(
+                    title: "루틴 생성 실패",
+                    comment: message
+                )
+                
+                owner.present(alert, animated: true)
+            }
             .disposed(by: disposeBag)
     }
     

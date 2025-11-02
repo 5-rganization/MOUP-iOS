@@ -58,4 +58,22 @@ final class RoutineRepository: RoutineRepositoryProtocol {
         
         return routines
     }
+    
+    func createRoutine(
+        name: String,
+        alarmTime: String,
+        tasks: [(content: String, orderIndex: Int)]
+    ) async throws -> Int {
+        let request = CreateRoutineRequestDTO(
+            routineName: name,
+            alarmTime: alarmTime,
+            routineTaskList: tasks.map {
+                RoutineTaskDTO(
+                    content: $0.content,
+                    orderIndex: $0.orderIndex
+                )
+            })
+        
+        return try await routineService.createRoutine(request: request)
+    }
 }

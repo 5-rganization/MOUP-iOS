@@ -11,19 +11,19 @@ import RxCocoa
 import RxDataSources
 
 struct RoutineRowViewState: IdentifiableType, Hashable {
-    let routine: Routine
+    let routine: RoutineSummary
     var isChecked: Bool
     
-    var identity: UUID {
-        return routine.id
+    var identity: Int {
+        return routine.routineId
     }
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(routine.id)
+        hasher.combine(routine.routineId)
     }
     
     static func == (lhs: RoutineRowViewState, rhs: RoutineRowViewState) -> Bool {
-        lhs.routine.id == rhs.routine.id && lhs.isChecked == rhs.isChecked
+        lhs.routine.routineId == rhs.routine.routineId && lhs.isChecked == rhs.isChecked
     }
 }
 
@@ -32,29 +32,51 @@ typealias RoutineSectionModel = AnimatableSectionModel<Int, RoutineRowViewState>
 final class RoutineSelectionViewModel {
     struct Input {
         let appear: Observable<Void>
-        let checkboxToggled: Observable<UUID>
-        let addNewRoutine: Observable<Routine>
-        let routineUpdated: Observable<Routine>
+        let checkboxToggled: Observable<Int>
+        let addNewRoutine: Observable<RoutineSummary>
+        let routineUpdated: Observable<RoutineSummary>
     }
     
     struct Output {
         let rows: Driver<[RoutineSectionModel]>
+        let error: Signal<String>
     }
     
     // MARK: - Properties
     
-    private let routinesRelay = BehaviorRelay<[Routine]>(value: [])
-    private let checkedIDsRelay = BehaviorRelay<Set<UUID>>(value: [])
+    private let routineUseCase: RoutineUseCaseProtocol
+    private let routinesRelay = BehaviorRelay<[RoutineSummary]>(value: [])
+    private let checkedIDsRelay = BehaviorRelay<Set<Int>>(value: [])
+    private let errorRelay = PublishRelay<String>()
     private let disposeBag = DisposeBag()
+    
+    // MARK: - Initializer
+    
+    init(routineUseCase: RoutineUseCaseProtocol) {
+        self.routineUseCase = routineUseCase
+    }
     
     // MARK: - Transform
     
     func transform(_ input: Input) -> Output {
         let initialRoutines = input.appear
-            .flatMapLatest { [weak self] _ -> Observable<[Routine]> in
+            .flatMapLatest { [weak self] _ -> Observable<[RoutineSummary]> in
                 guard let self else { return .empty() }
-                // TODO: usecase 호출
-                return .just(self.fetchDummyData())
+                
+                return Observable.create { observer in
+                    Task {
+                        do {
+                            let routines = try await self.routineUseCase.fetchAllRoutines()
+                            observer.onNext(routines)
+                            observer.onCompleted()
+                        } catch {
+                            self.errorRelay.accept("루틴 목록을 불러오는데 실패했습니다.")
+                            observer.onNext([])
+                            observer.onCompleted()
+                        }
+                    }
+                    return Disposables.create()
+                }
             }
         
         let newRoutineAdded = input.addNewRoutine
@@ -63,8 +85,8 @@ final class RoutineSelectionViewModel {
             }
         
         let routineUpdated = input.routineUpdated
-            .withLatestFrom(routinesRelay) { updated, current -> [Routine] in
-                current.map { $0.id == updated.id ? updated : $0 }
+            .withLatestFrom(routinesRelay) { updated, current -> [RoutineSummary] in
+                current.map { $0.routineId == updated.routineId ? updated : $0 }
             }
         
         Observable.merge(initialRoutines, newRoutineAdded, routineUpdated)
@@ -84,7 +106,7 @@ final class RoutineSelectionViewModel {
                 let viewStates = routines.map {
                     RoutineRowViewState(
                         routine: $0,
-                        isChecked: checkedIDs.contains($0.id)
+                        isChecked: checkedIDs.contains($0.routineId)
                     )
                 }
                 return [RoutineSectionModel(model: 0, items: viewStates)]
@@ -93,15 +115,8 @@ final class RoutineSelectionViewModel {
             .asDriver(onErrorJustReturn: [])
         
         return Output(
-            rows: rows
+            rows: rows,
+            error: errorRelay.asSignal()
         )
-    }
-    
-    private func fetchDummyData() -> [Routine] {
-        return [
-            Routine(id: UUID(), title: "오픈", alarmTime: nil, items: []),
-            Routine(id: UUID(), title: "폐기", alarmTime: nil, items: []),
-            Routine(id: UUID(), title: "마감", alarmTime: nil, items: [])
-        ]
     }
 }

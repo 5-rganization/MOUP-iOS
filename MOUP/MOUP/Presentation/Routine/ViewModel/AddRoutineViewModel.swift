@@ -37,20 +37,25 @@ final class AddRoutineViewModel {
     struct Output {
         let items: Driver<[TodoItem]>
         let focusOnRow: Signal<Int>
-        
         let title: Driver<String>
         let validationFocus: Signal<ValidationFocusTarget>
-        let saveCompleted: Signal<Routine>
+        let saveCompleted: Signal<RoutineSummary>
+        let error: Signal<String>
     }
     
     // MARK: - Properties
     
     private let disposeBag = DisposeBag()
     private let storage: DraftRoutineStorageProtocol
+    private let routineUseCase: RoutineUseCaseProtocol
     
     // MARK: - Initializer
     
-    init(storage: DraftRoutineStorageProtocol = DraftRoutineStorage.shared) {
+    init(
+        routineUseCase: RoutineUseCaseProtocol,
+        storage: DraftRoutineStorageProtocol = DraftRoutineStorage.shared
+    ) {
+        self.routineUseCase = routineUseCase
         self.storage = storage
     }
     
@@ -63,7 +68,8 @@ final class AddRoutineViewModel {
         
         let focusRelay = PublishRelay<Int>()
         let validationFocusRelay = PublishRelay<ValidationFocusTarget>()
-        let saveCompletedRelay = PublishRelay<Routine>()
+        let saveCompletedRelay = PublishRelay<RoutineSummary>()
+        let errorRelay = PublishRelay<String>()
         
         input.titleChanged
             .bind(to: titleRelay)
@@ -166,31 +172,58 @@ final class AddRoutineViewModel {
                 alarmTimeRelay,
                 itemsRelay
             ))
-            .subscribe(onNext: { title, alarmTime, items in
+            .flatMapLatest { [weak self] (title, alarmTime, items) -> Observable<RoutineSummary> in
+                guard let self else { return .empty() }
+                
                 if title.isEmpty {
                     validationFocusRelay.accept(.title)
-                    return
+                    return .empty()
                 }
                 
-                if alarmTime == nil {
+                guard let alarmTime = alarmTime else {
                     validationFocusRelay.accept(.alarmTime)
-                    return
+                    return .empty()
                 }
                 
                 let validItems = items.filter { !$0.text.isBlank }
                 if validItems.isEmpty {
                     validationFocusRelay.accept(.firstTodoItem)
-                    return
+                    return .empty()
                 }
                 
-                let newRoutine = Routine(
-                    id: UUID(), title: title, alarmTime: alarmTime, items: validItems
-                )
+                guard let hour = alarmTime.hour,
+                      let minute = alarmTime.minute else {
+                    validationFocusRelay.accept(.alarmTime)
+                    return .empty()
+                }
+                let alarmTimeString = String(format: "%d:%02d", hour, minute)
                 
-                // TODO: usecase 호출
-                print("저장 성공: \(newRoutine)")
-                saveCompletedRelay.accept(newRoutine)
-            })
+                let tasks = validItems.enumerated().map { (index, item) in
+                    (content: item.text, orderIndex: index)
+                }
+                
+                return Observable.create { observer in
+                    Task {
+                        do {
+                            let routineSummary = try await self.routineUseCase.createRoutine(
+                                name: title,
+                                alarmTime: alarmTimeString,
+                                tasks: tasks
+                            )
+                            
+                            print("루틴 생성 성공: \(routineSummary)")
+                            observer.onNext(routineSummary)
+                            observer.onCompleted()
+                        } catch {
+                            print("루틴 생성 실패: \(error)")
+                            errorRelay.accept("루틴 생성에 실패했습니다.")
+                            observer.onCompleted()
+                        }
+                    }
+                    return Disposables.create()
+                }
+            }
+            .bind(to: saveCompletedRelay)
             .disposed(by: disposeBag)
         
         return Output(
@@ -198,7 +231,8 @@ final class AddRoutineViewModel {
             focusOnRow: focusRelay.asSignal(),
             title: titleRelay.asDriver(),
             validationFocus: validationFocusRelay.asSignal(),
-            saveCompleted: saveCompletedRelay.asSignal()
+            saveCompleted: saveCompletedRelay.asSignal(),
+            error: errorRelay.asSignal()
         )
     }
 }

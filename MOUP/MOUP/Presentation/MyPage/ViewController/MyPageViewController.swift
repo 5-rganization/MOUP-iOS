@@ -108,6 +108,15 @@ private extension MyPageViewController {
             })
             .disposed(by: disposeBag)
         
+        mypageView.rx.dummyButton2Tapped
+            .subscribe(onNext: { [weak self] _ in
+                let coordinator = RoutineSelectionCoordinator(
+                    navigationController: self?.navigationController ?? UINavigationController()
+                )
+                coordinator.start()
+            })
+            .disposed(by: disposeBag)
+        
         let input = MyPageViewModel.Input(
             viewDidLoad: viewDidLoadSubject.asObservable(),
             logoutConfirmed: logoutConfirmed
