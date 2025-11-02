@@ -30,6 +30,7 @@ final class NotificationListViewController: UIViewController {
         
         configure()
         viewDidLoadSubject.onNext(())
+        observerPushNotifications()
     }
     
     // MARK: - Initializer
@@ -41,6 +42,12 @@ final class NotificationListViewController: UIViewController {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Deinit
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }
 
@@ -118,5 +125,26 @@ private extension NotificationListViewController {
                 // TODO: - 배지 업데이트
             }
             .disposed(by: disposeBag)
+    }
+    
+    func observerPushNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handlePushNotificationReceived),
+            name: .pushNotificationReceived,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handlePushNotificationReceived),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
+    }
+    
+    @objc func handlePushNotificationReceived() {
+        print("푸시 알림 수신 -> 알림 목록 새로고침")
+        refreshSubject.onNext(())
     }
 }

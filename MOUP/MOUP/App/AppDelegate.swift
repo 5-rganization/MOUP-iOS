@@ -77,6 +77,11 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         let userInfo = notification.request.content.userInfo
         self.logger.debug("포그라운드 알림: \(userInfo)")
+        NotificationCenter.default.post(
+            name: .pushNotificationReceived,
+            object: nil,
+            userInfo: userInfo
+        )
         completionHandler([.banner, .sound, .badge])
     }
     
@@ -86,7 +91,61 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
         self.logger.debug("알림 탭: \(userInfo)")
-        // TODO: - 알림 타입에 따라 화면 이동 구현 필요, userInfo["type"]을 통한 분기
+        
+        handleNotificationTap(userInfo)
+        
         completionHandler()
+    }
+    
+    private func handleNotificationTap(_ userInfo: [AnyHashable: Any]) {
+        guard let notificationType = userInfo["type"] as? String else {
+            self.logger.warning("알림 타입이 없습니다.")
+            
+            NotificationCenter.default.post(
+                name: .pushNotificationTapped,
+                object: nil,
+                userInfo: ["destination": "notificationList"]
+            )
+            return
+        }
+        
+        self.logger.debug("알림 타입: \(notificationType)")
+        
+        switch notificationType {
+        case "INVITE_APPROVED", "INVITE_REJECTED":
+            NotificationCenter.default.post(
+                name: .pushNotificationTapped,
+                object: nil,
+                userInfo: [
+                    "destination": "notificationList",
+                    "type": notificationType
+                ]
+            )
+        case "INVITE_REQUEST":
+            NotificationCenter.default.post(
+                name: .pushNotificationTapped,
+                object: nil,
+                userInfo: [
+                    "destination": "notificationList",
+                    "type": notificationType
+                ]
+            )
+        case "PAYDAY_REMINDER":
+            NotificationCenter.default.post(
+                name: .pushNotificationTapped,
+                object: nil,
+                userInfo: [
+                    "destination": "notificationList",
+                    "type": notificationType
+                ]
+            )
+        default:
+            self.logger.warning("알 수 없는 알림 타입: \(notificationType)")
+            NotificationCenter.default.post(
+                name: .pushNotificationTapped,
+                object: nil,
+                userInfo: ["destination": "notificationList"]
+            )
+        }
     }
 }

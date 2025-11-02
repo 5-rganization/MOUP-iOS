@@ -71,6 +71,13 @@ final class AppCoordinator: Coordinator {
             name: .deleteAccountSuccess,
             object: nil
         )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handlePushNotificationTapped),
+            name: .pushNotificationTapped,
+            object: nil
+        )
     }
     
     @objc private func handleUnauthorizedAccess() {
@@ -88,6 +95,25 @@ final class AppCoordinator: Coordinator {
     @objc private func handleDeleteAccountSuccess() {
         print("🔄 회원 탈퇴 성공, 로그인 화면으로 이동")
         showSignIn()
+    }
+    
+    @objc private func handlePushNotificationTapped(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let destination = userInfo["destination"] as? String else {
+            print("알림 정보가 없습니다.")
+            return
+        }
+        
+        print("푸시 알림 탭 - 목적지: \(destination)")
+        
+        guard tokenUseCase.checkSignedIn() else {
+            print("로그인되지 않은 상태")
+            return
+        }
+        
+        if destination == "notificationList" {
+            moveToNotificationList()
+        }
     }
     
     private func showSignIn() {
@@ -113,6 +139,16 @@ final class AppCoordinator: Coordinator {
         )
         childCoordinators.append(tabBarCoordinator)
         tabBarCoordinator.start()
+    }
+    
+    private func moveToNotificationList() {
+        guard let tabBarCoordinator = childCoordinators.first(where: { $0 is TabBarCoordinator }) as? TabBarCoordinator else {
+            print("TabBarCoordinator를 찾을 수 없습니다.")
+            return
+        }
+        
+        tabBarCoordinator.moveToNotificationList()
+        print("알림 리스트로 이동 완료")
     }
     
     // MARK: - Public Methods
