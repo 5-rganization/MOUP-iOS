@@ -52,6 +52,7 @@ private extension InviteCodeSheetViewController {
         
         output.inviteCode
             .withUnretained(self)
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { owner, code in
                 owner.inviteCodeSheetView.update(with: code)
             })
