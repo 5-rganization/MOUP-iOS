@@ -90,15 +90,22 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(vc, animated: true)
     }
     
-    func moveToManageAttendance() {
+    func moveToManageAttendance(workplaceId: Int) {
         let viewModel = ManageAttendanceViewModel()
-        let vc = ManageAttendanceViewController(viewModel: viewModel, coordinator: self)
+        let vc = ManageAttendanceViewController(
+            viewModel: viewModel,
+            coordinator: self,
+            workplaceId: workplaceId
+        )
         navigationController.pushViewController(vc, animated: true)
     }
     
     func moveToAttendanceHistory(navTitle: String) {
         let viewModel = AttendanceHistoryViewModel()
-        let vc = AttendanceHistoryViewController(viewModel: viewModel, navTitle: navTitle)
+        let vc = AttendanceHistoryViewController(
+            viewModel: viewModel,
+            navTitle: navTitle
+        )
         navigationController.pushViewController(vc, animated: true) // TODO: - 애니메이션 자연스러운지 다같이 확인해봐야함.
     }
     
@@ -106,7 +113,7 @@ final class HomeCoordinator: Coordinator {
         let viewModel = InviteCodeSheetViewModel(workplaceUseCase: workplaceUseCase)
         let vc = InviteCodeSheetViewController(
             viewModel: viewModel,
-            workplaceId: <#Int#>
+            workplaceId: workplaceId
         )
         vc.modalPresentationStyle = .pageSheet
         
