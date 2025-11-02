@@ -40,4 +40,3 @@ struct RoutineSummaryDTO: Decodable {
     let alarmTime: String?
 }
 
-

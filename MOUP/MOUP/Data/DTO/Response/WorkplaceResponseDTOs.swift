@@ -27,6 +27,7 @@ struct WorkplaceSummaryResponseDTO: Decodable {
 struct InviteCodeResponseDTO: Decodable {
     let inviteCode: String
     let returnAlreadyExists: Bool?
+}
 
 extension WorkplaceSummaryResponseDTO {
     func toDomain() -> WorkplaceSummary {
