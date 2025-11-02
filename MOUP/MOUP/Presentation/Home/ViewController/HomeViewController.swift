@@ -181,9 +181,9 @@ private extension HomeViewController {
 }
 
 extension HomeViewController: OwnerWorkplaceCellDelegate {
-    func didTapAttendanceBtn(workplaceName: String) {
+    func didTapAttendanceBtn(workplaceName: String, workplaceId: Int) {
         print("근태 관리 탭")
-        coordinator?.moveToManageAttendance()
+        coordinator?.moveToManageAttendance(workplaceId: workplaceId)
     }
 }
 

@@ -11,6 +11,7 @@ import RxDataSources
 
 final class ManageAttendanceViewController: UIViewController {
     // MARK: - Properties
+    private let workplaceId: Int
     private let manageAttendanceView = ManageAttendanceView()
     private let viewModel: ManageAttendanceViewModel
     private let disposeBag = DisposeBag()
@@ -32,9 +33,14 @@ final class ManageAttendanceViewController: UIViewController {
     }
     
     // MARK: - Initializer
-    init(viewModel: ManageAttendanceViewModel, coordinator: HomeCoordinator) {
+    init(
+        viewModel: ManageAttendanceViewModel,
+        coordinator: HomeCoordinator,
+        workplaceId: Int
+    ) {
         self.viewModel = viewModel
         self.coordinator = coordinator
+        self.workplaceId = workplaceId
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -89,7 +95,7 @@ private extension ManageAttendanceViewController {
         manageAttendanceView.rx.inviteBtnTapped
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
-                owner.coordinator?.presentInviteCodeSheet()
+                owner.coordinator?.presentInviteCodeSheet(workplaceId: owner.workplaceId)
             })
             .disposed(by: disposeBag)
     }
