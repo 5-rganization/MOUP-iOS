@@ -40,3 +40,7 @@ struct RoutineSummaryDTO: Decodable {
     let alarmTime: String?
 }
 
+/// 루틴 생성 응답 DTO
+struct CreateRoutineResponseDTO: Decodable {
+    let routineId: Int
+}
