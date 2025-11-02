@@ -96,6 +96,18 @@ private extension MyPageViewController {
             }
             .share()
         
+        mypageView.rx.dummyButtonTapped
+            .subscribe(onNext: { [weak self] _ in
+                let service = NotificationService()
+                let repository = NotificationRepository(notificationService: service)
+                let useCase = NotificationUseCase(notificationRepository: repository)
+                let vm = NotificationListViewModel(notificationUseCase: useCase)
+                let vc = NotificationListViewController(viewModel: vm)
+                
+                self?.navigationController?.pushViewController(vc, animated: false)
+            })
+            .disposed(by: disposeBag)
+        
         let input = MyPageViewModel.Input(
             viewDidLoad: viewDidLoadSubject.asObservable(),
             logoutConfirmed: logoutConfirmed

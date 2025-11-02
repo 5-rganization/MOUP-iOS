@@ -113,7 +113,7 @@ private extension NoticeListView {
         }
         
         tableView.snp.makeConstraints {
-            $0.top.equalTo(navigationBar.snp.bottom)
+            $0.top.equalTo(navigationBar.snp.bottom).offset(12)
             $0.directionalHorizontalEdges.bottom.equalTo(safeAreaLayoutGuide)
         }
         

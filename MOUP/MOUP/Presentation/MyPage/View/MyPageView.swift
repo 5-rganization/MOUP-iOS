@@ -107,6 +107,11 @@ final class MyPageView: UIView {
         $0.layer.borderColor = UIColor.primary500.cgColor
     }
     
+    fileprivate let dummyButton = UIButton().then {
+        $0.setTitle("임시알림화면이동버튼", for: .normal)
+        $0.setTitleColor(.gray900, for: .normal)
+    }
+    
     // MARK: - Initializer
     
     override init(frame: CGRect) {
@@ -175,7 +180,8 @@ private extension MyPageView {
             nicknameRoleStackView,
             editButton,
             menuStackView,
-            logoutButton
+            logoutButton,
+            dummyButton
         )
         
         profileImageFrame.addSubview(profileImageView)
@@ -251,6 +257,11 @@ private extension MyPageView {
             $0.directionalHorizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(44)
         }
+        
+        dummyButton.snp.makeConstraints {
+            $0.top.equalTo(logoutButton.snp.bottom).offset(20)
+            $0.centerX.equalToSuperview()
+        }
     }
 }
 
@@ -265,5 +276,9 @@ extension Reactive where Base: MyPageView {
     
     var logoutButtonTapped: ControlEvent<Void> {
         base.logoutButton.rx.tap
+    }
+    
+    var dummyButtonTapped: ControlEvent<Void> {
+        base.dummyButton.rx.tap
     }
 }
