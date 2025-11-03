@@ -24,6 +24,15 @@ final class InviteCodeInputCoordinator: Coordinator {
     func start() {
         let viewModel = InviteCodeInputViewModel(workplaceUseCase: workplaceUseCase)
         let vc = InviteCodeInputViewController(viewModel: viewModel)
+        vc.coordinator = self
         navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func moveToInviteCodeResult(workplace: InviteCodeWorkplace) {
+        DispatchQueue.main.async {
+            let viewModel = InviteCodeResultViewModel(workplace: workplace)
+            let vc = InviteCodeResultViewController(viewModel: viewModel)
+            self.navigationController.pushViewController(vc, animated: true)
+        }
     }
 }
