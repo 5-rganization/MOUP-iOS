@@ -17,7 +17,7 @@ struct WorkSummary {
     let endTime: Date?
     let workMinutes: Int
     let restTimeMinutes: Int
-    let estimatedNetIncome: Int
+    let estimatedNetIncome: Int?
     let repeatDays: [String]
     let repeatEndDate: String?
     let isMyWork: Bool

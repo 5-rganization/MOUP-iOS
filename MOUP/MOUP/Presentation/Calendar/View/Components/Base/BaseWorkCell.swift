@@ -87,8 +87,8 @@ class BaseWorkCell: UITableViewCell {
     }
     
     // MARK: - Override Methods
-    func update(work: CalendarWork) {
-        fatalError("update() 메서드 실행 실패 - 메서드가 오버라이딩 되지 않았습니다.")
+    func update(work: WorkSummary) {
+        fatalError("\(#function) 실행 실패 - 메서드가 오버라이딩 되지 않았습니다.")
     }
 }
 
@@ -150,7 +150,7 @@ extension BaseWorkCell {
     /// 설정된 라벨 컬러를 적용하는 메서드
     func setGivenLabelColor(_ labelColorStr: String) {
         guard let labelColor = LabelColorString(rawValue: labelColorStr) else {
-            assertionFailure("setGivenLabelColor() 메서드 실행 실패 - labelColorStr 값이 올바르지 않습니다.")
+            assertionFailure("\(#function) 실행 실패 - labelColorStr 값이 올바르지 않습니다.")
             return
         }
         labelColorBorderView.update(borderColor: labelColor)
@@ -162,19 +162,15 @@ extension BaseWorkCell {
     }
     
     /// 출퇴근 시간, 근무 시간을 계산하여 각 UI에 적용하는 메서드
-    func setTimeInfoUI(startTime: String, endTime: String, restTime: Int) {
-        if let workHour = DateFormatter.calculateWorkHour(startTime: startTime, endTime: endTime, restTime: restTime) {
-            startEndTimeLabel.text = "\(startTime) ~ \(endTime)"
-            
-            let workHourText: String
-            if workHour.minutesInt == 0 {
-                workHourText = " (\(workHour.hoursInt)시간)"
-            } else {
-                workHourText = " (\(workHour.hoursInt)시간 \(workHour.minutesInt)분)"
-            }
-            workHourLabel.text = workHourText
+    func setTimeInfoUI(startTime: Date, endTime: Date?, workMinutes: Int) {
+        let startTimeStr = DateFormatter.startEndTimeDateFormatter.string(from: startTime)
+        if let endTime {
+            let endTimeStr = DateFormatter.startEndTimeDateFormatter.string(from: endTime)
+            startEndTimeLabel.text = "\(startTimeStr) ~ \(endTimeStr)"
         } else {
-            assertionFailure("calculateWorkHour() 메서드 실행 실패 - Argument가 올바르지 않습니다.")
+            startEndTimeLabel.text = "\(startTimeStr) ~ 근무 중"
         }
+        
+        workHourLabel.text = workMinutes.timeString
     }
 }

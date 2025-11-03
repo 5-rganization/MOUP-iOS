@@ -17,24 +17,29 @@ final class CalendarWorkListViewModel {
     private let disposeBag = DisposeBag()
     
     // Initializer Injections
-    private var calendarWorkList: [CalendarWork] = []
+    private var calendarWorkList: [WorkSummary]
+    private let workUseCase: WorkUseCaseProtocol
+    
+    private var fetchTask: Task<Void, Never>?
     
     // MARK: - Input
     struct Input {
         let viewDidLoad: Observable<Void>
-        let deleteWorkId: Observable<Int64>
+        let deleteWorkId: Observable<Int>
     }
     
     // MARK: - Output
     struct Output {
-        let calendarWorkList: Observable<[CalendarWork]>
+        let calendarWorkList: Observable<[WorkSummary]>
+        let errorMessage: Observable<(title: String, message: String)>
     }
-    private let calendarWorkListRelay = BehaviorRelay<[CalendarWork]>(value: [])
+    private let calendarWorkListRelay = BehaviorRelay<[WorkSummary]>(value: [])
+    private let errorMessageRelay = PublishRelay<(title: String, message: String)>()
     
     // MARK: - Initializer
-    init(calendarWorkList: [CalendarWork]) {
+    init(workUseCase: WorkUseCaseProtocol, calendarWorkList: [WorkSummary]) {
+        self.workUseCase = workUseCase
         self.calendarWorkList = calendarWorkList
-        // TODO: UseCase 주입
     }
     
     // MARK: - Input ➡️ Output Transform
@@ -46,13 +51,26 @@ final class CalendarWorkListViewModel {
         
         input.deleteWorkId
             .subscribe(with: self) { owner, id in
-                // TODO: 근무 삭제 API 호출
-                // 삭제 확인된 경우
-                owner.calendarWorkList = owner.calendarWorkList.filter { $0.id != id }
-                owner.calendarWorkListRelay.accept(owner.calendarWorkList)
-                owner.logger.debug("근무 ID: \(id) - 삭제 성공")
+                owner.fetchTask?.cancel()
+                owner.fetchTask = Task {
+                    defer {
+                        if !Task.isCancelled { owner.calendarWorkListRelay.accept(owner.calendarWorkList) }
+                    }
+                    
+                    do {
+                        try await owner.workUseCase.deleteWork(workId: id)
+                        owner.calendarWorkList = owner.calendarWorkList.filter { $0.id != id }
+                    } catch is CancellationError {
+                        owner.logger.info("근무 삭제 Task가 취소되었습니다.")
+                    } catch let error as LocalizedError {
+                        owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                    } catch {
+                        owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                    }
+                }
             }.disposed(by: disposeBag)
         
-        return Output(calendarWorkList: calendarWorkListRelay.asObservable())
+        return Output(calendarWorkList: calendarWorkListRelay.asObservable(),
+                      errorMessage: errorMessageRelay.asObservable())
     }
 }

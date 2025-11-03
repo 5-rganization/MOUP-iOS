@@ -12,7 +12,7 @@ protocol FilterCoordinatorDelegate: AnyObject {
     /// 필터 선택 화면 내림
     func dismissed(_ coordinator: FilterCoordinator)
     /// 선택한 필터 적용
-    func applyFilter(_ coordinator: FilterCoordinator, filterWorkplace: FilterWorkplace?)
+    func applyFilter(_ coordinator: FilterCoordinator, filterWorkplace: WorkplaceSummary?)
 }
 
 /// `FilterModalViewController` Coordinator
@@ -23,22 +23,25 @@ final class FilterCoordinator: Coordinator {
     
     // Initializer Injections
     private let navigationController: UINavigationController
+    private let workplaceUseCase: WorkplaceUseCaseProtocol
     private let calendarMode: CalendarMode
-    private let selectedFilterWorkplace: FilterWorkplace?
+    private let selectedFilterWorkplace: WorkplaceSummary?
     
     // Property Injections
     weak var delegate: FilterCoordinatorDelegate?
     
     // MARK: - Initializer
-    init(navigationController: UINavigationController, calendarMode: CalendarMode, selectedFilterWorkplace: FilterWorkplace?) {
+    init(navigationController: UINavigationController, workplaceUseCase: WorkplaceUseCaseProtocol, calendarMode: CalendarMode, selectedFilterWorkplace: WorkplaceSummary?) {
         self.navigationController = navigationController
+        self.workplaceUseCase = workplaceUseCase
+        
         self.calendarMode = calendarMode
         self.selectedFilterWorkplace = selectedFilterWorkplace
     }
     
     // MARK: - Coordinator Methods
     func start() {
-        let filterVM = FilterViewModel()
+        let filterVM = FilterViewModel(workplaceUseCase: workplaceUseCase)
         let filterVC = FilterModalViewController(viewModel: filterVM, calendarMode: calendarMode, selectedFilterWorkplace: selectedFilterWorkplace)
         filterVC.delegate = self
         
@@ -58,7 +61,7 @@ extension FilterCoordinator: FilterModalVCDelegate {
         delegate?.dismissed(self)
     }
     
-    func applyButtonTapped(filterWorkplace: FilterWorkplace?) {
+    func applyButtonTapped(filterWorkplace: WorkplaceSummary?) {
         delegate?.applyFilter(self, filterWorkplace: filterWorkplace)
     }
 }

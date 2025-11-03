@@ -16,9 +16,9 @@ protocol CalendarWorkListModalVCDelegate: AnyObject {
     /// `presentationControllerDidDismiss`를 감지했을 때 사용되는 메서드
     func dismissReceived()
     /// 근무 목록 셀을 탭했을 때 사용되는 메서드
-    func workCellTapped(work: CalendarWork)
+    func workCellTapped(work: WorkSummary)
     /// 수정하기 버튼을 탭했을 때 사용되는 메서드
-    func editButtonTapped(work: CalendarWork)
+    func editButtonTapped(work: WorkSummary)
     /// 근무 등록하기 버튼을 탭했을 때 사용되는 메서드
     func registerButtonTapped()
     /// 캘린더에 업데이트가 필요할 때 사용되는 메서드
@@ -41,7 +41,7 @@ final class CalendarWorkListModalViewController: UIViewController {
     weak var delegate: CalendarWorkListModalVCDelegate?
     
     // Input Relays
-    private let deleteWorkIdRelay = PublishRelay<Int64>()
+    private let deleteWorkIdRelay = PublishRelay<Int>()
     
     // MARK: - UI Components
     private lazy var calendarWorkListView = CalendarWorkListView().then {
@@ -118,16 +118,21 @@ private extension CalendarWorkListModalViewController {
                     owner.calendarWorkListView.rx.sharedWorkTableViewDataSource.onNext(workList)
                 }
             }).disposed(by: disposeBag)
+        
+        output.errorMessage.asDriver(onErrorJustReturn: (title: "오류 발생", message: "잠시 후 다시 시도해주세요."))
+            .drive(with: self) { owner, errorMessage in
+                owner.presentNoticeModal(title: errorMessage.title, comment: errorMessage.message)
+            }.disposed(by: disposeBag)
     }
 }
 
 // MARK: - CalendarWorkListViewDelegate
 extension CalendarWorkListModalViewController: CalendarWorkListViewDelegate {
-    func editWork(work: CalendarWork) {
+    func editWork(work: WorkSummary) {
         delegate?.editButtonTapped(work: work)
     }
     
-    func deleteWork(id: Int64) {
+    func deleteWork(id: Int) {
         deleteWorkIdRelay.accept(id)
         delegate?.updateCalendarDataSource()
     }

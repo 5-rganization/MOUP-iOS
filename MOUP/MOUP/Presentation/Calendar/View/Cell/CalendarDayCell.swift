@@ -81,7 +81,7 @@ final class CalendarDayCell: JTACDayCell {
     }
     
     // MARK: - Internal Methods
-    func update(dateStr: String, isToday: Bool, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, calendarMode: CalendarMode, workList: [CalendarWork]) {
+    func update(dateStr: String, isToday: Bool, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, calendarMode: CalendarMode, workList: [WorkSummary]) {
         dayLabel.text = dateStr
         
         if isToday {

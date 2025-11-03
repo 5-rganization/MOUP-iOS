@@ -12,12 +12,12 @@ import RxSwift
 import SnapKit
 import Then
 
-/// `CalendarWorkListView`의 이벤트를 `CalendarWorkListModalViewController`에 
+/// `CalendarWorkListView`의 이벤트를 `CalendarWorkListModalViewController`에 전달하는 Delegate
 protocol CalendarWorkListViewDelegate: AnyObject {
     /// 근무 수정
-    func editWork(work: CalendarWork)
+    func editWork(work: WorkSummary)
     /// 근무 삭제
-    func deleteWork(id: Int64)
+    func deleteWork(id: Int)
 }
 
 /// 근무 리스트 UI
@@ -130,7 +130,7 @@ private extension CalendarWorkListView {
 
 // MARK: - Extension Reactive
 extension Reactive where Base: CalendarWorkListView {
-    var personalWorkTableViewDataSource: Binder<[CalendarWork]> {
+    var personalWorkTableViewDataSource: Binder<[WorkSummary]> {
         return Binder(base) { view, work in
             // RxSwift Delegate 오류 방지
             view.workTableView.dataSource = nil
@@ -152,7 +152,7 @@ extension Reactive where Base: CalendarWorkListView {
                 }.disposed(by: base.disposeBag)
         }
     }
-    var sharedWorkTableViewDataSource: Binder<[CalendarWork]> {
+    var sharedWorkTableViewDataSource: Binder<[WorkSummary]> {
         return Binder(base) { view, work in
             // RxSwift Delegate 오류 방지
             view.workTableView.dataSource = nil
@@ -174,7 +174,7 @@ extension Reactive where Base: CalendarWorkListView {
                 }.disposed(by: base.disposeBag)
         }
     }
-    var workTableViewModelSelected: ControlEvent<CalendarWork> { base.workTableView.rx.modelSelected(CalendarWork.self) }
+    var workTableViewModelSelected: ControlEvent<WorkSummary> { base.workTableView.rx.modelSelected(WorkSummary.self) }
     var workTableViewIsHidden: Binder<Bool> { base.workTableView.rx.isHidden }
     var emptyLabelIsHidden: Binder<Bool> { base.emptyLabel.rx.isHidden }
     var registerButtonTap: ControlEvent<Void> { base.registerButton.rx.tap }

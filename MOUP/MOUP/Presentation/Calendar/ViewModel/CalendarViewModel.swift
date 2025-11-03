@@ -5,73 +5,103 @@
 //  Created by 서동환 on 7/12/25.
 //
 
-import Foundation
 import OSLog
 
 import RxRelay
 import RxSwift
 
 /// 캘린더 VM
+@MainActor
 final class CalendarViewModel {
     
     // MARK: - Properties
     private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     private let disposeBag = DisposeBag()
     
+    // Initializer Injections
+    private let workUseCase: WorkUseCaseProtocol
+    private let workplaceUseCase: WorkplaceUseCaseProtocol
+    
+    private var fetchTask: Task<Void, Never>?
+    
     // MARK: - Input
     struct Input {
         let visibleDate: Observable<Date>
         let calendarMode: Observable<CalendarMode>
-        let personalFilterWorkplace: Observable<FilterWorkplace?>
-        let sharedFilterWorkplace: Observable<FilterWorkplace?>
+        let personalFilterWorkplace: Observable<WorkplaceSummary?>
+        let sharedFilterWorkplace: Observable<WorkplaceSummary?>
     }
     
     // MARK: - Output
     struct Output {
-        let calendarWorkList: Observable<[CalendarWork]>
+        let calendarWorkList: Observable<[WorkSummary]>
+        let errorMessage: Observable<(title: String, message: String)>
     }
-    private let calendarWorkListRelay = BehaviorRelay<[CalendarWork]>(value: [])
+    private let calendarWorkListRelay = BehaviorRelay<[WorkSummary]>(value: [])
+    private let errorMessageRelay = PublishRelay<(title: String, message: String)>()
     
     // MARK: - Initializer
-    init() {
-        // TODO: UseCase 주입
+    init(workUseCase: WorkUseCaseProtocol, workplaceUseCase: WorkplaceUseCaseProtocol) {
+        self.workUseCase = workUseCase
+        self.workplaceUseCase = workplaceUseCase
     }
     
     // MARK: - Input ➡️ Output Transform
     func transform(input: Input) -> Output {
-        // TODO: 근무 데이터 로딩 API 호출
         Observable.combineLatest(input.visibleDate, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
             .subscribe(with: self) { owner, combined in
                 let (visibleDate, calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
-                owner.logger.debug("근무 데이터 로딩 API 호출")
+                let baseYearMonth = DateFormatter.presentaionYearMonthDateFormatter.string(from: visibleDate)
                 
-                var calendarWorkList: [CalendarWork]
-                switch calendarMode {
-                case .personal:
-                    calendarWorkList = CalendarMockData.personalCalendarWorkListMock
-                    if let personalFilterWorkplace {
-                        calendarWorkList = calendarWorkList.filter { $0.workplaceId == personalFilterWorkplace.workplaceId }
+                owner.fetchTask?.cancel()
+                owner.fetchTask = Task {
+                    var calendarWorkList: [WorkSummary] = []
+                    defer {
+                        if !Task.isCancelled {
+                            calendarWorkList.sort(by: owner.sortCalendarWorkList)
+                            owner.calendarWorkListRelay.accept(calendarWorkList)
+                        }
                     }
-                case .shared:
-                    calendarWorkList = CalendarMockData.sharedCalendarWorkListMock
-                    if let sharedFilterWorkplace {
-                        calendarWorkList = calendarWorkList.filter { $0.workplaceId == sharedFilterWorkplace.workplaceId }
-                    } else {
-                        let firstWorkplaceId = calendarWorkList.sorted(by: { $0.workplaceName < $1.workplaceName }).first?.workplaceId
-                        calendarWorkList = calendarWorkList.filter { $0.workplaceId == firstWorkplaceId }
+                    
+                    do {
+                        switch calendarMode {
+                        case .personal:
+                            if let filterWorkplace = personalFilterWorkplace {
+                                calendarWorkList = try await owner.workUseCase.fetchWorkplaceMyWorkList(workplaceId: filterWorkplace.id, baseYearMonth: baseYearMonth)
+                            } else {
+                                calendarWorkList = try await owner.workUseCase.fetchAllMyWorkList(baseYearMonth: baseYearMonth)
+                            }
+                        case .shared:
+                            if let filterWorkplace = sharedFilterWorkplace {
+                                calendarWorkList = try await owner.workUseCase.fetchWorkplaceAllWorkList(workplaceId: filterWorkplace.id, baseYearMonth: baseYearMonth)
+                            } else {
+                                let workplaceSummaryList = try await owner.workplaceUseCase.fetchSharedWorkplaceOnly()
+                                if let firstSharedWorkplaceId = workplaceSummaryList.sorted(by: { $0.name < $1.name }).first?.id {
+                                    calendarWorkList = try await owner.workUseCase.fetchWorkplaceAllWorkList(workplaceId: firstSharedWorkplaceId, baseYearMonth: baseYearMonth)
+                                } else {
+                                    calendarWorkList = []
+                                }
+                            }
+                        }
+                        
+                    } catch is CancellationError {
+                        owner.logger.info("캘린더 근무 데이터 로딩 Task가 취소되었습니다.")
+                    } catch let error as LocalizedError {
+                        owner.errorMessageRelay.accept((title: "근무 불러오기 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                    } catch {
+                        owner.errorMessageRelay.accept((title: "근무 불러오기 실패", message: "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
                     }
                 }
-                calendarWorkList.sort(by: owner.sortCalendarWorkList)
-                owner.calendarWorkListRelay.accept(calendarWorkList)
-                owner.logger.debug("근무 데이터 로딩 완료")
             }.disposed(by: disposeBag)
-        return Output(calendarWorkList: calendarWorkListRelay.asObservable())
+        
+        return Output(calendarWorkList: calendarWorkListRelay.asObservable(),
+                      errorMessage: errorMessageRelay.asObservable())
     }
 }
 
 // MARK: - Private Methods
 private extension CalendarViewModel {
-    func sortCalendarWorkList(_ lhs: CalendarWork, _ rhs: CalendarWork) -> Bool {
-        return (lhs.startTime, lhs.endTime) < (rhs.startTime, rhs.endTime)
+    func sortCalendarWorkList(_ lhs: WorkSummary, _ rhs: WorkSummary) -> Bool {
+        (lhs.startTime, lhs.endTime ?? Date.distantFuture) < (rhs.startTime, rhs.endTime ?? Date.distantFuture)
     }
 }

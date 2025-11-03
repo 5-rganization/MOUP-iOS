@@ -31,7 +31,7 @@ extension NumberFormatter {
     /// 숫자를 "2,000,000원" 형식으로 반환
     static func formattedWon(from number: Int) -> String {
         guard let formatted = decimalFormatter.string(for: number) else {
-            assertionFailure("formattedWon() 메서드 실행 실패 - number가 올바르지 않습니다.")
+            assertionFailure("\(#function) 실행 실패 - number가 올바르지 않습니다.")
             return "\(number)원"
         }
         // 포맷 후 "원" 붙이기

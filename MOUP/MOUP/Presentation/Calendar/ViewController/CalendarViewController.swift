@@ -18,7 +18,7 @@ final class CalendarViewController: UIViewController {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     /// 캘린더 근무 Dictionary
-    private var calendarWorkDataSource: [Date: [CalendarWork]] = [:]
+    private var calendarWorkDataSource: [Date: [WorkSummary]] = [:]
     
     // Initializer Injections
     weak var coordinator: CalendarCoordinator?
@@ -30,9 +30,9 @@ final class CalendarViewController: UIViewController {
     /// 캘린더 개인/공유 모드
     private let calendarModeRelay = BehaviorRelay<CalendarMode>(value: .personal)
     /// 개인 캘린더 근무지/매장 필터
-    private let personalFilterWorkplaceRelay = BehaviorRelay<FilterWorkplace?>(value: nil)
+    private let personalFilterWorkplaceRelay = BehaviorRelay<WorkplaceSummary?>(value: nil)
     /// 공유 캘린더 근무지/매장 필터
-    private let sharedFilterWorkplaceRelay = BehaviorRelay<FilterWorkplace?>(value: nil)
+    private let sharedFilterWorkplaceRelay = BehaviorRelay<WorkplaceSummary?>(value: nil)
     
     // Others
     /// 현재 캘린더에 보이는 날짜
@@ -86,7 +86,7 @@ final class CalendarViewController: UIViewController {
         calendarView.getMonthCalendarView.scrollToDate(date, animateScroll: true)
     }
     
-    func updateFilter(filterWorkplace: FilterWorkplace?) {
+    func updateFilter(filterWorkplace: WorkplaceSummary?) {
         switch calendarModeRelay.value {
         case .personal:
             personalFilterWorkplaceRelay.accept(filterWorkplace)
@@ -153,7 +153,7 @@ private extension CalendarViewController {
             .subscribe(with: self) { owner, _ in
                 owner.deselectCell()
                 
-                let selectedFilterWorkplace: FilterWorkplace?
+                let selectedFilterWorkplace: WorkplaceSummary?
                 switch owner.calendarModeRelay.value {
                 case .personal:
                     selectedFilterWorkplace = owner.personalFilterWorkplaceRelay.value
@@ -178,6 +178,11 @@ private extension CalendarViewController {
 //                print("==================================================")
                 owner.populateDataSource(calendarWorkList: calendarWorkList)
             }.disposed(by: disposeBag)
+        
+        output.errorMessage.asDriver(onErrorJustReturn: (title: "오류 발생", message: "잠시 후 다시 시도해주세요."))
+            .drive(with: self) { owner, errorMessage in
+                owner.presentNoticeModal(title: errorMessage.title, comment: errorMessage.message)
+            }.disposed(by: disposeBag)
     }
 }
 
@@ -190,7 +195,7 @@ private extension CalendarViewController {
 
 // MARK: - Internal Calendar Methods
 extension CalendarViewController {
-    func populateDataSource(calendarWorkList: [CalendarWork]) {
+    func populateDataSource(calendarWorkList: [WorkSummary]) {
         // TODO: 수신한 데이터 지우지 않는 방향으로 수정
         calendarWorkDataSource.removeAll()
         for work in calendarWorkList {
@@ -223,7 +228,7 @@ private extension CalendarViewController {
         calendarView.getMonthCalendarView.scrollToDate(visibleDate, animateScroll: false)
     }
     
-    func configureCell(cell: JTACDayCell?, cellState: CellState, calendarMode: CalendarMode, workList: [CalendarWork]) {
+    func configureCell(cell: JTACDayCell?, cellState: CellState, calendarMode: CalendarMode, workList: [WorkSummary]) {
         guard let cell = cell as? CalendarDayCell else { return }
         
         let dateBelongsToThisMonth = (cellState.dateBelongsTo == .thisMonth)

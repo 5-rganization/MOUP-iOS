@@ -38,9 +38,9 @@ final class WorkContainerVStackView: UIStackView {
     // MARK: - Internal Methods
     /// 개인 캘린더 모드일 때 근무 표시 UI를 업데이트하는 메서드
     /// - Parameters:
-    ///   - workList: 근무 Entity 배열 `[CalendarWork]`
+    ///   - workList: 근무 Entity 배열 `[WorkSummary]`
     ///   - displayCount: 표시할 근무 UI 개수 `Int`
-    func updatePersonalModeWorkRows(workList: [CalendarWork], displayCount: Int) {
+    func updatePersonalModeWorkRows(workList: [WorkSummary], displayCount: Int) {
         self.arrangedSubviews.forEach { $0.isHidden = true }
         
         for (index, work) in workList.enumerated() {
@@ -63,9 +63,9 @@ final class WorkContainerVStackView: UIStackView {
     
     /// 공유 캘린더 모드일 때 근무 표시 UI를 업데이트하는 메서드
     /// - Parameters:
-    ///   - workList: 근무 Entity 배열 `[CalendarWork]`
+    ///   - workList: 근무 Entity 배열 `[WorkSummary]`
     ///   - displayCount: 표시할 근무 UI 개수 `Int`
-    func updateSharedModeWorkRows(workList: [CalendarWork], displayCount: Int) {
+    func updateSharedModeWorkRows(workList: [WorkSummary], displayCount: Int) {
         self.arrangedSubviews.forEach { $0.isHidden = true }
         
         for (index, work) in workList.enumerated() {

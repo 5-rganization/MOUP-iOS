@@ -37,8 +37,8 @@ class BaseWorkRowVStackView: UIStackView {
     }
     
     // MARK: - Override Methods
-    func update(work: CalendarWork) {
-        fatalError("update() 메서드 실행 실패 - 메서드가 오버라이딩 되지 않았습니다.")
+    func update(work: WorkSummary) {
+        fatalError("\(#function) 실행 실패 - 메서드가 오버라이딩 되지 않았습니다.")
     }
 }
 
@@ -82,7 +82,7 @@ extension BaseWorkRowVStackView {
     /// 설정된 라벨 컬러를 적용하는 메서드
     func setGivenLabelColor(_ labelColorStr: String) {
         guard let labelColor = LabelColorString(rawValue: labelColorStr) else {
-            assertionFailure("setGivenLabelColor() 메서드 실행 실패 - labelColorStr 값이 올바르지 않습니다.")
+            assertionFailure("\(#function) 실행 실패 - labelColorStr 값이 올바르지 않습니다.")
             return
         }
         self.backgroundColor = labelColor.backgroundColor

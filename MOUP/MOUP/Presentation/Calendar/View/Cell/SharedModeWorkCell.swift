@@ -14,23 +14,33 @@ final class SharedModeWorkCell: BaseWorkCell {
     static let identifier = String(describing: SharedModeWorkCell.self)
     
     // MARK: - Internal Methods
-    override func update(work: CalendarWork) {
-        // TODO: 실제 로그인한 사용자의 ID를 반영해야 함
-        // 사용자의 workerId가 789임을 가정
-        if work.workerId == 789 {
-            // TODO: 사장님 역할일 땐 setDefaultLabelColor()
-            setGivenLabelColor(work.labelColor)
-        } else {
+    override func update(work: WorkSummary) {
+        switch UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) {
+        case .worker:
+            if (work.isMyWork) {
+                setGivenLabelColor(work.workerSummary.workerBasedLabelColorStr)
+                menuButton.isHidden = false
+                dailyIncomeLabel.isHidden = false
+            } else {
+                setDefaultLabelColor()
+                menuButton.isHidden = true
+                dailyIncomeLabel.isHidden = true
+            }
+        case .owner:
+            if (work.isMyWork) {
+                setDefaultLabelColor()
+            } else {
+                setGivenLabelColor(work.workerSummary.ownerBasedLabelColorStr)
+            }
+            menuButton.isHidden = false
+            dailyIncomeLabel.isHidden = false
+        default:
             setDefaultLabelColor()
         }
         
-        titleLabel.text = work.workerName
-        sharedChipLabel.isHidden = !work.isShared
+        titleLabel.text = work.workerSummary.nickname
+        sharedChipLabel.isHidden = !work.workplaceSummary.isShared
         
-        setTimeInfoUI(startTime: work.startTime, endTime: work.endTime, restTime: work.restTime)
-        
-        // TODO: 사장님 역할일 때 dailyIncomeLabel 표시
-        dailyIncomeLabel.isHidden = true
-        // TODO: 알바생 역할일 때 자신의 근무가 아니면 menuButton 숨김
+        setTimeInfoUI(startTime: work.startTime, endTime: work.endTime, workMinutes: work.workMinutes)
     }
 }

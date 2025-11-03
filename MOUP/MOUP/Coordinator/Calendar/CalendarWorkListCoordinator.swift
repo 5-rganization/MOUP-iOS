@@ -13,7 +13,7 @@ protocol CalendarWorkListCoordinatorDelegate: AnyObject {
     func dismissed(_ coordinator: CalendarWorkListCoordinator)
     // TODO: 근무 엔티티를 직접 전달 or 근무 ID만 전달
     /// 근무 등록 화면 표시
-    func showWorkRegister(work: CalendarWork?)
+    func showWorkRegister(work: WorkSummary?)
     /// 캘린더 업데이트 요청
     func updateDataSource()
 }
@@ -26,16 +26,19 @@ final class CalendarWorkListCoordinator: Coordinator {
     
     // Initializer Injections
     private let navigationController: UINavigationController
+    private let workUseCase: WorkUseCaseProtocol
     private let selectedDay: Int
-    private let calendarWorkList: [CalendarWork]
+    private let calendarWorkList: [WorkSummary]
     private let calendarMode: CalendarMode
     
     // Property Injections
     weak var delegate: CalendarWorkListCoordinatorDelegate?
     
     // MARK: - Initializer
-    init(navigationController: UINavigationController, selectedDay: Int, calendarWorkList: [CalendarWork], calendarMode: CalendarMode) {
+    init(navigationController: UINavigationController, workUseCase: WorkUseCaseProtocol, selectedDay: Int, calendarWorkList: [WorkSummary], calendarMode: CalendarMode) {
         self.navigationController = navigationController
+        self.workUseCase = workUseCase
+        
         self.selectedDay = selectedDay
         self.calendarWorkList = calendarWorkList
         self.calendarMode = calendarMode
@@ -43,7 +46,7 @@ final class CalendarWorkListCoordinator: Coordinator {
     
     // MARK: - Coordinator Methods
     func start() {
-        let calendarWorkListVM = CalendarWorkListViewModel(calendarWorkList: calendarWorkList)
+        let calendarWorkListVM = CalendarWorkListViewModel(workUseCase: workUseCase, calendarWorkList: calendarWorkList)
         let calendarWorkListVC = CalendarWorkListModalViewController(coordinator: self, viewModel: calendarWorkListVM, selectedDay: selectedDay, calendarMode: calendarMode)
         calendarWorkListVC.delegate = self
         
@@ -65,11 +68,11 @@ extension CalendarWorkListCoordinator: CalendarWorkListModalVCDelegate {
         delegate?.dismissed(self)
     }
     
-    func workCellTapped(work: CalendarWork) {
+    func workCellTapped(work: WorkSummary) {
         delegate?.showWorkRegister(work: work)
     }
     
-    func editButtonTapped(work: CalendarWork) {
+    func editButtonTapped(work: WorkSummary) {
         delegate?.showWorkRegister(work: work)
     }
     
