@@ -287,7 +287,13 @@ private extension WorkService {
         
         // 디코딩 실패 시 원본 데이터 출력
         if response.value == nil, let data = response.data, let rawString = String(data: data, encoding: .utf8) {
-            logger.info("[\(functionName)] Decoding failed - Raw Data: \(rawString)")
+            logger.info("[\(functionName)] 디코딩 실패 - Raw Data: \(rawString)")
+            
+            if let afError = response.error?.asAFError,
+               case .responseSerializationFailed(let reason) = afError,
+               case .decodingFailed(let underlyingError) = reason {
+                logger.error("[\(functionName)] 에러 내용: \(String(describing: underlyingError))")
+            }
         }
     }
 }
