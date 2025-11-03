@@ -6,24 +6,67 @@
 //
 
 import UIKit
+import RxSwift
 
 class InviteCodeResultViewController: UIViewController {
-
+    // MARK: - Properties
+    private let disposeBag = DisposeBag()
+    private let inviteCodeResultView = InviteCodeResultView()
+    private let viewModel: InviteCodeResultViewModel
+    
+    // MARK: - loadView
+    override func loadView() {
+        view = inviteCodeResultView
+    }
+    
+    // MARK: - Initializer
+    init(viewModel: InviteCodeResultViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable, message: "storyboard is not supported.")
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented.")
+    }
+    
+    // MARK: - Lifecycles
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        configure()
+    }
+   
+}
+
+private extension InviteCodeResultViewController {
+    func configure() {
+        setBindings()
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    func setBindings() {
+        let input = InviteCodeResultViewModel.Input()
+        let output = viewModel.transform(input: input)
+        
+        output.workplace
+            .withUnretained(self)
+            .subscribe(onNext: { owner, workplace in
+                owner.inviteCodeResultView.update(with: workplace)
+            })
+            .disposed(by: disposeBag)
+        
+        inviteCodeResultView.rx.navBackBtnTapped
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        inviteCodeResultView.rx.registerInfoBtnTapped
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                print("등록하기 버튼 탭")
+            })
+            .disposed(by: disposeBag)
     }
-    */
-
 }
