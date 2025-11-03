@@ -51,7 +51,7 @@ final class CalendarViewModel {
         Observable.combineLatest(input.visibleDate, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
             .subscribe(with: self) { owner, combined in
                 let (visibleDate, calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
-                let baseYearMonth = DateFormatter.presentaionYearMonthDateFormatter.string(from: visibleDate)
+                let baseYearMonth = DateFormatter.dataYearMonthDateFormatter.string(from: visibleDate)
                 
                 owner.fetchTask?.cancel()
                 owner.fetchTask = Task {
