@@ -53,10 +53,17 @@ struct WorkDetailResponseDTO: Decodable {
 
 extension WorkDetailResponseDTO {
     func toDomain() -> WorkData {
-        WorkData(id: workId,
-                 workplaceSummary: workplaceSummaryInfo.toDomain(),
-                 workerSummary: workerSummaryInfo.toDomain(),
-                 routineSummaryList: routineSummaryInfoList.map { $0.toDomain() },
+        WorkData(
+            id: workId,
+            workplaceSummary: workplaceSummaryInfo.toDomain(),
+            workerSummary: workerSummaryInfo.toDomain(),
+            routineSummaryList: routineSummaryInfoList.map {
+                RoutineSummary(
+                    routineId: $0.routineId,
+                    routineName: $0.routineName,
+                    alarmTime: $0.alarmTime
+                )
+            },
                  workDate: workDate,
                  startTime: startTime,
                  actualStartTime: actualStartTime,
