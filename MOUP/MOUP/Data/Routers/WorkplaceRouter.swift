@@ -51,7 +51,7 @@ extension WorkplaceRouter: URLRequestConvertible {
         switch self {
         case .fetchWorkplaceList(let isSharedOnly):
             return ["isSharedOnly": isSharedOnly]
-        case .fetchWorkplaceByInviteCode:
+        case .createWorkplace, .fetchWorkplaceByInviteCode:
             return nil
         }
     }
