@@ -18,7 +18,7 @@ final class SharedModeWorkRowVStackView: BaseWorkRowVStackView {
         switch UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) {
         case .worker:
             if (work.isMyWork) {
-                setGivenLabelColor(work.workerSummary.workerBasedLabelColorStr)
+                setGivenLabelColor(work.workerSummary.workerBasedLabelColorStr ?? LabelColorString._default.rawValue)
             } else {
                 setDefaultLabelColor()
             }
@@ -26,7 +26,7 @@ final class SharedModeWorkRowVStackView: BaseWorkRowVStackView {
             if (work.isMyWork) {
                 setDefaultLabelColor()
             } else {
-                setGivenLabelColor(work.workerSummary.ownerBasedLabelColorStr)
+                setGivenLabelColor(work.workerSummary.ownerBasedLabelColorStr ?? LabelColorString._default.rawValue)
             }
         default:
             setDefaultLabelColor()
