@@ -8,14 +8,35 @@
 import UIKit
 
 enum LabelColorString: String, CaseIterable {
-    case _default = "기본색"
-    case red = "빨간색"
-    case orange = "주황색"
-    case yellow = "노란색"
-    case green = "초록색"
-    case blue = "파란색"
-    case indigo = "남색"
-    case purple = "보라색"
+    case _default = "DEFAULT"
+    case red = "RED"
+    case orange = "ORANGE"
+    case yellow = "YELLOW"
+    case green = "GREEN"
+    case blue = "BLUE"
+    case indigo = "INDIGO"
+    case purple = "PURPLE"
+    
+    var displayStr: String {
+        switch self {
+        case ._default:
+            "기본색"
+        case .red:
+            "빨간색"
+        case .orange:
+            "주황색"
+        case .yellow:
+            "노란색"
+        case .green:
+            "초록색"
+        case .blue:
+            "파란색"
+        case .indigo:
+            "남색"
+        case .purple:
+            "보라색"
+        }
+    }
     
     var labelColor: UIColor {
         switch self {
