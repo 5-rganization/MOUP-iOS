@@ -11,6 +11,10 @@ enum WorkplaceError: LocalizedError {
     case invalidRole // invite-codes, 403
     case notFound // invite-codes, 404
     case alreadyExists // invite-codes, 409
+    
+    // MARK: - Create 관련
+    case invalidField       // 422
+    case serverError        // 500
 }
 
 extension WorkplaceError {
@@ -23,6 +27,10 @@ extension WorkplaceError {
             return "입력한 초대코드에 해당하는 근무지가 없어요.\n다시 한번 확인해 주세요!"
         case .alreadyExists:
             return "이미 가입된 근무자입니다.\n다시 한번 확인해 주세요!"
+        case .invalidField:
+            return "입력하신 정보 중 일부가 잘못되었습니다.\n필수 항목을 다시 확인해 주세요!"
+        case .serverError:
+            return "서버 오류가 발생했습니다.\n잠시 후 다시 시도해 주세요."
         }
     }
 
@@ -35,6 +43,10 @@ extension WorkplaceError {
             return "invite-codes - 404, 요청한 정보를 찾을 수 없음"
         case .alreadyExists:
             return "invite-codes - 409, 사용자가 이미 근무자로 존재"
+        case .invalidField:
+            return "422 - 유효하지 않은 필드 값"
+        case .serverError:
+            return "500 - 내부 서버 오류"
         }
     }
 }

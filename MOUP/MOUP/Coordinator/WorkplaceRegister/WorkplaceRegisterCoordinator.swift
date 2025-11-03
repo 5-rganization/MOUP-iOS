@@ -27,7 +27,7 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
             workplaceVM: workplaceContainerviewModel,
             payVM: payContainerViewModel,
             workingConditionsVM: workingConditionsContainerViewModel,
-            colorLabelVM: colorLabelContainerViewModel
+            colorLabelVM: colorLabelContainerViewModel, workplaceUseCase: WorkplaceUseCase(workplaceRepository: WorkplaceRepository(workplaceService: WorkplaceService()))
         )
         
         let vc = WorkplaceRegisterViewController(
@@ -35,6 +35,7 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
             coordinator: self
         )
         
+        vc.hidesBottomBarWhenPushed = true
         navigationController.pushViewController(vc, animated: false)
     }
     
