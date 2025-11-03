@@ -10,6 +10,8 @@ import OSLog
 import RxRelay
 import RxSwift
 
+/// 캘린더 근무 목록 VM
+@MainActor
 final class CalendarWorkListViewModel {
     
     // MARK: - Properties
