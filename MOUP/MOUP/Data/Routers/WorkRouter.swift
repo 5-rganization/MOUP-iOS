@@ -41,8 +41,10 @@ enum WorkRouter {
     case fetchWorkplaceMyWorkList(workplaceId: Int, baseYearMonth: String)
     case fetchWorkplaceAllWorkList(workplaceId: Int, baseYearMonth: String)
     
-    case updateMyWork(workId: Int, dto: MyWorkUpdateRequestDTO)
-    case updateWorkerWork(workplaceId: Int, workerId: Int, workId: Int, dto: WorkerWorkUpdateRequestDTO)
+    case updateMySingleWork(workId: Int, dto: MyWorkUpdateRequestDTO)
+    case updateMyRecurringWork(workId: Int, dto: MyWorkUpdateRequestDTO)
+    case updateWorkerSingleWork(workplaceId: Int, workerId: Int, workId: Int, dto: WorkerWorkUpdateRequestDTO)
+    case updateWorkerRecurringWork(workplaceId: Int, workerId: Int, workId: Int, dto: WorkerWorkUpdateRequestDTO)
     
     case deleteWork(workId: Int)
     case deleteRecurringWork(workId: Int)
@@ -75,10 +77,14 @@ extension WorkRouter: URLRequestConvertible {
         case .fetchWorkplaceAllWorkList(let workplaceId, _):
             return "/workplaces/\(workplaceId)/works"
             
-        case .updateMyWork(let workId, _):
+        case .updateMySingleWork(let workId, _):
             return "/works/\(workId)"
-        case .updateWorkerWork(let workplaceId, let workerId, let workId, _):
+        case .updateMyRecurringWork(let workId, _):
+            return "/works/recurring/\(workId)"
+        case .updateWorkerSingleWork(let workplaceId, let workerId, let workId, _):
             return "/workplaces/\(workplaceId)/workers/\(workerId)/works/\(workId)"
+        case .updateWorkerRecurringWork(let workplaceId, let workerId, let workId, _):
+            return "/workplaces/\(workplaceId)/workers/\(workerId)/works/recurring/\(workId)"
             
         case .deleteWork(let workId):
             return "/works/\(workId)"
@@ -98,7 +104,7 @@ extension WorkRouter: URLRequestConvertible {
             return .post
         case .fetchWork, .fetchAllMyWorkList, .fetchWorkplaceMyWorkList, .fetchWorkplaceAllWorkList:
             return .get
-        case .updateMyWork, .updateWorkerWork, .endWork:
+        case .updateMySingleWork, .updateMyRecurringWork, .updateWorkerSingleWork, .updateWorkerRecurringWork, .endWork:
             return .patch
         case .deleteWork, .deleteRecurringWork:
             return .delete
@@ -112,9 +118,9 @@ extension WorkRouter: URLRequestConvertible {
         case .createWorkersWork(_, let dto):
             return dto
             
-        case .updateMyWork(_, let dto):
+        case .updateMySingleWork(_, let dto), .updateMyRecurringWork(_, let dto):
             return dto
-        case .updateWorkerWork(_, _, _, let dto):
+        case .updateWorkerSingleWork(_, _, _, let dto), .updateWorkerRecurringWork(_, _, _, let dto):
             return dto
             
         case .fetchWork, .fetchAllMyWorkList, .fetchWorkplaceMyWorkList, .fetchWorkplaceAllWorkList,

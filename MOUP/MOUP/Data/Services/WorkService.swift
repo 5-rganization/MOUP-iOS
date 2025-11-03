@@ -20,8 +20,10 @@ protocol WorkServiceProtocol {
     func fetchWorkplaceMyWorkList(workplaceId: Int, baseYearMonth: String) async throws -> WorkCalendarListResponseDTO
     func fetchWorkplaceAllWorkList(workplaceId: Int, baseYearMonth: String) async throws -> WorkCalendarListResponseDTO
     
-    func updateMyWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO?
-    func updateWorkerWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO?
+    func updateMySingleWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws
+    func updateMyRecurringWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO
+    func updateWorkerSingleWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws
+    func updateWorkerRecurringWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO
     
     func deleteWork(workId: Int) async throws
     func deleteRecurringWork(workId: Int) async throws
@@ -148,27 +150,24 @@ final class WorkService: WorkServiceProtocol {
         }
     }
     
-    func updateMyWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO? {
-        let request = session.request(WorkRouter.updateMyWork(workId: workId, dto: requestDTO))
+    func updateMySingleWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws {
+        let request = session.request(WorkRouter.updateMySingleWork(workId: workId, dto: requestDTO))
         let response = await request.serializingDecodable(WorkCreateResponseDTO.self).response
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
         
         switch statusCode {
-        case 200:
-            guard let dto = response.value else { throw NetworkError.noResponse }
-            return dto
         case 204:
-            return nil
+            return
         default:
             try handleCommonWorkError(statusCode: statusCode)
         }
     }
     
-    func updateWorkerWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO? {
-        let request = session.request(WorkRouter.updateWorkerWork(workplaceId: workplaceId, workerId: workerId, workId: workId, dto: requestDTO))
-        let response = await request.serializingDecodable(WorkCreateResponseDTO.self).response
+    func updateMyRecurringWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO {
+        let request = session.request(WorkRouter.updateMyRecurringWork(workId: workId, dto: requestDTO))
+        let response = await request.serializingDecodable(WorkCreateResponseDTO.self, decoder: isoDecoder).response
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -177,8 +176,37 @@ final class WorkService: WorkServiceProtocol {
         case 200:
             guard let dto = response.value else { throw NetworkError.noResponse }
             return dto
+        default:
+            try handleCommonWorkError(statusCode: statusCode)
+        }
+    }
+    
+    func updateWorkerSingleWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws {
+        let request = session.request(WorkRouter.updateWorkerSingleWork(workplaceId: workplaceId, workerId: workerId, workId: workId, dto: requestDTO))
+        let response = await request.serializingDecodable(WorkCreateResponseDTO.self).response
+        logResponse(response)
+        
+        guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
+        
+        switch statusCode {
         case 204:
-            return nil
+            return
+        default:
+            try handleCommonWorkError(statusCode: statusCode)
+        }
+    }
+    
+    func updateWorkerRecurringWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO {
+        let request = session.request(WorkRouter.updateWorkerRecurringWork(workplaceId: workplaceId, workerId: workerId, workId: workId, dto: requestDTO))
+        let response = await request.serializingDecodable(WorkCreateResponseDTO.self, decoder: isoDecoder).response
+        logResponse(response)
+        
+        guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
+        
+        switch statusCode {
+        case 200:
+            guard let dto = response.value else { throw NetworkError.noResponse }
+            return dto
         default:
             try handleCommonWorkError(statusCode: statusCode)
         }
