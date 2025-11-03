@@ -152,7 +152,7 @@ final class WorkService: WorkServiceProtocol {
     
     func updateMySingleWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws {
         let request = session.request(WorkRouter.updateMySingleWork(workId: workId, dto: requestDTO))
-        let response = await request.serializingDecodable(WorkCreateResponseDTO.self).response
+        let response = await request.serializingData().response
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -183,8 +183,7 @@ final class WorkService: WorkServiceProtocol {
     
     func updateWorkerSingleWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws {
         let request = session.request(WorkRouter.updateWorkerSingleWork(workplaceId: workplaceId, workerId: workerId, workId: workId, dto: requestDTO))
-        let response = await request.serializingDecodable(WorkCreateResponseDTO.self).response
-        logResponse(response)
+        let response = await request.serializingData().response
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
         
