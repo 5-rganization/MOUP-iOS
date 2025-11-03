@@ -137,7 +137,7 @@ extension WorkRouter: URLRequestConvertible {
     
     func asURLRequest() throws -> URLRequest {
         let url = baseURL.appendingPathComponent(path)
-        Self.logger.info("최종 url: \(url)")
+        Self.logger.info("API Endpoint: \(url)")
         var request = try URLRequest(url: url, method: method)
         
         if let requestBody {
@@ -153,6 +153,7 @@ extension WorkRouter: URLRequestConvertible {
         
         if let parameters {
             request = try URLEncoding.default.encode(request, with: parameters)
+            if let url = request.url { Self.logger.info("최종 URL (매개변수 포함): \(url.absoluteString)") }
         }
         
         return request
