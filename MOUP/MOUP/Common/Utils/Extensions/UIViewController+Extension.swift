@@ -55,6 +55,6 @@ extension UIViewController {
     func presentNoticeModal(title: String, comment: String, onConfirm: (() -> Void)? = nil) {
         let vc = NoticeModalViewController(title: title, comment: comment, onConfirm: onConfirm)
         vc.modalPresentationStyle = .overFullScreen
-        present(vc, animated: true)
+        present(vc, animated: false)
     }
 }
