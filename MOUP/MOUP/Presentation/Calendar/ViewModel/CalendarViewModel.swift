@@ -26,7 +26,7 @@ final class CalendarViewModel {
     
     // MARK: - Input
     struct Input {
-        let lastFetchCenterDate: Observable<Date>
+        let baseFetchDate: Observable<Date>
         let calendarMode: Observable<CalendarMode>
         let personalFilterWorkplace: Observable<WorkplaceSummary?>
         let sharedFilterWorkplace: Observable<WorkplaceSummary?>
@@ -49,10 +49,10 @@ final class CalendarViewModel {
     
     // MARK: - Input ➡️ Output Transform
     func transform(input: Input) -> Output {
-        Observable.combineLatest(input.lastFetchCenterDate, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
+        Observable.combineLatest(input.baseFetchDate, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
             .subscribe(with: self) { owner, combined in
-                let (lastFetchCenterDate, calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
-                let baseYearMonth = DateFormatter.dataYearMonthDateFormatter.string(from: lastFetchCenterDate)
+                let (baseFetchDate, calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
+                let baseYearMonth = DateFormatter.dataYearMonthDateFormatter.string(from: baseFetchDate)
                 
                 owner.fetchTask?.cancel()
                 owner.fetchTask = Task.detached {
@@ -66,15 +66,18 @@ final class CalendarViewModel {
                                 calendarWorkList = try await owner.workUseCase.fetchAllMyWorkList(baseYearMonth: baseYearMonth)
                             }
                             try Task.checkCancellation()
+                            
                         case .shared:
                             if let filterWorkplace = sharedFilterWorkplace {
                                 calendarWorkList = try await owner.workUseCase.fetchWorkplaceAllWorkList(workplaceId: filterWorkplace.id, baseYearMonth: baseYearMonth)
                             } else {
                                 let workplaceSummaryList = try await owner.workplaceUseCase.fetchSharedWorkplaceOnly()
                                 try Task.checkCancellation()
+                                
                                 if let firstSharedWorkplaceId = workplaceSummaryList.sorted(by: { $0.name < $1.name }).first?.id {
                                     calendarWorkList = try await owner.workUseCase.fetchWorkplaceAllWorkList(workplaceId: firstSharedWorkplaceId, baseYearMonth: baseYearMonth)
                                     try Task.checkCancellation()
+                                    
                                 } else {
                                     calendarWorkList = []
                                 }
@@ -85,9 +88,27 @@ final class CalendarViewModel {
                             guard let workDate = DateFormatter.dataSourceDateFormatter.date(from: work.workDate) else { return }
                             dict[workDate, default: []].insert(work)
                         }
+                        
+                        // 근무 데이터 보존용 코드 (UI 깜빡임 방지)
+                        let dateRange: ClosedRange<Date>? = {
+                            guard let minDate = Calendar.current.date(byAdding: .month, value: -6, to: baseFetchDate),
+                                  let maxDate = Calendar.current.date(byAdding: .month, value: 6, to: baseFetchDate),
+                                  let startOfMonth = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: minDate)) else { return nil }
+                            
+                            let endOfMonthStart = Calendar.current.dateComponents([.year, .month], from: maxDate)
+                            guard let endOfMonthStartDate = Calendar.current.date(from: endOfMonthStart),
+                                  let endOfMonth = Calendar.current.date(byAdding: DateComponents(month: 1, day: -1), to: endOfMonthStartDate) else { return nil }
+                            return startOfMonth...endOfMonth
+                        }()
+                        
                         await MainActor.run {
                             var currentDict = owner.calendarWorkDictRelay.value
-                            currentDict.merge(newChunkDict) { oldSet, newSet in oldSet.union(newSet) }
+                            if let dateRange {
+                                let datesToRemove = currentDict.keys.filter { dateRange.contains($0) }
+                                datesToRemove.forEach { currentDict[$0] = nil }
+                            }
+                            
+                            currentDict.merge(newChunkDict) { _, newSet in newSet }
                             owner.calendarWorkDictRelay.accept(currentDict)
                         }
                         

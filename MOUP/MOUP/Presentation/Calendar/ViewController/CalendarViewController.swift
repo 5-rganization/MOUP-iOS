@@ -28,7 +28,7 @@ final class CalendarViewController: UIViewController {
     
     // Input Relays
     /// 마지막으로 API를 요청한 기준 날짜
-    private let lastFetchCenterDateRelay = BehaviorRelay<Date>(value: Date.now.startOfMonth)
+    private let lastBaseFetchDateRelay = BehaviorRelay<Date>(value: Date.now.startOfMonth)
     /// 캘린더 개인/공유 모드
     private let calendarModeRelay = BehaviorRelay<CalendarMode>(value: .personal)
     /// 개인 캘린더 근무지/매장 필터
@@ -175,7 +175,7 @@ private extension CalendarViewController {
             }.disposed(by: disposeBag)
         
         // ViewModel 바인딩
-        let input = CalendarViewModel.Input(lastFetchCenterDate: lastFetchCenterDateRelay.asObservable(),
+        let input = CalendarViewModel.Input(baseFetchDate: lastBaseFetchDateRelay.asObservable(),
                                             calendarMode: calendarModeRelay.asObservable(),
                                             personalFilterWorkplace: personalFilterWorkplaceRelay.asObservable(),
                                             sharedFilterWorkplace: sharedFilterWorkplaceRelay.asObservable(),
@@ -205,7 +205,7 @@ private extension CalendarViewController {
 // MARK: - Internal Calendar Methods
 extension CalendarViewController {
     func updateDataSource() {
-        lastFetchCenterDateRelay.accept(visibleDate)
+        lastBaseFetchDateRelay.accept(visibleDate)
     }
     
     func selectCell(date: Date) {
@@ -272,7 +272,7 @@ private extension CalendarViewController {
     }
     
     func checkPrefetchCondition(date: Date) -> Bool {
-        let dayOffset = Calendar.current.dateComponents([.day], from: lastFetchCenterDateRelay.value, to: date).day ?? 111
+        let dayOffset = Calendar.current.dateComponents([.day], from: lastBaseFetchDateRelay.value, to: date).day ?? 111
         return abs(dayOffset) > fetchThresholdInDays
     }
     
