@@ -81,10 +81,12 @@ final class AttendanceCell: UITableViewCell {
     }
 
     // MARK: - Public Methods
-    func update(item: AttendanceData, userRole: UserRole) {
-        dateLabel.text = item.date
-        attendanceLabel.text = item.attendanceTime
-        leaveWorkLabel.text = item.leaveWorkTime
+    func update(item: AttendanceInfo, userRole: UserRole) {
+        dateLabel.text = item.workDate
+        // actualStartTime > startTime 우선 순위
+        attendanceLabel.text = item.actualStartTime ?? item.startTime
+        // actualEndTime > endTime > 빈 문자열 우선 순위
+        leaveWorkLabel.text = item.actualEndTime ?? item.endTime ?? "진행 중"
         
         applyUserRole(by: userRole)
     }
@@ -191,13 +193,8 @@ private extension AttendanceCell {
 
 private extension AttendanceCell {
     func applyUserRole(by role: UserRole) {
-        switch role {
-        case .worker:
-            attendanceRightChevron.removeFromSuperview()
-            leaveWorkRightChevron.removeFromSuperview()
-        case .owner:
-            // TODO: - stackView.addGesture를 통한 근무 내역 수정 페이지로 연결
-            break
-        }
+        // TODO: - 수정 페이지 생기면 역할 별 분기 필요
+        attendanceRightChevron.removeFromSuperview()
+        leaveWorkRightChevron.removeFromSuperview()
     }
 }

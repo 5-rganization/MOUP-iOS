@@ -13,9 +13,9 @@ struct AttendanceItem {
 }
 
 extension AttendanceItem: SectionModelType {
-    typealias Item = AttendanceData
+    typealias Item = AttendanceInfo
     
-    init(original: AttendanceItem, items: [AttendanceData]) {
+    init(original: AttendanceItem, items: [AttendanceInfo]) {
         self = original
         self.items = items
     }
