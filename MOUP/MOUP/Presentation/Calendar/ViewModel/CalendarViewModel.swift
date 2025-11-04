@@ -21,12 +21,16 @@ final class CalendarViewModel {
     private let workUseCase: WorkUseCaseProtocol
     private let workplaceUseCase: WorkplaceUseCaseProtocol
     
+    // Others
+    private var fetchTask: Task<Void, Never>?
+    
     // MARK: - Input
     struct Input {
         let lastFetchCenterDate: Observable<Date>
         let calendarMode: Observable<CalendarMode>
         let personalFilterWorkplace: Observable<WorkplaceSummary?>
         let sharedFilterWorkplace: Observable<WorkplaceSummary?>
+        let viewWillDisappear: Observable<Void>
     }
     
     // MARK: - Output
@@ -50,7 +54,8 @@ final class CalendarViewModel {
                 let (lastFetchCenterDate, calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
                 let baseYearMonth = DateFormatter.dataYearMonthDateFormatter.string(from: lastFetchCenterDate)
                 
-                Task.detached {
+                owner.fetchTask?.cancel()
+                owner.fetchTask = Task.detached {
                     do {
                         var calendarWorkList: [WorkSummary]
                         switch calendarMode {
@@ -60,13 +65,16 @@ final class CalendarViewModel {
                             } else {
                                 calendarWorkList = try await owner.workUseCase.fetchAllMyWorkList(baseYearMonth: baseYearMonth)
                             }
+                            try Task.checkCancellation()
                         case .shared:
                             if let filterWorkplace = sharedFilterWorkplace {
                                 calendarWorkList = try await owner.workUseCase.fetchWorkplaceAllWorkList(workplaceId: filterWorkplace.id, baseYearMonth: baseYearMonth)
                             } else {
                                 let workplaceSummaryList = try await owner.workplaceUseCase.fetchSharedWorkplaceOnly()
+                                try Task.checkCancellation()
                                 if let firstSharedWorkplaceId = workplaceSummaryList.sorted(by: { $0.name < $1.name }).first?.id {
                                     calendarWorkList = try await owner.workUseCase.fetchWorkplaceAllWorkList(workplaceId: firstSharedWorkplaceId, baseYearMonth: baseYearMonth)
+                                    try Task.checkCancellation()
                                 } else {
                                     calendarWorkList = []
                                 }
@@ -83,6 +91,8 @@ final class CalendarViewModel {
                             owner.calendarWorkDictRelay.accept(currentDict)
                         }
                         
+                    } catch is CancellationError {
+                        owner.logger.info("캘린더 근무지(매장) 근무 로딩 Task가 취소되었습니다.")
                     } catch let error as LocalizedError {
                         await MainActor.run {
                             owner.errorMessageRelay.accept((title: "근무 불러오기 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
@@ -93,6 +103,12 @@ final class CalendarViewModel {
                         }
                     }
                 }
+            }.disposed(by: disposeBag)
+        
+        input.viewWillDisappear
+            .subscribe(with: self) { owner, _ in
+                owner.fetchTask?.cancel()
+                owner.fetchTask = nil
             }.disposed(by: disposeBag)
         
         return Output(calendarWorkDict: calendarWorkDictRelay.asObservable(),

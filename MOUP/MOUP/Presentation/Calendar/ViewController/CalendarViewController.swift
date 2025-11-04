@@ -35,6 +35,8 @@ final class CalendarViewController: UIViewController {
     private let personalFilterWorkplaceRelay = BehaviorRelay<WorkplaceSummary?>(value: nil)
     /// 공유 캘린더 근무지/매장 필터
     private let sharedFilterWorkplaceRelay = BehaviorRelay<WorkplaceSummary?>(value: nil)
+    /// `viewWillDisappear` 이벤트
+    private let viewWillDisappearRelay = PublishRelay<Void>()
     
     // Others
     /// 현재 캘린더에 보이는 날짜
@@ -81,6 +83,11 @@ final class CalendarViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setCalendarView()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        viewWillDisappearRelay.accept(())
     }
     
     // MARK: - Internal Methods
@@ -171,7 +178,8 @@ private extension CalendarViewController {
         let input = CalendarViewModel.Input(lastFetchCenterDate: lastFetchCenterDateRelay.asObservable(),
                                             calendarMode: calendarModeRelay.asObservable(),
                                             personalFilterWorkplace: personalFilterWorkplaceRelay.asObservable(),
-                                            sharedFilterWorkplace: sharedFilterWorkplaceRelay.asObservable())
+                                            sharedFilterWorkplace: sharedFilterWorkplaceRelay.asObservable(),
+                                            viewWillDisappear: viewWillDisappearRelay.asObservable())
         let output = viewModel.transform(input: input)
         
         output.calendarWorkDict.asDriver(onErrorJustReturn: [:])
