@@ -226,12 +226,16 @@ private extension CalendarViewController {
         updateYearMonthLabel()
     }
     
-    func configureCell(cell: JTACDayCell?, cellState: CellState, calendarMode: CalendarMode, workList: [WorkSummary]) {
+    func configureCell(cell: JTACDayCell?, cellState: CellState, calendarMode: CalendarMode, workSet: Set<WorkSummary>) {
         guard let cell = cell as? CalendarDayCell else { return }
         
         let dateBelongsToThisMonth = (cellState.dateBelongsTo == .thisMonth)
         let isSelected = cellState.isSelected
         let isToday = Calendar.current.isDateInToday(cellState.date)
+        
+        let workList = Array(workSet).sorted {
+            ($0.startTime, $0.endTime ?? Date.distantFuture) < ($1.startTime, $1.endTime ?? Date.distantFuture)
+        }
         
         cell.update(dateStr: cellState.text,
                     isToday: isToday,
@@ -275,14 +279,14 @@ extension CalendarViewController: JTACMonthViewDataSource {
 // MARK: - JTACMonthViewDelegate
 extension CalendarViewController: JTACMonthViewDelegate {
     func calendar(_ calendar: JTACMonthView, willDisplay cell: JTACDayCell, forItemAt date: Date, cellState: CellState, indexPath: IndexPath) {
-        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workList: Array(calendarWorkDataSourceRelay.value[date] ?? []))
+        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workSet: calendarWorkDataSourceRelay.value[date] ?? [])
     }
     
     func calendar(_ calendar: JTACMonthView, cellForItemAt date: Date, cellState: CellState, indexPath: IndexPath) -> JTACDayCell {
         guard let cell = calendar.dequeueReusableJTAppleCell(withReuseIdentifier: CalendarDayCell.identifier, for: indexPath) as? CalendarDayCell else {
             return JTACDayCell()
         }
-        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workList: Array(calendarWorkDataSourceRelay.value[date] ?? []))
+        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workSet: calendarWorkDataSourceRelay.value[date] ?? [])
         return cell
     }
     
@@ -309,13 +313,13 @@ extension CalendarViewController: JTACMonthViewDelegate {
     
     func calendar(_ calendar: JTACMonthView, didSelectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
         selectedDate = date
-        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workList: Array(calendarWorkDataSourceRelay.value[date] ?? []))
+        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workSet: calendarWorkDataSourceRelay.value[date] ?? [])
         didSelectCell(selectedDate: date)
     }
     
     func calendar(_ calendar: JTACMonthView, didDeselectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
         selectedDate = nil
-        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workList: Array(calendarWorkDataSourceRelay.value[date] ?? []))
+        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workSet: calendarWorkDataSourceRelay.value[date] ?? [])
         didDeselectCell()
     }
 }
