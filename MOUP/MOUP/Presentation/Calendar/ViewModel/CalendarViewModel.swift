@@ -23,7 +23,7 @@ final class CalendarViewModel {
     
     // MARK: - Input
     struct Input {
-        let visibleDate: Observable<Date>
+        let lastFetchCenterDate: Observable<Date>
         let calendarMode: Observable<CalendarMode>
         let personalFilterWorkplace: Observable<WorkplaceSummary?>
         let sharedFilterWorkplace: Observable<WorkplaceSummary?>
@@ -45,10 +45,10 @@ final class CalendarViewModel {
     
     // MARK: - Input ➡️ Output Transform
     func transform(input: Input) -> Output {
-        Observable.combineLatest(input.visibleDate, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
+        Observable.combineLatest(input.lastFetchCenterDate, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
             .subscribe(with: self) { owner, combined in
-                let (visibleDate, calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
-                let baseYearMonth = DateFormatter.dataYearMonthDateFormatter.string(from: visibleDate)
+                let (lastFetchCenterDate, calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
+                let baseYearMonth = DateFormatter.dataYearMonthDateFormatter.string(from: lastFetchCenterDate)
                 
                 Task.detached {
                     do {
