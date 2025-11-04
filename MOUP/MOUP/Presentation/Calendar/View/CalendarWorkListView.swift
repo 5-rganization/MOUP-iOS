@@ -22,7 +22,7 @@ protocol CalendarWorkListViewDelegate: AnyObject {
     func deleteRecurringWork(workId: Int)
 }
 
-/// 근무 리스트 UI
+/// 캘린더 근무 목록 UI
 final class CalendarWorkListView: UIView {
     
     // MARK: - Properties
@@ -39,7 +39,7 @@ final class CalendarWorkListView: UIView {
         $0.font = .headBold(20)
         $0.textColor = .gray900
     }
-    /// 근무 리스트
+    /// 근무 목록
     fileprivate let workTableView = UITableView().then {
         $0.register(PersonalModeWorkCell.self, forCellReuseIdentifier: PersonalModeWorkCell.identifier)
         $0.register(SharedModeWorkCell.self, forCellReuseIdentifier: SharedModeWorkCell.identifier)

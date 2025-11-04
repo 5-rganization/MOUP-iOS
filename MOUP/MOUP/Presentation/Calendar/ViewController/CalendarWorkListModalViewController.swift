@@ -25,7 +25,7 @@ protocol CalendarWorkListModalVCDelegate: AnyObject {
     func updateCalendarDataSource()
 }
 
-/// 근무 리스트 모달 VC
+/// 캘린더 근무 목록 모달 VC
 final class CalendarWorkListModalViewController: UIViewController {
     
     // MARK: - Properties
@@ -104,8 +104,7 @@ private extension CalendarWorkListModalViewController {
             }.disposed(by: disposeBag)
         
         // ViewModel 바인딩
-        let input = CalendarWorkListViewModel.Input(viewDidLoad: Observable.just(()),
-                                                    deleteSingleWorkId: deleteSingleWorkIdRelay.asObservable(),
+        let input = CalendarWorkListViewModel.Input(deleteSingleWorkId: deleteSingleWorkIdRelay.asObservable(),
                                                     deleteRecurringWorkId: deleteRecurringWorkIdRelay.asObservable())
         let output = viewModel.transform(input: input)
         
@@ -126,6 +125,11 @@ private extension CalendarWorkListModalViewController {
             .drive(with: self) { owner, errorMessage in
                 owner.presentNoticeModal(title: errorMessage.title, comment: errorMessage.message)
             }.disposed(by: disposeBag)
+        
+        output.updateCalendar.asDriver(onErrorJustReturn: ())
+            .drive(with: self) { owner, _ in
+                owner.delegate?.updateCalendarDataSource()
+            }.disposed(by: disposeBag)
     }
 }
 
@@ -137,12 +141,10 @@ extension CalendarWorkListModalViewController: CalendarWorkListViewDelegate {
     
     func deleteSingleWork(workId: Int) {
         deleteSingleWorkIdRelay.accept(workId)
-        delegate?.updateCalendarDataSource()
     }
     
     func deleteRecurringWork(workId: Int) {
         deleteRecurringWorkIdRelay.accept(workId)
-        delegate?.updateCalendarDataSource()
     }
 }
 

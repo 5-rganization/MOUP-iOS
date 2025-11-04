@@ -7,6 +7,8 @@
 
 import UIKit
 
+import RxSwift
+
 /// `CalendarWorkListCoordinator`의 이벤트를 `CalendarCoordinator`에 전달하는 Delegate
 protocol CalendarWorkListCoordinatorDelegate: AnyObject {
     /// 근무 목록 화면 내림
@@ -28,14 +30,14 @@ final class CalendarWorkListCoordinator: Coordinator {
     private let navigationController: UINavigationController
     private let workUseCase: WorkUseCaseProtocol
     private let selectedDay: Int
-    private let calendarWorkList: [WorkSummary]
+    private let calendarWorkList: Observable<[WorkSummary]>
     private let calendarMode: CalendarMode
     
     // Property Injections
     weak var delegate: CalendarWorkListCoordinatorDelegate?
     
     // MARK: - Initializer
-    init(navigationController: UINavigationController, workUseCase: WorkUseCaseProtocol, selectedDay: Int, calendarWorkList: [WorkSummary], calendarMode: CalendarMode) {
+    init(navigationController: UINavigationController, workUseCase: WorkUseCaseProtocol, selectedDay: Int, calendarWorkList: Observable<[WorkSummary]>, calendarMode: CalendarMode) {
         self.navigationController = navigationController
         self.workUseCase = workUseCase
         

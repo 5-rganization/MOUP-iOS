@@ -19,15 +19,11 @@ final class CalendarWorkListViewModel {
     private let disposeBag = DisposeBag()
     
     // Initializer Injections
-    private var calendarWorkList: [WorkSummary]
     private let workUseCase: WorkUseCaseProtocol
-    
-    private var deleteSingleTask: Task<Void, Never>?
-    private var deleteRecurringTask: Task<Void, Never>?
+    private let calendarWorkList: Observable<[WorkSummary]>
     
     // MARK: - Input
     struct Input {
-        let viewDidLoad: Observable<Void>
         let deleteSingleWorkId: Observable<Int>
         let deleteRecurringWorkId: Observable<Int>
     }
@@ -36,37 +32,25 @@ final class CalendarWorkListViewModel {
     struct Output {
         let calendarWorkList: Observable<[WorkSummary]>
         let errorMessage: Observable<(title: String, message: String)>
+        let updateCalendar: Observable<Void>
     }
-    private let calendarWorkListRelay = BehaviorRelay<[WorkSummary]>(value: [])
     private let errorMessageRelay = PublishRelay<(title: String, message: String)>()
+    private let updateCalendarRelay = PublishRelay<Void>()
     
     // MARK: - Initializer
-    init(workUseCase: WorkUseCaseProtocol, calendarWorkList: [WorkSummary]) {
+    init(workUseCase: WorkUseCaseProtocol, calendarWorkList: Observable<[WorkSummary]>) {
         self.workUseCase = workUseCase
         self.calendarWorkList = calendarWorkList
     }
     
     // MARK: - Input ➡️ Output Transform
     func transform(input: Input) -> Output {
-        input.viewDidLoad
-            .subscribe(with: self) { owner, _ in
-                owner.calendarWorkListRelay.accept(owner.calendarWorkList)
-            }.disposed(by: disposeBag)
-        
         input.deleteSingleWorkId
             .subscribe(with: self) { owner, workId in
-                owner.deleteSingleTask?.cancel()
-                owner.deleteSingleTask = Task {
-                    defer {
-                        if !Task.isCancelled { owner.calendarWorkListRelay.accept(owner.calendarWorkList) }
-                    }
-                    
+                Task {
                     do {
                         try await owner.workUseCase.deleteWork(workId: workId)
-                        
-                        owner.calendarWorkList = owner.calendarWorkList.filter { $0.id != workId }
-                    } catch is CancellationError {
-                        owner.logger.info("단일 근무 삭제 Task가 취소되었습니다.")
+                        owner.updateCalendarRelay.accept(())
                     } catch let error as LocalizedError {
                         owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
                     } catch {
@@ -77,18 +61,10 @@ final class CalendarWorkListViewModel {
         
         input.deleteRecurringWorkId
             .subscribe(with: self) { owner, workId in
-                owner.deleteRecurringTask?.cancel()
-                owner.deleteRecurringTask = Task {
-                    defer {
-                        if !Task.isCancelled { owner.calendarWorkListRelay.accept(owner.calendarWorkList) }
-                    }
-                    
+                Task {
                     do {
                         try await owner.workUseCase.deleteRecurringWork(workId: workId)
-                        
-                        owner.calendarWorkList = owner.calendarWorkList.filter { $0.id != workId }
-                    } catch is CancellationError {
-                        owner.logger.info("반복 근무 삭제 Task가 취소되었습니다.")
+                        owner.updateCalendarRelay.accept(())
                     } catch let error as LocalizedError {
                         owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
                     } catch {
@@ -97,7 +73,8 @@ final class CalendarWorkListViewModel {
                 }
             }.disposed(by: disposeBag)
         
-        return Output(calendarWorkList: calendarWorkListRelay.asObservable(),
-                      errorMessage: errorMessageRelay.asObservable())
+        return Output(calendarWorkList: calendarWorkList,
+                      errorMessage: errorMessageRelay.asObservable(),
+                      updateCalendar: updateCalendarRelay.asObservable())
     }
 }

@@ -8,6 +8,8 @@
 import UIKit
 import OSLog
 
+import RxSwift
+
 /// `CalendarViewController` Coordinator
 final class CalendarCoordinator: Coordinator {
     
@@ -65,7 +67,7 @@ final class CalendarCoordinator: Coordinator {
         childCoordinators.append(filterCoordinator)
     }
     
-    func showCalendarWorkList(selectedDay: Int, calendarWorkList: [WorkSummary], calendarMode: CalendarMode) {
+    func showCalendarWorkList(selectedDay: Int, calendarWorkList: Observable<[WorkSummary]>, calendarMode: CalendarMode) {
         let calendarWorkListCoordinator = CalendarWorkListCoordinator(navigationController: navigationController,
                                                                       workUseCase: workUseCase,
                                                                       selectedDay: selectedDay,
