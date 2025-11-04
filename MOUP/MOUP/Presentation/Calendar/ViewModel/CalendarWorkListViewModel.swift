@@ -22,12 +22,14 @@ final class CalendarWorkListViewModel {
     private var calendarWorkList: [WorkSummary]
     private let workUseCase: WorkUseCaseProtocol
     
-    private var fetchTask: Task<Void, Never>?
+    private var deleteSingleTask: Task<Void, Never>?
+    private var deleteRecurringTask: Task<Void, Never>?
     
     // MARK: - Input
     struct Input {
         let viewDidLoad: Observable<Void>
-        let deleteWorkId: Observable<Int>
+        let deleteSingleWorkId: Observable<Int>
+        let deleteRecurringWorkId: Observable<Int>
     }
     
     // MARK: - Output
@@ -51,19 +53,42 @@ final class CalendarWorkListViewModel {
                 owner.calendarWorkListRelay.accept(owner.calendarWorkList)
             }.disposed(by: disposeBag)
         
-        input.deleteWorkId
-            .subscribe(with: self) { owner, id in
-                owner.fetchTask?.cancel()
-                owner.fetchTask = Task {
+        input.deleteSingleWorkId
+            .subscribe(with: self) { owner, workId in
+                owner.deleteSingleTask?.cancel()
+                owner.deleteSingleTask = Task {
                     defer {
                         if !Task.isCancelled { owner.calendarWorkListRelay.accept(owner.calendarWorkList) }
                     }
                     
                     do {
-                        try await owner.workUseCase.deleteWork(workId: id)
-                        owner.calendarWorkList = owner.calendarWorkList.filter { $0.id != id }
+                        try await owner.workUseCase.deleteWork(workId: workId)
+                        
+                        owner.calendarWorkList = owner.calendarWorkList.filter { $0.id != workId }
                     } catch is CancellationError {
-                        owner.logger.info("근무 삭제 Task가 취소되었습니다.")
+                        owner.logger.info("단일 근무 삭제 Task가 취소되었습니다.")
+                    } catch let error as LocalizedError {
+                        owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                    } catch {
+                        owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                    }
+                }
+            }.disposed(by: disposeBag)
+        
+        input.deleteRecurringWorkId
+            .subscribe(with: self) { owner, workId in
+                owner.deleteRecurringTask?.cancel()
+                owner.deleteRecurringTask = Task {
+                    defer {
+                        if !Task.isCancelled { owner.calendarWorkListRelay.accept(owner.calendarWorkList) }
+                    }
+                    
+                    do {
+                        try await owner.workUseCase.deleteRecurringWork(workId: workId)
+                        
+                        owner.calendarWorkList = owner.calendarWorkList.filter { $0.id != workId }
+                    } catch is CancellationError {
+                        owner.logger.info("반복 근무 삭제 Task가 취소되었습니다.")
                     } catch let error as LocalizedError {
                         owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
                     } catch {

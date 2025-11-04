@@ -41,7 +41,8 @@ final class CalendarWorkListModalViewController: UIViewController {
     weak var delegate: CalendarWorkListModalVCDelegate?
     
     // Input Relays
-    private let deleteWorkIdRelay = PublishRelay<Int>()
+    private let deleteSingleWorkIdRelay = PublishRelay<Int>()
+    private let deleteRecurringWorkIdRelay = PublishRelay<Int>()
     
     // MARK: - UI Components
     private lazy var calendarWorkListView = CalendarWorkListView().then {
@@ -103,7 +104,9 @@ private extension CalendarWorkListModalViewController {
             }.disposed(by: disposeBag)
         
         // ViewModel 바인딩
-        let input = CalendarWorkListViewModel.Input(viewDidLoad: Observable.just(()), deleteWorkId: deleteWorkIdRelay.asObservable())
+        let input = CalendarWorkListViewModel.Input(viewDidLoad: Observable.just(()),
+                                                    deleteSingleWorkId: deleteSingleWorkIdRelay.asObservable(),
+                                                    deleteRecurringWorkId: deleteRecurringWorkIdRelay.asObservable())
         let output = viewModel.transform(input: input)
         
         output.calendarWorkList.asDriver(onErrorJustReturn: [])
@@ -132,8 +135,13 @@ extension CalendarWorkListModalViewController: CalendarWorkListViewDelegate {
         delegate?.editButtonTapped(work: work)
     }
     
-    func deleteWork(id: Int) {
-        deleteWorkIdRelay.accept(id)
+    func deleteSingleWork(workId: Int) {
+        deleteSingleWorkIdRelay.accept(workId)
+        delegate?.updateCalendarDataSource()
+    }
+    
+    func deleteRecurringWork(workId: Int) {
+        deleteRecurringWorkIdRelay.accept(workId)
         delegate?.updateCalendarDataSource()
     }
 }

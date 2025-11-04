@@ -16,8 +16,10 @@ import Then
 protocol CalendarWorkListViewDelegate: AnyObject {
     /// 근무 수정
     func editWork(work: WorkSummary)
-    /// 근무 삭제
-    func deleteWork(id: Int)
+    /// 단일 근무 삭제
+    func deleteSingleWork(workId: Int)
+    /// 반복 근무 삭제
+    func deleteRecurringWork(workId: Int)
 }
 
 /// 근무 리스트 UI
@@ -144,10 +146,20 @@ extension Reactive where Base: CalendarWorkListView {
                     let editAction = UIAction(title: "수정하기") { _ in
                         base.delegate?.editWork(work: work)
                     }
-                    let deleteAction = UIAction(title: "삭제하기", attributes: .destructive) { _ in
-                        base.delegate?.deleteWork(id: work.id)
+                    let singleDeleteAction = UIAction(title: "삭제하기", attributes: .destructive) { _ in
+                        base.delegate?.deleteSingleWork(workId: work.id)
                     }
-                    cell.menuButton.menu = UIMenu(children: [editAction, deleteAction])
+                    let recurringDeleteAction = UIAction(title: "이후 모든 근무 삭제", attributes: .destructive) { _ in
+                        base.delegate?.deleteRecurringWork(workId: work.id)
+                    }
+                    if work.repeatDays.isEmpty {
+                        cell.menuButton.menu = UIMenu(children: [editAction, singleDeleteAction])
+                    } else {
+                        singleDeleteAction.title = "이 근무만 삭제"
+                        let deleteSubMenu = UIMenu(title: "삭제하기", options: .destructive, children: [singleDeleteAction, recurringDeleteAction])
+                        cell.menuButton.menu = UIMenu(children: [editAction, deleteSubMenu])
+                    }
+                    
                     cell.update(work: work)
                 }.disposed(by: base.disposeBag)
         }
@@ -166,10 +178,20 @@ extension Reactive where Base: CalendarWorkListView {
                     let editAction = UIAction(title: "수정하기") { _ in
                         base.delegate?.editWork(work: work)
                     }
-                    let deleteAction = UIAction(title: "삭제하기", attributes: .destructive) { _ in
-                        base.delegate?.deleteWork(id: work.id)
+                    let singleDeleteAction = UIAction(title: "삭제하기", attributes: .destructive) { _ in
+                        base.delegate?.deleteSingleWork(workId: work.id)
                     }
-                    cell.menuButton.menu = UIMenu(children: [editAction, deleteAction])
+                    let recurringDeleteAction = UIAction(title: "이후 모든 근무 삭제", attributes: .destructive) { _ in
+                        base.delegate?.deleteRecurringWork(workId: work.id)
+                    }
+                    if work.repeatDays.isEmpty {
+                        cell.menuButton.menu = UIMenu(children: [editAction, singleDeleteAction])
+                    } else {
+                        singleDeleteAction.title = "이 근무만 삭제"
+                        let deleteSubMenu = UIMenu(title: "삭제하기", options: .destructive, children: [singleDeleteAction, recurringDeleteAction])
+                        cell.menuButton.menu = UIMenu(children: [editAction, deleteSubMenu])
+                    }
+                    
                     cell.update(work: work)
                 }.disposed(by: base.disposeBag)
         }
