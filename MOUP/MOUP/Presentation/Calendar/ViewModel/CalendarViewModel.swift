@@ -53,9 +53,8 @@ final class CalendarViewModel {
             .subscribe(with: self) { owner, combined in
                 let (baseFetchDate, calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
                 let baseYearMonth = DateFormatter.dataYearMonthDateFormatter.string(from: baseFetchDate)
-                
                 owner.fetchTask?.cancel()
-                owner.fetchTask = Task.detached {
+                owner.fetchTask = Task {
                     do {
                         var calendarWorkList: [WorkSummary]
                         switch calendarMode {
