@@ -13,7 +13,7 @@ import RxCocoa
 enum SignInOutputEvent {
     case loginSuccessed
     case navigateToSignUp
-    case showAlert(Error)
+    case showAlert((title: String, message: String))
 }
 
 final class SignInViewModel {
@@ -57,36 +57,50 @@ final class SignInViewModel {
             owner.appleLoginTriggered.accept(())
         }.disposed(by: disposeBag)
         
-        input.authResult.subscribe(with: self, onNext: { owner, result in
-            let (provider, username, authCode) = result
-            
-            guard let provider else { return }
-            if authCode == "" { return }
-            Task {
-                do {
-                    try await self.authUseCase.signIn(
-                        requestDTO: LoginRequestDTO(
-                            provider: provider.rawValue,
-                            authCode: authCode,
-                            username: username,
-                            fcmToken: UserDefaultsManager.shared.fcmToken ?? ""
+        input.authResult.subscribe(
+            with: self,
+            onNext: {
+                owner,
+                result in
+                let (provider, username, authCode) = result
+                
+                guard let provider else { return }
+                if authCode == "" { return }
+                Task {
+                    do {
+                        try await self.authUseCase.signIn(
+                            requestDTO: LoginRequestDTO(
+                                provider: provider.rawValue,
+                                authCode: authCode,
+                                username: username,
+                                fcmToken: UserDefaultsManager.shared.fcmToken ?? ""
+                            )
                         )
-                    )
-                    self.signInOutputEventRelay.accept(SignInOutputEvent.loginSuccessed)
-                } catch let error as NetworkError {
-                    switch error {
-                    case .serverError,
-                            .noResponse,
-                            .invalidResponse(_):
-                        self.signInOutputEventRelay.accept(SignInOutputEvent.showAlert(error))
-                    }
-                } catch let error as AuthError {
-                    switch error {
-                    case .notMember:
-                        self.loginProviderRelay.accept(provider)
-                        self.signInOutputEventRelay.accept(SignInOutputEvent.navigateToSignUp)
-                    default:
-                        return
+                        self.signInOutputEventRelay.accept(SignInOutputEvent.loginSuccessed)
+                    } catch let error as NetworkError {
+                        let errorInfo: (title: String, message: String)
+                        switch error {
+                        case .serverError:
+                            errorInfo = (title: "서버 오류", message: error.localizedDescription)
+                        case .noResponse,
+                                .invalidResponse:
+                            errorInfo = (title: "예상치 못한 오류", message: error.localizedDescription)
+                        }
+                        self.signInOutputEventRelay.accept(.showAlert(errorInfo))
+                    } catch let error as AuthError {
+                        switch error {
+                        case .notMember:
+                            self.loginProviderRelay.accept(provider)
+                            self.signInOutputEventRelay.accept(SignInOutputEvent.navigateToSignUp)
+                        default:
+                            self.signInOutputEventRelay.accept(
+                                .showAlert(
+                                    (
+                                        title: "로그인 실패",
+                                        message: error.localizedDescription
+                                    )
+                                )
+                            )
                     }
                 }
             }
