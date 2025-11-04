@@ -43,32 +43,39 @@ final class CalendarWorkListViewModel {
     }
     
     // MARK: - Input ➡️ Output Transform
-    @MainActor
     func transform(input: Input) -> Output {
         input.deleteSingleWorkId
             .subscribe(with: self) { owner, workId in
-                Task {
+                Task.detached {
                     do {
                         try await owner.workUseCase.deleteWork(workId: workId)
-                        owner.updateCalendarRelay.accept(())
+                        await MainActor.run { owner.updateCalendarRelay.accept(()) }
                     } catch let error as LocalizedError {
-                        owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        await MainActor.run {
+                            owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        }
                     } catch {
-                        owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        await MainActor.run {
+                            owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        }
                     }
                 }
             }.disposed(by: disposeBag)
         
         input.deleteRecurringWorkId
             .subscribe(with: self) { owner, workId in
-                Task {
+                Task.detached {
                     do {
                         try await owner.workUseCase.deleteRecurringWork(workId: workId)
-                        owner.updateCalendarRelay.accept(())
+                        await MainActor.run { owner.updateCalendarRelay.accept(()) }
                     } catch let error as LocalizedError {
-                        owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        await MainActor.run {
+                            owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        }
                     } catch {
-                        owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        await MainActor.run {
+                            owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        }
                     }
                 }
             }.disposed(by: disposeBag)
