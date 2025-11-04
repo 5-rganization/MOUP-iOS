@@ -13,9 +13,9 @@ struct ManageAttendanceItem {
 }
 
 extension ManageAttendanceItem: SectionModelType {
-    typealias Item = Employee
+    typealias Item = WorkerSummary
     
-    init(original: ManageAttendanceItem, items: [Employee]) {
+    init(original: ManageAttendanceItem, items: [WorkerSummary]) {
         self = original
         self.items = items
     }

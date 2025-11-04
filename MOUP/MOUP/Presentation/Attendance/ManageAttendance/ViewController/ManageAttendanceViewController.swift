@@ -22,8 +22,8 @@ final class ManageAttendanceViewController: UIViewController {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: ManageAttendanceCell.identifier, for: indexPath) as? ManageAttendanceCell else {
                 return UITableViewCell()
             }
-            let color = LabelColorString.init(rawValue: item.labelColor)?.labelColor ?? .primary50
-            cell.update(color: color, name: item.name)
+            let color = LabelColorString.init(rawValue: item.workerBasedLabelColor?.rawValue ?? "기본색") ?? ._default
+            cell.update(color: color.labelColor, name: item.nickname)
             return cell
     })
     
@@ -87,8 +87,13 @@ private extension ManageAttendanceViewController {
         
         manageAttendanceView.rx.modelSelected
             .withUnretained(self)
-            .subscribe(onNext: { owner, model in
-                owner.coordinator?.moveToAttendanceHistory(navTitle: model.name)
+            .subscribe(
+                onNext: { owner, model in
+                    owner.coordinator?.moveToAttendanceHistory(
+                        navTitle: model.nickname,
+                        workplaceId: owner.workplaceId,
+                        workerId: model.workerId
+                    )
             })
             .disposed(by: disposeBag)
         
