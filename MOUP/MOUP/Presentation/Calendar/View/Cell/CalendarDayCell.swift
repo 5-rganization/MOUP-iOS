@@ -102,6 +102,7 @@ final class CalendarDayCell: JTACDayCell {
         self.isUserInteractionEnabled = dateBelongsToThisMonth
         dayLabel.isHidden = !dateBelongsToThisMonth
         selectedView.isHidden = !isSelected
+        workContainerVStackView.isHidden = !dateBelongsToThisMonth
         
         let displayCount = 4
         switch calendarMode {
