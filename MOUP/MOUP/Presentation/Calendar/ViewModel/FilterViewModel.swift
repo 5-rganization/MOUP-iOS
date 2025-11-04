@@ -11,7 +11,6 @@ import RxRelay
 import RxSwift
 
 /// 필터 VM
-@MainActor
 final class FilterViewModel {
     
     // MARK: - Properties
@@ -42,6 +41,7 @@ final class FilterViewModel {
     }
     
     // MARK: - Input ➡️ Output Transform
+    @MainActor
     func transform(input: Input) -> Output {
         input.viewDidLoad
             .subscribe(with: self) { owner, calendarMode in

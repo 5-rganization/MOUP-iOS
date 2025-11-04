@@ -11,7 +11,6 @@ import RxRelay
 import RxSwift
 
 /// 캘린더 VM
-@MainActor
 final class CalendarViewModel {
     
     // MARK: - Properties
@@ -47,6 +46,7 @@ final class CalendarViewModel {
     }
     
     // MARK: - Input ➡️ Output Transform
+    @MainActor
     func transform(input: Input) -> Output {
         Observable.combineLatest(input.visibleDate, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
             .subscribe(with: self) { owner, combined in

@@ -11,7 +11,6 @@ import RxRelay
 import RxSwift
 
 /// 캘린더 근무 목록 VM
-@MainActor
 final class CalendarWorkListViewModel {
     
     // MARK: - Properties
@@ -44,6 +43,7 @@ final class CalendarWorkListViewModel {
     }
     
     // MARK: - Input ➡️ Output Transform
+    @MainActor
     func transform(input: Input) -> Output {
         input.deleteSingleWorkId
             .subscribe(with: self) { owner, workId in
