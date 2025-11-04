@@ -310,7 +310,7 @@ private extension WorkService {
     /// - Parameter functionName: 이 로그를 호출한 상위 함수의 이름 (자동으로 채워짐)
     func logResponse<T>(_ response: DataResponse<T, AFError>, _ functionName: String = #function) {
         logger.info("[\(functionName)] Server StatusCode: \(String(describing: response.response?.statusCode))")
-        logger.info("[\(functionName)] Server Response Value: \(String(describing: response.value))")
+//        logger.info("[\(functionName)] Server Response Value: \(String(describing: response.value))")
         
         // 디코딩 실패 시 원본 데이터 출력
         if response.value == nil, let data = response.data, let rawString = String(data: data, encoding: .utf8) {
