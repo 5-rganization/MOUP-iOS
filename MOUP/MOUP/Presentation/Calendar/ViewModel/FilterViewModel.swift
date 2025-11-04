@@ -20,11 +20,13 @@ final class FilterViewModel {
     // Initializer Injections
     private let workplaceUseCase: WorkplaceUseCaseProtocol
     
+    // Others
     private var fetchTask: Task<Void, Never>?
     
     // MARK: - Input
     struct Input {
         let viewDidLoad: Observable<CalendarMode>
+        let viewWillDisappear: Observable<Void>
     }
     
     // MARK: - Output
@@ -44,8 +46,7 @@ final class FilterViewModel {
     func transform(input: Input) -> Output {
         input.viewDidLoad
             .subscribe(with: self) { owner, calendarMode in
-                owner.fetchTask?.cancel()
-                owner.fetchTask = Task.detached {
+                owner.fetchTask = Task {
                     do {
                         var filterList: [WorkplaceSummary] = []
                         
@@ -56,15 +57,15 @@ final class FilterViewModel {
                         case .shared:
                             filterList = try await owner.workplaceUseCase.fetchSharedWorkplaceOnly()
                         }
+                        try Task.checkCancellation()
                         
-                        if !Task.isCancelled {
-                            filterList.sort { lhs, rhs in
-                                if lhs.id == -1 { return true }
-                                if rhs.id == -1 { return false }
-                                return lhs.name < rhs.name
-                            }
-                            await MainActor.run { [filterList] in owner.filterWorkplaceListRelay.accept(filterList) }
+                        filterList.sort { lhs, rhs in
+                            if lhs.id == -1 { return true }
+                            if rhs.id == -1 { return false }
+                            return lhs.name < rhs.name
                         }
+                        await MainActor.run { [filterList] in owner.filterWorkplaceListRelay.accept(filterList) }
+                        
                     } catch is CancellationError {
                         owner.logger.info("캘린더 근무지(매장) 필터 로딩 Task가 취소되었습니다.")
                     } catch let error as LocalizedError {
@@ -84,6 +85,12 @@ final class FilterViewModel {
                         }
                     }
                 }
+            }.disposed(by: disposeBag)
+        
+        input.viewWillDisappear
+            .subscribe(with: self) { owner, _ in
+                owner.fetchTask?.cancel()
+                owner.fetchTask = nil
             }.disposed(by: disposeBag)
         
         return Output(filterWorkplaceList: filterWorkplaceListRelay.asObservable(),

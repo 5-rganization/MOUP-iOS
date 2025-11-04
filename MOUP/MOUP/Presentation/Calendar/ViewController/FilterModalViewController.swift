@@ -32,6 +32,9 @@ final class FilterModalViewController: UIViewController {
     // Property Injections
     weak var delegate: FilterModalVCDelegate?
     
+    // Input Relays
+    private let viewWillDisappearRelay = PublishRelay<Void>()
+    
     // MARK: - UI Components
     private let filterView = FilterView()
     
@@ -57,6 +60,11 @@ final class FilterModalViewController: UIViewController {
         super.viewDidLoad()
         configure()
         setFilterView()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        viewWillDisappearRelay.accept(())
     }
 }
 
@@ -97,7 +105,8 @@ private extension FilterModalViewController {
             }).disposed(by: disposeBag)
         
         // ViewModel 바인딩
-        let input = FilterViewModel.Input(viewDidLoad: Observable.just(calendarMode))
+        let input = FilterViewModel.Input(viewDidLoad: Observable.just(calendarMode),
+                                          viewWillDisappear: viewWillDisappearRelay.asObservable())
         let output = viewModel.transform(input: input)
         
         let filterWorkplaceListDriver = output.filterWorkplaceList.asDriver(onErrorJustReturn: [])
