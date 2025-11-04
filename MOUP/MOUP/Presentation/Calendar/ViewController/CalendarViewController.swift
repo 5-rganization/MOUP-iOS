@@ -233,9 +233,7 @@ private extension CalendarViewController {
         let isSelected = cellState.isSelected
         let isToday = Calendar.current.isDateInToday(cellState.date)
         
-        let workList = Array(workSet).sorted {
-            ($0.startTime, $0.endTime ?? Date.distantFuture) < ($1.startTime, $1.endTime ?? Date.distantFuture)
-        }
+        let workList = Array(workSet).sorted(by: sortCalendarWorkList)
         
         cell.update(dateStr: cellState.text,
                     isToday: isToday,
@@ -248,8 +246,9 @@ private extension CalendarViewController {
     
     func didSelectCell(selectedDate: Date) {
         let selectedDay = Calendar.current.component(.day, from: selectedDate)
-        let calendarWorkList = calendarWorkDataSourceRelay.map { dict in
-            Array(dict[selectedDate] ?? []).sorted(by: { ($0.startTime, $0.endTime ?? Date.distantFuture) < ($1.startTime, $1.endTime ?? Date.distantFuture) })
+        let calendarWorkList: Observable<[WorkSummary]> = calendarWorkDataSourceRelay.map { [weak self] dict in
+            guard let self else { return [] }
+            return Array(dict[selectedDate] ?? []).sorted(by: self.sortCalendarWorkList)
         }
         coordinator?.showCalendarWorkList(selectedDay: selectedDay,
                                           calendarWorkList: calendarWorkList,
@@ -260,6 +259,10 @@ private extension CalendarViewController {
     func didDeselectCell() {
         coordinator?.dismissCalendarWorkList()
         calendarViewTapRecognizer.isEnabled = false
+    }
+    
+    func sortCalendarWorkList(_ lhs: WorkSummary, _ rhs: WorkSummary) -> Bool {
+        (lhs.startTime, lhs.endTime ?? Date.distantFuture) < (rhs.startTime, rhs.endTime ?? Date.distantFuture)
     }
 }
 
