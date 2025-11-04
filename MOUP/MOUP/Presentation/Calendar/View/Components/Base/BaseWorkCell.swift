@@ -171,6 +171,6 @@ extension BaseWorkCell {
             startEndTimeLabel.text = "\(startTimeStr) ~ 근무 중"
         }
         
-        workHourLabel.text = workMinutes.timeString
+        workHourLabel.text = workMinutes.timeStringWithHideableMiniutes
     }
 }
