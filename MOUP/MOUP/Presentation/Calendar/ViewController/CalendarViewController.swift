@@ -234,6 +234,7 @@ private extension CalendarViewController {
         calendarView.getMonthCalendarView.scrollToDate(date, animateScroll: true)
         visibleDate = date
         updateYearMonthLabel()
+        updateDataSource()
     }
     
     func configureCell(cell: JTACDayCell?, cellState: CellState, calendarMode: CalendarMode, workSet: Set<WorkSummary>) {
