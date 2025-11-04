@@ -21,8 +21,6 @@ final class CalendarViewModel {
     private let workUseCase: WorkUseCaseProtocol
     private let workplaceUseCase: WorkplaceUseCaseProtocol
     
-    private var fetchTask: Task<Void, Never>?
-    
     // MARK: - Input
     struct Input {
         let visibleDate: Observable<Date>
@@ -33,10 +31,10 @@ final class CalendarViewModel {
     
     // MARK: - Output
     struct Output {
-        let calendarWorkDict: Observable<[Date: [WorkSummary]]>
+        let calendarWorkDict: Observable<[Date: Set<WorkSummary>]>
         let errorMessage: Observable<(title: String, message: String)>
     }
-    private let calendarWorkDictRelay = BehaviorRelay<[Date: [WorkSummary]]>(value: [:])
+    private let calendarWorkDictRelay = BehaviorRelay<[Date: Set<WorkSummary>]>(value: [:])
     private let errorMessageRelay = PublishRelay<(title: String, message: String)>()
     
     // MARK: - Initializer
@@ -52,11 +50,9 @@ final class CalendarViewModel {
                 let (visibleDate, calendarMode, personalFilterWorkplace, sharedFilterWorkplace) = combined
                 let baseYearMonth = DateFormatter.dataYearMonthDateFormatter.string(from: visibleDate)
                 
-                owner.fetchTask?.cancel()
-                owner.fetchTask = Task.detached {
+                Task.detached {
                     do {
-                        var calendarWorkList: [WorkSummary] = []
-                        
+                        var calendarWorkList: [WorkSummary]
                         switch calendarMode {
                         case .personal:
                             if let filterWorkplace = personalFilterWorkplace {
@@ -77,16 +73,16 @@ final class CalendarViewModel {
                             }
                         }
                         
-                        if !Task.isCancelled {
-                            let dataSource = calendarWorkList.reduce(into: [Date: [WorkSummary]]()) { dict, work in
-                                guard let workDate = DateFormatter.dataSourceDateFormatter.date(from: work.workDate) else { return }
-                                dict[workDate, default: []].append(work)
-                            }
-                            await MainActor.run { owner.calendarWorkDictRelay.accept(dataSource) }
+                        let newChunkDict = calendarWorkList.reduce(into: [Date: Set<WorkSummary>]()) { dict, work in
+                            guard let workDate = DateFormatter.dataSourceDateFormatter.date(from: work.workDate) else { return }
+                            dict[workDate, default: []].insert(work)
+                        }
+                        await MainActor.run {
+                            var currentDict = owner.calendarWorkDictRelay.value
+                            currentDict.merge(newChunkDict) { oldSet, newSet in oldSet.union(newSet) }
+                            owner.calendarWorkDictRelay.accept(currentDict)
                         }
                         
-                    } catch is CancellationError {
-                        owner.logger.info("캘린더 근무 데이터 로딩 Task가 취소되었습니다.")
                     } catch let error as LocalizedError {
                         await MainActor.run {
                             owner.errorMessageRelay.accept((title: "근무 불러오기 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
@@ -101,12 +97,5 @@ final class CalendarViewModel {
         
         return Output(calendarWorkDict: calendarWorkDictRelay.asObservable(),
                       errorMessage: errorMessageRelay.asObservable())
-    }
-}
-
-// MARK: - Private Methods
-private extension CalendarViewModel {
-    func sortCalendarWorkList(_ lhs: WorkSummary, _ rhs: WorkSummary) -> Bool {
-        (lhs.startTime, lhs.endTime ?? Date.distantFuture) < (rhs.startTime, rhs.endTime ?? Date.distantFuture)
     }
 }
