@@ -33,10 +33,10 @@ final class CalendarViewModel {
     
     // MARK: - Output
     struct Output {
-        let calendarWorkList: Observable<[WorkSummary]>
+        let calendarWorkDict: Observable<[Date: [WorkSummary]]>
         let errorMessage: Observable<(title: String, message: String)>
     }
-    private let calendarWorkListRelay = BehaviorRelay<[WorkSummary]>(value: [])
+    private let calendarWorkDictRelay = BehaviorRelay<[Date: [WorkSummary]]>(value: [:])
     private let errorMessageRelay = PublishRelay<(title: String, message: String)>()
     
     // MARK: - Initializer
@@ -46,7 +46,6 @@ final class CalendarViewModel {
     }
     
     // MARK: - Input ➡️ Output Transform
-    @MainActor
     func transform(input: Input) -> Output {
         Observable.combineLatest(input.visibleDate, input.calendarMode, input.personalFilterWorkplace, input.sharedFilterWorkplace)
             .subscribe(with: self) { owner, combined in
@@ -54,16 +53,10 @@ final class CalendarViewModel {
                 let baseYearMonth = DateFormatter.dataYearMonthDateFormatter.string(from: visibleDate)
                 
                 owner.fetchTask?.cancel()
-                owner.fetchTask = Task {
-                    var calendarWorkList: [WorkSummary] = []
-                    defer {
-                        if !Task.isCancelled {
-                            calendarWorkList.sort(by: owner.sortCalendarWorkList)
-                            owner.calendarWorkListRelay.accept(calendarWorkList)
-                        }
-                    }
-                    
+                owner.fetchTask = Task.detached {
                     do {
+                        var calendarWorkList: [WorkSummary] = []
+                        
                         switch calendarMode {
                         case .personal:
                             if let filterWorkplace = personalFilterWorkplace {
@@ -84,17 +77,29 @@ final class CalendarViewModel {
                             }
                         }
                         
+                        if !Task.isCancelled {
+                            let dataSource = calendarWorkList.reduce(into: [Date: [WorkSummary]]()) { dict, work in
+                                guard let workDate = DateFormatter.dataSourceDateFormatter.date(from: work.workDate) else { return }
+                                dict[workDate, default: []].append(work)
+                            }
+                            await MainActor.run { owner.calendarWorkDictRelay.accept(dataSource) }
+                        }
+                        
                     } catch is CancellationError {
                         owner.logger.info("캘린더 근무 데이터 로딩 Task가 취소되었습니다.")
                     } catch let error as LocalizedError {
-                        owner.errorMessageRelay.accept((title: "근무 불러오기 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        await MainActor.run {
+                            owner.errorMessageRelay.accept((title: "근무 불러오기 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        }
                     } catch {
-                        owner.errorMessageRelay.accept((title: "근무 불러오기 실패", message: "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        await MainActor.run {
+                            owner.errorMessageRelay.accept((title: "근무 불러오기 실패", message: "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        }
                     }
                 }
             }.disposed(by: disposeBag)
         
-        return Output(calendarWorkList: calendarWorkListRelay.asObservable(),
+        return Output(calendarWorkDict: calendarWorkDictRelay.asObservable(),
                       errorMessage: errorMessageRelay.asObservable())
     }
 }

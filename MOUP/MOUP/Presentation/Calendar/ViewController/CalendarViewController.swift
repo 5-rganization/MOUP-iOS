@@ -170,9 +170,10 @@ private extension CalendarViewController {
                                             sharedFilterWorkplace: sharedFilterWorkplaceRelay.asObservable())
         let output = viewModel.transform(input: input)
         
-        output.calendarWorkList.asDriver(onErrorJustReturn: [])
-            .drive(with: self) { owner, calendarWorkList in
-                owner.populateDataSource(calendarWorkList: calendarWorkList)
+        output.calendarWorkDict.asDriver(onErrorJustReturn: [:])
+            .drive(with: self) { owner, calendarWorkDict in
+                owner.calendarWorkDataSourceRelay.accept(calendarWorkDict)
+                owner.calendarView.getMonthCalendarView.reloadData()
             }.disposed(by: disposeBag)
         
         output.errorMessage.asDriver(onErrorJustReturn: (title: "오류 발생", message: "잠시 후 다시 시도해주세요."))
@@ -191,16 +192,6 @@ private extension CalendarViewController {
 
 // MARK: - Internal Calendar Methods
 extension CalendarViewController {
-    func populateDataSource(calendarWorkList: [WorkSummary]) {
-        var dataSource: [Date: [WorkSummary]] = [:]
-        for work in calendarWorkList {
-            guard let workDate = DateFormatter.dataSourceDateFormatter.date(from: work.workDate) else { continue }
-            dataSource[workDate, default: []].append(work)
-        }
-        calendarWorkDataSourceRelay.accept(dataSource)
-        calendarView.getMonthCalendarView.reloadData()
-    }
-    
     func updateDataSource() {
         visibleDateRelay.accept(visibleDate)
     }
