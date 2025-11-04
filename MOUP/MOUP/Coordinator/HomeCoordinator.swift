@@ -18,8 +18,12 @@ final class HomeCoordinator: Coordinator {
     private let workplaceService: WorkplaceServiceProtocol
     private let workplaceRepository: WorkplaceRepositoryProtocol
     private let workplaceUseCase: WorkplaceUseCaseProtocol
+    private let attendanceService: AttendanceServiceProtocol
+    private let attendanceRepository: AttendanceRepositoryProtocol
+    private let attendanceUseCase: AttendanceUseCaseProtocol
+    private var userRole: UserRole
     
-    init(navigationController: UINavigationController) {
+    init(navigationController: UINavigationController, userRole: UserRole) {
         self.navigationController = navigationController
         self.homeService = HomeService()
         self.homeRepository = HomeRepository(homeService: homeService)
@@ -30,20 +34,22 @@ final class HomeCoordinator: Coordinator {
         self.workplaceService = WorkplaceService()
         self.workplaceRepository = WorkplaceRepository(workplaceService: workplaceService)
         self.workplaceUseCase = WorkplaceUseCase(workplaceRepository: workplaceRepository)
+        self.attendanceService = AttendanceService()
+        self.attendanceRepository = AttendanceRepository(attendanceService: attendanceService)
+        self.attendanceUseCase = AttendanceUseCase(attendanceRepository: attendanceRepository)
+        self.userRole = userRole
+        
     }
     
     func start() {
-        guard let rawValue = UserDefaultsManager.shared.userRole,
-        let role = UserRole(rawValue: rawValue) else { return }
-        
         let homeVM = HomeViewModel(
-            userRole: role,
+            userRole: userRole,
             useCase: homeUseCase
         )
         let homeVC = HomeViewController(
             coordinator: self,
             homeViewModel: homeVM,
-            userRole: role
+            userRole: userRole
         )
         navigationController.pushViewController(homeVC, animated: false)
     }
@@ -100,8 +106,14 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(vc, animated: true)
     }
     
-    func moveToAttendanceHistory(navTitle: String) {
-        let viewModel = AttendanceHistoryViewModel()
+    func moveToAttendanceHistory(navTitle: String, workplaceId: Int, workerId: Int? = nil) {
+        
+        let viewModel = AttendanceHistoryViewModel(
+            userRole: userRole,
+            workplaceId: workplaceId,
+            workerId: workerId,
+            attendanceUseCase: attendanceUseCase
+        )
         let vc = AttendanceHistoryViewController(
             viewModel: viewModel,
             navTitle: navTitle

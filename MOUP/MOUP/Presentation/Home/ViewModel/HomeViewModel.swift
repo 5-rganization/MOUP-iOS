@@ -14,7 +14,7 @@ private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: 
 
 final class HomeViewModel {
     // MARK: - Properties
-    private let userRole: UserRole
+    let userRole: UserRole
     private let disposeBag = DisposeBag()
     private let homeUseCase: HomeUseCaseProtocol
     

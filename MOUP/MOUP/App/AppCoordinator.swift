@@ -26,14 +26,19 @@ final class AppCoordinator: Coordinator {
         self.authService = AuthService()
         self.authRepository = AuthRepository(authService: authService)
         self.authUseCase = AuthUseCase(authRepository: authRepository)
-        
+        print("AccessToken: \(KeychainManager.shared.read(key: "accessToken"))")
         setupNetworkManager()
         setupNotifications()
     }
 
     func start() {
         if tokenUseCase.checkSignedIn() {
-            showTabBar()
+            if let rawValue = UserDefaultsManager.shared.userRole,
+               let role = UserRole(rawValue: rawValue) {
+                showTabBar(userRole: role)
+            } else {
+                handleUnauthorizedAccess()
+            }
         } else {
             showSignIn()
         }
@@ -71,13 +76,14 @@ final class AppCoordinator: Coordinator {
         signInCoordinator.start()
     }
     
-    private func showTabBar() {
+    private func showTabBar(userRole: UserRole) {
         childCoordinators.removeAll()
         
         let tabBarCoordinator = TabBarCoordinator(
             coordinator: self,
             window: window,
-            authUseCase: authUseCase
+            authUseCase: authUseCase,
+            userRole: userRole
         )
         childCoordinators.append(tabBarCoordinator)
         tabBarCoordinator.start()
@@ -86,7 +92,12 @@ final class AppCoordinator: Coordinator {
     // MARK: - Public Methods
     
     func moveToTabBar() {
-        showTabBar()
+        if let rawValue = UserDefaultsManager.shared.userRole,
+           let role = UserRole(rawValue: rawValue) {
+            showTabBar(userRole: role)
+        } else {
+            handleUnauthorizedAccess()
+        }
     }
     
     deinit {

@@ -14,7 +14,6 @@ final class HomeViewController: UIViewController {
     weak var coordinator: HomeCoordinator?
     private let homeViewModel: HomeViewModel
     private let homeView: HomeView
-    private let userRole: UserRole
     private let disposeBag = DisposeBag()
     
     private lazy var dataSource = RxTableViewSectionedAnimatedDataSource<HomeTableViewFirstSection>(animationConfiguration: AnimationConfiguration(deleteAnimation: .automatic)) { dataSource, tableView, indexPath, item in
@@ -48,7 +47,6 @@ final class HomeViewController: UIViewController {
     init(coordinator: HomeCoordinator? = nil, homeViewModel: HomeViewModel, userRole: UserRole) {
         self.coordinator = coordinator
         self.homeViewModel = homeViewModel
-        self.userRole = userRole
         self.homeView = HomeView(userRole: userRole)
         
         super.init(nibName: nil, bundle: nil)
@@ -101,7 +99,7 @@ private extension HomeViewController {
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
                 print("플러스 버튼 탭")
-                switch owner.userRole {
+                switch owner.homeViewModel.userRole {
                 case .owner:
                     owner.coordinator?.moveToDirectRegistration()
                 case .worker:
@@ -174,7 +172,7 @@ private extension HomeViewController {
         let action = UIAction(title: "출퇴근 기록") { [weak self] _ in
             guard let self else { return }
             print("출퇴근 기록 확인")
-            self.coordinator?.moveToAttendanceHistory(navTitle: "송눈섭") // TODO: - 알바 기준 UserDefault 등에 저장되어있는 닉네임 호출 필요
+            self.coordinator?.moveToAttendanceHistory(navTitle: "송눈섭", workplaceId: workplaceId) // TODO: - 알바 기준 UserDefault 등에 저장되어있는 닉네임 호출 필요
         }
         return action
     }

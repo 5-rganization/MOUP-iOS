@@ -12,18 +12,28 @@ final class TabBarCoordinator: Coordinator {
     private let window: UIWindow
     private let tabBarViewModel: TabBarViewModel
     private let tabBarController: TabBarViewController
+    private let userRole: UserRole
 
-    init(coordinator: Coordinator, window: UIWindow, authUseCase: AuthUseCaseProtocol) {
+    init(
+        coordinator: Coordinator,
+        window: UIWindow,
+        authUseCase: AuthUseCaseProtocol,
+        userRole: UserRole
+    ) {
         self.coordinator = coordinator
         self.window = window
         self.tabBarViewModel = TabBarViewModel(authUseCase: authUseCase)
         self.tabBarController = TabBarViewController(viewModel: tabBarViewModel)
+        self.userRole = userRole
     }
 
     func start() {
         // Home
         let homeNav = UINavigationController()
-        let homeCoordinator = HomeCoordinator(navigationController: homeNav)
+        let homeCoordinator = HomeCoordinator(
+            navigationController: homeNav,
+            userRole: userRole
+        )
         childCoordinators.append(homeCoordinator)
         homeCoordinator.start()
 
