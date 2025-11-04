@@ -100,12 +100,17 @@ private extension FilterModalViewController {
         let input = FilterViewModel.Input(viewDidLoad: Observable.just(calendarMode))
         let output = viewModel.transform(input: input)
         
-        output.filterWorkplaceList.asDriver(onErrorJustReturn: [])
-            .drive(with: self, onNext: { owner, filterWorkplaceList in
+        let filterWorkplaceListDriver = output.filterWorkplaceList.asDriver(onErrorJustReturn: [])
+        filterWorkplaceListDriver
+            .drive(with: self) { owner, filterWorkplaceList in
                 owner.filterView.rx.emptyLabelIsHidden.onNext(!filterWorkplaceList.isEmpty)
                 owner.filterView.rx.filterTableViewIsHidden.onNext(filterWorkplaceList.isEmpty)
                 owner.filterView.rx.filterTableViewDataSource.onNext(filterWorkplaceList)
-                
+            }.disposed(by: disposeBag)
+        
+        filterWorkplaceListDriver
+            .skip(1)  // BehaviorRelay의 초기값(빈 배열) 스킵
+            .drive(with: self, onNext: { owner, filterWorkplaceList in
                 // 초기 셀 선택 로직
                 if owner.selectedFilterWorkplace == nil {
                     owner.setDefaultSelect(firstOfList: filterWorkplaceList.first)
