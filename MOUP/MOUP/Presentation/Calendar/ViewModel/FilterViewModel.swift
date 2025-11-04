@@ -41,25 +41,14 @@ final class FilterViewModel {
     }
     
     // MARK: - Input ➡️ Output Transform
-    @MainActor
     func transform(input: Input) -> Output {
         input.viewDidLoad
             .subscribe(with: self) { owner, calendarMode in
                 owner.fetchTask?.cancel()
-                owner.fetchTask = Task {
-                    var filterList: [WorkplaceSummary] = []
-                    defer {
-                        if !Task.isCancelled {
-                            filterList.sort { lhs, rhs in
-                                if lhs.id == -1 { return true }
-                                if rhs.id == -1 { return false }
-                                return lhs.name < rhs.name
-                            }
-                            owner.filterWorkplaceListRelay.accept(filterList)
-                        }
-                    }
-                    
+                owner.fetchTask = Task.detached {
                     do {
+                        var filterList: [WorkplaceSummary] = []
+                        
                         switch calendarMode {
                         case .personal:
                             filterList = try await owner.workplaceUseCase.fetchAllWorkplace()
@@ -67,19 +56,32 @@ final class FilterViewModel {
                         case .shared:
                             filterList = try await owner.workplaceUseCase.fetchSharedWorkplaceOnly()
                         }
+                        
+                        if !Task.isCancelled {
+                            filterList.sort { lhs, rhs in
+                                if lhs.id == -1 { return true }
+                                if rhs.id == -1 { return false }
+                                return lhs.name < rhs.name
+                            }
+                            await MainActor.run { [filterList] in owner.filterWorkplaceListRelay.accept(filterList) }
+                        }
                     } catch is CancellationError {
                         owner.logger.info("캘린더 근무지(매장) 필터 로딩 Task가 취소되었습니다.")
                     } catch let error as LocalizedError {
-                        switch UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) {
-                        case .worker:
-                            owner.errorMessageRelay.accept((title: "근무지 목록 불러오기 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
-                        case .owner:
-                            owner.errorMessageRelay.accept((title: "매장 목록 불러오기 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
-                        default:
-                            owner.errorMessageRelay.accept((title: "근무지(매장) 목록 불러오기 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        await MainActor.run {
+                            switch UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) {
+                            case .worker:
+                                owner.errorMessageRelay.accept((title: "근무지 목록 불러오기 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                            case .owner:
+                                owner.errorMessageRelay.accept((title: "매장 목록 불러오기 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                            default:
+                                owner.errorMessageRelay.accept((title: "근무지(매장) 목록 불러오기 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                            }
                         }
                     } catch {
-                        owner.errorMessageRelay.accept((title: "근무지(매장) 목록 불러오기 실패", message: "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        await MainActor.run {
+                            owner.errorMessageRelay.accept((title: "근무지(매장) 목록 불러오기 실패", message: "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        }
                     }
                 }
             }.disposed(by: disposeBag)
