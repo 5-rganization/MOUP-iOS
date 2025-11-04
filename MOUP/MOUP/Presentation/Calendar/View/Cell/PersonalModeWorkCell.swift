@@ -15,7 +15,7 @@ final class PersonalModeWorkCell: BaseWorkCell {
     
     // MARK: - Internal Methods
     override func update(work: WorkSummary) {
-        switch UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue)  {
+        switch UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) {
         case .worker:
             setGivenLabelColor(work.workerSummary.workerBasedLabelColorStr ?? LabelColorString._default.rawValue)
             dailyIncomeLabel.isHidden = false

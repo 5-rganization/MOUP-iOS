@@ -133,8 +133,12 @@ private extension FilterModalViewController {
 // MARK: - Private Methods
 private extension FilterModalViewController {
     func setFilterView() {
-        // TODO: 사용자 역할에 따라 변경
-        filterView.update(headerStr: "나의 근무지")
+        switch UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) {
+        case .owner:
+            filterView.update(headerStr: "나의 매장")
+        default:
+            filterView.update(headerStr: "나의 근무지")
+        }
     }
     
     func setDefaultSelect(firstOfList filterWorkplace: WorkplaceSummary?) {

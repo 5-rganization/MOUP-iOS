@@ -192,7 +192,6 @@ private extension CalendarViewController {
 // MARK: - Internal Calendar Methods
 extension CalendarViewController {
     func populateDataSource(calendarWorkList: [WorkSummary]) {
-        // TODO: 수신한 데이터 지우지 않는 방향으로 수정
         var dataSource: [Date: [WorkSummary]] = [:]
         for work in calendarWorkList {
             guard let workDate = DateFormatter.dataSourceDateFormatter.date(from: work.workDate) else { continue }

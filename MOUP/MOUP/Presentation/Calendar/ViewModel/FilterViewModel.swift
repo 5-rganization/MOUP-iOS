@@ -70,7 +70,7 @@ final class FilterViewModel {
                     } catch is CancellationError {
                         owner.logger.info("캘린더 근무지(매장) 필터 로딩 Task가 취소되었습니다.")
                     } catch let error as LocalizedError {
-                        switch UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue)  {
+                        switch UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) {
                         case .worker:
                             owner.errorMessageRelay.accept((title: "근무지 목록 불러오기 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
                         case .owner:
