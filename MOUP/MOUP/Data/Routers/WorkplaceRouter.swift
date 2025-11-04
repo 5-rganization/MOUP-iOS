@@ -57,9 +57,8 @@ extension WorkplaceRouter: URLRequestConvertible {
 
     var encoding: ParameterEncoding {
         switch self {
-        case .fetchWorkplaceByInviteCode:
+        case .fetchWorkplaceByInviteCode, .fetchInviteCode:
             return URLEncoding.default
-        case .fetchInviteCode:
         case .createWorkplace:
             return JSONEncoding.default
         }

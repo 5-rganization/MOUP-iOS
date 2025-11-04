@@ -32,6 +32,8 @@ final class WorkplaceRepository: WorkplaceRepositoryProtocol {
             inviteCode: response.inviteCode,
             returnAlreadyExists: response.returnAlreadyExists
         )
+    }
+        
     func createWorkplace(request: WorkplaceCreateRequestDTO) async throws -> WorkplaceCreate {
         let response = try await workplaceService.createWorkplace(request: request)
         return WorkplaceCreate(workplaceId: response.workplaceId)
