@@ -50,7 +50,11 @@ final class FilterViewModel {
                     var filterList: [WorkplaceSummary] = []
                     defer {
                         if !Task.isCancelled {
-                            filterList.sort(by: { $0.name < $1.name })
+                            filterList.sort { lhs, rhs in
+                                if lhs.id == -1 { return true }
+                                if rhs.id == -1 { return false }
+                                return lhs.name < rhs.name
+                            }
                             owner.filterWorkplaceListRelay.accept(filterList)
                         }
                     }
