@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import OSLog
 
 import JTAppleCalendar
 import RxCocoa
@@ -16,6 +17,7 @@ import Then
 final class CalendarViewController: UIViewController {
     
     // MARK: - Properties
+    private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     private let disposeBag = DisposeBag()
     /// 캘린더 근무 Dictionary
     private var calendarWorkDataSourceRelay = BehaviorRelay<[Date: Set<WorkSummary>]>(value: [:])
@@ -26,7 +28,7 @@ final class CalendarViewController: UIViewController {
     
     // Input Relays
     /// 마지막으로 API를 요청한 기준 날짜
-    private let lastFetchCenterDateRelay = BehaviorRelay<Date>(value: .now)
+    private let lastFetchCenterDateRelay = BehaviorRelay<Date>(value: Date.now.startOfMonth)
     /// 캘린더 개인/공유 모드
     private let calendarModeRelay = BehaviorRelay<CalendarMode>(value: .personal)
     /// 개인 캘린더 근무지/매장 필터
@@ -39,8 +41,8 @@ final class CalendarViewController: UIViewController {
     private var visibleDate: Date = .now
     /// 선택한 날짜
     private var selectedDate: Date?
-    /// 데이터를 로딩할 임계값(몇 개월을 초과하여 스크롤했을 때 데이터를 로딩할지)
-    private let fetchThresholdInMonths = 4
+    /// 데이터를 로딩할 임계값(며칠을 초과하여 스크롤했을 때 데이터를 로딩할지)
+    private let fetchThresholdInDays = 110
     
     // MARK: - UI Components
     private let todayButton = UIBarButtonItem(title: "오늘").then {
@@ -261,6 +263,11 @@ private extension CalendarViewController {
         calendarViewTapRecognizer.isEnabled = false
     }
     
+    func checkPrefetchCondition(date: Date) -> Bool {
+        let dayOffset = Calendar.current.dateComponents([.day], from: lastFetchCenterDateRelay.value, to: date).day ?? 111
+        return abs(dayOffset) > fetchThresholdInDays
+    }
+    
     func sortCalendarWorkList(_ lhs: WorkSummary, _ rhs: WorkSummary) -> Bool {
         (lhs.startTime, lhs.endTime ?? Date.distantFuture) < (rhs.startTime, rhs.endTime ?? Date.distantFuture)
     }
@@ -296,8 +303,12 @@ extension CalendarViewController: JTACMonthViewDelegate {
     // 사용자의 터치, programmatic한 스크롤 모두 호출
     func calendar(_ calendar: JTACMonthView, didScrollToDateSegmentWith visibleDates: DateSegmentInfo) {
         guard let date = visibleDates.monthDates.first?.date else { return }
-        let monthOffset = Calendar.current.dateComponents([.month], from: lastFetchCenterDateRelay.value, to: date).month ?? 5
-        if abs(monthOffset) > fetchThresholdInMonths { updateDataSource() }
+        
+        // 근무 데이터 로딩 (willScrollToDateSegmentWith에서 로딩한 경우 fetchThresholdInDays에 의해 실행 X)
+        if checkPrefetchCondition(date: date) {
+            logger.info("[\(#function)] 캘린더 근무 데이터 Prefetch")
+            updateDataSource()
+        }
     }
     
     // 사용자의 터치에 의해서만 호출됨, programmatic한 스크롤의 경우 호출 X
@@ -309,9 +320,10 @@ extension CalendarViewController: JTACMonthViewDelegate {
         updateYearMonthLabel()
         
         // 근무 데이터 로딩
-        let monthOffset = Calendar.current.dateComponents([.month], from: lastFetchCenterDateRelay.value, to: date).month ?? 5
-        print(monthOffset)
-        if abs(monthOffset) > fetchThresholdInMonths { updateDataSource() }
+        if checkPrefetchCondition(date: date) {
+            logger.info("[\(#function)] 캘린더 근무 데이터 Prefetch")
+            updateDataSource()
+        }
     }
     
     func calendar(_ calendar: JTACMonthView, didSelectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
