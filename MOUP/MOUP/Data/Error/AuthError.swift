@@ -20,15 +20,15 @@ extension AuthError {
     var errorDescription: String? {
         switch self {
         case .notMember:
-            return "회원이 아닙니다. 회원 가입 화면으로 이동합니다."
+            return "회원이 아닙니다.\n회원 가입 화면으로 이동합니다."
         case .invalidUserName:
-            return "닉네임이 올바르지 않습니다. 특수문자 제외 8자 이하로 입력해주세요."
+            return "닉네임이 올바르지 않습니다.\n특수문자 제외 8자 이하로 입력해주세요."
         case .invalidToken:
-            return "로그인 정보가 만료되었습니다. 다시 로그인해주세요."
+            return "로그인 정보가 만료되었습니다.\n다시 로그인해주세요."
         case .deletedUser:
-            return "탈퇴 처리된 계정입니다. 신규 회원으로 가입해주세요."
+            return "탈퇴 처리된 계정입니다.\n신규 회원으로 가입해주세요."
         case .alreadySignUp:
-            return "이미 회원가입이 완료된 유저입니다. 로그인해주세요."
+            return "이미 회원가입이 완료된 유저입니다.\n로그인해주세요."
         }
     }
 
