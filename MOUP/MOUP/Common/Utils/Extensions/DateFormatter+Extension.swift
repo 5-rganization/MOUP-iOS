@@ -94,4 +94,29 @@ extension DateFormatter {
         $0.locale = Locale(identifier: "ko_KR")
         $0.timeZone = TimeZone(identifier: "Asia/Seoul")
     }
+    
+    /// ISO8601 ("2025-10-11T08:30:00Z") -> Date
+    static let iso8601Full = DateFormatter().then {
+        $0.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        $0.locale = Locale(identifier: "ko_KR")
+        $0.timeZone = TimeZone(abbreviation: "UTC")
+    }
+    
+    /// yyyy-MM-dd -> Date
+    static let yyyyMMdd = DateFormatter().then {
+        $0.dateFormat = "yyyy-MM-dd"
+        $0.locale = Locale(identifier: "ko_KR")
+    }
+    
+    /// Date -> "M/d E"
+    static let displayDate = DateFormatter().then {
+        $0.dateFormat = "M/d E"
+        $0.locale = Locale(identifier: "ko_KR")
+    }
+    
+    static let displayTime = DateFormatter().then {
+        $0.dateFormat = "HH : mm"
+        $0.locale = Locale(identifier: "ko_KR")
+    }
+    
 }
