@@ -274,7 +274,7 @@ extension CalendarViewController: JTACMonthViewDelegate {
         return cell
     }
     
-    func calendar(_ calendar: JTACMonthView, didScrollToDateSegmentWith visibleDates: DateSegmentInfo) {
+    func calendar(_ calendar: JTACMonthView, willScrollToDateSegmentWith visibleDates: DateSegmentInfo) {
         guard let date = visibleDates.monthDates.first?.date else { return }
         visibleDate = date
         updateDataSource()
