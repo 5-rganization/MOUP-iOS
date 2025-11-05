@@ -31,6 +31,7 @@ final class AttendanceHistoryView: UIView {
         $0.rowHeight = 60
         $0.separatorStyle = .none
         $0.allowsSelection = false
+        $0.bounces = false
         $0.sectionHeaderTopPadding = 0
         $0.register(AttendanceHistoryTableHeaderView.self, forHeaderFooterViewReuseIdentifier: AttendanceHistoryTableHeaderView.identifier)
         $0.register(AttendanceCell.self, forCellReuseIdentifier: AttendanceCell.identifier)
@@ -89,8 +90,8 @@ private extension AttendanceHistoryView {
         
         leftVerticalDivider.snp.makeConstraints {
             $0.top.equalTo(navigationBar.snp.bottom)
-            $0.leading.equalToSuperview().inset(85)
-            $0.bottom.equalTo(safeAreaLayoutGuide)
+            $0.leading.equalToSuperview().inset(125)
+            $0.bottom.equalToSuperview()
             $0.width.equalTo(1)
         }
         
@@ -98,14 +99,14 @@ private extension AttendanceHistoryView {
             $0.top.equalTo(navigationBar.snp.bottom)
             $0.width.equalTo(1)
             $0.leading.equalTo(leftVerticalDivider.snp.trailing)
-                    .offset((UIScreen.main.bounds.width - 85 - 1) / 2)
-            $0.bottom.equalTo(safeAreaLayoutGuide)
+                    .offset((UIScreen.main.bounds.width - 125 - 1) / 2)
+            $0.bottom.equalToSuperview()
         }
         
         tableView.snp.makeConstraints {
             $0.top.equalTo(navigationBar.snp.bottom)
             $0.directionalHorizontalEdges.equalToSuperview()
-            $0.bottom.equalTo(safeAreaLayoutGuide)
+            $0.bottom.equalToSuperview()
         }
     }
 }

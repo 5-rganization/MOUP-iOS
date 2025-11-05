@@ -148,13 +148,13 @@ private extension AttendanceCell {
     func setConstraints() {
         dateContainer.snp.makeConstraints {
             $0.directionalVerticalEdges.leading.equalToSuperview()
-            $0.width.equalTo(85)
+            $0.width.equalTo(125)
         }
         
         dateView.snp.makeConstraints {
             $0.directionalVerticalEdges.equalToSuperview().inset(6)
             $0.leading.equalToSuperview().inset(13.5)
-            $0.width.equalTo(58)
+            $0.width.equalTo(101)
         }
         
         dateLabel.snp.makeConstraints {
