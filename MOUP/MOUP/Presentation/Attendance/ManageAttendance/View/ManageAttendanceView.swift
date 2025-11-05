@@ -48,6 +48,11 @@ final class ManageAttendanceView: UIView {
     ) -> Disposable {
         return section.bind(to: tableView.rx.items(dataSource: dataSource))
     }
+    
+    func updateEmptyState(_ isEmpty: Bool) {
+        tableView.isHidden = isEmpty
+        emptyView.isHidden = !isEmpty
+    }
 }
 
 private extension ManageAttendanceView {

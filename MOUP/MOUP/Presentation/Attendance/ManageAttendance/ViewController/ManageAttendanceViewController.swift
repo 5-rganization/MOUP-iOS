@@ -11,7 +11,6 @@ import RxDataSources
 
 final class ManageAttendanceViewController: UIViewController {
     // MARK: - Properties
-    private let workplaceId: Int
     private let manageAttendanceView = ManageAttendanceView()
     private let viewModel: ManageAttendanceViewModel
     private let disposeBag = DisposeBag()
@@ -22,7 +21,7 @@ final class ManageAttendanceViewController: UIViewController {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: ManageAttendanceCell.identifier, for: indexPath) as? ManageAttendanceCell else {
                 return UITableViewCell()
             }
-            let color = LabelColorString.init(rawValue: item.workerBasedLabelColor?.rawValue ?? "기본색") ?? ._default
+            let color = LabelColorString.init(rawValue: item.workerBasedLabelColorStr ?? "기본색") ?? ._default
             cell.update(color: color.labelColor, name: item.nickname)
             return cell
     })
@@ -35,12 +34,10 @@ final class ManageAttendanceViewController: UIViewController {
     // MARK: - Initializer
     init(
         viewModel: ManageAttendanceViewModel,
-        coordinator: HomeCoordinator,
-        workplaceId: Int
+        coordinator: HomeCoordinator
     ) {
         self.viewModel = viewModel
         self.coordinator = coordinator
-        self.workplaceId = workplaceId
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -75,7 +72,18 @@ private extension ManageAttendanceViewController {
         let input = ManageAttendanceViewModel.Input(viewDidLoad: .just(()))
         let output = viewModel.transform(input: input)
         
-        manageAttendanceView.setupTableView(section: output.employees, dataSource: dataSource)
+        let sharedWorkers = output.workers.share()
+        
+        manageAttendanceView.setupTableView(section: sharedWorkers, dataSource: dataSource)
+            .disposed(by: disposeBag)
+        
+        sharedWorkers
+            .map { $0.first?.items.isEmpty ?? true }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, isEmpty in
+                owner.manageAttendanceView.updateEmptyState(isEmpty)
+            }
             .disposed(by: disposeBag)
         
         manageAttendanceView.rx.navBackBtnTapped
@@ -86,21 +94,32 @@ private extension ManageAttendanceViewController {
             .disposed(by: disposeBag)
         
         manageAttendanceView.rx.modelSelected
-            .withUnretained(self)
-            .subscribe(
-                onNext: { owner, model in
-                    owner.coordinator?.moveToAttendanceHistory(
-                        navTitle: model.nickname,
-                        workplaceId: owner.workplaceId,
-                        workerId: model.workerId
-                    )
+            .subscribe(onNext: { [weak self] model in
+                guard let self else { return }
+                self.coordinator?.moveToAttendanceHistory(
+                    navTitle: model.nickname,
+                    workplaceId: self.viewModel.workplaceId,
+                    workerId: model.id
+                )
             })
             .disposed(by: disposeBag)
         
         manageAttendanceView.rx.inviteBtnTapped
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
-                owner.coordinator?.presentInviteCodeSheet(workplaceId: owner.workplaceId)
+                owner.coordinator?.presentInviteCodeSheet(workplaceId: owner.viewModel.workplaceId)
+            })
+            .disposed(by: disposeBag)
+        
+        output.errorMessage
+            .withUnretained(self)
+            .subscribe(
+                onNext: { owner, error in
+                    owner.presentNoticeModal(
+                        title: error.title,
+                        comment: error.message) {
+                            owner.navigationController?.popViewController(animated: true)
+                        }
             })
             .disposed(by: disposeBag)
     }
