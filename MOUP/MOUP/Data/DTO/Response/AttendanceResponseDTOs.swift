@@ -29,6 +29,7 @@ struct WorkerWorkplaceAttendanceHistoryDTO: Decodable {
     let myWorkAttendanceInfoList: [WorkerAttendanceSummaryDTO]
 }
 
+/// 근무지에 속한 근무자들 조회 결과
 struct WorkplaceWorkersResponseDTO: Decodable {
     let workerSummaryInfoList: [WorkerSummaryResponseDTO]
 }

@@ -7,8 +7,8 @@
 
 struct WorkerSummary {
     let id: Int
-    let workerBasedLabelColorStr: String
-    let ownerBasedLabelColorStr: String
+    let workerBasedLabelColorStr: String?
+    let ownerBasedLabelColorStr: String?
     let nickname: String
     let profileImg: String?
 }

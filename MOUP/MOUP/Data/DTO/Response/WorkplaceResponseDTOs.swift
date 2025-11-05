@@ -33,6 +33,7 @@ extension WorkplaceSummaryResponseDTO {
     func toDomain() -> WorkplaceSummary {
         WorkplaceSummary(id: workplaceId, name: workplaceName, isShared: isShared)
     }
+}
 
 struct WorkplaceSummaryListResponseDTO: Decodable {
     let workplaceSummaryInfoList: [WorkplaceSummaryInfoDTO]
