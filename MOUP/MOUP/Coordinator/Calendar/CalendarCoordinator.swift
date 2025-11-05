@@ -68,12 +68,12 @@ final class CalendarCoordinator: Coordinator {
     }
     
     func showCalendarWorkList(selectedDay: Int, calendarWorkList: Observable<[WorkSummary]>, calendarMode: CalendarMode) {
-        let calendarWorkListCoordinator = CalendarWorkListCoordinator(navigationController: navigationController,
+        let calendarWorkListCoordinator = CalendarWorkListCoordinator(parentCoordinator: self,
+                                                                      navigationController: navigationController,
                                                                       workUseCase: workUseCase,
                                                                       selectedDay: selectedDay,
                                                                       calendarWorkList: calendarWorkList,
                                                                       calendarMode: calendarMode)
-        calendarWorkListCoordinator.delegate = self
         calendarWorkListCoordinator.start()
         childCoordinators.append(calendarWorkListCoordinator)
     }
@@ -124,13 +124,16 @@ extension CalendarCoordinator: FilterCoordinatorDelegate {
     }
 }
 
-// MARK: - CalendarWorkListCoordinatorDelegate
-extension CalendarCoordinator: CalendarWorkListCoordinatorDelegate {
+// MARK: - CalendarWorkListCoordinator Methods
+extension CalendarCoordinator {
+    /// 근무 목록 화면 내림
     func dismissed(_ coordinator: CalendarWorkListCoordinator) {
         calendarVC.deselectCell()
         removeChildCoordinator(coordinator, needToDismiss: false)
     }
     
+    // TODO: 근무 엔티티를 직접 전달 or 근무 ID만 전달
+    /// 근무 등록 화면 표시
     func showWorkRegister(work: WorkSummary?) {
         // TODO: - 근무 수정 화면 연결
         if let work {
@@ -141,6 +144,7 @@ extension CalendarCoordinator: CalendarWorkListCoordinatorDelegate {
         }
     }
     
+    /// 캘린더 업데이트 요청
     func updateDataSource() {
         calendarVC.updateDataSource()
     }

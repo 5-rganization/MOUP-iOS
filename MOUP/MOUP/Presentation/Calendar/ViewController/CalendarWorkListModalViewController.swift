@@ -37,9 +37,6 @@ final class CalendarWorkListModalViewController: UIViewController {
     private let selectedDay: Int
     private let calendarMode: CalendarMode
     
-    // Property Injections
-    weak var delegate: CalendarWorkListModalVCDelegate?
-    
     // Input Relays
     private let deleteSingleWorkIdRelay = PublishRelay<Int>()
     private let deleteRecurringWorkIdRelay = PublishRelay<Int>()
@@ -128,7 +125,7 @@ private extension CalendarWorkListModalViewController {
         
         output.updateCalendar.asDriver(onErrorJustReturn: ())
             .drive(with: self) { owner, _ in
-                owner.delegate?.updateCalendarDataSource()
+                owner.coordinator?.updateCalendarDataSource()
             }.disposed(by: disposeBag)
     }
 }
@@ -136,7 +133,7 @@ private extension CalendarWorkListModalViewController {
 // MARK: - CalendarWorkListViewDelegate
 extension CalendarWorkListModalViewController: CalendarWorkListViewDelegate {
     func editWork(work: WorkSummary) {
-        delegate?.editButtonTapped(work: work)
+        coordinator?.editButtonTapped(work: work)
     }
     
     func deleteSingleWork(workId: Int) {
@@ -151,6 +148,6 @@ extension CalendarWorkListModalViewController: CalendarWorkListViewDelegate {
 // MARK: - UIAdaptivePresentationControllerDelegate
 extension CalendarWorkListModalViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        delegate?.dismissReceived()
+        coordinator?.dismissReceived()
     }
 }
