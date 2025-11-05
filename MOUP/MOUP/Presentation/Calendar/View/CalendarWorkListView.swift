@@ -143,23 +143,7 @@ extension Reactive where Base: CalendarWorkListView {
                     cellIdentifier: PersonalModeWorkCell.identifier,
                     cellType: PersonalModeWorkCell.self
                 )) { _, work, cell in
-                    let editAction = UIAction(title: "수정하기") { _ in
-                        base.delegate?.editWork(work: work)
-                    }
-                    let singleDeleteAction = UIAction(title: "삭제하기", attributes: .destructive) { _ in
-                        base.delegate?.deleteSingleWork(workId: work.id)
-                    }
-                    let recurringDeleteAction = UIAction(title: "이후 모든 근무 삭제", attributes: .destructive) { _ in
-                        base.delegate?.deleteRecurringWork(workId: work.id)
-                    }
-                    if work.repeatDays.isEmpty {
-                        cell.menuButton.menu = UIMenu(children: [editAction, singleDeleteAction])
-                    } else {
-                        singleDeleteAction.title = "이 근무만 삭제"
-                        let deleteSubMenu = UIMenu(title: "삭제하기", options: .destructive, children: [singleDeleteAction, recurringDeleteAction])
-                        cell.menuButton.menu = UIMenu(children: [editAction, deleteSubMenu])
-                    }
-                    
+                    cell.menuButton.menu = createMenu(for: work)
                     cell.update(work: work)
                 }.disposed(by: base.disposeBag)
         }
@@ -175,23 +159,7 @@ extension Reactive where Base: CalendarWorkListView {
                     cellIdentifier: SharedModeWorkCell.identifier,
                     cellType: SharedModeWorkCell.self
                 )) { _, work, cell in
-                    let editAction = UIAction(title: "수정하기") { _ in
-                        base.delegate?.editWork(work: work)
-                    }
-                    let singleDeleteAction = UIAction(title: "삭제하기", attributes: .destructive) { _ in
-                        base.delegate?.deleteSingleWork(workId: work.id)
-                    }
-                    let recurringDeleteAction = UIAction(title: "이후 모든 근무 삭제", attributes: .destructive) { _ in
-                        base.delegate?.deleteRecurringWork(workId: work.id)
-                    }
-                    if work.repeatDays.isEmpty {
-                        cell.menuButton.menu = UIMenu(children: [editAction, singleDeleteAction])
-                    } else {
-                        singleDeleteAction.title = "이 근무만 삭제"
-                        let deleteSubMenu = UIMenu(title: "삭제하기", options: .destructive, children: [singleDeleteAction, recurringDeleteAction])
-                        cell.menuButton.menu = UIMenu(children: [editAction, deleteSubMenu])
-                    }
-                    
+                    cell.menuButton.menu = createMenu(for: work)
                     cell.update(work: work)
                 }.disposed(by: base.disposeBag)
         }
@@ -200,4 +168,23 @@ extension Reactive where Base: CalendarWorkListView {
     var workTableViewIsHidden: Binder<Bool> { base.workTableView.rx.isHidden }
     var emptyLabelIsHidden: Binder<Bool> { base.emptyLabel.rx.isHidden }
     var registerButtonTap: ControlEvent<Void> { base.registerButton.rx.tap }
+    
+    private func createMenu(for work: WorkSummary) -> UIMenu {
+        let editAction = UIAction(title: "수정하기") { _ in
+            base.delegate?.editWork(work: work)
+        }
+        let singleDeleteAction = UIAction(title: "삭제하기", attributes: .destructive) { _ in
+            base.delegate?.deleteSingleWork(workId: work.id)
+        }
+        let recurringDeleteAction = UIAction(title: "이후 모든 근무 삭제", attributes: .destructive) { _ in
+            base.delegate?.deleteRecurringWork(workId: work.id)
+        }
+        if work.repeatDays.isEmpty {
+            return UIMenu(children: [editAction, singleDeleteAction])
+        } else {
+            singleDeleteAction.title = "이 근무만 삭제"
+            let deleteSubMenu = UIMenu(title: "삭제하기", options: .destructive, children: [singleDeleteAction, recurringDeleteAction])
+            return UIMenu(children: [editAction, deleteSubMenu])
+        }
+    }
 }
