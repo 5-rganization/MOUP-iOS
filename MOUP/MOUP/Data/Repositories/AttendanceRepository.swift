@@ -27,4 +27,25 @@ final class AttendanceRepository: AttendanceRepositoryProtocol {
         )
         return attendanceMapper.mapToOwnerWorkplaceAttendanceHistory(dto: response)
     }
+    
+    func fetchWorkplaceWorkers(workplaceId: Int, isActiveOnly: Bool) async throws -> [WorkerSummary] {
+        let response = try await attendanceService.fetchWorkplaceWorkers(workplaceId: workplaceId, isActiveOnly: isActiveOnly)
+        return response.workerSummaryInfoList.map {
+            return WorkerSummary(
+                id: $0.workerId,
+                workerBasedLabelColorStr: $0.workerBasedLabelColor,
+                ownerBasedLabelColorStr: $0.ownerBasedLabelColor,
+                nickname: $0.nickname,
+                profileImg: $0.profileImg
+            )
+        }
+    }
+    
+    func startWork(workplaceId: Int) async throws {
+        try await attendanceService.startWork(workplaceId: workplaceId)
+    }
+    
+    func endWork(workplaceId: Int) async throws {
+        try await attendanceService.endWork(workplaceId: workplaceId)
+    }
 }

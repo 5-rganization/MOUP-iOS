@@ -21,4 +21,16 @@ final class AttendanceUseCase: AttendanceUseCaseProtocol {
     func fetchOwnerWorkplaceAttendanceHistory(workplaceId: Int, workerId: Int) async throws -> OwnerWorkplaceAttendanceHistory {
         try await attendanceRepository.fetchOwnerWorkplaceAttendanceHistory(workplaceId: workplaceId, workerId: workerId)
     }
+    
+    func fetchWorkplaceWorkers(workplaceId: Int, isActiveOnly: Bool) async throws -> [WorkerSummary] {
+        try await attendanceRepository.fetchWorkplaceWorkers(workplaceId: workplaceId, isActiveOnly: isActiveOnly)
+    }
+    
+    func startWork(workplaceId: Int) async throws {
+        try await attendanceRepository.startWork(workplaceId: workplaceId)
+    }
+    
+    func endWork(workplaceId: Int) async throws {
+        try await attendanceRepository.endWork(workplaceId: workplaceId)
+    }
 }

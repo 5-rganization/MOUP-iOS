@@ -67,7 +67,7 @@ final class AttendanceHistoryViewModel {
 
 private extension AttendanceHistoryViewModel {
     func fetchWorkerWorkplaceAttendanceHistory() {
-        Task {
+        Task { @MainActor in
             do {
                 let response = try await attendanceUseCase.fetchWorkerWorkplaceAttendanceHistory(workplaceId: workplaceId)
                 attendanceDataRelay.accept(
@@ -75,14 +75,14 @@ private extension AttendanceHistoryViewModel {
                         items: response.myWorkAttendanceInfoList
                     )]
                 )
-            } catch let error as AttendanceError {
+            } catch is AttendanceError {
                 errorMessageRelay.accept(
                     (
                         title: "근무 내역 불러오기 실패",
                         message: "근무 내역을 불러오는 데에 실패했습니다.\n잠시 후 다시 시도해주세요."
                     )
                 )
-            } catch let error as NetworkError {
+            } catch is NetworkError {
                 errorMessageRelay.accept(
                     (
                         title: "서버 오류",
@@ -101,7 +101,7 @@ private extension AttendanceHistoryViewModel {
     }
     
     func fetchOwnerWorkplaceAttendanceHistory() {
-        Task {
+        Task { @MainActor in
             do {
                 guard let workerId else { return }
                 let response = try await attendanceUseCase.fetchOwnerWorkplaceAttendanceHistory(workplaceId: workplaceId, workerId: workerId)
@@ -110,14 +110,14 @@ private extension AttendanceHistoryViewModel {
                         items: response.workerWorkAttendanceInfoList
                     )]
                 )
-            } catch let error as AttendanceError {
+            } catch is AttendanceError {
                 errorMessageRelay.accept(
                     (
                         title: "근무 내역 불러오기 실패",
                         message: "근무 내역을 불러오는 데에 실패했습니다.\n잠시 후 다시 시도해주세요."
                     )
                 )
-            } catch let error as NetworkError {
+            } catch is NetworkError {
                 errorMessageRelay.accept(
                     (
                         title: "서버 오류",

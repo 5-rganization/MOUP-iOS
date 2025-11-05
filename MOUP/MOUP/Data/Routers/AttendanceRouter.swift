@@ -11,6 +11,9 @@ import Alamofire
 enum AttendanceRouter {
     case fetchWorkerWorkplaceAttendanceHistory(workplaceId: Int)
     case fetchOwnerWorkplaceAttendanceHistory(workplaceId: Int, workerId: Int)
+    case fetchWorkplaceWorkers(workplaceId: Int, isActiveOnly: Bool)
+    case startWork(workplaceId: Int)
+    case endWork(workplaceId: Int)
 }
 
 extension AttendanceRouter: URLRequestConvertible {
@@ -27,21 +30,35 @@ extension AttendanceRouter: URLRequestConvertible {
             return "/workplaces/\(workplaceId)/workers/me"
         case .fetchOwnerWorkplaceAttendanceHistory(let workplaceId, let workerId):
             return "/workplaces/\(workplaceId)/workers/\(workerId)"
+        case .fetchWorkplaceWorkers(let workplaceId, _):
+            return "/workplaces/\(workplaceId)/workers"
+        case .startWork(let workplaceId):
+            return "/workplaces/\(workplaceId)/workers/me/works/start"
+        case .endWork(let workplaceId):
+            return "/workplaces/\(workplaceId)/workers/me/works/end"
         }
     }
 
     var method: HTTPMethod {
         switch self {
         case .fetchWorkerWorkplaceAttendanceHistory,
-                .fetchOwnerWorkplaceAttendanceHistory:
+                .fetchOwnerWorkplaceAttendanceHistory,
+                .fetchWorkplaceWorkers:
             return .get
+        case .startWork:
+            return .post
+        case .endWork:
+            return .patch
         }
     }
 
     var requestBody: Encodable? {
         switch self {
         case .fetchWorkerWorkplaceAttendanceHistory,
-                .fetchOwnerWorkplaceAttendanceHistory:
+                .fetchOwnerWorkplaceAttendanceHistory,
+                .fetchWorkplaceWorkers,
+                .startWork,
+                .endWork:
             return nil
         }
     }
@@ -49,16 +66,33 @@ extension AttendanceRouter: URLRequestConvertible {
     var encoding: ParameterEncoding {
         switch self {
         case .fetchWorkerWorkplaceAttendanceHistory,
-                .fetchOwnerWorkplaceAttendanceHistory:
-            return JSONEncoding.default
+                .fetchOwnerWorkplaceAttendanceHistory,
+                .fetchWorkplaceWorkers,
+                .startWork,
+                .endWork:
+            return URLEncoding.default
         }
     }
 
     func asURLRequest() throws -> URLRequest {
-        let url = baseURL.appendingPathComponent(path)
+        var url = baseURL.appendingPathComponent(path)
         print("최종 url: \(url)")
-        var request = try URLRequest(url: url, method: method)
 
+        switch self {
+        case .fetchWorkplaceWorkers(_, let isActiveOnly):
+            var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+            components?.queryItems = [
+                URLQueryItem(name: "isActiveOnly", value: "\(isActiveOnly)")
+            ]
+            if let newURL = components?.url {
+                url = newURL
+            }
+        default:
+            break
+        }
+        
+        var request = try URLRequest(url: url, method: method)
+        
         if let body = requestBody {
             let encoder = JSONEncoder()
             request.httpBody = try encoder.encode(body)
@@ -67,7 +101,6 @@ extension AttendanceRouter: URLRequestConvertible {
             if let httpBody = request.httpBody {
                 print("Request body: \(String(data: httpBody, encoding: .utf8) ?? "")")
             }
-
         }
 
         return request
