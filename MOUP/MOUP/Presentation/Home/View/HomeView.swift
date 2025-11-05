@@ -25,7 +25,7 @@ final class HomeView: UIView {
         $0.image = .homeAppTitle
     }
     
-    private let refreshButton = UIButton().then {
+    fileprivate let refreshButton = UIButton().then {
         var config = UIButton.Configuration.plain()
         config.contentInsets = NSDirectionalEdgeInsets(top: 13.75, leading: 12.98, bottom: 13.75, trailing: 12.98)
         config.image = UIImage.refreshButton
@@ -73,11 +73,19 @@ final class HomeView: UIView {
         section: Observable<[HomeTableViewFirstSection]>,
         dataSource: RxTableViewSectionedAnimatedDataSource<HomeTableViewFirstSection>
     ) -> Disposable {
-        return section.bind(to: tableView.rx.items(dataSource: dataSource))
+        return section
+            .observe(on: MainScheduler.instance)
+            .bind(to: tableView.rx.items(dataSource: dataSource))
     }
     
     func updateHomeHeader(headerData: HomeHeaderData) {
         tableHeaderView.update(data: headerData)
+    }
+    
+    func updateActiveWorkplace(_ active: WorkplaceMonthSummary?) {
+        for case let cell as WorkerWorkplaceCell in tableView.visibleCells {
+            cell.updateAttendanceState(activatedId: active?.homeWorkplace.workplace.id)
+        }
     }
 }
 
@@ -129,9 +137,6 @@ private extension HomeView {
     }
     
     func setTableHeaderView() {
-        // TODO: - 테이블뷰 셀 상단 영역 8을 그림자를 위해 남겨놨으니 설정 필요
-        guard let rawValue = UserDefaultsManager.shared.userRole,
-        let role = UserRole(rawValue: rawValue) else { return }
         tableHeaderView.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 332)
         tableView.tableHeaderView = tableHeaderView
     }
@@ -149,5 +154,9 @@ extension Reactive where Base: HomeView {
     
     var plusButtonTap: ControlEvent<Void> {
         return base.tableHeaderView.rx.plusButtonTap
+    }
+    
+    var refreshBtnTap: ControlEvent<Void> {
+        return base.refreshButton.rx.tap
     }
 }

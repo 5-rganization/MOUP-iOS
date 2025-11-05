@@ -12,6 +12,7 @@ final class AttendanceConfirmModalViewController: UIViewController {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     private let confirmModalView = ConfirmationModal()
+    var onConfirm: (() -> Void)?
     
     // MARK: - Lifecycles
     override func viewDidLoad() {
@@ -53,7 +54,9 @@ private extension AttendanceConfirmModalViewController {
         confirmModalView.rx.confirmBtnTapped
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
-                self.dismiss(animated: true)
+                owner.dismiss(animated: true) {
+                    owner.onConfirm?()
+                }
             })
             .disposed(by: disposeBag)
         

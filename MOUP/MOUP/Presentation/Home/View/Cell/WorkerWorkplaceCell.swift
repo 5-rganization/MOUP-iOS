@@ -12,8 +12,8 @@ import SnapKit
 import Then
 
 protocol WorkerWorkplaceCellDelegate: AnyObject {
-    func didTapStartBtn()
-    func didTapEndBtn()
+    func didTapStartBtn(workplaceId: Int)
+    func didTapEndBtn(workplaceId: Int)
 }
 
 class WorkerWorkplaceCell: UITableViewCell {
@@ -22,6 +22,7 @@ class WorkerWorkplaceCell: UITableViewCell {
     weak var delegate: WorkerWorkplaceCellDelegate?
     private let disposeBag = DisposeBag()
     private var isExpanded: Bool = false
+    private var workplaceId: Int?
 
     // MARK: - UI Components
     private let containerView = CardButton()
@@ -111,6 +112,18 @@ class WorkerWorkplaceCell: UITableViewCell {
         secondSectionView.update(with: info)
         self.workplaceOfficialChip.isHidden = !info.homeWorkplace.workplace.isShared
         self.menuButton.menu = menu
+        self.workplaceId = info.homeWorkplace.workplace.id
+    }
+    
+    func updateAttendanceState(activatedId: Int?) { // activatedId: 근무 활성화된 workplace의 Id
+        if let activatedId { // 근무 중인 근무지가 있을 경우, 해당 근무지 퇴근 버튼만 활성화 후 그 외 버튼 모두 비활성화
+            let isActivated = self.workplaceId == activatedId
+            startWorkButton.isEnabled = false
+            endWorkButton.isEnabled = isActivated
+        } else { // 어느 곳에서도 근무 중이지 않을 경우, 모든 근무지들에 대한 출근 버튼 활성화 및 퇴근 버튼 비활성화
+            startWorkButton.isEnabled = true
+            endWorkButton.isEnabled = false
+        }
     }
 }
 
@@ -243,14 +256,16 @@ private extension WorkerWorkplaceCell {
         startWorkButton.rx.tap
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
-                owner.delegate?.didTapStartBtn()
+                guard let workplaceId = owner.workplaceId else { return }
+                owner.delegate?.didTapStartBtn(workplaceId: workplaceId)
             })
             .disposed(by: disposeBag)
         
         endWorkButton.rx.tap
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
-                owner.delegate?.didTapEndBtn()
+                guard let workplaceId = owner.workplaceId else { return }
+                owner.delegate?.didTapEndBtn(workplaceId: workplaceId)
             })
             .disposed(by: disposeBag)
     }

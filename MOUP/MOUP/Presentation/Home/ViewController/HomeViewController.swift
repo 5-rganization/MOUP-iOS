@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import RxRelay
 import RxDataSources
 
 final class HomeViewController: UIViewController {
@@ -15,6 +16,9 @@ final class HomeViewController: UIViewController {
     private let homeViewModel: HomeViewModel
     private let homeView: HomeView
     private let disposeBag = DisposeBag()
+    private let refreshRelay = PublishRelay<Void>()
+    private let startBtnRelay = PublishRelay<Int>() // 근무지 id
+    private let endBtnRelay = PublishRelay<Int>()
     
     private lazy var dataSource = RxTableViewSectionedAnimatedDataSource<HomeTableViewFirstSection>(animationConfiguration: AnimationConfiguration(deleteAnimation: .automatic)) { dataSource, tableView, indexPath, item in
         switch item {
@@ -76,7 +80,12 @@ private extension HomeViewController {
     }
     
     func setBindings() {
-        let input = HomeViewModel.Input(viewDidLoad: Observable.just(()))
+        let input = HomeViewModel.Input(
+            viewDidLoad: Observable.just(()),
+            didRefresh: refreshRelay.asObservable(),
+            startWorkTapped: startBtnRelay.asObservable(),
+            endWorkTapped: endBtnRelay.asObservable()
+        )
         let output = homeViewModel.transform(input: input)
         
         homeView.rx.todayRoutineCardTap
@@ -108,6 +117,13 @@ private extension HomeViewController {
             })
             .disposed(by: disposeBag)
         
+        homeView.rx.refreshBtnTap
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.refreshRelay.accept(())
+            })
+            .disposed(by: disposeBag)
+        
         homeView.setupTableView(section: output.firstSectionData, dataSource: dataSource)
             .disposed(by: disposeBag)
         
@@ -116,6 +132,20 @@ private extension HomeViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { owner, data in
                 owner.homeView.updateHomeHeader(headerData: data)
+            })
+            .disposed(by: disposeBag)
+        
+        output.errorMessage
+            .withUnretained(self)
+            .subscribe(onNext: { owner, error in
+                owner.presentNoticeModal(title: error.title, comment: error.message)
+            })
+            .disposed(by: disposeBag)
+        
+        output.activeWorkplace
+            .withUnretained(self)
+            .subscribe(onNext: { owner, workplace in
+                owner.homeView.updateActiveWorkplace(workplace)
             })
             .disposed(by: disposeBag)
     }
@@ -186,12 +216,14 @@ extension HomeViewController: OwnerWorkplaceCellDelegate {
 }
 
 extension HomeViewController: WorkerWorkplaceCellDelegate {
-    func didTapStartBtn() {
-        print("시작 버튼 탭")
-        coordinator?.presentConfirmationModal()
+    func didTapStartBtn(workplaceId: Int) {
+        coordinator?.presentConfirmationModal { [weak self] in
+            guard let self else { return }
+            self.startBtnRelay.accept(workplaceId)
+        }
     }
     
-    func didTapEndBtn() {
-        print("종료 버튼 탭")
+    func didTapEndBtn(workplaceId: Int) {
+        self.endBtnRelay.accept(workplaceId)
     }
 }
