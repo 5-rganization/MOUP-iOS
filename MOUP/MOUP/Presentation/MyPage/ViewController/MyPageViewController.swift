@@ -13,13 +13,15 @@ import MessageUI
 final class MyPageViewController: UIViewController {
     
     // MARK: - Properties
-    
+
     weak var coordinator: MyPageCoordinator?
     private let mypageView = MyPageView()
     private let viewModel: MyPageViewModel
     private let disposeBag = DisposeBag()
-    
+
     private let viewDidLoadSubject = PublishSubject<Void>()
+
+    private var routineSelectionCoordinator: RoutineSelectionCoordinator?
     
     // MARK: - Lifecycle
     
@@ -110,9 +112,13 @@ private extension MyPageViewController {
         
         mypageView.rx.dummyButton2Tapped
             .subscribe(onNext: { [weak self] _ in
+                guard let self = self,
+                      let navigationController = self.navigationController else { return }
+
                 let coordinator = RoutineSelectionCoordinator(
-                    navigationController: self?.navigationController ?? UINavigationController()
+                    navigationController: navigationController
                 )
+                self.routineSelectionCoordinator = coordinator
                 coordinator.start()
             })
             .disposed(by: disposeBag)

@@ -16,18 +16,19 @@ final class AddRoutineView: UIView {
     // MARK: - Properties
     
     enum Section { case main }
-    fileprivate lazy var dataSource = UITableViewDiffableDataSource<Section, TodoItem>(
+    fileprivate lazy var dataSource = UITableViewDiffableDataSource<Section, RoutineTaskItem>(
         tableView: tableView
     ) { tableView, indexPath, item in
         guard let cell = tableView.dequeueReusableCell(withIdentifier: TodoCell.id, for: indexPath) as? TodoCell else {
             fatalError("TodoCell을 생성할 수 없습니다.")
         }
-        cell.textField.text = item.text
+        cell.textField.text = item.content
         return cell
     }
     fileprivate let itemTextChangeRelay = PublishRelay<(index: Int, text: String)>()
     fileprivate let itemMovedRelay = PublishRelay<(source: Int, destination: Int)>()
     fileprivate let itemDeleteRelay = PublishRelay<Int>()
+    fileprivate var isHandlingDragDrop = false
 
     // MARK: - UI Components
     
@@ -141,10 +142,12 @@ final class AddRoutineView: UIView {
         alarmTimeButton.layer.add(animation, forKey: "position")
     }
     
-    func restoreItems(_ items: [TodoItem]) {
-        let validItems = items.isEmpty ? [TodoItem(text: "")] : items
+    func restoreItems(_ items: [RoutineTaskItem]) {
+        let validItems = items.isEmpty ? [RoutineTaskItem(
+            content: "", orderIndex: 0
+        )] : items
         
-        var snapshot = NSDiffableDataSourceSnapshot<Section, TodoItem>()
+        var snapshot = NSDiffableDataSourceSnapshot<Section, RoutineTaskItem>()
         snapshot.appendSections([.main])
         snapshot.appendItems(validItems, toSection: .main)
         dataSource.apply(snapshot, animatingDifferences: false)
@@ -310,7 +313,7 @@ extension AddRoutineView: UITableViewDragDelegate {
         guard let item = dataSource.itemIdentifier(for: indexPath) else {
             return []
         }
-        let provider = NSItemProvider(object: item.text as NSString)
+        let provider = NSItemProvider(object: item.content as NSString)
         let dragItem = UIDragItem(itemProvider: provider)
         dragItem.localObject = item
         return [dragItem]
@@ -340,9 +343,14 @@ extension AddRoutineView: UITableViewDropDelegate {
             let row = tableView.numberOfRows(inSection: section)
             destinationIndexPath = IndexPath(row: row, section: section)
         }
-        
-        guard let sourceIndexPath = coordinator.items.first?.sourceIndexPath else { return }
-        
+
+        guard let item = coordinator.items.first,
+              let sourceIndexPath = item.sourceIndexPath else { return }
+
+        coordinator.drop(item.dragItem, toRowAt: destinationIndexPath)
+
+        self.isHandlingDragDrop = true
+
         self.itemMovedRelay.accept(
             (source: sourceIndexPath.row, destination: destinationIndexPath.row)
         )
@@ -366,12 +374,16 @@ extension Reactive where Base: AddRoutineView {
         return base.itemMovedRelay.asObservable()
     }
     
-    var items: Binder<[TodoItem]> {
+    var items: Binder<[RoutineTaskItem]> {
         return Binder(self.base) { view, items in
-            var snapshot = NSDiffableDataSourceSnapshot<AddRoutineView.Section, TodoItem>()
+            var snapshot = NSDiffableDataSourceSnapshot<AddRoutineView.Section, RoutineTaskItem>()
             snapshot.appendSections([.main])
             snapshot.appendItems(items, toSection: .main)
-            view.dataSource.apply(snapshot, animatingDifferences: true)
+
+            let shouldAnimate = !view.isHandlingDragDrop
+            view.dataSource.apply(snapshot, animatingDifferences: shouldAnimate)
+
+            view.isHandlingDragDrop = false
         }
     }
     

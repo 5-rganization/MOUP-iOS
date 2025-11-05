@@ -79,11 +79,9 @@ private extension RoutineSelectionViewController {
         
         routineSelectionView.rx.plusButtonDidTap
             .bind(with: self) { owner, _ in
-                print("새 루틴 버튼 터치")
                 owner.coordinator?.showAddRoutineViewController(onSave: { newRoutine in
                      owner.addNewRoutineRelay.accept(newRoutine)
                 })
-                
             }
             .disposed(by: disposeBag)
         

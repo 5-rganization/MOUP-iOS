@@ -29,13 +29,13 @@ final class AddRoutineViewModel {
         let itemMoved: Observable<(source: Int, destination: Int)>
         let itemDeleted: Observable<Int>
         
-        let itemsLoaded: Observable<[TodoItem]>?
+        let itemsLoaded: Observable<[RoutineTaskItem]>?
     }
     
     // MARK: - Output
     
     struct Output {
-        let items: Driver<[TodoItem]>
+        let items: Driver<[RoutineTaskItem]>
         let focusOnRow: Signal<Int>
         let title: Driver<String>
         let validationFocus: Signal<ValidationFocusTarget>
@@ -62,7 +62,9 @@ final class AddRoutineViewModel {
     // MARK: - Transform
     
     func transform(input: Input) -> Output {
-        let itemsRelay = BehaviorRelay<[TodoItem]>(value: [TodoItem(text: "")])
+        let itemsRelay = BehaviorRelay<[RoutineTaskItem]>(value: [
+            RoutineTaskItem(content: "", orderIndex: 0)
+        ])
         let titleRelay = BehaviorRelay<String>(value: "")
         let alarmTimeRelay = BehaviorRelay<DateComponents?>(value: nil)
         
@@ -90,55 +92,67 @@ final class AddRoutineViewModel {
             .subscribe(onNext: { currentItems in                
                 var newItems = currentItems
                 
-                if let lastItem = newItems.last, lastItem.text.isEmpty {
+                if let lastItem = newItems.last, lastItem.content.isEmpty {
                     focusRelay.accept(newItems.count - 1)
                     return
                 }
                 
-                newItems.append(TodoItem(text: ""))
+                let newOrderIndex = (newItems.last?.orderIndex ?? -1) + 1
+                newItems.append(RoutineTaskItem(content: "", orderIndex: newOrderIndex))
                 itemsRelay.accept(newItems)
                 focusRelay.accept(newItems.count - 1)
             })
             .disposed(by: disposeBag)
         
         input.itemTextChanged
-            .withLatestFrom(itemsRelay) { (change, currentItems) -> [TodoItem] in
+            .withLatestFrom(itemsRelay) { (change, currentItems) -> [RoutineTaskItem] in
                 var newItems = currentItems
                 let (index, text) = change
                 guard newItems.indices.contains(index) else { return newItems }
-                
-                newItems[index].text = text
+
+                newItems[index] = RoutineTaskItem(
+                    content: text,
+                    orderIndex: newItems[index].orderIndex,
+                    id: newItems[index].id
+                )
                 return newItems
             }
             .bind(to: itemsRelay)
             .disposed(by: disposeBag)
         
         input.itemMoved
-            .withLatestFrom(itemsRelay) { (move, currentItems) -> [TodoItem] in
+            .withLatestFrom(itemsRelay) { (move, currentItems) -> [RoutineTaskItem] in
                 var newItems = currentItems
                 let (sourceIndex, destinationIndex) = move
-                
+
                 guard newItems.indices.contains(sourceIndex),
                       (0...newItems.count).contains(destinationIndex) else { return newItems }
-                
+
                 let itemToMove = newItems.remove(at: sourceIndex)
                 newItems.insert(itemToMove, at: destinationIndex)
-                return newItems
+
+                return newItems.enumerated().map { index, item in
+                    RoutineTaskItem(content: item.content, orderIndex: index, id: item.id)
+                }
             }
             .bind(to: itemsRelay)
             .disposed(by: disposeBag)
         
         input.itemDeleted
-            .withLatestFrom(itemsRelay) { (indexToDelete, currentItems) -> [TodoItem] in
+            .withLatestFrom(itemsRelay) { (indexToDelete, currentItems) -> [RoutineTaskItem] in
                 var newItems = currentItems
                 guard newItems.indices.contains(indexToDelete) else { return newItems }
-                
+
                 newItems.remove(at: indexToDelete)
-                
+
                 if newItems.isEmpty {
-                    newItems.append(TodoItem(text: ""))
+                    newItems.append(RoutineTaskItem(content: "", orderIndex: 0))
+                } else {
+                    newItems = newItems.enumerated().map { index, item in
+                        RoutineTaskItem(content: item.content, orderIndex: index, id: item.id)
+                    }
                 }
-                
+
                 return newItems
             }
             .bind(to: itemsRelay)
@@ -146,20 +160,29 @@ final class AddRoutineViewModel {
         
         Observable.combineLatest(titleRelay, alarmTimeRelay, itemsRelay)
             .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
-            .map { title, alarmTime, items in
-                DraftRoutine(
-                    title: title,
-                    alarmTime: alarmTime,
-                    items: items,
-                    savedAt: Date()
-                )
-            }
+            .take(until: saveCompletedRelay)
             .withUnretained(self)
-            .subscribe(onNext: { owner, draft in
-                owner.storage.saveDraft(draft)
+            .subscribe(onNext: { owner, value in
+                let (title, alarmTime, items) = value
+
+                let hasTitle = !title.isEmpty
+                let hasAlarmTime = alarmTime != nil
+                let hasValidItems = items.contains { !$0.content.isEmpty }
+
+                if hasTitle || hasAlarmTime || hasValidItems {
+                    let draft = DraftRoutine(
+                        title: title,
+                        alarmTime: alarmTime,
+                        items: items,
+                        savedAt: Date()
+                    )
+                    owner.storage.saveDraft(draft)
+                } else {
+                    owner.storage.deleteDraft()
+                }
             })
             .disposed(by: disposeBag)
-        
+
         saveCompletedRelay
             .subscribe(onNext: { [weak self] _ in
                 self?.storage.deleteDraft()
@@ -185,7 +208,7 @@ final class AddRoutineViewModel {
                     return .empty()
                 }
                 
-                let validItems = items.filter { !$0.text.isBlank }
+                let validItems = items.filter { !$0.content.isBlank }
                 if validItems.isEmpty {
                     validationFocusRelay.accept(.firstTodoItem)
                     return .empty()
@@ -198,8 +221,8 @@ final class AddRoutineViewModel {
                 }
                 let alarmTimeString = String(format: "%d:%02d", hour, minute)
                 
-                let tasks = validItems.enumerated().map { (index, item) in
-                    (content: item.text, orderIndex: index)
+                let tasks = validItems.map { item in
+                    (content: item.content, orderIndex: item.orderIndex)
                 }
                 
                 return Observable.create { observer in

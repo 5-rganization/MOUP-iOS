@@ -5,6 +5,7 @@
 //  Created by 송규섭 on 10/6/25.
 //
 
+/* 사용하지 않을 예정입니다. RoutineTaskItem.swift로 전환합니다. */
 import Foundation
 
 struct TodoItem: Hashable, Codable {
