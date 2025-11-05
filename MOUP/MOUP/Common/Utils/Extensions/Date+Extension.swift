@@ -11,6 +11,10 @@ extension Date {
     /// 현재 날짜가 속한 월의 1일을 반환합니다. (시간은 00:00:00)
     var startOfMonth: Date {
         let components = Calendar.current.dateComponents([.year, .month], from: self)
-        return Calendar.current.date(from: components)!
+        guard let startOfMonth = Calendar.current.date(from: components) else {
+            assertionFailure("기존 날짜의 연/월 구성 요소로 날짜를 생성할 수 없습니다.")
+            return self
+        }
+        return startOfMonth
     }
 }
