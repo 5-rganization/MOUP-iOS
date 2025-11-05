@@ -108,15 +108,16 @@ extension DateFormatter {
         $0.locale = Locale(identifier: "ko_KR")
     }
     
-    /// Date -> "M/d E"
+    /// Date -> "MM / dd / E"
     static let displayDate = DateFormatter().then {
-        $0.dateFormat = "M/d E"
+        $0.dateFormat = "MM / dd / E"
         $0.locale = Locale(identifier: "ko_KR")
     }
     
     static let displayTime = DateFormatter().then {
         $0.dateFormat = "HH : mm"
         $0.locale = Locale(identifier: "ko_KR")
+        $0.timeZone = TimeZone(identifier: "Asia/Seoul")
     }
     
 }
