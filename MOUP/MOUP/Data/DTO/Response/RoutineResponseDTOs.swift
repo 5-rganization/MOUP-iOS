@@ -29,12 +29,6 @@ struct AllRoutineResponseDTO: Decodable {
     let routineSummaryInfoList: [RoutineSummaryDTO]
 }
 
-extension RoutineSummaryResponseDTO {
-    func toDomain() -> RoutineSummary {
-        RoutineSummary(id: routineId, routineName: routineName, alarmTime: alarmTime)
-    }
-}
-
 /// 루틴 요약 정보 리스트 응답 DTO
 struct RoutineSummaryListResponseDTO: Decodable {
     let routineSummaryInfoList: [RoutineSummaryDTO]

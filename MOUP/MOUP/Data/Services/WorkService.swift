@@ -20,8 +20,10 @@ protocol WorkServiceProtocol {
     func fetchWorkplaceMyWorkList(workplaceId: Int, baseYearMonth: String) async throws -> WorkCalendarListResponseDTO
     func fetchWorkplaceAllWorkList(workplaceId: Int, baseYearMonth: String) async throws -> WorkCalendarListResponseDTO
     
-    func updateMyWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO?
-    func updateWorkerWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO?
+    func updateMySingleWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws
+    func updateMyRecurringWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO
+    func updateWorkerSingleWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws
+    func updateWorkerRecurringWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO
     
     func deleteWork(workId: Int) async throws
     func deleteRecurringWork(workId: Int) async throws
@@ -37,7 +39,7 @@ final class WorkService: WorkServiceProtocol {
     private let isoDecoder = JSONDecoder().then { $0.dateDecodingStrategy = .iso8601 }
     
     func createMyWork(workplaceId: Int, requestDTO: MyWorkCreateRequestDTO) async throws -> WorkCreateResponseDTO {
-        let request = AF.request(WorkRouter.createMyWork(workplaceId: workplaceId, dto: requestDTO))
+        let request = session.request(WorkRouter.createMyWork(workplaceId: workplaceId, dto: requestDTO))
         let response = await request.serializingDecodable(WorkCreateResponseDTO.self).response
         logResponse(response)
         
@@ -53,7 +55,7 @@ final class WorkService: WorkServiceProtocol {
     }
     
     func createWorkersWork(workplaceId: Int, requestDTO: WorkersWorkCreateRequestDTO) async throws -> WorkersWorkCreateResponseDTO {
-        let request = AF.request(WorkRouter.createWorkersWork(workplaceId: workplaceId, dto: requestDTO))
+        let request = session.request(WorkRouter.createWorkersWork(workplaceId: workplaceId, dto: requestDTO))
         let response = await request.serializingDecodable(WorkersWorkCreateResponseDTO.self).response
         logResponse(response)
         
@@ -69,7 +71,7 @@ final class WorkService: WorkServiceProtocol {
     }
     
     func fetchWorkDetail(workId: Int) async throws -> WorkDetailResponseDTO {
-        let request = AF.request(WorkRouter.fetchWork(workId: workId, viewQueryType: .detail))
+        let request = session.request(WorkRouter.fetchWork(workId: workId, viewQueryType: .detail))
         let response = await request.serializingDecodable(WorkDetailResponseDTO.self, decoder: isoDecoder).response
         logResponse(response)
         
@@ -85,7 +87,7 @@ final class WorkService: WorkServiceProtocol {
     }
     
     func fetchWorkSummary(workId: Int) async throws -> WorkSummaryResponseDTO {
-        let request = AF.request(WorkRouter.fetchWork(workId: workId, viewQueryType: .summary))
+        let request = session.request(WorkRouter.fetchWork(workId: workId, viewQueryType: .summary))
         let response = await request.serializingDecodable(WorkSummaryResponseDTO.self, decoder: isoDecoder).response
         logResponse(response)
         
@@ -101,7 +103,7 @@ final class WorkService: WorkServiceProtocol {
     }
     
     func fetchAllMyWorkList(baseYearMonth: String) async throws -> WorkCalendarListResponseDTO {
-        let request = AF.request(WorkRouter.fetchAllMyWorkList(baseYearMonth: baseYearMonth))
+        let request = session.request(WorkRouter.fetchAllMyWorkList(baseYearMonth: baseYearMonth))
         let response = await request.serializingDecodable(WorkCalendarListResponseDTO.self, decoder: isoDecoder).response
         logResponse(response)
         
@@ -117,7 +119,7 @@ final class WorkService: WorkServiceProtocol {
     }
     
     func fetchWorkplaceMyWorkList(workplaceId: Int, baseYearMonth: String) async throws -> WorkCalendarListResponseDTO {
-        let request = AF.request(WorkRouter.fetchWorkplaceMyWorkList(workplaceId: workplaceId, baseYearMonth: baseYearMonth))
+        let request = session.request(WorkRouter.fetchWorkplaceMyWorkList(workplaceId: workplaceId, baseYearMonth: baseYearMonth))
         let response = await request.serializingDecodable(WorkCalendarListResponseDTO.self, decoder: isoDecoder).response
         logResponse(response)
         
@@ -133,7 +135,7 @@ final class WorkService: WorkServiceProtocol {
     }
     
     func fetchWorkplaceAllWorkList(workplaceId: Int, baseYearMonth: String) async throws -> WorkCalendarListResponseDTO {
-        let request = AF.request(WorkRouter.fetchWorkplaceAllWorkList(workplaceId: workplaceId, baseYearMonth: baseYearMonth))
+        let request = session.request(WorkRouter.fetchWorkplaceAllWorkList(workplaceId: workplaceId, baseYearMonth: baseYearMonth))
         let response = await request.serializingDecodable(WorkCalendarListResponseDTO.self, decoder: isoDecoder).response
         logResponse(response)
         
@@ -148,27 +150,24 @@ final class WorkService: WorkServiceProtocol {
         }
     }
     
-    func updateMyWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO? {
-        let request = AF.request(WorkRouter.updateMyWork(workId: workId, dto: requestDTO))
-        let response = await request.serializingDecodable(WorkCreateResponseDTO.self).response
+    func updateMySingleWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws {
+        let request = session.request(WorkRouter.updateMySingleWork(workId: workId, dto: requestDTO))
+        let response = await request.serializingData().response
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
         
         switch statusCode {
-        case 200:
-            guard let dto = response.value else { throw NetworkError.noResponse }
-            return dto
         case 204:
-            return nil
+            return
         default:
             try handleCommonWorkError(statusCode: statusCode)
         }
     }
     
-    func updateWorkerWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO? {
-        let request = AF.request(WorkRouter.updateWorkerWork(workplaceId: workplaceId, workerId: workerId, workId: workId, dto: requestDTO))
-        let response = await request.serializingDecodable(WorkCreateResponseDTO.self).response
+    func updateMyRecurringWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO {
+        let request = session.request(WorkRouter.updateMyRecurringWork(workId: workId, dto: requestDTO))
+        let response = await request.serializingDecodable(WorkCreateResponseDTO.self, decoder: isoDecoder).response
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -177,15 +176,43 @@ final class WorkService: WorkServiceProtocol {
         case 200:
             guard let dto = response.value else { throw NetworkError.noResponse }
             return dto
+        default:
+            try handleCommonWorkError(statusCode: statusCode)
+        }
+    }
+    
+    func updateWorkerSingleWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws {
+        let request = session.request(WorkRouter.updateWorkerSingleWork(workplaceId: workplaceId, workerId: workerId, workId: workId, dto: requestDTO))
+        let response = await request.serializingData().response
+        
+        guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
+        
+        switch statusCode {
         case 204:
-            return nil
+            return
+        default:
+            try handleCommonWorkError(statusCode: statusCode)
+        }
+    }
+    
+    func updateWorkerRecurringWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO {
+        let request = session.request(WorkRouter.updateWorkerRecurringWork(workplaceId: workplaceId, workerId: workerId, workId: workId, dto: requestDTO))
+        let response = await request.serializingDecodable(WorkCreateResponseDTO.self, decoder: isoDecoder).response
+        logResponse(response)
+        
+        guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
+        
+        switch statusCode {
+        case 200:
+            guard let dto = response.value else { throw NetworkError.noResponse }
+            return dto
         default:
             try handleCommonWorkError(statusCode: statusCode)
         }
     }
     
     func deleteWork(workId: Int) async throws {
-        let request = AF.request(WorkRouter.deleteWork(workId: workId))
+        let request = session.request(WorkRouter.deleteWork(workId: workId))
         let response = await request.serializingData().response
         logResponse(response)
         
@@ -200,7 +227,7 @@ final class WorkService: WorkServiceProtocol {
     }
     
     func deleteRecurringWork(workId: Int) async throws {
-        let request = AF.request(WorkRouter.deleteRecurringWork(workId: workId))
+        let request = session.request(WorkRouter.deleteRecurringWork(workId: workId))
         let response = await request.serializingData().response
         logResponse(response)
         
@@ -215,7 +242,7 @@ final class WorkService: WorkServiceProtocol {
     }
     
     func startWork(workplaceId: Int) async throws -> WorkCreateResponseDTO? {
-        let request = AF.request(WorkRouter.startWork(workplaceId: workplaceId))
+        let request = session.request(WorkRouter.startWork(workplaceId: workplaceId))
         let response = await request.serializingDecodable(WorkCreateResponseDTO.self).response
         logResponse(response)
         
@@ -237,7 +264,7 @@ final class WorkService: WorkServiceProtocol {
     }
     
     func endWork(workplaceId: Int) async throws {
-        let request = AF.request(WorkRouter.endWork(workplaceId: workplaceId))
+        let request = session.request(WorkRouter.endWork(workplaceId: workplaceId))
         let response = await request.serializingData().response
         logResponse(response)
         
@@ -282,12 +309,18 @@ private extension WorkService {
     /// - Parameter response: Alamofire의 `DataResponse`
     /// - Parameter functionName: 이 로그를 호출한 상위 함수의 이름 (자동으로 채워짐)
     func logResponse<T>(_ response: DataResponse<T, AFError>, _ functionName: String = #function) {
-        logger.debug("[\(functionName)] Server Response Value: \(String(describing: response.value))")
-        logger.debug("[\(functionName)] Server StatusCode: \(String(describing: response.response?.statusCode))")
+        logger.info("[\(functionName)] Server StatusCode: \(String(describing: response.response?.statusCode))")
+        logger.info("[\(functionName)] Server Response Value: \(String(describing: response.value))")
         
         // 디코딩 실패 시 원본 데이터 출력
         if response.value == nil, let data = response.data, let rawString = String(data: data, encoding: .utf8) {
-            logger.debug("[\(functionName)] Decoding failed - Raw Data: \(rawString)")
+            logger.info("[\(functionName)] 디코딩 실패 - Raw Data: \(rawString)")
+            
+            if let afError = response.error?.asAFError,
+               case .responseSerializationFailed(let reason) = afError,
+               case .decodingFailed(let underlyingError) = reason {
+                logger.error("[\(functionName)] 에러 내용: \(String(describing: underlyingError))")
+            }
         }
     }
 }

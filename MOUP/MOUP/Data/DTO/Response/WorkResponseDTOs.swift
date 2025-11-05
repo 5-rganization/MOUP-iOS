@@ -35,7 +35,7 @@ extension FailedWorkerInfoDTO {
 struct WorkDetailResponseDTO: Decodable {
     let workId: Int
     let workerSummaryInfo: WorkerSummaryResponseDTO
-    let workplaceSummaryInfo: WorkplaceSummaryResponseDTO
+    let workplaceSummaryInfo: WorkplaceSummaryInfoDTO
     let routineSummaryInfoList: [RoutineSummaryDTO]
     let workDate: String
     let startTime: Date
@@ -54,9 +54,9 @@ struct WorkDetailResponseDTO: Decodable {
 extension WorkDetailResponseDTO {
     func toDomain() -> WorkData {
         WorkData(id: workId,
-                 workplaceSummary: workplaceSummaryInfo.toDomain(),
+                 workplaceSummary: WorkplaceSummary(id: workplaceSummaryInfo.workplaceId, name: workplaceSummaryInfo.workplaceName, isShared: workplaceSummaryInfo.isShared),
                  workerSummary: workerSummaryInfo.toDomain(),
-                 routineSummaryList: routineSummaryInfoList.map { $0.toDomain() },
+                 routineSummaryList: routineSummaryInfoList.map { RoutineSummary(routineId: $0.routineId, routineName: $0.routineName, alarmTime: $0.alarmTime) },
                  workDate: workDate,
                  startTime: startTime,
                  actualStartTime: actualStartTime,
@@ -76,7 +76,7 @@ extension WorkDetailResponseDTO {
 struct WorkSummaryResponseDTO: Decodable {
     let workId: Int
     let workerSummaryInfo: WorkerSummaryResponseDTO
-    let workplaceSummaryInfo: WorkplaceSummaryResponseDTO
+    let workplaceSummaryInfo: WorkplaceSummaryInfoDTO
     let workDate: String
     let startTime: Date
     let endTime: Date?
@@ -92,7 +92,7 @@ struct WorkSummaryResponseDTO: Decodable {
 extension WorkSummaryResponseDTO {
     func toDomain() -> WorkSummary {
         WorkSummary(id: workId,
-                    workplaceSummary: workplaceSummaryInfo.toDomain(),
+                    workplaceSummary: WorkplaceSummary(id: workplaceSummaryInfo.workplaceId, name: workplaceSummaryInfo.workplaceName, isShared: workplaceSummaryInfo.isShared),
                     workerSummary: workerSummaryInfo.toDomain(),
                     workDate: workDate,
                     startTime: startTime,

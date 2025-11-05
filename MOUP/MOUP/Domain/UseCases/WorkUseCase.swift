@@ -42,12 +42,20 @@ final class WorkUseCase: WorkUseCaseProtocol {
         try await workRepository.fetchWorkplaceAllWorkList(workplaceId: workplaceId, baseYearMonth: baseYearMonth)
     }
     
-    func updateMyWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws -> [Int]? {
-        try await workRepository.updateMyWork(workId: workId, requestDTO: requestDTO)
+    func updateMySingleWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws {
+        try await workRepository.updateMySingleWork(workId: workId, requestDTO: requestDTO)
     }
     
-    func updateWorkerWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> [Int]? {
-        try await workRepository.updateWorkerWork(workplaceId: workplaceId, workerId: workerId, workId: workId, requestDTO: requestDTO)
+    func updateMyRecurringWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws -> [Int] {
+        try await workRepository.updateMyRecurringWork(workId: workId, requestDTO: requestDTO)
+    }
+    
+    func updateWorkerSingleWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws  {
+        try await workRepository.updateWorkerSingleWork(workplaceId: workplaceId, workerId: workerId, workId: workId, requestDTO: requestDTO)
+    }
+    
+    func updateWorkerRecurringWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> [Int] {
+        try await workRepository.updateWorkerRecurringWork(workplaceId: workplaceId, workerId: workerId, workId: workId, requestDTO: requestDTO)
     }
     
     func deleteWork(workId: Int) async throws {

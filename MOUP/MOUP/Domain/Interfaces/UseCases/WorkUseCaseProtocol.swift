@@ -35,15 +35,33 @@ protocol WorkUseCaseProtocol: AnyObject {
     /// - Parameter baseYearMonth: 조회 기준 월 (`yyyy-MM` 형식)
     func fetchWorkplaceAllWorkList(workplaceId: Int, baseYearMonth: String) async throws -> [WorkSummary]
     
-    /// 내 근무를 업데이트합니다.
-    /// - Returns: 반복 근무가 수정되어 ID 목록이 반환되면 `[Int]`,
-    ///            단일 근무만 수정되어 데이터가 없는 성공 시 `nil`
-    func updateMyWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws -> [Int]?
+    /// 단일 근무를 업데이트합니다.
+    /// - Parameters:
+    ///   - workId: 수정할 근무의 ID
+    ///   - requestDTO: 근무 수정 정보
+    func updateMySingleWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws
+    /// 반복 근무 전체를 업데이트합니다.
+    /// - Parameters:
+    ///   - workId: 수정할 반복 근무 시리즈의 기준 ID
+    ///   - requestDTO: 근무 수정 정보
+    /// - Returns: 이 작업으로 인해 업데이트된 **모든** 반복 근무 건의 ID 목록 (`[Int]`)
+    func updateMyRecurringWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws -> [Int]
     
-    /// 근무자의 근무를 업데이트합니다. (사장님 전용)
-    /// - Returns: 반복 근무가 수정되어 ID 목록이 반환되면 `[Int]`,
-    ///            단일 근무만 수정되어 데이터가 없는 성공 시 `nil`
-    func updateWorkerWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> [Int]?
+    /// 근무자의 단일 근무를 업데이트합니다. (사장님 전용)
+    /// - Parameters:
+    ///   - workplaceId: 매장 ID
+    ///   - workerId: 근무자 ID
+    ///   - workId: 수정할 근무의 ID
+    ///   - requestDTO: 근무 수정 정보
+    func updateWorkerSingleWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws
+    /// 근무자의 반복 근무 전체를 업데이트합니다. (사장님 전용)
+    /// - Parameters:
+    ///   - workplaceId: 매장 ID
+    ///   - workerId: 근무자 ID
+    ///   - workId: 수정할 반복 근무 시리즈의 기준 ID
+    ///   - requestDTO: 근무 수정 정보
+    /// - Returns: 이 작업으로 인해 업데이트된 **모든** 반복 근무 건의 ID 목록 (`[Int]`)
+    func updateWorkerRecurringWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> [Int]
     
     /// 단일 근무를 삭제합니다.
     func deleteWork(workId: Int) async throws
