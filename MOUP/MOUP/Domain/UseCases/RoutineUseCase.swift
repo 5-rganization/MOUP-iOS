@@ -36,11 +36,25 @@ final class RoutineUseCase: RoutineUseCaseProtocol {
             alarmTime: alarmTime,
             tasks: tasks
         )
-        
+
         return RoutineSummary(
             routineId: routineId,
             routineName: name,
             alarmTime: alarmTime
+        )
+    }
+
+    func updateRoutine(
+        routineId: Int,
+        name: String,
+        alarmTime: String,
+        tasks: [(content: String, orderIndex: Int)]
+    ) async throws {
+        try await routineRepository.updateRoutine(
+            routineId: routineId,
+            name: name,
+            alarmTime: alarmTime,
+            tasks: tasks
         )
     }
 }

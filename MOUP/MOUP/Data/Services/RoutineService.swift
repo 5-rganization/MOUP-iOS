@@ -16,6 +16,7 @@ protocol RoutineServiceProtocol: AnyObject {
     func fetchWorkRoutines(workId: Int) async throws -> WorkRoutineResponseDTO
     func fetchAllRoutines() async throws -> AllRoutineResponseDTO
     func createRoutine(request: CreateRoutineRequestDTO) async throws -> Int
+    func updateRoutine(routineId: Int, request: UpdateRoutineRequestDTO) async throws
 }
 
 final class RoutineService: RoutineServiceProtocol {
@@ -78,10 +79,10 @@ final class RoutineService: RoutineServiceProtocol {
     func createRoutine(request: CreateRoutineRequestDTO) async throws -> Int {
         let request = session.request(RoutineRouter.createRoutine(request: request))
         let response = await request.serializingDecodable(CreateRoutineResponseDTO.self).response
-        
+
         let statusCode = response.response?.statusCode
         logger.debug("statusCode: \(statusCode ?? 0)")
-        
+
         switch statusCode {
         case 201:
             guard let dto = response.value else {
@@ -91,6 +92,23 @@ final class RoutineService: RoutineServiceProtocol {
             return dto.routineId
         default:
             logger.error("루틴 생성 실패 - statusCode: \(statusCode ?? 0)")
+            throw NetworkError.serverError
+        }
+    }
+
+    func updateRoutine(routineId: Int, request: UpdateRoutineRequestDTO) async throws {
+        let request = session.request(RoutineRouter.updateRoutine(routineId: routineId, request: request))
+        let response = await request.serializingData().response
+
+        let statusCode = response.response?.statusCode
+        logger.debug("statusCode: \(statusCode ?? 0)")
+
+        switch statusCode {
+        case 200:
+            logger.debug("루틴 업데이트 성공 - routineId: \(routineId)")
+            return
+        default:
+            logger.error("루틴 업데이트 실패 - statusCode: \(statusCode ?? 0)")
             throw NetworkError.serverError
         }
     }

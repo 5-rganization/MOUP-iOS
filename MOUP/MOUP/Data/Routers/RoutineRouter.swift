@@ -13,6 +13,7 @@ enum RoutineRouter {
     case fetchWorkRoutines(workId: Int)
     case fetchAllRoutines
     case createRoutine(request: CreateRoutineRequestDTO)
+    case updateRoutine(routineId: Int, request: UpdateRoutineRequestDTO)
 }
 
 extension RoutineRouter: URLRequestConvertible {
@@ -31,6 +32,8 @@ extension RoutineRouter: URLRequestConvertible {
             return "/routines/works/\(workId)/routines"
         case .fetchAllRoutines, .createRoutine:
             return "/routines"
+        case .updateRoutine(let routineId, _):
+            return "/routines/\(routineId)"
         }
     }
 
@@ -40,6 +43,8 @@ extension RoutineRouter: URLRequestConvertible {
             return .get
         case .createRoutine:
             return .post
+        case .updateRoutine:
+            return .put
         }
     }
 
@@ -49,6 +54,8 @@ extension RoutineRouter: URLRequestConvertible {
             return nil
         case .createRoutine(let request):
             return request
+        case .updateRoutine(_, let request):
+            return request
         }
     }
 
@@ -56,7 +63,7 @@ extension RoutineRouter: URLRequestConvertible {
         switch self {
         case .fetchTodayRoutines, .fetchWorkRoutines, .fetchAllRoutines:
             return URLEncoding.default
-        case .createRoutine:
+        case .createRoutine, .updateRoutine:
             return JSONEncoding.default
         }
     }

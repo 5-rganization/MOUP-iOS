@@ -10,18 +10,18 @@ import RxSwift
 import RxCocoa
 
 final class EditRoutineViewController: UIViewController {
-    
+
     // MARK: - Properties
-    
-    private let editRoutinedView = EditRoutineView()
+
+    private let editRoutineView = EditRoutineView()
     private let viewModel: EditRoutineViewModel
     private let disposeBag = DisposeBag()
-    var onEdit: ((Routine) -> Void)?
+    var onEdit: ((RoutineSummary) -> Void)?
     
     // MARK: - Lifecycle
-    
+
     override func loadView() {
-        self.view = editRoutinedView
+        self.view = editRoutineView
     }
 
     override func viewDidLoad() {
@@ -50,91 +50,104 @@ private extension EditRoutineViewController {
     
     // MARK: - setBindings
     func setBindings() {
-        editRoutinedView.rx.backButtonTap
+        editRoutineView.rx.backButtonTap
             .bind(with: self) { owner, _ in
                 owner.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
-        
-        let selectedTime = editRoutinedView.rx.alarmTimeButtonTap
+
+        let selectedTime = editRoutineView.rx.alarmTimeButtonTap
             .flatMapLatest { [weak self] _ -> Observable<DateComponents> in
                 guard let self else { return .empty() }
-                
+
                 let timePickerVC = TimePickerSheetViewController()
-                
+
                 if let sheet = timePickerVC.sheetPresentationController {
                     sheet.detents = [.medium()]
                     sheet.prefersGrabberVisible = true
                     sheet.prefersScrollingExpandsWhenScrolledToEdge = true
                     sheet.preferredCornerRadius = 16
                 }
-                
+
                 self.present(timePickerVC, animated: true)
-                
+
                 return timePickerVC.selectedTimeEvent
             }
             .share()
-        
+
         selectedTime
             .bind(with: self) { owner, comps in
-                owner.editRoutinedView.updateAlarmTimeChip(with: comps)
+                owner.editRoutineView.updateAlarmTimeChip(with: comps)
             }
             .disposed(by: disposeBag)
-        
+
         let input = EditRoutineViewModel.Input(
-            titleChanged: editRoutinedView.rx.titleText
+            titleChanged: editRoutineView.rx.titleText
                 .orEmpty
                 .skip(1)
                 .distinctUntilChanged(),
             alarmTimeChanged: selectedTime.map { Optional($0) }.asObservable(),
-            editButtonTapped: editRoutinedView.rx.editButtonTap.asObservable(),
-            addTodoButtonTapped: editRoutinedView.rx.addButtonTap.asObservable(),
-            itemTextChanged: editRoutinedView.rx.itemTextChanged,
-            itemMoved: editRoutinedView.rx.itemMoved,
-            itemDeleted: editRoutinedView.rx.itemDeleted
+            editButtonTapped: editRoutineView.rx.editButtonTap.asObservable(),
+            addTodoButtonTapped: editRoutineView.rx.addButtonTap.asObservable(),
+            itemTextChanged: editRoutineView.rx.itemTextChanged,
+            itemMoved: editRoutineView.rx.itemMoved,
+            itemDeleted: editRoutineView.rx.itemDeleted
         )
-        
+
         let output = viewModel.transform(input: input)
-        
+
         output.items
-            .drive(editRoutinedView.rx.items)
+            .drive(editRoutineView.rx.items)
             .disposed(by: disposeBag)
-        
+
         output.focusOnRow
-            .emit(to: editRoutinedView.rx.focusOnRow)
+            .emit(to: editRoutineView.rx.focusOnRow)
             .disposed(by: disposeBag)
-        
+
         output.title
-            .drive(editRoutinedView.rx.titleText)
+            .drive(editRoutineView.rx.titleText)
             .disposed(by: disposeBag)
-        
+
         output.alarmTime
             .drive(with: self) { owner, comps in
                 if let comps {
-                    owner.editRoutinedView.updateAlarmTimeChip(with: comps)
+                    owner.editRoutineView.updateAlarmTimeChip(with: comps)
                 }
             }
             .disposed(by: disposeBag)
-        
+
         output.validationFocus
             .emit(with: self, onNext: { owner, target in
                 switch target {
                 case .title:
-                    owner.editRoutinedView.focusOnTitle()
+                    owner.editRoutineView.focusOnTitle()
                 case .alarmTime:
-                    owner.editRoutinedView.shakeAlarmButton()
+                    owner.editRoutineView.shakeAlarmButton()
                 case .firstTodoItem:
-                    let focusBinder = owner.editRoutinedView.rx.focusOnRow
+                    let focusBinder = owner.editRoutineView.rx.focusOnRow
                     focusBinder.onNext(0)
                 }
             })
             .disposed(by: disposeBag)
-        
+
         output.editCompleted
             .emit(with: self, onNext: { owner, updated in
                 owner.onEdit?(updated)
                 owner.navigationController?.popViewController(animated: true)
             })
+            .disposed(by: disposeBag)
+
+        output.error
+            .emit(with: self) { owner, message in
+                print("에러: \(message)")
+
+                let alert = NoticeModalViewController(
+                    title: "루틴 수정 실패",
+                    comment: message
+                )
+
+                owner.present(alert, animated: true)
+            }
             .disposed(by: disposeBag)
     }
 }

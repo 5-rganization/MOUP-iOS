@@ -16,4 +16,10 @@ protocol RoutineRepositoryProtocol: AnyObject {
         alarmTime: String,
         tasks: [(content: String, orderIndex: Int)]
     ) async throws -> Int
+    func updateRoutine(
+        routineId: Int,
+        name: String,
+        alarmTime: String,
+        tasks: [(content: String, orderIndex: Int)]
+    ) async throws
 }

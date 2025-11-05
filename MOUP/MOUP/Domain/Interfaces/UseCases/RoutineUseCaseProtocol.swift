@@ -16,4 +16,10 @@ protocol RoutineUseCaseProtocol: AnyObject {
         alarmTime: String,
         tasks: [(content: String, orderIndex: Int)]
     ) async throws -> RoutineSummary
+    func updateRoutine(
+        routineId: Int,
+        name: String,
+        alarmTime: String,
+        tasks: [(content: String, orderIndex: Int)]
+    ) async throws
 }

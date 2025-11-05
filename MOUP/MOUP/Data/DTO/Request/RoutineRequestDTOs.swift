@@ -13,6 +13,12 @@ struct CreateRoutineRequestDTO: Encodable {
     let routineTaskList: [RoutineTaskDTO]
 }
 
+struct UpdateRoutineRequestDTO: Encodable {
+    let routineName: String
+    let alarmTime: String
+    let routineTaskList: [RoutineTaskDTO]
+}
+
 struct RoutineTaskDTO: Encodable {
     let content: String
     let orderIndex: Int
