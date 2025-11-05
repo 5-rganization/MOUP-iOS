@@ -46,7 +46,7 @@ final class CalendarWorkListViewModel {
     func transform(input: Input) -> Output {
         input.deleteSingleWorkId
             .subscribe(with: self) { owner, workId in
-                Task.detached {
+                Task {
                     do {
                         try await owner.workUseCase.deleteWork(workId: workId)
                         await MainActor.run { owner.updateCalendarRelay.accept(()) }
@@ -64,7 +64,7 @@ final class CalendarWorkListViewModel {
         
         input.deleteRecurringWorkId
             .subscribe(with: self) { owner, workId in
-                Task.detached {
+                Task {
                     do {
                         try await owner.workUseCase.deleteRecurringWork(workId: workId)
                         await MainActor.run { owner.updateCalendarRelay.accept(()) }
