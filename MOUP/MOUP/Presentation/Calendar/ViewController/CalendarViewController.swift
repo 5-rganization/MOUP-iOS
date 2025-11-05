@@ -175,7 +175,7 @@ private extension CalendarViewController {
             }.disposed(by: disposeBag)
         
         // ViewModel 바인딩
-        let input = CalendarViewModel.Input(baseFetchDate: lastBaseFetchDateRelay.asObservable(),
+        let input = CalendarViewModel.Input(baseFetchDate: lastBaseFetchDateRelay.asObservable().skip(1),
                                             calendarMode: calendarModeRelay.asObservable(),
                                             personalFilterWorkplace: personalFilterWorkplaceRelay.asObservable(),
                                             sharedFilterWorkplace: sharedFilterWorkplaceRelay.asObservable(),
@@ -223,6 +223,7 @@ private extension CalendarViewController {
     func setCalendarView() {
         calendarView.getMonthCalendarView.scrollToDate(visibleDate, animateScroll: false)
         updateYearMonthLabel()
+        updateDataSource()
     }
     
     func updateYearMonthLabel() {
