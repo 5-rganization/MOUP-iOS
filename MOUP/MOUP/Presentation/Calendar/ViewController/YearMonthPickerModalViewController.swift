@@ -29,19 +29,18 @@ final class YearMonthPickerModalViewController: UIViewController {
     private let yearMonthList = [(CalendarRange.startYear...CalendarRange.endYear).map { String($0) }, (1...12).map { String($0) }]
     
     // Initializer Injections
+    weak var coordinator: YearMonthPickerCoordinator?
     /// `pickerView`에서 didSelect된 연도
     private var focusedYear: Int
     /// `pickerView`에서 didSelect된 월
     private var focusedMonth: Int
     
-    // Property Injections
-    weak var delegate: YearMonthPickerModalVCDelegate?
-    
     // MARK: - UI Components
     private let yearMonthPickerView = YearMonthPickerView()
     
     // MARK: - Initializer
-    init(currYear: Int, currMonth: Int) {
+    init(coordinator: YearMonthPickerCoordinator?, currYear: Int, currMonth: Int) {
+        self.coordinator = coordinator
         self.focusedYear = currYear
         self.focusedMonth = currMonth
         super.init(nibName: nil, bundle: nil)
@@ -89,12 +88,12 @@ private extension YearMonthPickerModalViewController {
     func setBindings() {
         yearMonthPickerView.rx.cancelButtonTap
             .subscribe(with: self) { owner, _ in
-                owner.delegate?.cancelButtonTapped()
+                owner.coordinator?.cancelButtonTapped()
             }.disposed(by: disposeBag)
         
         yearMonthPickerView.rx.gotoButtonTap
             .subscribe(with: self, onNext: { owner, _ in
-                owner.delegate?.gotoButtonTapped(focusedYear: owner.focusedYear, focusedMonth: owner.focusedMonth)
+                owner.coordinator?.gotoButtonTapped(focusedYear: owner.focusedYear, focusedMonth: owner.focusedMonth)
             }).disposed(by: disposeBag)
     }
 }
@@ -156,6 +155,6 @@ extension YearMonthPickerModalViewController: UIPickerViewDelegate {
 // MARK: - UIAdaptivePresentationControllerDelegate
 extension YearMonthPickerModalViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        delegate?.dismissReceived()
+        coordinator?.dismissReceived()
     }
 }

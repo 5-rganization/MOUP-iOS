@@ -49,10 +49,10 @@ final class CalendarCoordinator: Coordinator {
     }
     
     func showYearMonthPicker(currYear: Int, currMonth: Int) {
-        let yearMonthCoordinator = YearMonthPickerCoordinator(navigationController: navigationController,
+        let yearMonthCoordinator = YearMonthPickerCoordinator(parentCoordinator: self,
+                                                              navigationController: navigationController,
                                                               currYear: currYear,
                                                               currMonth: currMonth)
-        yearMonthCoordinator.delegate = self
         yearMonthCoordinator.start()
         childCoordinators.append(yearMonthCoordinator)
     }
@@ -84,28 +84,29 @@ final class CalendarCoordinator: Coordinator {
         }
         removeChildCoordinator(coordinator, needToDismiss: true)
     }
+    
+    func dismissed(_ coordinator: Coordinator) {
+        if coordinator is CalendarWorkListCoordinator { calendarVC.deselectCell() }
+        removeChildCoordinator(coordinator, needToDismiss: false)
+    }
 }
 
 // MARK: - Private Methods
 private extension CalendarCoordinator {
     func removeChildCoordinator(_ coordinator: Coordinator, needToDismiss: Bool) {
         childCoordinators = childCoordinators.filter { $0 !== coordinator }
-        if needToDismiss {
-            navigationController.dismiss(animated: true)
-        }
+        if needToDismiss { navigationController.dismiss(animated: true) }
     }
 }
 
-// MARK: - YearMonthCoordinatorDelegate
-extension CalendarCoordinator: YearMonthPickerCoordinatorDelegate {
-    func dismissed(_ coordinator: YearMonthPickerCoordinator) {
-        removeChildCoordinator(coordinator, needToDismiss: false)
-    }
-    
+// MARK: - YearMonthCoordinator Methods
+extension CalendarCoordinator {
+    /// 연/월 이동 취소
     func cancelled(_ coordinator: YearMonthPickerCoordinator) {
         removeChildCoordinator(coordinator, needToDismiss: true)
     }
     
+    /// 선택한 연/월로 이동
     func changeYearMonth(_ coordinator: YearMonthPickerCoordinator, focusedYear: Int, focusedMonth: Int) {
         calendarVC.updateYearMonth(focusedYear: focusedYear, focusedMonth: focusedMonth)
         removeChildCoordinator(coordinator, needToDismiss: true)
@@ -114,11 +115,6 @@ extension CalendarCoordinator: YearMonthPickerCoordinatorDelegate {
 
 // MARK: - FilterCoordinator Methods
 extension CalendarCoordinator {
-    /// 필터 선택 화면 내림
-    func dismissed(_ coordinator: FilterCoordinator) {
-        removeChildCoordinator(coordinator, needToDismiss: false)
-    }
-    
     /// 선택한 필터 적용
     func applyFilter(_ coordinator: FilterCoordinator, filterWorkplace: WorkplaceSummary?) {
         calendarVC.updateFilter(filterWorkplace: filterWorkplace)
@@ -128,12 +124,6 @@ extension CalendarCoordinator {
 
 // MARK: - CalendarWorkListCoordinator Methods
 extension CalendarCoordinator {
-    /// 근무 목록 화면 내림
-    func dismissed(_ coordinator: CalendarWorkListCoordinator) {
-        calendarVC.deselectCell()
-        removeChildCoordinator(coordinator, needToDismiss: false)
-    }
-    
     // TODO: 근무 엔티티를 직접 전달 or 근무 ID만 전달
     /// 근무 등록 화면 표시
     func showWorkRegister(work: WorkSummary?) {
