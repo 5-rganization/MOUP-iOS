@@ -325,7 +325,7 @@ extension CalendarViewController: JTACMonthViewDelegate {
         guard let date = visibleDates.monthDates.first?.date else { return }
         visibleDate = date
         
-        // 연-월 라벨 변경
+        // 연/월 라벨 변경
         updateYearMonthLabel()
         
         // 근무 데이터 로딩
