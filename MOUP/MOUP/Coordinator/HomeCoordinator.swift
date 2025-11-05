@@ -44,7 +44,8 @@ final class HomeCoordinator: Coordinator {
     func start() {
         let homeVM = HomeViewModel(
             userRole: userRole,
-            useCase: homeUseCase
+            homeUseCase: homeUseCase,
+            attendanceUseCase: attendanceUseCase
         )
         let homeVC = HomeViewController(
             coordinator: self,
@@ -79,6 +80,14 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(vc, animated: true)
     }
     
+//    func moveToAllRoutine() {
+//        let coordinator = RoutineSelectionCoordinator(navigationController: navigationController)
+//        childCoordinators.append(coordinator)
+//        DispatchQueue.main.async {
+//            coordinator.start()
+//        }
+//    }
+    
     func moveToTodayRoutine() {
         let viewModel = TodayRoutineViewModel(routineUseCase: routineUseCase)
         let vc = TodayRoutineViewController(viewModel: viewModel)
@@ -97,11 +106,13 @@ final class HomeCoordinator: Coordinator {
     }
     
     func moveToManageAttendance(workplaceId: Int) {
-        let viewModel = ManageAttendanceViewModel()
+        let viewModel = ManageAttendanceViewModel(
+            attendanceUseCase: attendanceUseCase,
+            workplaceId: workplaceId
+        )
         let vc = ManageAttendanceViewController(
             viewModel: viewModel,
-            coordinator: self,
-            workplaceId: workplaceId
+            coordinator: self
         )
         navigationController.pushViewController(vc, animated: true)
     }
@@ -140,8 +151,9 @@ final class HomeCoordinator: Coordinator {
         navigationController.present(vc, animated: true)
     }
     
-    func presentConfirmationModal() {
+    func presentConfirmationModal(onConfirm: (() -> Void)? = nil) {
         let vc = AttendanceConfirmModalViewController()
+        vc.onConfirm = onConfirm
         vc.modalPresentationStyle = .overFullScreen
         vc.modalTransitionStyle = .crossDissolve
         navigationController.present(vc, animated: true)
