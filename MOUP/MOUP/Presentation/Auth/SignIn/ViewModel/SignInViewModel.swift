@@ -82,8 +82,7 @@ final class SignInViewModel {
                         switch error {
                         case .serverError:
                             errorInfo = (title: "서버 오류", message: error.localizedDescription)
-                        case .noResponse,
-                                .invalidResponse:
+                        default:
                             errorInfo = (title: "예상치 못한 오류", message: error.localizedDescription)
                         }
                         self.signInOutputEventRelay.accept(.showAlert(errorInfo))
