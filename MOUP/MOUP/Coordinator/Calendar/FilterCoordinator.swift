@@ -7,14 +7,6 @@
 
 import UIKit
 
-/// `FilterCoordinator`의 이벤트를 `CalendarCoordinator`에 전달하는 Delegate
-protocol FilterCoordinatorDelegate: AnyObject {
-    /// 필터 선택 화면 내림
-    func dismissed(_ coordinator: FilterCoordinator)
-    /// 선택한 필터 적용
-    func applyFilter(_ coordinator: FilterCoordinator, filterWorkplace: WorkplaceSummary?)
-}
-
 /// `FilterModalViewController` Coordinator
 final class FilterCoordinator: Coordinator {
     
@@ -22,16 +14,15 @@ final class FilterCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     
     // Initializer Injections
+    weak var parentCoordinator: CalendarCoordinator?
     private let navigationController: UINavigationController
     private let workplaceUseCase: WorkplaceUseCaseProtocol
     private let calendarMode: CalendarMode
     private let selectedFilterWorkplace: WorkplaceSummary?
     
-    // Property Injections
-    weak var delegate: FilterCoordinatorDelegate?
-    
     // MARK: - Initializer
-    init(navigationController: UINavigationController, workplaceUseCase: WorkplaceUseCaseProtocol, calendarMode: CalendarMode, selectedFilterWorkplace: WorkplaceSummary?) {
+    init(parentCoordinator: CalendarCoordinator?, navigationController: UINavigationController, workplaceUseCase: WorkplaceUseCaseProtocol, calendarMode: CalendarMode, selectedFilterWorkplace: WorkplaceSummary?) {
+        self.parentCoordinator = parentCoordinator
         self.navigationController = navigationController
         self.workplaceUseCase = workplaceUseCase
         
@@ -42,8 +33,7 @@ final class FilterCoordinator: Coordinator {
     // MARK: - Coordinator Methods
     func start() {
         let filterVM = FilterViewModel(workplaceUseCase: workplaceUseCase)
-        let filterVC = FilterModalViewController(viewModel: filterVM, calendarMode: calendarMode, selectedFilterWorkplace: selectedFilterWorkplace)
-        filterVC.delegate = self
+        let filterVC = FilterModalViewController(coordinator: self, viewModel: filterVM, calendarMode: calendarMode, selectedFilterWorkplace: selectedFilterWorkplace)
         
         if let sheet = filterVC.sheetPresentationController {
             sheet.detents = [.medium()]
@@ -55,13 +45,13 @@ final class FilterCoordinator: Coordinator {
     }
 }
 
-// MARK: - FilterModalVCDelegate
-extension FilterCoordinator: FilterModalVCDelegate {
+// MARK: - Parent Coordinator Methods
+extension FilterCoordinator {
     func dismissReceived() {
-        delegate?.dismissed(self)
+        parentCoordinator?.dismissed(self)
     }
     
     func applyButtonTapped(filterWorkplace: WorkplaceSummary?) {
-        delegate?.applyFilter(self, filterWorkplace: filterWorkplace)
+        parentCoordinator?.applyFilter(self, filterWorkplace: filterWorkplace)
     }
 }

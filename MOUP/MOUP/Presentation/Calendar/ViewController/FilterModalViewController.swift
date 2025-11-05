@@ -25,12 +25,11 @@ final class FilterModalViewController: UIViewController {
     private let disposeBag = DisposeBag()
     
     // Initializer Injections
+    weak var coordinator: FilterCoordinator?
     private let viewModel: FilterViewModel
     private let calendarMode: CalendarMode
     private var selectedFilterWorkplace: WorkplaceSummary?
     
-    // Property Injections
-    weak var delegate: FilterModalVCDelegate?
     
     // Input Relays
     private let viewWillDisappearRelay = PublishRelay<Void>()
@@ -39,7 +38,8 @@ final class FilterModalViewController: UIViewController {
     private let filterView = FilterView()
     
     // MARK: - Initializer
-    init(viewModel: FilterViewModel, calendarMode: CalendarMode, selectedFilterWorkplace: WorkplaceSummary?) {
+    init(coordinator: FilterCoordinator, viewModel: FilterViewModel, calendarMode: CalendarMode, selectedFilterWorkplace: WorkplaceSummary?) {
+        self.coordinator = coordinator
         self.viewModel = viewModel
         self.calendarMode = calendarMode
         self.selectedFilterWorkplace = selectedFilterWorkplace
@@ -101,7 +101,7 @@ private extension FilterModalViewController {
         
         filterView.rx.applyButtonTap.asDriver()
             .drive(with: self, onNext: { owner, _ in
-                owner.delegate?.applyButtonTapped(filterWorkplace: owner.selectedFilterWorkplace)
+                owner.coordinator?.applyButtonTapped(filterWorkplace: owner.selectedFilterWorkplace)
             }).disposed(by: disposeBag)
         
         // ViewModel 바인딩
@@ -163,6 +163,6 @@ private extension FilterModalViewController {
 // MARK: - UIAdaptivePresentationControllerDelegate
 extension FilterModalViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        delegate?.dismissReceived()
+        coordinator?.dismissReceived()
     }
 }

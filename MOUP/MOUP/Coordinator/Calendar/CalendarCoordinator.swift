@@ -58,11 +58,11 @@ final class CalendarCoordinator: Coordinator {
     }
     
     func showFilter(calendarMode: CalendarMode, selectedFilterWorkplace: WorkplaceSummary?) {
-        let filterCoordinator = FilterCoordinator(navigationController: navigationController,
+        let filterCoordinator = FilterCoordinator(parentCoordinator: self,
+                                                  navigationController: navigationController,
                                                   workplaceUseCase: workplaceUseCase,
                                                   calendarMode: calendarMode,
                                                   selectedFilterWorkplace: selectedFilterWorkplace)
-        filterCoordinator.delegate = self
         filterCoordinator.start()
         childCoordinators.append(filterCoordinator)
     }
@@ -112,12 +112,14 @@ extension CalendarCoordinator: YearMonthPickerCoordinatorDelegate {
     }
 }
 
-// MARK: - FilterCoordinatorDelegate
-extension CalendarCoordinator: FilterCoordinatorDelegate {
+// MARK: - FilterCoordinator Methods
+extension CalendarCoordinator {
+    /// 필터 선택 화면 내림
     func dismissed(_ coordinator: FilterCoordinator) {
         removeChildCoordinator(coordinator, needToDismiss: false)
     }
     
+    /// 선택한 필터 적용
     func applyFilter(_ coordinator: FilterCoordinator, filterWorkplace: WorkplaceSummary?) {
         calendarVC.updateFilter(filterWorkplace: filterWorkplace)
         removeChildCoordinator(coordinator, needToDismiss: true)
