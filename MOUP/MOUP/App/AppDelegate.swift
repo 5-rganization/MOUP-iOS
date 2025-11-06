@@ -98,54 +98,52 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
     
     private func handleNotificationTap(_ userInfo: [AnyHashable: Any]) {
-        guard let notificationType = userInfo["type"] as? String else {
-            self.logger.warning("알림 타입이 없습니다.")
-            
-            NotificationCenter.default.post(
-                name: .pushNotificationTapped,
-                object: nil,
-                userInfo: ["destination": "notificationList"]
-            )
-            return
+        let notificationTypeString = userInfo[PushNotificationKey.type] as? String
+        let notificationType = PushNotificationType(from: notificationTypeString)
+        
+        if let notificationType = notificationType {
+            self.logger.debug("알림 타입: \(notificationType.rawValue)")
+        } else {
+            self.logger.warning("알림 타입이 없거나 알 수 없는 타입입니다: \(notificationTypeString ?? "nil")")
         }
         
-        self.logger.debug("알림 타입: \(notificationType)")
+        let destination = determineDestination(for: notificationType)
         
-        switch notificationType {
-        case "INVITE_APPROVED", "INVITE_REJECTED":
-            NotificationCenter.default.post(
-                name: .pushNotificationTapped,
-                object: nil,
-                userInfo: [
-                    "destination": "notificationList",
-                    "type": notificationType
-                ]
-            )
-        case "INVITE_REQUEST":
-            NotificationCenter.default.post(
-                name: .pushNotificationTapped,
-                object: nil,
-                userInfo: [
-                    "destination": "notificationList",
-                    "type": notificationType
-                ]
-            )
-        case "PAYDAY_REMINDER":
-            NotificationCenter.default.post(
-                name: .pushNotificationTapped,
-                object: nil,
-                userInfo: [
-                    "destination": "notificationList",
-                    "type": notificationType
-                ]
-            )
-        default:
-            self.logger.warning("알 수 없는 알림 타입: \(notificationType)")
-            NotificationCenter.default.post(
-                name: .pushNotificationTapped,
-                object: nil,
-                userInfo: ["destination": "notificationList"]
-            )
+        postNotificationTappedEvent(
+            destination: destination,
+            type: notificationTypeString
+        )
+    }
+    
+    private func determineDestination(
+        for type: PushNotificationType?
+    ) -> PushNotificationDestination {
+        guard let type else {
+            return .notificationList
         }
+        
+        switch type {
+        case .inviteApproved, .inviteRejected, .inviteRequest, .paydayReminder:
+            return .notificationList
+        }
+    }
+    
+    private func postNotificationTappedEvent(
+        destination: PushNotificationDestination,
+        type: String?
+    ) {
+        var userInfo: [String: Any] = [
+            PushNotificationKey.destination: destination.rawValue
+        ]
+        
+        if let type = type {
+            userInfo[PushNotificationKey.type] = type
+        }
+        
+        NotificationCenter.default.post(
+            name: .pushNotificationTapped,
+            object: nil,
+            userInfo: userInfo
+        )
     }
 }
