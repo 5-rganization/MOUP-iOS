@@ -110,14 +110,11 @@ private extension RoutineSelectionViewController {
         routineSelectionView.tableView.rx.modelSelected(RoutineRowViewState.self)
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
             .bind(with: self) { owner, viewState in
-                // TODO: RoutineSummary → Routine 변환 후 수정 화면 이동
-                print("⚠️ 루틴 수정 화면 이동 - ID: \(viewState.routine.routineId)")
-                
-//                owner.coordinator?.showEditRoutineViewController(
-//                    routine: viewState.routine
-//                ) { updated in
-//                    owner.routineUpdatedRelay.accept(updated)
-//                }
+                owner.coordinator?.showEditRoutineViewController(
+                    routine: viewState.routine
+                ) { updated in
+                    owner.routineUpdatedRelay.accept(updated)
+                }
             }
             .disposed(by: disposeBag)
         

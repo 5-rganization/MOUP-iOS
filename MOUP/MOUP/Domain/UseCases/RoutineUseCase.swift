@@ -26,6 +26,10 @@ final class RoutineUseCase: RoutineUseCaseProtocol {
         try await routineRepository.fetchAllRoutines()
     }
     
+    func fetchRoutineDetail(routineId: Int) async throws -> RoutineDetail {
+        try await routineRepository.fetchRoutineDetail(routineId: routineId)
+    }
+
     func createRoutine(
         name: String,
         alarmTime: String,

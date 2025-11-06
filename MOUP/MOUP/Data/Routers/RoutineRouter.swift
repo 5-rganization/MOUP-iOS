@@ -12,6 +12,7 @@ enum RoutineRouter {
     case fetchTodayRoutines
     case fetchWorkRoutines(workId: Int)
     case fetchAllRoutines
+    case fetchRoutineDetail(routineId: Int)
     case createRoutine(request: CreateRoutineRequestDTO)
     case updateRoutine(routineId: Int, request: UpdateRoutineRequestDTO)
 }
@@ -32,6 +33,8 @@ extension RoutineRouter: URLRequestConvertible {
             return "/routines/works/\(workId)/routines"
         case .fetchAllRoutines, .createRoutine:
             return "/routines"
+        case .fetchRoutineDetail(let routineId):
+            return "/routines/\(routineId)"
         case .updateRoutine(let routineId, _):
             return "/routines/\(routineId)"
         }
@@ -39,18 +42,18 @@ extension RoutineRouter: URLRequestConvertible {
 
     var method: HTTPMethod {
         switch self {
-        case .fetchTodayRoutines, .fetchWorkRoutines, .fetchAllRoutines:
+        case .fetchTodayRoutines, .fetchWorkRoutines, .fetchAllRoutines, .fetchRoutineDetail:
             return .get
         case .createRoutine:
             return .post
         case .updateRoutine:
-            return .put
+            return .patch
         }
     }
 
     var requestBody: Encodable? {
         switch self {
-        case .fetchTodayRoutines, .fetchWorkRoutines, .fetchAllRoutines:
+        case .fetchTodayRoutines, .fetchWorkRoutines, .fetchAllRoutines, .fetchRoutineDetail:
             return nil
         case .createRoutine(let request):
             return request
@@ -61,7 +64,7 @@ extension RoutineRouter: URLRequestConvertible {
 
     var encoding: ParameterEncoding {
         switch self {
-        case .fetchTodayRoutines, .fetchWorkRoutines, .fetchAllRoutines:
+        case .fetchTodayRoutines, .fetchWorkRoutines, .fetchAllRoutines, .fetchRoutineDetail:
             return URLEncoding.default
         case .createRoutine, .updateRoutine:
             return JSONEncoding.default

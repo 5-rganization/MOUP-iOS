@@ -50,10 +50,38 @@ final class RoutineSelectionCoordinator: Coordinator {
         navigationController.pushViewController(addRoutineVC, animated: true)
     }
     
-    func showEditRoutineViewController(routine: Routine, onEdit: @escaping (Routine) -> Void) {
-        let vm = EditRoutineViewModel(routine: routine)
-        let vc = EditRoutineViewController(viewModel: vm)
-        vc.onEdit = onEdit
-        navigationController.pushViewController(vc, animated: true)
+    func showEditRoutineViewController(
+        routine: RoutineSummary,
+        onEdit: @escaping (RoutineSummary) -> Void
+    ) {
+        Task {
+            do {
+                let routineDetail = try await routineUseCase.fetchRoutineDetail(routineId: routine.routineId)
+
+                await MainActor.run {
+                    let vm = EditRoutineViewModel(
+                        routine: routineDetail.summary,
+                        tasks: routineDetail.tasks,
+                        routineUseCase: routineUseCase
+                    )
+                    let vc = EditRoutineViewController(viewModel: vm)
+                    vc.onEdit = onEdit
+                    navigationController.pushViewController(vc, animated: true)
+                }
+            } catch {
+                await MainActor.run {
+                    let alert = NoticeModalViewController(
+                        title: "오류",
+                        comment: "루틴 정보를 불러올 수 없습니다."
+                    )
+                    
+                    navigationController.pushViewController(alert, animated: true)
+
+                    if let topVC = navigationController.topViewController {
+                        topVC.present(alert, animated: true)
+                    }
+                }
+            }
+        }
     }
 }

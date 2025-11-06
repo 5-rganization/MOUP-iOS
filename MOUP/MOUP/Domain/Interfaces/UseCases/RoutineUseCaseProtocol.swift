@@ -11,6 +11,7 @@ protocol RoutineUseCaseProtocol: AnyObject {
     func fetchTodayRoutines() async throws -> [TodayRoutine]
     func fetchWorkRoutines(workId: Int) async throws -> [RoutineSummary]
     func fetchAllRoutines() async throws -> [RoutineSummary]
+    func fetchRoutineDetail(routineId: Int) async throws -> RoutineDetail
     func createRoutine(
         name: String,
         alarmTime: String,

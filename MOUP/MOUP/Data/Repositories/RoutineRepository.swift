@@ -59,6 +59,11 @@ final class RoutineRepository: RoutineRepositoryProtocol {
         return routines
     }
     
+    func fetchRoutineDetail(routineId: Int) async throws -> RoutineDetail {
+        let response = try await routineService.fetchRoutineDetail(routineId: routineId)
+        return response.toDomain()
+    }
+
     func createRoutine(
         name: String,
         alarmTime: String,

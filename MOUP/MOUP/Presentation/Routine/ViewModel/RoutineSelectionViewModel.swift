@@ -23,7 +23,10 @@ struct RoutineRowViewState: IdentifiableType, Hashable {
     }
     
     static func == (lhs: RoutineRowViewState, rhs: RoutineRowViewState) -> Bool {
-        lhs.routine.routineId == rhs.routine.routineId && lhs.isChecked == rhs.isChecked
+        lhs.routine.routineId == rhs.routine.routineId &&
+        lhs.routine.routineName == rhs.routine.routineName &&
+        lhs.routine.alarmTime == rhs.routine.alarmTime &&
+        lhs.isChecked == rhs.isChecked
     }
 }
 
