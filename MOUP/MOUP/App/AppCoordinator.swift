@@ -6,8 +6,11 @@
 //
 
 import UIKit
+import OSLog
 
 final class AppCoordinator: Coordinator {
+    private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
+    
     var childCoordinators = [Coordinator]()
     let window: UIWindow
 
@@ -88,31 +91,39 @@ final class AppCoordinator: Coordinator {
     }
     
     @objc private func handleLogoutSuccess() {
-        print("로그아웃 성공, 로그인 화면으로 이동")
+        self.logger.info("로그아웃 성공, 로그인 화면으로 이동")
         showSignIn()
     }
     
     @objc private func handleDeleteAccountSuccess() {
-        print("🔄 회원 탈퇴 성공, 로그인 화면으로 이동")
+        self.logger.info("회원 탈퇴 성공, 로그인 화면으로 이동")
         showSignIn()
     }
     
     @objc private func handlePushNotificationTapped(_ notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let destination = userInfo["destination"] as? String else {
-            print("알림 정보가 없습니다.")
+              let destinationString = userInfo["destination"] as? String,
+              let destination = PushNotificationDestination(from: destinationString) else {
+            self.logger.warning("알림 정보가 없습니다.")
             return
         }
         
-        print("푸시 알림 탭 - 목적지: \(destination)")
+        self.logger.info("푸시 알림 탭 - 목적지: \(destination.rawValue, privacy: .public)")
         
         guard tokenUseCase.checkSignedIn() else {
-            print("로그인되지 않은 상태")
+            self.logger.debug("로그인되지 않은 상태")
             return
         }
         
-        if destination == "notificationList" {
+        switch destination {
+        case .notificationList:
             moveToNotificationList()
+        case .routineDetail:
+            break
+        case .workDetail:
+            break
+        case .home:
+            break
         }
     }
     
@@ -143,12 +154,12 @@ final class AppCoordinator: Coordinator {
     
     private func moveToNotificationList() {
         guard let tabBarCoordinator = childCoordinators.first(where: { $0 is TabBarCoordinator }) as? TabBarCoordinator else {
-            print("TabBarCoordinator를 찾을 수 없습니다.")
+            self.logger.error("TabBarCoordinator를 찾을 수 없습니다.")
             return
         }
         
         tabBarCoordinator.moveToNotificationList()
-        print("알림 리스트로 이동 완료")
+        self.logger.debug("알림 리스트로 이동 완료")
     }
     
     // MARK: - Public Methods
