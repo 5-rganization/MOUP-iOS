@@ -149,6 +149,7 @@ private extension AddRoutineViewController {
                     title: "루틴 생성 실패",
                     comment: message
                 )
+                alert.modalTransitionStyle = .crossDissolve
                 
                 owner.present(alert, animated: true)
             }

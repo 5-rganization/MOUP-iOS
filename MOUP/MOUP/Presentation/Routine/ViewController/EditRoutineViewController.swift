@@ -145,6 +145,7 @@ private extension EditRoutineViewController {
                     title: "루틴 수정 실패",
                     comment: message
                 )
+                alert.modalTransitionStyle = .crossDissolve
 
                 owner.present(alert, animated: true)
             }
