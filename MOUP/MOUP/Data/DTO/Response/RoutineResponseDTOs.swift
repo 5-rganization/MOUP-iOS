@@ -44,3 +44,32 @@ struct RoutineSummaryDTO: Decodable {
 struct CreateRoutineResponseDTO: Decodable {
     let routineId: Int
 }
+
+/// 루틴 상세 조회 응답 DTO
+struct RoutineDetailResponseDTO: Decodable {
+    let routineId: Int
+    let routineName: String
+    let alarmTime: String?
+    let routineTaskList: [RoutineTaskDetailDTO]
+}
+
+struct RoutineTaskDetailDTO: Decodable {
+    let content: String
+    let orderIndex: Int
+}
+
+extension RoutineDetailResponseDTO {
+    func toDomain() -> RoutineDetail {
+        RoutineDetail(
+            routineId: routineId,
+            routineName: routineName,
+            alarmTime: alarmTime,
+            tasks: routineTaskList.map { task in
+                RoutineTaskItem(
+                    content: task.content,
+                    orderIndex: task.orderIndex
+                )
+            }
+        )
+    }
+}
