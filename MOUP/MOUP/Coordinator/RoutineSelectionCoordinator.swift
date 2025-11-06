@@ -56,7 +56,9 @@ final class RoutineSelectionCoordinator: Coordinator {
     ) {
         Task {
             do {
-                let routineDetail = try await routineUseCase.fetchRoutineDetail(routineId: routine.routineId)
+                let routineDetail = try await routineUseCase.fetchRoutineDetail(
+                    routineId: routine.routineId
+                )
 
                 await MainActor.run {
                     let vm = EditRoutineViewModel(
@@ -74,11 +76,12 @@ final class RoutineSelectionCoordinator: Coordinator {
                         title: "오류",
                         comment: "루틴 정보를 불러올 수 없습니다."
                     )
-                    
-                    navigationController.pushViewController(alert, animated: true)
+                    alert.modalTransitionStyle = .crossDissolve
 
-                    if let topVC = navigationController.topViewController {
-                        topVC.present(alert, animated: true)
+                    if let presenter = navigationController.visibleViewController {
+                        presenter.present(alert, animated: true)
+                    } else {
+                        navigationController.pushViewController(alert, animated: true)
                     }
                 }
             }
