@@ -39,8 +39,12 @@ final class CalendarViewController: UIViewController {
     private let viewWillDisappearRelay = PublishRelay<Void>()
     
     // Others
-    /// 현재 캘린더에 보이는 날짜
-    private var visibleDate: Date = .now
+    /// 현재 캘린더에 보이는 월의 1일
+    private var visibleMonthStartDate: Date = .now.startOfMonth {
+        didSet {
+            visibleMonthStartDate = visibleMonthStartDate.startOfMonth
+        }
+    }
     /// 선택한 날짜
     private var selectedDate: Date?
     /// 데이터를 로딩할 임계값(며칠을 초과하여 스크롤했을 때 데이터를 로딩할지)
@@ -206,7 +210,7 @@ private extension CalendarViewController {
 // MARK: - Internal Calendar Methods
 extension CalendarViewController {
     func updateDataSource() {
-        lastBaseFetchDateRelay.accept(visibleDate)
+        lastBaseFetchDateRelay.accept(visibleMonthStartDate)
     }
     
     func selectCell(date: Date) {
@@ -222,19 +226,19 @@ extension CalendarViewController {
 // MARK: - Private Calendar Methods
 private extension CalendarViewController {
     func setCalendarView() {
-        calendarView.getMonthCalendarView.scrollToDate(visibleDate, animateScroll: false)
+        calendarView.getMonthCalendarView.scrollToDate(visibleMonthStartDate, animateScroll: false)
         updateYearMonthLabel()
         updateDataSource()
     }
     
     func updateYearMonthLabel() {
-        let dateStr = DateFormatter.presentaionYearMonthDateFormatter.string(from: visibleDate)
+        let dateStr = DateFormatter.presentaionYearMonthDateFormatter.string(from: visibleMonthStartDate)
         calendarView.getCalendarHeaderView.update(dateStr: dateStr)
     }
     
     func scrollToDate(_ date: Date) {
         calendarView.getMonthCalendarView.scrollToDate(date, animateScroll: true)
-        visibleDate = date
+        visibleMonthStartDate = date
         updateYearMonthLabel()
         updateDataSource()
     }
@@ -325,7 +329,7 @@ extension CalendarViewController: JTACMonthViewDelegate {
     // 사용자의 터치에 의해서만 호출됨, programmatic한 스크롤의 경우 호출 X
     func calendar(_ calendar: JTACMonthView, willScrollToDateSegmentWith visibleDates: DateSegmentInfo) {
         guard let date = visibleDates.monthDates.first?.date else { return }
-        visibleDate = date
+        visibleMonthStartDate = date
         
         // 연/월 라벨 변경
         updateYearMonthLabel()
