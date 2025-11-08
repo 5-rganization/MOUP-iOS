@@ -83,6 +83,7 @@ final class HomeCoordinator: Coordinator {
     func moveToAllRoutine() {
         let viewModel = AllRoutineViewModel(routineUseCase: routineUseCase)
         let vc = AllRoutineViewController(viewModel: viewModel)
+        vc.coordinator = self
         navigationController.pushViewController(vc, animated: true)
     }
     
@@ -173,5 +174,43 @@ final class HomeCoordinator: Coordinator {
         let viewModel = NotificationListViewModel(notificationUseCase: notificationUseCase)
         let notificationListVC = NotificationListViewController(viewModel: viewModel)
         navigationController.pushViewController(notificationListVC, animated: true)
+    }
+    
+    func showEditRoutineViewController(
+        routine: RoutineSummary,
+        onEdit: @escaping (RoutineSummary) -> Void
+    ) {
+        Task {
+            do {
+                let routineDetail = try await routineUseCase.fetchRoutineDetail(
+                    routineId: routine.routineId
+                )
+
+                await MainActor.run {
+                    let vm = EditRoutineViewModel(
+                        routine: routineDetail.summary,
+                        tasks: routineDetail.tasks,
+                        routineUseCase: routineUseCase
+                    )
+                    let vc = EditRoutineViewController(viewModel: vm)
+                    vc.onEdit = onEdit
+                    navigationController.pushViewController(vc, animated: true)
+                }
+            } catch {
+                await MainActor.run {
+                    let alert = NoticeModalViewController(
+                        title: "오류",
+                        comment: "루틴 정보를 불러올 수 없습니다."
+                    )
+                    alert.modalTransitionStyle = .crossDissolve
+
+                    if let presenter = navigationController.visibleViewController {
+                        presenter.present(alert, animated: true)
+                    } else {
+                        navigationController.pushViewController(alert, animated: true)
+                    }
+                }
+            }
+        }
     }
 }
