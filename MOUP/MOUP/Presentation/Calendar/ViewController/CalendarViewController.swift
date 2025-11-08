@@ -118,6 +118,7 @@ private extension CalendarViewController {
     
     // MARK: - setStyles
     func setStyles() {
+        // TODO: BaseNavigationBar로 교체
         self.setNavigationBar(title: "캘린더")
         self.navigationItem.rightBarButtonItem = todayButton
         

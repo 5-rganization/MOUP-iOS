@@ -51,7 +51,7 @@ extension WorkplaceRouter: URLRequestConvertible {
         switch self {
         case .fetchWorkplaceList(let isSharedOnly):
             return ["isSharedOnly": isSharedOnly]
-        case .createWorkplace, .fetchWorkplaceByInviteCode:
+        case .createWorkplace, .fetchWorkplaceByInviteCode, .fetchInviteCode:
             return nil
         }
     }
@@ -69,9 +69,9 @@ extension WorkplaceRouter: URLRequestConvertible {
 
     var encoding: ParameterEncoding {
         switch self {
-        case .fetchWorkplaceByInviteCode, .fetchInviteCode:
+        case .fetchWorkplaceList, .fetchWorkplaceByInviteCode:
             return URLEncoding.default
-        case .createWorkplace:
+        case .createWorkplace, .fetchInviteCode:
             return JSONEncoding.default
         }
     }
