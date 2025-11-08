@@ -97,9 +97,9 @@ private extension ManageAttendanceViewController {
             .subscribe(onNext: { [weak self] model in
                 guard let self else { return }
                 self.coordinator?.moveToAttendanceHistory(
-                    navTitle: model.nickname,
                     workplaceId: self.viewModel.workplaceId,
-                    workerId: model.id
+                    workerId: model.id,
+                    navTitle: model.nickname
                 )
             })
             .disposed(by: disposeBag)

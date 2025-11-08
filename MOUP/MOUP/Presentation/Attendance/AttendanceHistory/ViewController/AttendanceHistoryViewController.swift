@@ -11,8 +11,8 @@ import RxDataSources
 
 final class AttendanceHistoryViewController: UIViewController {
     // MARK: - Properties
-    private let navTitle: String
-    private lazy var attendanceHistoryView = AttendanceHistoryView(title: navTitle) // TODO: - 실제 쓰는 네임으로 변경 필요.
+    private let workplaceName: String
+    private lazy var attendanceHistoryView = AttendanceHistoryView(title: workplaceName) // TODO: - 실제 쓰는 네임으로 변경 필요.
     private let viewModel: AttendanceHistoryViewModel
     private let disposeBag = DisposeBag()
     
@@ -31,9 +31,9 @@ final class AttendanceHistoryViewController: UIViewController {
     }
     
     // MARK: - Initializer
-    init(viewModel: AttendanceHistoryViewModel, navTitle: String) {
-        self.navTitle = navTitle
+    init(viewModel: AttendanceHistoryViewModel, workplaceName: String) {
         self.viewModel = viewModel
+        self.workplaceName = workplaceName
         super.init(nibName: nil, bundle: nil)
     }
     

@@ -80,13 +80,19 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(vc, animated: true)
     }
     
-//    func moveToAllRoutine() {
-//        let coordinator = RoutineSelectionCoordinator(navigationController: navigationController)
-//        childCoordinators.append(coordinator)
-//        DispatchQueue.main.async {
-//            coordinator.start()
-//        }
-//    }
+    func showAddRoutineViewController(onSave: @escaping (Routine) -> Void) {
+        let viewModel = AddRoutineViewModel()
+        let addRoutineVC = AddRoutineViewController(viewModel: viewModel)
+        addRoutineVC.onSave = onSave
+        navigationController.pushViewController(addRoutineVC, animated: true)
+    }
+    
+    func showEditRoutineViewController(routine: Routine, onEdit: @escaping (Routine) -> Void) {
+        let vm = EditRoutineViewModel(routine: routine)
+        let vc = EditRoutineViewController(viewModel: vm)
+        vc.onEdit = onEdit
+        navigationController.pushViewController(vc, animated: true)
+    }
     
     func moveToTodayRoutine() {
         let viewModel = TodayRoutineViewModel(routineUseCase: routineUseCase)
@@ -117,7 +123,7 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(vc, animated: true)
     }
     
-    func moveToAttendanceHistory(navTitle: String, workplaceId: Int, workerId: Int? = nil) {
+    func moveToAttendanceHistory(workplaceId: Int, workerId: Int? = nil, navTitle: String) {
         
         let viewModel = AttendanceHistoryViewModel(
             userRole: userRole,
@@ -127,7 +133,7 @@ final class HomeCoordinator: Coordinator {
         )
         let vc = AttendanceHistoryViewController(
             viewModel: viewModel,
-            navTitle: navTitle
+            workplaceName: navTitle,
         )
         navigationController.pushViewController(vc, animated: true) // TODO: - 애니메이션 자연스러운지 다같이 확인해봐야함.
     }
