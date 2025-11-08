@@ -93,6 +93,13 @@ final class HomeView: UIView {
             cell.updateAttendanceState(activatedId: active?.homeWorkplace.workplace.id)
         }
     }
+    
+    func updateBellButton(hasUnread: Bool) {
+        let imageName: UIImage? = hasUnread ? .bellButtonWithDot : .bellButton
+        var config = bellButton.configuration
+        config?.image = imageName
+        bellButton.configuration = config
+    }
 }
 
 private extension HomeView {
@@ -152,7 +159,6 @@ private extension HomeView {
         tableHeaderView.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 332)
         tableView.tableHeaderView = tableHeaderView
     }
-    
 }
 
 extension Reactive where Base: HomeView {

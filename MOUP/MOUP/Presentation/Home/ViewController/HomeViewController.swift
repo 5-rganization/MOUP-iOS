@@ -19,6 +19,7 @@ final class HomeViewController: UIViewController {
     private let refreshRelay = PublishRelay<Void>()
     private let startBtnRelay = PublishRelay<Int>() // 근무지 id
     private let endBtnRelay = PublishRelay<Int>()
+    private let viewWillAppearRelay = PublishRelay<Void>()
     
     private lazy var dataSource = RxTableViewSectionedAnimatedDataSource<HomeTableViewFirstSection>(animationConfiguration: AnimationConfiguration(deleteAnimation: .automatic)) { dataSource, tableView, indexPath, item in
         switch item {
@@ -67,6 +68,10 @@ final class HomeViewController: UIViewController {
         configure()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewWillAppearRelay.accept(())
+    }
 }
 
 private extension HomeViewController {
@@ -84,7 +89,8 @@ private extension HomeViewController {
             viewDidLoad: Observable.just(()),
             didRefresh: refreshRelay.asObservable(),
             startWorkTapped: startBtnRelay.asObservable(),
-            endWorkTapped: endBtnRelay.asObservable()
+            endWorkTapped: endBtnRelay.asObservable(),
+            viewWillAppear: viewWillAppearRelay.asObservable()
         )
         let output = homeViewModel.transform(input: input)
         
@@ -153,6 +159,14 @@ private extension HomeViewController {
             .withUnretained(self)
             .subscribe(onNext: { owner, workplace in
                 owner.homeView.updateActiveWorkplace(workplace)
+            })
+            .disposed(by: disposeBag)
+        
+        output.unreadCount
+            .observe(on: MainScheduler.instance)
+            .withUnretained(self)
+            .subscribe(onNext: { owner, count in
+                owner.homeView.updateBellButton(hasUnread: count > 0)
             })
             .disposed(by: disposeBag)
     }

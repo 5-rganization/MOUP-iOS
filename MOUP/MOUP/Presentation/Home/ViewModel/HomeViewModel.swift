@@ -18,6 +18,7 @@ final class HomeViewModel {
     private let disposeBag = DisposeBag()
     private let homeUseCase: HomeUseCaseProtocol
     private let attendanceUseCase: AttendanceUseCaseProtocol
+    private let notificationUseCase: NotificationUseCaseProtocol
     
     private let homeHeaderDataRelay = BehaviorRelay<HomeHeaderData>(
         value: HomeHeaderData(
@@ -32,15 +33,18 @@ final class HomeViewModel {
     )
     private let activeWorkplaceRelay = BehaviorRelay<WorkplaceMonthSummary?>(value: nil)
     private let errorMessageRelay = PublishRelay<(title: String, message: String)>()
+    private let unreadCountRelay = BehaviorRelay<Int>(value: 0)
     
     init(
         userRole: UserRole,
         homeUseCase: HomeUseCaseProtocol,
-        attendanceUseCase: AttendanceUseCaseProtocol
+        attendanceUseCase: AttendanceUseCaseProtocol,
+        notificationUseCase: NotificationUseCaseProtocol
     ) {
         self.userRole = userRole
         self.homeUseCase = homeUseCase
         self.attendanceUseCase = attendanceUseCase
+        self.notificationUseCase = notificationUseCase
     }
 
     // MARK: - Input, Output
@@ -49,6 +53,7 @@ final class HomeViewModel {
         let didRefresh: Observable<Void>
         let startWorkTapped: Observable<Int>
         let endWorkTapped: Observable<Int>
+        let viewWillAppear: Observable<Void>
     }
 
     struct Output {
@@ -56,6 +61,7 @@ final class HomeViewModel {
         let homeHeaderData: Observable<HomeHeaderData>
         let activeWorkplace: Observable<WorkplaceMonthSummary?>
         let errorMessage: Observable<(title: String, message: String)>
+        let unreadCount: Observable<Int>
     }
 
     // MARK: - transform
@@ -89,11 +95,34 @@ final class HomeViewModel {
             })
             .disposed(by: disposeBag)
         
+        Observable.merge(input.viewDidLoad, input.viewWillAppear)
+            .flatMapLatest { [weak self] _ -> Observable<Int> in
+                guard let self else { return .just(0) }
+                
+                return Observable.create { observer in
+                    Task {
+                        do {
+                            let notifications = try await self.notificationUseCase.fetchNotifications()
+                            let unreadCount = notifications.filter { !$0.isRead }.count
+                            observer.onNext(unreadCount)
+                            observer.onCompleted()
+                        } catch {
+                            observer.onNext(0)
+                            observer.onCompleted()
+                        }
+                    }
+                    return Disposables.create()
+                }
+            }
+            .bind(to: unreadCountRelay)
+            .disposed(by: disposeBag)
+        
         return Output(
             firstSectionData: firstSectionDataRelay.asObservable(),
             homeHeaderData: homeHeaderDataRelay.asObservable(),
             activeWorkplace: activeWorkplaceRelay.asObservable(),
-            errorMessage: errorMessageRelay.asObservable()
+            errorMessage: errorMessageRelay.asObservable(),
+            unreadCount: unreadCountRelay.asObservable()
         )
     }
 
