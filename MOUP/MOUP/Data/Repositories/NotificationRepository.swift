@@ -60,7 +60,6 @@ final class NotificationRepository: NotificationRepositoryProtocol {
         for format in formats {
             let formatter = DateFormatter()
             formatter.dateFormat = format
-            formatter.locale = Locale(identifier: "en_US_POSIX")
             formatter.timeZone = TimeZone(identifier: "UTC")
             
             if let date = formatter.date(from: dateString) {
