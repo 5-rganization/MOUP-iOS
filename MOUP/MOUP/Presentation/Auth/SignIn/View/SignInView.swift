@@ -6,6 +6,7 @@
 //
 
 import UIKit
+
 import RxSwift
 import RxCocoa
 import SnapKit
@@ -19,7 +20,7 @@ final class SignInView: UIView {
     // MARK: - UI Components
     private let logo = UIImageView().then {
         $0.contentMode = .scaleAspectFit
-        $0.image = .logo
+        $0.image = .signInLogo
     }
     
     private(set) var appleLoginButton = UIButton().then {
@@ -28,6 +29,13 @@ final class SignInView: UIView {
     
     private(set) var googleLoginButton = UIButton().then {
         $0.setImage(.googleSignInButton, for: .normal)
+    }
+    
+    private let buttonVStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.alignment = .center
+        $0.distribution = .fillEqually
+        $0.spacing = 12
     }
 
     // MARK: - Getter
@@ -66,9 +74,11 @@ private extension SignInView {
     func setHierarchy() {
         addSubviews(
             logo,
-            appleLoginButton,
-            googleLoginButton
+            buttonVStackView
         )
+        
+        buttonVStackView.addArrangedSubviews(appleLoginButton,
+                                             googleLoginButton)
     }
     
     // MARK: - setStyles
@@ -79,16 +89,23 @@ private extension SignInView {
     // MARK: - setConstraints
     func setConstraints() {
         logo.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(208)
-            $0.horizontalEdges.equalToSuperview().inset(71.5)
+            $0.width.equalTo(self.safeAreaLayoutGuide).multipliedBy(0.6)
+            $0.centerX.equalTo(self.safeAreaLayoutGuide)
+            $0.centerY.equalTo(self.safeAreaLayoutGuide).offset(-100)
         }
+        
+        buttonVStackView.snp.makeConstraints {
+            $0.directionalHorizontalEdges.equalTo(self.safeAreaLayoutGuide).inset(16)
+            $0.centerX.equalTo(self.safeAreaLayoutGuide)
+            $0.bottom.equalTo(self.safeAreaLayoutGuide).inset(100)
+        }
+        
         appleLoginButton.snp.makeConstraints {
-            $0.top.equalTo(logo.snp.bottom).offset(100)
-            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(44)
         }
+        
         googleLoginButton.snp.makeConstraints {
-            $0.top.equalTo(appleLoginButton.snp.bottom).offset(16)
-            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(44)
         }
     }
 
