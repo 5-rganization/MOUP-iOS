@@ -101,7 +101,7 @@ private extension AttendanceHistoryTableHeaderView {
         dateTitleView.snp.makeConstraints {
             $0.top.leading.equalToSuperview()
             $0.bottom.equalToSuperview().inset(6)
-            $0.width.equalTo(85)
+            $0.width.equalTo(125)
         }
         
         stackView.snp.makeConstraints {

@@ -15,8 +15,15 @@ final class HomeCoordinator: Coordinator {
     private let routineUseCase: RoutineUseCaseProtocol
     private let routineRepository: RoutineRepositoryProtocol
     private let routineService: RoutineServiceProtocol
+    private let workplaceService: WorkplaceServiceProtocol
+    private let workplaceRepository: WorkplaceRepositoryProtocol
+    private let workplaceUseCase: WorkplaceUseCaseProtocol
+    private let attendanceService: AttendanceServiceProtocol
+    private let attendanceRepository: AttendanceRepositoryProtocol
+    private let attendanceUseCase: AttendanceUseCaseProtocol
+    private var userRole: UserRole
     
-    init(navigationController: UINavigationController) {
+    init(navigationController: UINavigationController, userRole: UserRole) {
         self.navigationController = navigationController
         self.homeService = HomeService()
         self.homeRepository = HomeRepository(homeService: homeService)
@@ -24,29 +31,47 @@ final class HomeCoordinator: Coordinator {
         self.routineService = RoutineService()
         self.routineRepository = RoutineRepository(routineService: routineService)
         self.routineUseCase = RoutineUseCase(routineRepository: routineRepository)
+        self.workplaceService = WorkplaceService()
+        self.workplaceRepository = WorkplaceRepository(workplaceService: workplaceService)
+        self.workplaceUseCase = WorkplaceUseCase(workplaceRepository: workplaceRepository)
+        self.attendanceService = AttendanceService()
+        self.attendanceRepository = AttendanceRepository(attendanceService: attendanceService)
+        self.attendanceUseCase = AttendanceUseCase(attendanceRepository: attendanceRepository)
+        self.userRole = userRole
+        
     }
     
     func start() {
-        guard let rawValue = UserDefaultsManager.shared.userRole,
-        let role = UserRole(rawValue: rawValue) else { return }
-        
         let homeVM = HomeViewModel(
-            userRole: role,
-            useCase: homeUseCase
+            userRole: userRole,
+            homeUseCase: homeUseCase,
+            attendanceUseCase: attendanceUseCase
         )
         let homeVC = HomeViewController(
             coordinator: self,
             homeViewModel: homeVM,
-            userRole: role
+            userRole: userRole
         )
         navigationController.pushViewController(homeVC, animated: false)
     }
     
     func presentWorkplaceRegistrationSheet() {
-        let coordinator = WorkplaceRegisterSheetCoordinator(navigationController: navigationController)
+        let coordinator = WorkplaceRegisterSheetCoordinator(
+            navigationController: navigationController,
+            workplaceUseCase: workplaceUseCase
+        )
         coordinator.coordinator = self
         childCoordinators.append(coordinator)
         coordinator.start()
+    }
+    
+    func moveToDirectRegistration() { // 직접 등록
+        print("moveToDirectRegistration")
+        let coordinator = WorkplaceRegisterCoordinator(navigationController: navigationController)
+        childCoordinators.append(coordinator)
+        DispatchQueue.main.async {
+            coordinator.start()
+        }
     }
     
     func moveToAllRoutine() {
@@ -54,6 +79,14 @@ final class HomeCoordinator: Coordinator {
         let vc = AllRoutineViewController(viewModel: viewModel)
         navigationController.pushViewController(vc, animated: true)
     }
+    
+//    func moveToAllRoutine() {
+//        let coordinator = RoutineSelectionCoordinator(navigationController: navigationController)
+//        childCoordinators.append(coordinator)
+//        DispatchQueue.main.async {
+//            coordinator.start()
+//        }
+//    }
     
     func moveToTodayRoutine() {
         let viewModel = TodayRoutineViewModel(routineUseCase: routineUseCase)
@@ -72,21 +105,39 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(vc, animated: true)
     }
     
-    func moveToManageAttendance() {
-        let viewModel = ManageAttendanceViewModel()
-        let vc = ManageAttendanceViewController(viewModel: viewModel, coordinator: self)
+    func moveToManageAttendance(workplaceId: Int) {
+        let viewModel = ManageAttendanceViewModel(
+            attendanceUseCase: attendanceUseCase,
+            workplaceId: workplaceId
+        )
+        let vc = ManageAttendanceViewController(
+            viewModel: viewModel,
+            coordinator: self
+        )
         navigationController.pushViewController(vc, animated: true)
     }
     
-    func moveToAttendanceHistory(navTitle: String) {
-        let viewModel = AttendanceHistoryViewModel()
-        let vc = AttendanceHistoryViewController(viewModel: viewModel, navTitle: navTitle)
+    func moveToAttendanceHistory(navTitle: String, workplaceId: Int, workerId: Int? = nil) {
+        
+        let viewModel = AttendanceHistoryViewModel(
+            userRole: userRole,
+            workplaceId: workplaceId,
+            workerId: workerId,
+            attendanceUseCase: attendanceUseCase
+        )
+        let vc = AttendanceHistoryViewController(
+            viewModel: viewModel,
+            navTitle: navTitle
+        )
         navigationController.pushViewController(vc, animated: true) // TODO: - 애니메이션 자연스러운지 다같이 확인해봐야함.
     }
     
-    func presentInviteCodeSheet() {
-        let viewModel = InviteCodeSheetViewModel()
-        let vc = InviteCodeSheetViewController(viewModel: viewModel)
+    func presentInviteCodeSheet(workplaceId: Int) {
+        let viewModel = InviteCodeSheetViewModel(workplaceUseCase: workplaceUseCase)
+        let vc = InviteCodeSheetViewController(
+            viewModel: viewModel,
+            workplaceId: workplaceId
+        )
         vc.modalPresentationStyle = .pageSheet
         
         if let sheet = vc.sheetPresentationController {
@@ -100,8 +151,9 @@ final class HomeCoordinator: Coordinator {
         navigationController.present(vc, animated: true)
     }
     
-    func presentConfirmationModal() {
+    func presentConfirmationModal(onConfirm: (() -> Void)? = nil) {
         let vc = AttendanceConfirmModalViewController()
+        vc.onConfirm = onConfirm
         vc.modalPresentationStyle = .overFullScreen
         vc.modalTransitionStyle = .crossDissolve
         navigationController.present(vc, animated: true)

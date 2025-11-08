@@ -16,7 +16,7 @@ import GoogleSignIn
 final class SignInViewController: UIViewController {
     
     // MARK: - Properties
-    private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: SignInViewController.self))
     
     private let signInVM: SignInViewModel
     private let signInView = SignInView()
@@ -102,15 +102,16 @@ private extension SignInViewController {
             .withUnretained(self)
             .observe(on: MainScheduler.instance )
             .subscribe(
-                onNext: {
-                    owner,
-                    tuple in
+                onNext: { (
+                    owner: SignInViewController,
+                    tuple: (SignInOutputEvent, LoginProvider?)
+                ) in
                     switch tuple.0 {
                     case .loginSuccessed:
-                        print("로그인 성공")
+                        owner.logger.log(level: .debug, "로그인 성공")
                         owner.coordinator?.moveToTabBar()
                     case .navigateToSignUp:
-                        print("회원가입 필요")
+                        owner.logger.debug("회원가입 필요")
                         guard let provider = tuple.1 else {
                             print("provider is nil")
                             return
@@ -120,7 +121,11 @@ private extension SignInViewController {
                             authorizationCode: owner.authResultRelay.value.authCode
                         )
                     case .showAlert(let error):
-                        print("로그인 실패 : \(error.localizedDescription)")
+                        owner.logger.error("로그인 실패 : \(error.message)")
+                        owner.presentNoticeModal(
+                            title: error.title,
+                            comment: error.message
+                        )
                 }
             })
             .disposed(by: disposeBag)

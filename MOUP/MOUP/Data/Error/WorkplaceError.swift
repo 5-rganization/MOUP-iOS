@@ -18,7 +18,7 @@ enum WorkplaceError: LocalizedError {
 }
 
 extension WorkplaceError {
-    // 사용자 친화 에러 메시지
+    // 사용자 친화 에러 메시지, 초대 코드에 해당하는 근무지 찾기 기준
     var errorDescription: String? {
         switch self {
         case .invalidRole:

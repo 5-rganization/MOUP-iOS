@@ -12,13 +12,14 @@ import SnapKit
 import Then
 
 protocol OwnerWorkplaceCellDelegate: AnyObject {
-    func didTapAttendanceBtn(workplaceName: String)
+    func didTapAttendanceBtn(workplaceName: String, workplaceId: Int)
 }
 
 class OwnerWorkplaceCell: UITableViewCell {
     // MARK: - Properties
     static let identifier = "OwnerWorkplaceCell"
     private var workplaceName: String = ""
+    private var workplaceId: Int?
     weak var delegate: OwnerWorkplaceCellDelegate?
     private let disposeBag = DisposeBag()
     private var isExpanded: Bool = false
@@ -94,18 +95,15 @@ class OwnerWorkplaceCell: UITableViewCell {
     }
 
     // MARK: - Public Methods
-    func update(item: HomeSectionItem, menu: UIMenu) {
-        switch item {
-        case .worker:
-            break
-        case .owner(let ownerInfo):
-            self.nameLabel.text = ownerInfo.workplace.name
-            self.workplaceName = ownerInfo.workplace.name
-            setTotalEarnedLabel(ownerInfo.workerSummaries)
-            self.workplaceOfficialChip.isHidden = !ownerInfo.workplace.isShared
-            self.secondSectionView.update(with: ownerInfo.workerSummaries)
-            self.menuButton.menu = menu
-        }
+    func update(info: OwnerMonthlyWorkplaceSummary, menu: UIMenu) {
+        self.nameLabel.text = info.workplace.name
+        self.workplaceName = info.workplace.name
+        setTotalEarnedLabel(info.workerSummaries)
+        self.workplaceOfficialChip.isHidden = !info.workplace.isShared
+        self.secondSectionView.update(with: info.workerSummaries)
+        self.menuButton.menu = menu
+        
+        self.workplaceId = info.workplace.id
     }
 }
 
@@ -226,7 +224,8 @@ private extension OwnerWorkplaceCell {
         attendanceButton.rx.tap
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
-                owner.delegate?.didTapAttendanceBtn(workplaceName: owner.workplaceName)
+                guard let id = owner.workplaceId else { return }
+                owner.delegate?.didTapAttendanceBtn(workplaceName: owner.workplaceName, workplaceId: id)
             })
             .disposed(by: disposeBag)
     }

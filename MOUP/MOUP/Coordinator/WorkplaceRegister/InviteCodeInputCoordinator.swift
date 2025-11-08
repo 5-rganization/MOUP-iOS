@@ -11,20 +11,28 @@ final class InviteCodeInputCoordinator: Coordinator {
     weak var coordinator: WorkplaceRegisterSheetCoordinator?
     var childCoordinators = [Coordinator]()
     private let navigationController: UINavigationController
-    private let workplaceService: WorkplaceServiceProtocol
-    private let workplaceRepository: WorkplaceRepositoryProtocol
     private let workplaceUseCase: WorkplaceUseCaseProtocol
     
-    init(navigationController: UINavigationController) {
+    init(
+        navigationController: UINavigationController,
+        workplaceUseCase: WorkplaceUseCaseProtocol
+    ) {
         self.navigationController = navigationController
-        self.workplaceService = WorkplaceService()
-        self.workplaceRepository = WorkplaceRepository(workplaceService: workplaceService)
-        self.workplaceUseCase = WorkplaceUseCase(workplaceRepository: workplaceRepository)
+        self.workplaceUseCase = workplaceUseCase
     }
     
     func start() {
         let viewModel = InviteCodeInputViewModel(workplaceUseCase: workplaceUseCase)
         let vc = InviteCodeInputViewController(viewModel: viewModel)
+        vc.coordinator = self
         navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func moveToInviteCodeResult(workplace: InviteCodeWorkplace) {
+        DispatchQueue.main.async {
+            let viewModel = InviteCodeResultViewModel(workplace: workplace)
+            let vc = InviteCodeResultViewController(viewModel: viewModel)
+            self.navigationController.pushViewController(vc, animated: true)
+        }
     }
 }

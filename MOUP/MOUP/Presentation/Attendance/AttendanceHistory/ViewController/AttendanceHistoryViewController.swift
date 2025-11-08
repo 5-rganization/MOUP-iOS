@@ -16,12 +16,12 @@ final class AttendanceHistoryViewController: UIViewController {
     private let viewModel: AttendanceHistoryViewModel
     private let disposeBag = DisposeBag()
     
-    private let dataSource = RxTableViewSectionedReloadDataSource<AttendanceItem>(
+    private lazy var dataSource = RxTableViewSectionedReloadDataSource<AttendanceItem>(
         configureCell: { dataSource, tableView, indexPath, item in
             guard let cell = tableView.dequeueReusableCell(withIdentifier: AttendanceCell.identifier, for: indexPath) as? AttendanceCell else {
                 return UITableViewCell()
             }
-            cell.update(item: item, userRole: .worker) // TODO: - 실제 사용중인 유저의 role를 대입 필요
+            cell.update(item: item, userRole: self.viewModel.userRole) // TODO: - 실제 사용중인 유저의 role를 대입 필요
             return cell
     })
     
@@ -85,6 +85,18 @@ private extension AttendanceHistoryViewController {
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
                 owner.navigationController?.popViewController(animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        output.errorMessage
+            .withUnretained(self)
+            .subscribe(
+                onNext: { owner, error in
+                    owner.presentNoticeModal(
+                        title: error.title,
+                        comment: error.message) {
+                            owner.navigationController?.popViewController(animated: true)
+                        }
             })
             .disposed(by: disposeBag)
     }

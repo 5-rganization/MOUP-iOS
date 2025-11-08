@@ -48,6 +48,11 @@ final class ManageAttendanceView: UIView {
     ) -> Disposable {
         return section.bind(to: tableView.rx.items(dataSource: dataSource))
     }
+    
+    func updateEmptyState(_ isEmpty: Bool) {
+        tableView.isHidden = isEmpty
+        emptyView.isHidden = !isEmpty
+    }
 }
 
 private extension ManageAttendanceView {
@@ -102,8 +107,8 @@ extension Reactive where Base: ManageAttendanceView {
         return base.tableView.rx.itemSelected
     }
     
-    var modelSelected: ControlEvent<Employee> {
-        return base.tableView.rx.modelSelected(Employee.self)
+    var modelSelected: ControlEvent<WorkerSummary> {
+        return base.tableView.rx.modelSelected(WorkerSummary.self)
     }
     
     var inviteBtnTapped: ControlEvent<Void> {

@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import RxRelay
 import RxDataSources
 
 final class HomeViewController: UIViewController {
@@ -14,25 +15,27 @@ final class HomeViewController: UIViewController {
     weak var coordinator: HomeCoordinator?
     private let homeViewModel: HomeViewModel
     private let homeView: HomeView
-    private let userRole: UserRole
     private let disposeBag = DisposeBag()
+    private let refreshRelay = PublishRelay<Void>()
+    private let startBtnRelay = PublishRelay<Int>() // 근무지 id
+    private let endBtnRelay = PublishRelay<Int>()
     
     private lazy var dataSource = RxTableViewSectionedAnimatedDataSource<HomeTableViewFirstSection>(animationConfiguration: AnimationConfiguration(deleteAnimation: .automatic)) { dataSource, tableView, indexPath, item in
         switch item {
-        case .owner:
+        case .owner(let ownerInfo):
             guard let cell = tableView.dequeueReusableCell(withIdentifier: OwnerWorkplaceCell.identifier, for: indexPath) as? OwnerWorkplaceCell else {
                 return UITableViewCell()
             }
-            let menu = self.setMenu(role: .owner)
-            cell.update(item: item, menu: menu)
+            let menu = self.setMenu(role: .owner, workplaceId: ownerInfo.workplace.id)
+            cell.update(info: ownerInfo, menu: menu)
             cell.delegate = self
             return cell
-        case .worker:
+        case .worker(let workerInfo):
             guard let cell = tableView.dequeueReusableCell(withIdentifier: WorkerWorkplaceCell.identifier, for: indexPath) as? WorkerWorkplaceCell else {
                 return UITableViewCell()
             }
-            let menu = self.setMenu(role: .worker)
-            cell.update(item: item, menu: menu)
+            let menu = self.setMenu(role: .worker, workplaceId: workerInfo.homeWorkplace.workplace.id)
+            cell.update(info: workerInfo, menu: menu)
             cell.delegate = self
             return cell
         }
@@ -48,7 +51,6 @@ final class HomeViewController: UIViewController {
     init(coordinator: HomeCoordinator? = nil, homeViewModel: HomeViewModel, userRole: UserRole) {
         self.coordinator = coordinator
         self.homeViewModel = homeViewModel
-        self.userRole = userRole
         self.homeView = HomeView(userRole: userRole)
         
         super.init(nibName: nil, bundle: nil)
@@ -78,7 +80,12 @@ private extension HomeViewController {
     }
     
     func setBindings() {
-        let input = HomeViewModel.Input(viewDidLoad: Observable.just(()))
+        let input = HomeViewModel.Input(
+            viewDidLoad: Observable.just(()),
+            didRefresh: refreshRelay.asObservable(),
+            startWorkTapped: startBtnRelay.asObservable(),
+            endWorkTapped: endBtnRelay.asObservable()
+        )
         let output = homeViewModel.transform(input: input)
         
         homeView.rx.todayRoutineCardTap
@@ -101,7 +108,19 @@ private extension HomeViewController {
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
                 print("플러스 버튼 탭")
-                owner.coordinator?.presentWorkplaceRegistrationSheet()
+                switch owner.homeViewModel.userRole {
+                case .owner:
+                    owner.coordinator?.moveToDirectRegistration()
+                case .worker:
+                    owner.coordinator?.presentWorkplaceRegistrationSheet()
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        homeView.rx.refreshBtnTap
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.refreshRelay.accept(())
             })
             .disposed(by: disposeBag)
         
@@ -115,72 +134,96 @@ private extension HomeViewController {
                 owner.homeView.updateHomeHeader(headerData: data)
             })
             .disposed(by: disposeBag)
+        
+        output.errorMessage
+            .withUnretained(self)
+            .subscribe(onNext: { owner, error in
+                owner.presentNoticeModal(title: error.title, comment: error.message)
+            })
+            .disposed(by: disposeBag)
+        
+        output.activeWorkplace
+            .withUnretained(self)
+            .subscribe(onNext: { owner, workplace in
+                owner.homeView.updateActiveWorkplace(workplace)
+            })
+            .disposed(by: disposeBag)
     }
 }
 
 private extension HomeViewController {
     // MARK: - UIMenu Methods
-    func setMenu(role: UserRole) -> UIMenu {
+    func setMenu(role: UserRole, workplaceId: Int) -> UIMenu {
         let children: [UIAction] = { [weak self] in
             guard let self else { return [] }
             switch role {
             case .worker:
-                return [ edit(), delete(), attendanceHistory() ]
+                return [
+                    edit(id: workplaceId),
+                    delete(id: workplaceId),
+                    attendanceHistory(id: workplaceId)
+                ]
             case .owner:
-                return [ edit(), delete(), sendInvitationCode() ]
+                return [
+                    edit(id: workplaceId),
+                    delete(id: workplaceId),
+                    sendInvitationCode(id: workplaceId)
+                ]
             }
         }()
         let menu = UIMenu(title: "", children: children)
         return menu
     }
     
-    func edit() -> UIAction {
+    func edit(id workplaceId: Int) -> UIAction {
         let action = UIAction(title: "수정하기") { _ in
             print("수정하기")
         }
         return action
     }
     
-    func delete() -> UIAction {
+    func delete(id workplaceId: Int) -> UIAction {
         let action = UIAction(title: "삭제하기") { _ in
             print("삭제하기")
         }
         return action
     }
     
-    func sendInvitationCode() -> UIAction {
+    func sendInvitationCode(id workplaceId: Int) -> UIAction {
         let action = UIAction(title: "초대 코드 보내기") { [weak self] _ in
             guard let self else { return }
             print("초대 코드 보내기")
-            self.coordinator?.presentInviteCodeSheet()
+            self.coordinator?.presentInviteCodeSheet(workplaceId: workplaceId)
         }
         return action
     }
     
-    func attendanceHistory() -> UIAction {
+    func attendanceHistory(id workplaceId: Int) -> UIAction {
         let action = UIAction(title: "출퇴근 기록") { [weak self] _ in
             guard let self else { return }
             print("출퇴근 기록 확인")
-            self.coordinator?.moveToAttendanceHistory(navTitle: "송눈섭") // TODO: - 알바 기준 UserDefault 등에 저장되어있는 닉네임 호출 필요
+            self.coordinator?.moveToAttendanceHistory(navTitle: "송눈섭", workplaceId: workplaceId) // TODO: - 알바 기준 UserDefault 등에 저장되어있는 닉네임 호출 필요
         }
         return action
     }
 }
 
 extension HomeViewController: OwnerWorkplaceCellDelegate {
-    func didTapAttendanceBtn(workplaceName: String) {
+    func didTapAttendanceBtn(workplaceName: String, workplaceId: Int) {
         print("근태 관리 탭")
-        coordinator?.moveToManageAttendance()
+        coordinator?.moveToManageAttendance(workplaceId: workplaceId)
     }
 }
 
 extension HomeViewController: WorkerWorkplaceCellDelegate {
-    func didTapStartBtn() {
-        print("시작 버튼 탭")
-        coordinator?.presentConfirmationModal()
+    func didTapStartBtn(workplaceId: Int) {
+        coordinator?.presentConfirmationModal { [weak self] in
+            guard let self else { return }
+            self.startBtnRelay.accept(workplaceId)
+        }
     }
     
-    func didTapEndBtn() {
-        print("종료 버튼 탭")
+    func didTapEndBtn(workplaceId: Int) {
+        self.endBtnRelay.accept(workplaceId)
     }
 }

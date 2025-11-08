@@ -11,7 +11,7 @@ import RxSwift
 class InviteCodeInputViewController: UIViewController {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    weak var coordinator: Coordinator?
+    weak var coordinator: InviteCodeInputCoordinator?
     private let inviteCodeInputView = InviteCodeInputView()
     private let viewModel: InviteCodeInputViewModel
     
@@ -54,8 +54,9 @@ private extension InviteCodeInputViewController {
         
         output.searchResult
             .withUnretained(self)
-            .subscribe(onNext: { owner, _ in
-                
+            .subscribe(onNext: { owner, workplace in
+                guard let workplace else { return }
+                owner.coordinator?.moveToInviteCodeResult(workplace: workplace)
             })
             .disposed(by: disposeBag)
         
@@ -73,6 +74,8 @@ private extension InviteCodeInputViewController {
                 owner.navigationController?.popViewController(animated: true)
             })
             .disposed(by: disposeBag)
+        
+        
     }
     
     func setDelegate() {

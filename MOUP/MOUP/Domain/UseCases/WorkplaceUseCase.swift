@@ -18,6 +18,9 @@ final class WorkplaceUseCase: WorkplaceUseCaseProtocol {
         try await workplaceRepository.fetchWorkplaceByInviteCode(inviteCode: inviteCode)
     }
     
+    func fetchInviteCode(workplaceId: Int, forceGenerate: Bool) async throws -> InviteCodeInfo {
+        try await workplaceRepository.fetchInviteCode(workplaceId: workplaceId, forceGenerate: forceGenerate)
+    }
     
     func createWorkplace(request: WorkplaceCreateRequestDTO) async throws -> WorkplaceCreate {
         try await workplaceRepository.createWorkplace(request: request)
