@@ -22,6 +22,9 @@ final class HomeCoordinator: Coordinator {
     private let attendanceRepository: AttendanceRepositoryProtocol
     private let attendanceUseCase: AttendanceUseCaseProtocol
     private var userRole: UserRole
+    private let notificationService: NotificationServiceProtocol
+    private let notificationRepository: NotificationRepositoryProtocol
+    private let notificationUseCase: NotificationUseCaseProtocol
     
     init(navigationController: UINavigationController, userRole: UserRole) {
         self.navigationController = navigationController
@@ -38,7 +41,9 @@ final class HomeCoordinator: Coordinator {
         self.attendanceRepository = AttendanceRepository(attendanceService: attendanceService)
         self.attendanceUseCase = AttendanceUseCase(attendanceRepository: attendanceRepository)
         self.userRole = userRole
-        
+        self.notificationService = NotificationService()
+        self.notificationRepository = NotificationRepository(notificationService: notificationService)
+        self.notificationUseCase = NotificationUseCase(notificationRepository: notificationRepository)
     }
     
     func start() {
@@ -161,5 +166,11 @@ final class HomeCoordinator: Coordinator {
     
     func removeChildCoordinator(_ coordinator: Coordinator) {
         childCoordinators.removeAll { $0 === coordinator }
+    }
+    
+    func showNotificationList() {
+        let viewModel = NotificationListViewModel(notificationUseCase: notificationUseCase)
+        let notificationListVC = NotificationListViewController(viewModel: viewModel)
+        navigationController.pushViewController(notificationListVC, animated: true)
     }
 }

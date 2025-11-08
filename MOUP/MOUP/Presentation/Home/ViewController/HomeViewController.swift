@@ -124,6 +124,13 @@ private extension HomeViewController {
             })
             .disposed(by: disposeBag)
         
+        homeView.rx.bellButtonTap
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.coordinator?.showNotificationList()
+            })
+            .disposed(by: disposeBag)
+        
         homeView.setupTableView(section: output.firstSectionData, dataSource: dataSource)
             .disposed(by: disposeBag)
         

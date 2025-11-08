@@ -23,10 +23,6 @@ final class MyPageCoordinator: Coordinator {
     private let noticeRepository: NoticeRepositoryProtocol
     private let noticeUseCase: NoticeUseCaseProtocol
     
-    private let notificationService: NotificationServiceProtocol
-    private let notificationRepository: NotificationRepositoryProtocol
-    private let notificationUseCase: NotificationUseCaseProtocol
-    
     private lazy var myPageVC: MyPageViewController = {
         let viewModel = MyPageViewModel(
             userUseCase: userUseCase,
@@ -50,10 +46,6 @@ final class MyPageCoordinator: Coordinator {
         self.noticeService = NoticeService()
         self.noticeRepository = NoticeRepository(noticeService: noticeService)
         self.noticeUseCase = NoticeUseCase(noticeRepository: noticeRepository)
-        
-        self.notificationService = NotificationService()
-        self.notificationRepository = NotificationRepository(notificationService: notificationService)
-        self.notificationUseCase = NotificationUseCase(notificationRepository: notificationRepository)
     }
 
     func start() {
@@ -144,11 +136,5 @@ final class MyPageCoordinator: Coordinator {
         )
         logoutFailVC.onDeleteConfirmed = onConfirm
         vc.present(logoutFailVC, animated: true)
-    }
-    
-    func showNotificationList() {
-        let viewModel = NotificationListViewModel(notificationUseCase: notificationUseCase)
-        let notificationListVC = NotificationListViewController(viewModel: viewModel)
-        navigationController.pushViewController(notificationListVC, animated: true)
     }
 }
