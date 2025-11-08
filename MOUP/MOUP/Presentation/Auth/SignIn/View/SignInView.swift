@@ -96,7 +96,6 @@ private extension SignInView {
         
         buttonVStackView.snp.makeConstraints {
             $0.directionalHorizontalEdges.equalTo(self.safeAreaLayoutGuide).inset(16)
-            $0.centerX.equalTo(self.safeAreaLayoutGuide)
             $0.bottom.equalTo(self.safeAreaLayoutGuide).inset(100)
         }
         
