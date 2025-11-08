@@ -80,7 +80,7 @@ private extension AllRoutineViewController {
         )
         .withUnretained(self)
         .subscribe(onNext: { owner, result in
-            let (indexPath, routine) = result
+            let (_, routine) = result
             
             owner.coordinator?.showEditRoutineViewController(
                 routine: routine

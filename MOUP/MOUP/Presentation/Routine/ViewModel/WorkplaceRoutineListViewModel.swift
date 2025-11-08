@@ -45,6 +45,20 @@ final class WorkplaceRoutineListViewModel {
             errorMessage: errorMessageRelay.asObservable()
         )
     }
+    
+    // MARK: - Public Methods
+    
+    func updateRoutine(_ updatedRoutine: RoutineSummary) {
+        var currentItems = routinesRelay.value
+        
+        guard !currentItems.isEmpty else { return }
+        
+        let updatedRoutines = currentItems[0].items.map { routine in
+            routine.routineId == updatedRoutine.routineId ? updatedRoutine : routine
+        }
+        
+        routinesRelay.accept([RoutineItem(items: updatedRoutines)])
+    }
 }
 
 private extension WorkplaceRoutineListViewModel {
