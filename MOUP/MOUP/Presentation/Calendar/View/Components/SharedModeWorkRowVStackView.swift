@@ -14,17 +14,25 @@ import Then
 final class SharedModeWorkRowVStackView: BaseWorkRowVStackView {
     
     // MARK: - Internal Methods
-    override func update(work: CalendarWork) {
-        // TODO: 실제 로그인한 사용자의 ID를 반영해야 함
-        // 사용자의 workerId가 789임을 가정
-        if work.workerId == 789 {
-            // TODO: 사장님 역할일 땐 setDefaultLabelColor()
-            setGivenLabelColor(work.labelColor)
-        } else {
+    override func update(work: WorkSummary) {
+        switch UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) {
+        case .worker:
+            if (work.isMyWork) {
+                setGivenLabelColor(work.workerSummary.workerBasedLabelColorStr ?? LabelColorString._default.rawValue)
+            } else {
+                setDefaultLabelColor()
+            }
+        case .owner:
+            if (work.isMyWork) {
+                setDefaultLabelColor()
+            } else {
+                setGivenLabelColor(work.workerSummary.ownerBasedLabelColorStr ?? LabelColorString._default.rawValue)
+            }
+        default:
             setDefaultLabelColor()
         }
         
-        titleLabel.text = work.workerName
+        titleLabel.text = work.workerSummary.nickname
         dailyIncomeLabel.isHidden = true
     }
 }

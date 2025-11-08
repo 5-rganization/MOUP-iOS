@@ -9,6 +9,7 @@ import Foundation
 import Alamofire
 
 enum WorkplaceRouter {
+    case fetchWorkplaceList(isSharedOnly: Bool)
     case fetchWorkplaceByInviteCode(inviteCode: String)
     case fetchInviteCode(workplaceId: Int, requestDTO: InviteCodeRequestDTO)
     case createWorkplace(request: WorkplaceCreateRequestDTO)
@@ -24,6 +25,8 @@ extension WorkplaceRouter: URLRequestConvertible {
 
     var path: String {
         switch self {
+        case .fetchWorkplaceList:
+            return "/workplaces"
         case .fetchWorkplaceByInviteCode(let inviteCode):
             return "/workplaces/invite-codes/\(inviteCode)"
         case .fetchInviteCode(let workplaceId, _):
@@ -35,7 +38,7 @@ extension WorkplaceRouter: URLRequestConvertible {
 
     var method: HTTPMethod {
         switch self {
-        case .fetchWorkplaceByInviteCode:
+        case .fetchWorkplaceList, .fetchWorkplaceByInviteCode:
             return .get
         case .fetchInviteCode:
             return .put
@@ -43,10 +46,19 @@ extension WorkplaceRouter: URLRequestConvertible {
             return .post
         }
     }
+    
+    var parameters: Parameters? {
+        switch self {
+        case .fetchWorkplaceList(let isSharedOnly):
+            return ["isSharedOnly": isSharedOnly]
+        case .createWorkplace, .fetchWorkplaceByInviteCode, .fetchInviteCode:
+            return nil
+        }
+    }
 
     var requestBody: Encodable? {
         switch self {
-        case .fetchWorkplaceByInviteCode:
+        case .fetchWorkplaceList, .fetchWorkplaceByInviteCode:
             return nil
         case .fetchInviteCode(_, let requestDTO):
             return requestDTO
@@ -57,9 +69,9 @@ extension WorkplaceRouter: URLRequestConvertible {
 
     var encoding: ParameterEncoding {
         switch self {
-        case .fetchWorkplaceByInviteCode, .fetchInviteCode:
+        case .fetchWorkplaceList, .fetchWorkplaceByInviteCode:
             return URLEncoding.default
-        case .createWorkplace:
+        case .createWorkplace, .fetchInviteCode:
             return JSONEncoding.default
         }
     }
@@ -77,6 +89,10 @@ extension WorkplaceRouter: URLRequestConvertible {
             if let httpBody = request.httpBody {
                 print("Request body: \(String(data: httpBody, encoding: .utf8) ?? "")")
             }
+        }
+        
+        if let parameters {
+            request = try URLEncoding.default.encode(request, with: parameters)
         }
 
         return request

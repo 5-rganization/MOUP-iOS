@@ -7,9 +7,12 @@
 
 import os
 import Foundation
+import OSLog
+
 import Alamofire
 
 protocol WorkplaceServiceProtocol: AnyObject {
+    func fetchWorkplaceList(isSharedOnly: Bool) async throws -> WorkplaceSummaryListResponseDTO
     func fetchWorkplaceByInviteCode(inviteCode: String) async throws -> InviteCodeWorkplaceResponseDTO
     func fetchInviteCode(workplaceId: Int, forceGenerate: Bool) async throws -> InviteCodeResponseDTO
     func createWorkplace(request: WorkplaceCreateRequestDTO) async throws -> WorkplaceCreateResponseDTO
@@ -18,8 +21,31 @@ protocol WorkplaceServiceProtocol: AnyObject {
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: "WorkplaceService"))
 
 final class WorkplaceService: WorkplaceServiceProtocol {
+    private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
+    
     private let session = NetworkManager.shared.session
-
+    
+    func fetchWorkplaceList(isSharedOnly: Bool) async throws -> WorkplaceSummaryListResponseDTO {
+        let request = session.request(WorkplaceRouter.fetchWorkplaceList(isSharedOnly: isSharedOnly))
+        let response = await request.serializingDecodable(WorkplaceSummaryListResponseDTO.self).response
+        
+        logger.debug("\(String(describing: response.value))")
+        logger.debug("\(String(describing: response.response?.statusCode))")
+        
+        guard let statusCode = response.response?.statusCode else {
+            throw NetworkError.noResponse
+        }
+        
+        switch statusCode {
+        case 200:
+            guard let dto = response.value else { throw NetworkError.noResponse }
+            return dto
+        default:
+            print(NetworkError.serverError.debugDescription!)
+            throw NetworkError.serverError
+        }
+    }
+    
     func fetchWorkplaceByInviteCode(inviteCode: String) async throws -> InviteCodeWorkplaceResponseDTO {
         let request = session.request(WorkplaceRouter.fetchWorkplaceByInviteCode(inviteCode: inviteCode))
         let response = await request.serializingDecodable(InviteCodeWorkplaceResponseDTO.self).response

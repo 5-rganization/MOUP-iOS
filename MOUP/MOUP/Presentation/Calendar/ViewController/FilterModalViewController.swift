@@ -15,7 +15,7 @@ protocol FilterModalVCDelegate: AnyObject {
     /// `presentationControllerDidDismiss`를 감지했을 때 사용되는 메서드
     func dismissReceived()
     /// 적용하기 버튼을 탭했을 때 사용되는 메서드
-    func applyButtonTapped(filterWorkplace: FilterWorkplace?)
+    func applyButtonTapped(filterWorkplace: WorkplaceSummary?)
 }
 
 /// 필터 모달 VC
@@ -27,16 +27,19 @@ final class FilterModalViewController: UIViewController {
     // Initializer Injections
     private let viewModel: FilterViewModel
     private let calendarMode: CalendarMode
-    private var selectedFilterWorkplace: FilterWorkplace?
+    private var selectedFilterWorkplace: WorkplaceSummary?
     
     // Property Injections
     weak var delegate: FilterModalVCDelegate?
+    
+    // Input Relays
+    private let viewWillDisappearRelay = PublishRelay<Void>()
     
     // MARK: - UI Components
     private let filterView = FilterView()
     
     // MARK: - Initializer
-    init(viewModel: FilterViewModel, calendarMode: CalendarMode, selectedFilterWorkplace: FilterWorkplace?) {
+    init(viewModel: FilterViewModel, calendarMode: CalendarMode, selectedFilterWorkplace: WorkplaceSummary?) {
         self.viewModel = viewModel
         self.calendarMode = calendarMode
         self.selectedFilterWorkplace = selectedFilterWorkplace
@@ -57,6 +60,11 @@ final class FilterModalViewController: UIViewController {
         super.viewDidLoad()
         configure()
         setFilterView()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        viewWillDisappearRelay.accept(())
     }
 }
 
@@ -83,7 +91,7 @@ private extension FilterModalViewController {
         // View 바인딩
         filterView.rx.filterTableViewModelSelected
             .subscribe(with: self) { owner, filterWorkplace in
-                if filterWorkplace.workplaceId != -1 {
+                if filterWorkplace.id != -1 {
                     owner.selectedFilterWorkplace = filterWorkplace
                 } else {
                     // 전체 보기
@@ -97,38 +105,53 @@ private extension FilterModalViewController {
             }).disposed(by: disposeBag)
         
         // ViewModel 바인딩
-        let input = FilterViewModel.Input(viewDidLoad: Observable.just(calendarMode))
+        let input = FilterViewModel.Input(viewDidLoad: Observable.just(calendarMode),
+                                          viewWillDisappear: viewWillDisappearRelay.asObservable())
         let output = viewModel.transform(input: input)
         
-        output.filterWorkplaceList.asDriver(onErrorJustReturn: [])
-            .drive(with: self, onNext: { owner, filterWorkplaceList in
+        let filterWorkplaceListDriver = output.filterWorkplaceList.asDriver(onErrorJustReturn: [])
+        filterWorkplaceListDriver
+            .drive(with: self) { owner, filterWorkplaceList in
                 owner.filterView.rx.emptyLabelIsHidden.onNext(!filterWorkplaceList.isEmpty)
                 owner.filterView.rx.filterTableViewIsHidden.onNext(filterWorkplaceList.isEmpty)
                 owner.filterView.rx.filterTableViewDataSource.onNext(filterWorkplaceList)
-                
+            }.disposed(by: disposeBag)
+        
+        filterWorkplaceListDriver
+            .skip(1)  // BehaviorRelay의 초기값(빈 배열) 스킵
+            .drive(with: self, onNext: { owner, filterWorkplaceList in
                 // 초기 셀 선택 로직
                 if owner.selectedFilterWorkplace == nil {
                     owner.setDefaultSelect(firstOfList: filterWorkplaceList.first)
                 } else {
-                    if let selectedIndex = filterWorkplaceList.firstIndex(where: { $0.workplaceId == owner.selectedFilterWorkplace?.workplaceId }) {
+                    if let selectedIndex = filterWorkplaceList.firstIndex(where: { $0.id == owner.selectedFilterWorkplace?.id }) {
                         owner.filterView.selectRow(at: IndexPath(row: selectedIndex, section: 0))
                     } else {
                         owner.setDefaultSelect(firstOfList: filterWorkplaceList.first)
                     }
                 }
             }).disposed(by: disposeBag)
+        
+        output.errorMessage.asDriver(onErrorJustReturn: (title: "오류 발생", message: "잠시 후 다시 시도해주세요."))
+            .drive(with: self) { owner, errorMessage in
+                owner.presentNoticeModal(title: errorMessage.title, comment: errorMessage.message)
+            }.disposed(by: disposeBag)
     }
 }
 
 // MARK: - Private Methods
 private extension FilterModalViewController {
     func setFilterView() {
-        // TODO: 사용자 역할에 따라 변경
-        filterView.update(headerStr: "나의 근무지")
+        switch UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) {
+        case .owner:
+            filterView.update(headerStr: "나의 매장")
+        default:
+            filterView.update(headerStr: "나의 근무지")
+        }
     }
     
-    func setDefaultSelect(firstOfList filterWorkplace: FilterWorkplace?) {
-        if filterWorkplace?.workplaceId == -1 {
+    func setDefaultSelect(firstOfList filterWorkplace: WorkplaceSummary?) {
+        if filterWorkplace?.id == -1 {
             selectedFilterWorkplace = nil
         } else {
             selectedFilterWorkplace = filterWorkplace

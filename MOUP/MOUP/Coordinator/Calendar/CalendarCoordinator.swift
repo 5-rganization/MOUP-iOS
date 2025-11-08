@@ -8,6 +8,8 @@
 import UIKit
 import OSLog
 
+import RxSwift
+
 /// `CalendarViewController` Coordinator
 final class CalendarCoordinator: Coordinator {
     
@@ -15,15 +17,30 @@ final class CalendarCoordinator: Coordinator {
     private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     
     var childCoordinators = [Coordinator]()
-    private lazy var calendarVM = CalendarViewModel()
+    private lazy var calendarVM = CalendarViewModel(workUseCase: self.workUseCase, workplaceUseCase: self.workplaceUseCase)
     private lazy var calendarVC = CalendarViewController(coordinator: self, viewModel: calendarVM)
     
     // Initializer Injections
     private let navigationController: UINavigationController
+    private let workService: WorkServiceProtocol
+    private let workRepository: WorkRepositoryProtocol
+    private let workUseCase: WorkUseCaseProtocol
+    private let workplaceService: WorkplaceServiceProtocol
+    private let workplaceRepository: WorkplaceRepositoryProtocol
+    private let workplaceUseCase: WorkplaceUseCaseProtocol
     
     // MARK: - Initializer
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
+        
+        self.workService = WorkService()
+        self.workRepository = WorkRepository(workService: workService)
+        self.workUseCase = WorkUseCase(workRepository: workRepository)
+        
+        self.workplaceService = WorkplaceService()
+        self.workplaceRepository = WorkplaceRepository(workplaceService: workplaceService)
+        self.workplaceUseCase = WorkplaceUseCase(workplaceRepository: workplaceRepository)
+        
     }
     
     // MARK: - Coordinator Methods
@@ -40,8 +57,9 @@ final class CalendarCoordinator: Coordinator {
         childCoordinators.append(yearMonthCoordinator)
     }
     
-    func showFilter(calendarMode: CalendarMode, selectedFilterWorkplace: FilterWorkplace?) {
+    func showFilter(calendarMode: CalendarMode, selectedFilterWorkplace: WorkplaceSummary?) {
         let filterCoordinator = FilterCoordinator(navigationController: navigationController,
+                                                  workplaceUseCase: workplaceUseCase,
                                                   calendarMode: calendarMode,
                                                   selectedFilterWorkplace: selectedFilterWorkplace)
         filterCoordinator.delegate = self
@@ -49,8 +67,9 @@ final class CalendarCoordinator: Coordinator {
         childCoordinators.append(filterCoordinator)
     }
     
-    func showCalendarWorkList(selectedDay: Int, calendarWorkList: [CalendarWork], calendarMode: CalendarMode) {
+    func showCalendarWorkList(selectedDay: Int, calendarWorkList: Observable<[WorkSummary]>, calendarMode: CalendarMode) {
         let calendarWorkListCoordinator = CalendarWorkListCoordinator(navigationController: navigationController,
+                                                                      workUseCase: workUseCase,
                                                                       selectedDay: selectedDay,
                                                                       calendarWorkList: calendarWorkList,
                                                                       calendarMode: calendarMode)
@@ -61,7 +80,7 @@ final class CalendarCoordinator: Coordinator {
     
     func dismissCalendarWorkList() {
         guard let coordinator = childCoordinators.first(where: { $0 is CalendarWorkListCoordinator }) else {
-            fatalError("dismissCalendarWorkList() 메서드 실행 실패 - childCoordinators에 CalendarWorkListCoordinator가 존재하지 않습니다.")
+            fatalError("\(#function) 실행 실패 - childCoordinators에 CalendarWorkListCoordinator가 존재하지 않습니다.")
         }
         removeChildCoordinator(coordinator, needToDismiss: true)
     }
@@ -99,7 +118,7 @@ extension CalendarCoordinator: FilterCoordinatorDelegate {
         removeChildCoordinator(coordinator, needToDismiss: false)
     }
     
-    func applyFilter(_ coordinator: FilterCoordinator, filterWorkplace: FilterWorkplace?) {
+    func applyFilter(_ coordinator: FilterCoordinator, filterWorkplace: WorkplaceSummary?) {
         calendarVC.updateFilter(filterWorkplace: filterWorkplace)
         removeChildCoordinator(coordinator, needToDismiss: true)
     }
@@ -112,7 +131,7 @@ extension CalendarCoordinator: CalendarWorkListCoordinatorDelegate {
         removeChildCoordinator(coordinator, needToDismiss: false)
     }
     
-    func showWorkRegister(work: CalendarWork?) {
+    func showWorkRegister(work: WorkSummary?) {
         // TODO: - 근무 수정 화면 연결
         if let work {
             logger.debug("WorkRegisterVC 표시 - 근무 수정")

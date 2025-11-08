@@ -10,6 +10,7 @@ import OSLog
 import RxRelay
 import RxSwift
 
+/// 캘린더 근무 목록 VM
 final class CalendarWorkListViewModel {
     
     // MARK: - Properties
@@ -17,42 +18,70 @@ final class CalendarWorkListViewModel {
     private let disposeBag = DisposeBag()
     
     // Initializer Injections
-    private var calendarWorkList: [CalendarWork] = []
+    private let workUseCase: WorkUseCaseProtocol
+    private let calendarWorkList: Observable<[WorkSummary]>
     
     // MARK: - Input
     struct Input {
-        let viewDidLoad: Observable<Void>
-        let deleteWorkId: Observable<Int64>
+        let deleteSingleWorkId: Observable<Int>
+        let deleteRecurringWorkId: Observable<Int>
     }
     
     // MARK: - Output
     struct Output {
-        let calendarWorkList: Observable<[CalendarWork]>
+        let calendarWorkList: Observable<[WorkSummary]>
+        let errorMessage: Observable<(title: String, message: String)>
+        let updateCalendar: Observable<Void>
     }
-    private let calendarWorkListRelay = BehaviorRelay<[CalendarWork]>(value: [])
+    private let errorMessageRelay = PublishRelay<(title: String, message: String)>()
+    private let updateCalendarRelay = PublishRelay<Void>()
     
     // MARK: - Initializer
-    init(calendarWorkList: [CalendarWork]) {
+    init(workUseCase: WorkUseCaseProtocol, calendarWorkList: Observable<[WorkSummary]>) {
+        self.workUseCase = workUseCase
         self.calendarWorkList = calendarWorkList
-        // TODO: UseCase 주입
     }
     
     // MARK: - Input ➡️ Output Transform
     func transform(input: Input) -> Output {
-        input.viewDidLoad
-            .subscribe(with: self) { owner, _ in
-                owner.calendarWorkListRelay.accept(owner.calendarWorkList)
+        input.deleteSingleWorkId
+            .subscribe(with: self) { owner, workId in
+                Task {
+                    do {
+                        try await owner.workUseCase.deleteWork(workId: workId)
+                        await MainActor.run { owner.updateCalendarRelay.accept(()) }
+                    } catch let error as LocalizedError {
+                        await MainActor.run {
+                            owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        }
+                    } catch {
+                        await MainActor.run {
+                            owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        }
+                    }
+                }
             }.disposed(by: disposeBag)
         
-        input.deleteWorkId
-            .subscribe(with: self) { owner, id in
-                // TODO: 근무 삭제 API 호출
-                // 삭제 확인된 경우
-                owner.calendarWorkList = owner.calendarWorkList.filter { $0.id != id }
-                owner.calendarWorkListRelay.accept(owner.calendarWorkList)
-                owner.logger.debug("근무 ID: \(id) - 삭제 성공")
+        input.deleteRecurringWorkId
+            .subscribe(with: self) { owner, workId in
+                Task {
+                    do {
+                        try await owner.workUseCase.deleteRecurringWork(workId: workId)
+                        await MainActor.run { owner.updateCalendarRelay.accept(()) }
+                    } catch let error as LocalizedError {
+                        await MainActor.run {
+                            owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        }
+                    } catch {
+                        await MainActor.run {
+                            owner.errorMessageRelay.accept((title: "근무 삭제 실패", message: "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        }
+                    }
+                }
             }.disposed(by: disposeBag)
         
-        return Output(calendarWorkList: calendarWorkListRelay.asObservable())
+        return Output(calendarWorkList: calendarWorkList,
+                      errorMessage: errorMessageRelay.asObservable(),
+                      updateCalendar: updateCalendarRelay.asObservable())
     }
 }

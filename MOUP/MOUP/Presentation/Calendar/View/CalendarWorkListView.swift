@@ -12,15 +12,17 @@ import RxSwift
 import SnapKit
 import Then
 
-/// `CalendarWorkListView`의 이벤트를 `CalendarWorkListModalViewController`에 
+/// `CalendarWorkListView`의 이벤트를 `CalendarWorkListModalViewController`에 전달하는 Delegate
 protocol CalendarWorkListViewDelegate: AnyObject {
     /// 근무 수정
-    func editWork(work: CalendarWork)
-    /// 근무 삭제
-    func deleteWork(id: Int64)
+    func editWork(work: WorkSummary)
+    /// 단일 근무 삭제
+    func deleteSingleWork(workId: Int)
+    /// 반복 근무 삭제
+    func deleteRecurringWork(workId: Int)
 }
 
-/// 근무 리스트 UI
+/// 캘린더 근무 목록 UI
 final class CalendarWorkListView: UIView {
     
     // MARK: - Properties
@@ -37,7 +39,7 @@ final class CalendarWorkListView: UIView {
         $0.font = .headBold(20)
         $0.textColor = .gray900
     }
-    /// 근무 리스트
+    /// 근무 목록
     fileprivate let workTableView = UITableView().then {
         $0.register(PersonalModeWorkCell.self, forCellReuseIdentifier: PersonalModeWorkCell.identifier)
         $0.register(SharedModeWorkCell.self, forCellReuseIdentifier: SharedModeWorkCell.identifier)
@@ -130,7 +132,7 @@ private extension CalendarWorkListView {
 
 // MARK: - Extension Reactive
 extension Reactive where Base: CalendarWorkListView {
-    var personalWorkTableViewDataSource: Binder<[CalendarWork]> {
+    var personalWorkTableViewDataSource: Binder<[WorkSummary]> {
         return Binder(base) { view, work in
             // RxSwift Delegate 오류 방지
             view.workTableView.dataSource = nil
@@ -141,18 +143,12 @@ extension Reactive where Base: CalendarWorkListView {
                     cellIdentifier: PersonalModeWorkCell.identifier,
                     cellType: PersonalModeWorkCell.self
                 )) { _, work, cell in
-                    let editAction = UIAction(title: "수정하기") { _ in
-                        base.delegate?.editWork(work: work)
-                    }
-                    let deleteAction = UIAction(title: "삭제하기", attributes: .destructive) { _ in
-                        base.delegate?.deleteWork(id: work.id)
-                    }
-                    cell.menuButton.menu = UIMenu(children: [editAction, deleteAction])
+                    cell.menuButton.menu = createMenu(for: work)
                     cell.update(work: work)
                 }.disposed(by: base.disposeBag)
         }
     }
-    var sharedWorkTableViewDataSource: Binder<[CalendarWork]> {
+    var sharedWorkTableViewDataSource: Binder<[WorkSummary]> {
         return Binder(base) { view, work in
             // RxSwift Delegate 오류 방지
             view.workTableView.dataSource = nil
@@ -163,19 +159,32 @@ extension Reactive where Base: CalendarWorkListView {
                     cellIdentifier: SharedModeWorkCell.identifier,
                     cellType: SharedModeWorkCell.self
                 )) { _, work, cell in
-                    let editAction = UIAction(title: "수정하기") { _ in
-                        base.delegate?.editWork(work: work)
-                    }
-                    let deleteAction = UIAction(title: "삭제하기", attributes: .destructive) { _ in
-                        base.delegate?.deleteWork(id: work.id)
-                    }
-                    cell.menuButton.menu = UIMenu(children: [editAction, deleteAction])
+                    cell.menuButton.menu = createMenu(for: work)
                     cell.update(work: work)
                 }.disposed(by: base.disposeBag)
         }
     }
-    var workTableViewModelSelected: ControlEvent<CalendarWork> { base.workTableView.rx.modelSelected(CalendarWork.self) }
+    var workTableViewModelSelected: ControlEvent<WorkSummary> { base.workTableView.rx.modelSelected(WorkSummary.self) }
     var workTableViewIsHidden: Binder<Bool> { base.workTableView.rx.isHidden }
     var emptyLabelIsHidden: Binder<Bool> { base.emptyLabel.rx.isHidden }
     var registerButtonTap: ControlEvent<Void> { base.registerButton.rx.tap }
+    
+    private func createMenu(for work: WorkSummary) -> UIMenu {
+        let editAction = UIAction(title: "수정하기") { _ in
+            base.delegate?.editWork(work: work)
+        }
+        let singleDeleteAction = UIAction(title: "삭제하기", attributes: .destructive) { _ in
+            base.delegate?.deleteSingleWork(workId: work.id)
+        }
+        let recurringDeleteAction = UIAction(title: "이후 모든 근무 삭제", attributes: .destructive) { _ in
+            base.delegate?.deleteRecurringWork(workId: work.id)
+        }
+        if work.repeatDays.isEmpty {
+            return UIMenu(children: [editAction, singleDeleteAction])
+        } else {
+            singleDeleteAction.title = "이 근무만 삭제"
+            let deleteSubMenu = UIMenu(title: "삭제하기", options: .destructive, children: [singleDeleteAction, recurringDeleteAction])
+            return UIMenu(children: [editAction, deleteSubMenu])
+        }
+    }
 }

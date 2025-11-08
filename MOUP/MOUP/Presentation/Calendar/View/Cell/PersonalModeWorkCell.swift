@@ -14,21 +14,30 @@ final class PersonalModeWorkCell: BaseWorkCell {
     static let identifier = String(describing: PersonalModeWorkCell.self)
     
     // MARK: - Internal Methods
-    override func update(work: CalendarWork) {
-        setGivenLabelColor(work.labelColor)
+    override func update(work: WorkSummary) {
+        switch UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) {
+        case .worker:
+            setGivenLabelColor(work.workerSummary.workerBasedLabelColorStr ?? LabelColorString._default.rawValue)
+            dailyIncomeLabel.isHidden = false
+        case .owner:
+            setGivenLabelColor(work.workerSummary.ownerBasedLabelColorStr ?? LabelColorString._default.rawValue)
+            dailyIncomeLabel.isHidden = true
+        default:
+            setGivenLabelColor(LabelColorString._default.rawValue)
+            dailyIncomeLabel.isHidden = true
+        }
         
-        titleLabel.text = work.workplaceName
-        sharedChipLabel.isHidden = !work.isShared
+        titleLabel.text = work.workplaceSummary.name
+        sharedChipLabel.isHidden = !work.workplaceSummary.isShared
         
-        setTimeInfoUI(startTime: work.startTime, endTime: work.endTime, restTime: work.restTime)
+        setTimeInfoUI(startTime: work.startTime, endTime: work.endTime, workMinutes: work.workMinutes)
         
-        // TODO: 사장님 역할일 때 dailyIncomeLabel 숨김
-        dailyIncomeLabel.isHidden = false
-        switch work.salaryCalculation {
-        case .hourly:
-            dailyIncomeLabel.text = "\(NumberFormatter.formattedWon(from: work.dailyIncome))"
-        case .fixed:
-            dailyIncomeLabel.text = SalaryCalculation.fixed.rawValue
+        if let dailyIncome = work.estimatedNetIncome {
+            // 시급
+            dailyIncomeLabel.text = NumberFormatter.formattedWon(from: dailyIncome)
+        } else {
+            // 고정급
+            dailyIncomeLabel.text = SalaryCalculation.fixed.displayStr
         }
     }
 }

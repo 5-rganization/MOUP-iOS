@@ -81,7 +81,7 @@ final class CalendarDayCell: JTACDayCell {
     }
     
     // MARK: - Internal Methods
-    func update(dateStr: String, isToday: Bool, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, calendarMode: CalendarMode, workList: [CalendarWork]) {
+    func update(dateStr: String, isToday: Bool, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, calendarMode: CalendarMode, workList: [WorkSummary]) {
         dayLabel.text = dateStr
         
         if isToday {
@@ -102,6 +102,7 @@ final class CalendarDayCell: JTACDayCell {
         self.isUserInteractionEnabled = dateBelongsToThisMonth
         dayLabel.isHidden = !dateBelongsToThisMonth
         selectedView.isHidden = !isSelected
+        workContainerVStackView.isHidden = !dateBelongsToThisMonth
         
         let displayCount = 4
         switch calendarMode {

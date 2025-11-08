@@ -14,6 +14,14 @@ final class WorkplaceUseCase: WorkplaceUseCaseProtocol {
         self.workplaceRepository = workplaceRepository
     }
     
+    func fetchAllWorkplace() async throws -> [WorkplaceSummary] {
+        try await workplaceRepository.fetchWorkplaceList(isSharedOnly: false)
+    }
+    
+    func fetchSharedWorkplaceOnly() async throws -> [WorkplaceSummary] {
+        try await workplaceRepository.fetchWorkplaceList(isSharedOnly: true)
+    }
+    
     func fetchWorkplaceByInviteCode(inviteCode: String) async throws -> InviteCodeWorkplace {
         try await workplaceRepository.fetchWorkplaceByInviteCode(inviteCode: inviteCode)
     }

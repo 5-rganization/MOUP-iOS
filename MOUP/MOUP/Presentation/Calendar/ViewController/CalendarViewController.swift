@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import OSLog
 
 import JTAppleCalendar
 import RxCocoa
@@ -16,29 +17,34 @@ import Then
 final class CalendarViewController: UIViewController {
     
     // MARK: - Properties
+    private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     private let disposeBag = DisposeBag()
     /// 캘린더 근무 Dictionary
-    private var calendarWorkDataSource: [Date: [CalendarWork]] = [:]
+    private var calendarWorkDataSourceRelay = BehaviorRelay<[Date: Set<WorkSummary>]>(value: [:])
     
     // Initializer Injections
     weak var coordinator: CalendarCoordinator?
     private let viewModel: CalendarViewModel
     
     // Input Relays
-    /// 현재 캘린더에 보이는 날짜
-    private let visibleDateRelay = PublishRelay<Date>()
+    /// 마지막으로 API를 요청한 기준 날짜
+    private let lastBaseFetchDateRelay = BehaviorRelay<Date>(value: Date.now.startOfMonth)
     /// 캘린더 개인/공유 모드
     private let calendarModeRelay = BehaviorRelay<CalendarMode>(value: .personal)
     /// 개인 캘린더 근무지/매장 필터
-    private let personalFilterWorkplaceRelay = BehaviorRelay<FilterWorkplace?>(value: nil)
+    private let personalFilterWorkplaceRelay = BehaviorRelay<WorkplaceSummary?>(value: nil)
     /// 공유 캘린더 근무지/매장 필터
-    private let sharedFilterWorkplaceRelay = BehaviorRelay<FilterWorkplace?>(value: nil)
+    private let sharedFilterWorkplaceRelay = BehaviorRelay<WorkplaceSummary?>(value: nil)
+    /// `viewWillDisappear` 이벤트
+    private let viewWillDisappearRelay = PublishRelay<Void>()
     
     // Others
     /// 현재 캘린더에 보이는 날짜
     private var visibleDate: Date = .now
     /// 선택한 날짜
     private var selectedDate: Date?
+    /// 데이터를 로딩할 임계값(며칠을 초과하여 스크롤했을 때 데이터를 로딩할지)
+    private let fetchThresholdInDays = 110
     
     // MARK: - UI Components
     private let todayButton = UIBarButtonItem(title: "오늘").then {
@@ -79,14 +85,19 @@ final class CalendarViewController: UIViewController {
         setCalendarView()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        viewWillDisappearRelay.accept(())
+    }
+    
     // MARK: - Internal Methods
     func updateYearMonth(focusedYear: Int, focusedMonth: Int) {
         let formattedMonth = String(format: "%.2d", focusedMonth)
         guard let date = DateFormatter.dataSourceDateFormatter.date(from: "\(focusedYear).\(formattedMonth).01") else { return }
-        calendarView.getMonthCalendarView.scrollToDate(date, animateScroll: true)
+        scrollToDate(date)
     }
     
-    func updateFilter(filterWorkplace: FilterWorkplace?) {
+    func updateFilter(filterWorkplace: WorkplaceSummary?) {
         switch calendarModeRelay.value {
         case .personal:
             personalFilterWorkplaceRelay.accept(filterWorkplace)
@@ -107,6 +118,7 @@ private extension CalendarViewController {
     
     // MARK: - setStyles
     func setStyles() {
+        // TODO: BaseNavigationBar로 교체
         self.setNavigationBar(title: "캘린더")
         self.navigationItem.rightBarButtonItem = todayButton
         
@@ -130,7 +142,7 @@ private extension CalendarViewController {
         todayButton.rx.tap
             .subscribe(with: self) { owner, _ in
                 owner.deselectCell()
-                owner.calendarView.getMonthCalendarView.scrollToDate(.now, animateScroll: true)
+                owner.scrollToDate(.now)
             }.disposed(by: disposeBag)
         
         calendarView.getCalendarHeaderView.rx.yearMonthButtonTap
@@ -153,7 +165,7 @@ private extension CalendarViewController {
             .subscribe(with: self) { owner, _ in
                 owner.deselectCell()
                 
-                let selectedFilterWorkplace: FilterWorkplace?
+                let selectedFilterWorkplace: WorkplaceSummary?
                 switch owner.calendarModeRelay.value {
                 case .personal:
                     selectedFilterWorkplace = owner.personalFilterWorkplaceRelay.value
@@ -164,19 +176,22 @@ private extension CalendarViewController {
             }.disposed(by: disposeBag)
         
         // ViewModel 바인딩
-        let input = CalendarViewModel.Input(visibleDate: visibleDateRelay.asObservable(),
+        let input = CalendarViewModel.Input(baseFetchDate: lastBaseFetchDateRelay.asObservable().skip(1),
                                             calendarMode: calendarModeRelay.asObservable(),
                                             personalFilterWorkplace: personalFilterWorkplaceRelay.asObservable(),
-                                            sharedFilterWorkplace: sharedFilterWorkplaceRelay.asObservable())
+                                            sharedFilterWorkplace: sharedFilterWorkplaceRelay.asObservable(),
+                                            viewWillDisappear: viewWillDisappearRelay.asObservable())
         let output = viewModel.transform(input: input)
         
-        output.calendarWorkList.asDriver(onErrorJustReturn: [])
-            .drive(with: self) { owner, calendarWorkList in
-//                print("==================================================")
-//                print("calendarWorkList")
-//                dump(calendarWorkList)
-//                print("==================================================")
-                owner.populateDataSource(calendarWorkList: calendarWorkList)
+        output.calendarWorkDict.asDriver(onErrorJustReturn: [:])
+            .drive(with: self) { owner, calendarWorkDict in
+                owner.calendarWorkDataSourceRelay.accept(calendarWorkDict)
+                owner.calendarView.getMonthCalendarView.reloadData()
+            }.disposed(by: disposeBag)
+        
+        output.errorMessage.asDriver(onErrorJustReturn: (title: "오류 발생", message: "잠시 후 다시 시도해주세요."))
+            .drive(with: self) { owner, errorMessage in
+                owner.presentNoticeModal(title: errorMessage.title, comment: errorMessage.message)
             }.disposed(by: disposeBag)
     }
 }
@@ -190,19 +205,8 @@ private extension CalendarViewController {
 
 // MARK: - Internal Calendar Methods
 extension CalendarViewController {
-    func populateDataSource(calendarWorkList: [CalendarWork]) {
-        // TODO: 수신한 데이터 지우지 않는 방향으로 수정
-        calendarWorkDataSource.removeAll()
-        for work in calendarWorkList {
-            guard let workDate = DateFormatter.dataSourceDateFormatter.date(from: work.workDate) else { continue }
-            calendarWorkDataSource[workDate, default: []].append(work)
-        }
-        
-        calendarView.getMonthCalendarView.reloadData()
-    }
-    
     func updateDataSource() {
-        visibleDateRelay.accept(visibleDate)
+        lastBaseFetchDateRelay.accept(visibleDate)
     }
     
     func selectCell(date: Date) {
@@ -211,9 +215,7 @@ extension CalendarViewController {
     }
     
     func deselectCell() {
-        if let selectedDate {
-            calendarView.getMonthCalendarView.deselect(dates: [selectedDate])
-        }
+        if let selectedDate { calendarView.getMonthCalendarView.deselect(dates: [selectedDate]) }
     }
 }
 
@@ -221,14 +223,30 @@ extension CalendarViewController {
 private extension CalendarViewController {
     func setCalendarView() {
         calendarView.getMonthCalendarView.scrollToDate(visibleDate, animateScroll: false)
+        updateYearMonthLabel()
+        updateDataSource()
     }
     
-    func configureCell(cell: JTACDayCell?, cellState: CellState, calendarMode: CalendarMode, workList: [CalendarWork]) {
+    func updateYearMonthLabel() {
+        let dateStr = DateFormatter.presentaionYearMonthDateFormatter.string(from: visibleDate)
+        calendarView.getCalendarHeaderView.update(dateStr: dateStr)
+    }
+    
+    func scrollToDate(_ date: Date) {
+        calendarView.getMonthCalendarView.scrollToDate(date, animateScroll: true)
+        visibleDate = date
+        updateYearMonthLabel()
+        updateDataSource()
+    }
+    
+    func configureCell(cell: JTACDayCell?, cellState: CellState, calendarMode: CalendarMode, workSet: Set<WorkSummary>) {
         guard let cell = cell as? CalendarDayCell else { return }
         
         let dateBelongsToThisMonth = (cellState.dateBelongsTo == .thisMonth)
         let isSelected = cellState.isSelected
         let isToday = Calendar.current.isDateInToday(cellState.date)
+        
+        let workList = Array(workSet).sorted(by: sortCalendarWorkList)
         
         cell.update(dateStr: cellState.text,
                     isToday: isToday,
@@ -241,8 +259,12 @@ private extension CalendarViewController {
     
     func didSelectCell(selectedDate: Date) {
         let selectedDay = Calendar.current.component(.day, from: selectedDate)
+        let calendarWorkList: Observable<[WorkSummary]> = calendarWorkDataSourceRelay.map { [weak self] dict in
+            guard let self else { return [] }
+            return Array(dict[selectedDate] ?? []).sorted(by: self.sortCalendarWorkList)
+        }
         coordinator?.showCalendarWorkList(selectedDay: selectedDay,
-                                          calendarWorkList: calendarWorkDataSource[selectedDate] ?? [],
+                                          calendarWorkList: calendarWorkList,
                                           calendarMode: calendarModeRelay.value)
         calendarViewTapRecognizer.isEnabled = true
     }
@@ -250,6 +272,15 @@ private extension CalendarViewController {
     func didDeselectCell() {
         coordinator?.dismissCalendarWorkList()
         calendarViewTapRecognizer.isEnabled = false
+    }
+    
+    func checkPrefetchCondition(date: Date) -> Bool {
+        let dayOffset = Calendar.current.dateComponents([.day], from: lastBaseFetchDateRelay.value, to: date).day ?? 111
+        return abs(dayOffset) > fetchThresholdInDays
+    }
+    
+    func sortCalendarWorkList(_ lhs: WorkSummary, _ rhs: WorkSummary) -> Bool {
+        (lhs.startTime, lhs.endTime ?? Date.distantFuture) < (rhs.startTime, rhs.endTime ?? Date.distantFuture)
     }
 }
 
@@ -269,35 +300,52 @@ extension CalendarViewController: JTACMonthViewDataSource {
 // MARK: - JTACMonthViewDelegate
 extension CalendarViewController: JTACMonthViewDelegate {
     func calendar(_ calendar: JTACMonthView, willDisplay cell: JTACDayCell, forItemAt date: Date, cellState: CellState, indexPath: IndexPath) {
-        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workList: calendarWorkDataSource[date] ?? [])
+        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workSet: calendarWorkDataSourceRelay.value[date] ?? [])
     }
     
     func calendar(_ calendar: JTACMonthView, cellForItemAt date: Date, cellState: CellState, indexPath: IndexPath) -> JTACDayCell {
         guard let cell = calendar.dequeueReusableJTAppleCell(withReuseIdentifier: CalendarDayCell.identifier, for: indexPath) as? CalendarDayCell else {
             return JTACDayCell()
         }
-        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workList: calendarWorkDataSource[date] ?? [])
+        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workSet: calendarWorkDataSourceRelay.value[date] ?? [])
         return cell
     }
     
+    // 사용자의 터치, programmatic한 스크롤 모두 호출
     func calendar(_ calendar: JTACMonthView, didScrollToDateSegmentWith visibleDates: DateSegmentInfo) {
         guard let date = visibleDates.monthDates.first?.date else { return }
-        visibleDate = date
-        updateDataSource()
         
-        let dateStr = DateFormatter.yearMonthDateFormatter.string(from: date)
-        calendarView.getCalendarHeaderView.update(dateStr: dateStr)
+        // 근무 데이터 로딩 (willScrollToDateSegmentWith에서 로딩한 경우 fetchThresholdInDays에 의해 실행 X)
+        if checkPrefetchCondition(date: date) {
+            logger.info("[\(#function)] 캘린더 근무 데이터 Prefetch")
+            updateDataSource()
+        }
+    }
+    
+    // 사용자의 터치에 의해서만 호출됨, programmatic한 스크롤의 경우 호출 X
+    func calendar(_ calendar: JTACMonthView, willScrollToDateSegmentWith visibleDates: DateSegmentInfo) {
+        guard let date = visibleDates.monthDates.first?.date else { return }
+        visibleDate = date
+        
+        // 연/월 라벨 변경
+        updateYearMonthLabel()
+        
+        // 근무 데이터 로딩
+        if checkPrefetchCondition(date: date) {
+            logger.info("[\(#function)] 캘린더 근무 데이터 Prefetch")
+            updateDataSource()
+        }
     }
     
     func calendar(_ calendar: JTACMonthView, didSelectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
         selectedDate = date
-        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workList: calendarWorkDataSource[date] ?? [])
+        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workSet: calendarWorkDataSourceRelay.value[date] ?? [])
         didSelectCell(selectedDate: date)
     }
     
     func calendar(_ calendar: JTACMonthView, didDeselectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
         selectedDate = nil
-        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workList: calendarWorkDataSource[date] ?? [])
+        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workSet: calendarWorkDataSourceRelay.value[date] ?? [])
         didDeselectCell()
     }
 }

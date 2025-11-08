@@ -8,7 +8,7 @@
 import Foundation
 
 /// 근무 요약 Entity
-struct WorkSummary {
+struct WorkSummary: Hashable {
     let id: Int
     let workplaceSummary: WorkplaceSummary
     let workerSummary: WorkerSummary
@@ -17,9 +17,13 @@ struct WorkSummary {
     let endTime: Date?
     let workMinutes: Int
     let restTimeMinutes: Int
-    let estimatedNetIncome: Int
+    let estimatedNetIncome: Int?
     let repeatDays: [String]
     let repeatEndDate: String?
     let isMyWork: Bool
     let isEditable: Bool
+    
+    static func == (lhs: WorkSummary, rhs: WorkSummary) -> Bool { lhs.id == rhs.id }
+    
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
 }

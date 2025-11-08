@@ -144,7 +144,7 @@ private extension FilterView {
 
 // MARK: - Extension Reactive
 extension Reactive where Base: FilterView {
-    var filterTableViewDataSource: Binder<([FilterWorkplace])> {
+    var filterTableViewDataSource: Binder<([WorkplaceSummary])> {
         return Binder(base) { view, filterWorkplace in
             // RxSwift Delegate 오류 방지
             view.filterTableView.dataSource = nil
@@ -155,11 +155,11 @@ extension Reactive where Base: FilterView {
                     cellIdentifier: FilterCell.identifier,
                     cellType: FilterCell.self
                 )) { _, filterWorkplace, cell in
-                    cell.update(workplaceName: filterWorkplace.workplaceName)
+                    cell.update(workplaceName: filterWorkplace.name)
                 }.disposed(by: base.disposeBag)
         }
     }
-    var filterTableViewModelSelected: ControlEvent<FilterWorkplace> { base.filterTableView.rx.modelSelected(FilterWorkplace.self) }
+    var filterTableViewModelSelected: ControlEvent<WorkplaceSummary> { base.filterTableView.rx.modelSelected(WorkplaceSummary.self) }
     var filterTableViewIsHidden: Binder<Bool> { base.filterTableView.rx.isHidden }
     var emptyLabelIsHidden: Binder<Bool> { base.emptyLabel.rx.isHidden }
     var applyButtonTap: ControlEvent<Void> { base.applyButton.rx.tap }
