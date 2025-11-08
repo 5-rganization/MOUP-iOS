@@ -39,7 +39,7 @@ final class YearMonthPickerModalViewController: UIViewController {
     private let yearMonthPickerView = YearMonthPickerView()
     
     // MARK: - Initializer
-    init(coordinator: YearMonthPickerCoordinator?, currYear: Int, currMonth: Int) {
+    init(coordinator: YearMonthPickerCoordinator, currYear: Int, currMonth: Int) {
         self.coordinator = coordinator
         self.focusedYear = currYear
         self.focusedMonth = currMonth
