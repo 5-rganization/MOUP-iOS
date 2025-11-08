@@ -16,26 +16,26 @@ final class AddRoutineViewController: UIViewController {
     private let addRoutineView = AddRoutineView()
     private let viewModel: AddRoutineViewModel
     private let disposeBag = DisposeBag()
-    var onSave: ((Routine) -> Void)?
+    var onSave: ((RoutineSummary) -> Void)?
     private let titleInputSubject = PublishSubject<String>()
     private let alarmTimeInputSubject = PublishSubject<DateComponents?>()
-    private let itemsInputSubject = PublishSubject<[TodoItem]>()
+    private let itemsInputSubject = PublishSubject<[RoutineTaskItem]>()
     
     // MARK: - Lifecycle
-    
+
     override func loadView() {
         self.view = addRoutineView
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         configure()
         checkAndPromptLoadDraft()
     }
-    
+
     // MARK: - Initializer
-    
+
     init(viewModel: AddRoutineViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -135,56 +135,73 @@ private extension AddRoutineViewController {
             .disposed(by: disposeBag)
         
         output.saveCompleted
-            .emit(with: self, onNext: { owner, newRoutine in
-                owner.onSave?(newRoutine)
+            .emit(with: self, onNext: { owner, routineSummary in
+                owner.onSave?(routineSummary)
                 owner.navigationController?.popViewController(animated: true)
             })
+            .disposed(by: disposeBag)
+        
+        output.error
+            .emit(with: self) { owner, message in
+                print("에러: \(message)")
+                
+                let alert = NoticeModalViewController(
+                    title: "루틴 생성 실패",
+                    comment: message
+                )
+                alert.modalTransitionStyle = .crossDissolve
+                
+                owner.present(alert, animated: true)
+            }
             .disposed(by: disposeBag)
     }
     
     func checkAndPromptLoadDraft() {
         guard let draft = DraftRoutineStorage.shared.loadDraft() else { return }
-        
+
+        let hasTitle = !draft.title.isEmpty
+        let hasAlarmTime = draft.alarmTime != nil
+        let hasValidItems = draft.items.contains { !$0.content.isEmpty }
+
+        guard hasTitle || hasAlarmTime || hasValidItems else {
+            DraftRoutineStorage.shared.deleteDraft()
+            return
+        }
+
         let alert = DeleteAlertViewController(
             alertTitle: "저장된 루틴이 있습니다",
             alertMessage: "이전에 저장한 내용을 불러올까요?",
             deleteButtonTitle: "불러오기"
         )
-        
+
         alert.onDeleteConfirmed = { [weak self] in
             self?.loadDraft(draft)
         }
-        
+
         alert.onCancelConfirmed = {
             DraftRoutineStorage.shared.deleteDraft()
         }
-        
+
         present(alert, animated: false)
     }
     
     func loadDraft(_ draft: DraftRoutine) {
         if !draft.title.isEmpty {
             addRoutineView.updateRoutineTitleLabel(with: draft.title)
-        }
-        
-        if let alarmTime = draft.alarmTime {
-            addRoutineView.updateAlarmTimeChip(with: alarmTime)
-        }
-        
-        if !draft.items.isEmpty {
-            addRoutineView.restoreItems(draft.items)
-        }
-        
-        if !draft.title.isEmpty {
             titleInputSubject.onNext(draft.title)
         }
         
         if let alarmTime = draft.alarmTime {
+            addRoutineView.updateAlarmTimeChip(with: alarmTime)
             alarmTimeInputSubject.onNext(alarmTime)
         }
         
         if !draft.items.isEmpty {
-            itemsInputSubject.onNext(draft.items)
+            let reindexedItems = draft.items.enumerated().map { index, item in
+                RoutineTaskItem(content: item.content, orderIndex: index, id: item.id)
+            }
+            addRoutineView.restoreItems(reindexedItems)
+            itemsInputSubject.onNext(reindexedItems)
         }
     }
 }

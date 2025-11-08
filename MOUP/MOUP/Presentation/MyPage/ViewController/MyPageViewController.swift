@@ -13,11 +13,15 @@ import MessageUI
 final class MyPageViewController: UIViewController {
     
     // MARK: - Properties
-    
+
     weak var coordinator: MyPageCoordinator?
     private let mypageView = MyPageView()
     private let viewModel: MyPageViewModel
     private let disposeBag = DisposeBag()
+
+    private let viewDidLoadSubject = PublishSubject<Void>()
+
+    private var routineSelectionCoordinator: RoutineSelectionCoordinator?
     
     // MARK: - Lifecycle
     
@@ -29,6 +33,8 @@ final class MyPageViewController: UIViewController {
         super.viewDidLoad()
         
         configure()
+        
+        viewDidLoadSubject.onNext(())
     }
     
     // MARK: - Initializer
@@ -75,6 +81,8 @@ private extension MyPageViewController {
                 switch menu {
                 case .account:
                     owner.coordinator?.showAccountViewController()
+                case .notice:
+                    owner.coordinator?.showNoticeList()
                 case .contact:
                     owner.presentContactMailComposer()
                 case .info:
@@ -90,29 +98,48 @@ private extension MyPageViewController {
             }
             .share()
         
-        let input = MyPageViewModel.Input(logoutConfirmed: logoutConfirmed)
+        let input = MyPageViewModel.Input(
+            viewDidLoad: viewDidLoadSubject.asObservable(),
+            logoutConfirmed: logoutConfirmed
+        )
         let output = viewModel.transform(input)
         
         output.isLoading
-            .skip(1)
-            .drive(with: self) { _, isLoading in
-                print(isLoading ? "로그아웃 중입니다." : "로그아웃 완료")
+            .drive(with: self) { owner, isLoading in
+                if isLoading {
+                    owner.mypageView.showLoading()
+                } else {
+                    owner.mypageView.hideLoading()
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        output.profile
+            .compactMap { $0 }
+            .drive(with: self) { owner, profile in
+                owner.mypageView.updateProfile(profile)
             }
             .disposed(by: disposeBag)
         
         output.logoutSuccess
-            .emit(onNext: {
-                print("로그아웃 성공. 로그인 화면으로 이동")
-                // TODO: - 로그인 화면으로 전환
-            })
+            .emit(with: self) { owner, _ in
+                NotificationCenter.default.post(
+                    name: .logoutSuccess,
+                    object: nil
+                )
+            }
             .disposed(by: disposeBag)
         
         output.error
             .emit(with: self) { owner, message in
-                owner.coordinator?.showLogoutFail(from: owner) {
-                    owner.dismiss(animated: false)
-                    print(message)
+                if message.contains("로그아웃") {
+                    owner.coordinator?.showLogoutFail(from: owner) {
+                        owner.dismiss(animated: false)
+                    }
+                } else {
+                    print("에러: \(message)")
                 }
+                
             }
             .disposed(by: disposeBag)
     }

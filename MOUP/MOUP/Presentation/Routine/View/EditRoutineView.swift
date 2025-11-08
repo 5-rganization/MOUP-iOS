@@ -12,22 +12,23 @@ import RxSwift
 import RxCocoa
 
 final class EditRoutineView: UIView {
-    
+
     // MARK: - Properties
-    
+
     enum Section { case main }
-    fileprivate lazy var dataSource = UITableViewDiffableDataSource<Section, TodoItem>(
+    fileprivate lazy var dataSource = UITableViewDiffableDataSource<Section, RoutineTaskItem>(
         tableView: tableView
     ) { tableView, indexPath, item in
         guard let cell = tableView.dequeueReusableCell(withIdentifier: TodoCell.id, for: indexPath) as? TodoCell else {
             fatalError("TodoCell을 생성할 수 없습니다.")
         }
-        cell.textField.text = item.text
+        cell.textField.text = item.content
         return cell
     }
     fileprivate let itemTextChangeRelay = PublishRelay<(index: Int, text: String)>()
     fileprivate let itemMovedRelay = PublishRelay<(source: Int, destination: Int)>()
     fileprivate let itemDeleteRelay = PublishRelay<Int>()
+    fileprivate var isHandlingDragDrop = false
 
     // MARK: - UI Components
     
@@ -297,7 +298,7 @@ extension EditRoutineView: UITableViewDragDelegate {
         guard let item = dataSource.itemIdentifier(for: indexPath) else {
             return []
         }
-        let provider = NSItemProvider(object: item.text as NSString)
+        let provider = NSItemProvider(object: item.content as NSString)
         let dragItem = UIDragItem(itemProvider: provider)
         dragItem.localObject = item
         return [dragItem]
@@ -327,9 +328,17 @@ extension EditRoutineView: UITableViewDropDelegate {
             let row = tableView.numberOfRows(inSection: section)
             destinationIndexPath = IndexPath(row: row, section: section)
         }
-        
-        guard let sourceIndexPath = coordinator.items.first?.sourceIndexPath else { return }
-        
+
+        guard let item = coordinator.items.first,
+              let sourceIndexPath = item.sourceIndexPath else { return }
+
+        // Coordinator를 통해 드롭 애니메이션 수행
+        coordinator.drop(item.dragItem, toRowAt: destinationIndexPath)
+
+        // 드래그 앤 드롭 처리 중임을 표시
+        self.isHandlingDragDrop = true
+
+        // ViewModel에 변경사항 알림
         self.itemMovedRelay.accept(
             (source: sourceIndexPath.row, destination: destinationIndexPath.row)
         )
@@ -353,12 +362,18 @@ extension Reactive where Base: EditRoutineView {
         return base.itemMovedRelay.asObservable()
     }
     
-    var items: Binder<[TodoItem]> {
+    var items: Binder<[RoutineTaskItem]> {
         return Binder(self.base) { view, items in
-            var snapshot = NSDiffableDataSourceSnapshot<EditRoutineView.Section, TodoItem>()
+            var snapshot = NSDiffableDataSourceSnapshot<EditRoutineView.Section, RoutineTaskItem>()
             snapshot.appendSections([.main])
             snapshot.appendItems(items, toSection: .main)
-            view.dataSource.apply(snapshot, animatingDifferences: true)
+
+            // 드래그 앤 드롭 중일 때는 애니메이션 비활성화
+            let shouldAnimate = !view.isHandlingDragDrop
+            view.dataSource.apply(snapshot, animatingDifferences: shouldAnimate)
+
+            // 플래그 리셋
+            view.isHandlingDragDrop = false
         }
     }
     

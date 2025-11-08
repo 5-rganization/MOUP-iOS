@@ -19,9 +19,9 @@ final class RoutineSelectionViewController: UIViewController {
     private let viewModel: RoutineSelectionViewModel
     private let disposeBag = DisposeBag()
     
-    private let addNewRoutineRelay = PublishRelay<Routine>()
-    private let checkboxToggledRelay = PublishRelay<UUID>()
-    private let routineUpdatedRelay = PublishRelay<Routine>()
+    private let addNewRoutineRelay = PublishRelay<RoutineSummary>()
+    private let checkboxToggledRelay = PublishRelay<Int>()
+    private let routineUpdatedRelay = PublishRelay<RoutineSummary>()
     
     // MARK: - Lifecycle
     
@@ -71,12 +71,17 @@ private extension RoutineSelectionViewController {
     func setBindings() {
         let dataSource = createDataSource()
         
+        routineSelectionView.rx.backButtonDidTap
+            .bind(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+        
         routineSelectionView.rx.plusButtonDidTap
             .bind(with: self) { owner, _ in
                 owner.coordinator?.showAddRoutineViewController(onSave: { newRoutine in
-                    owner.addNewRoutineRelay.accept(newRoutine)
+                     owner.addNewRoutineRelay.accept(newRoutine)
                 })
-                
             }
             .disposed(by: disposeBag)
         
@@ -93,6 +98,12 @@ private extension RoutineSelectionViewController {
         
         output.rows
             .drive(routineSelectionView.tableView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+        
+        output.error
+            .emit(with: self) { owner, message in
+                // TODO: - 에러 알림 표시
+            }
             .disposed(by: disposeBag)
         
         routineSelectionView.tableView.rx.modelSelected(RoutineRowViewState.self)
@@ -126,7 +137,7 @@ private extension RoutineSelectionViewController {
                 cell.update(with: viewState)
                 
                 cell.rx.checkboxDidTap
-                    .map { viewState.routine.id }
+                    .map { viewState.routine.routineId }
                     .bind(to: self.checkboxToggledRelay)
                     .disposed(by: cell.disposeBag)
                 

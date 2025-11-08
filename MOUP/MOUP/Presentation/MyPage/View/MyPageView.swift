@@ -13,6 +13,7 @@ import RxCocoa
 
 enum MyPageMenu: String, CaseIterable {
     case account = "계정"
+    case notice = "공지사항"
     case contact = "문의하기"
     case info = "정보"
 }
@@ -26,6 +27,22 @@ final class MyPageView: UIView {
     private let disposeBag = DisposeBag()
     
     // MARK: - UI Components
+    
+    private let loadingIndicator = UIActivityIndicatorView(style: .large).then {
+        $0.color = .primary500
+        $0.hidesWhenStopped = true
+    }
+    
+    private let loadingLabel = UILabel().then {
+        $0.text = "프로필을 불러오는 중입니다."
+        $0.font = .bodyMedium(14)
+        $0.textColor = .gray600
+        $0.isHidden = true
+    }
+    
+    private let contentView = UIView().then {
+        $0.alpha = 0
+    }
     
     private let profileImageFrame = UIImageView().then {
         $0.contentMode = .scaleAspectFill
@@ -48,14 +65,12 @@ final class MyPageView: UIView {
     private let nicknameLabel = UILabel().then {
         $0.font = .bodyMedium(16)
         $0.setLineSpacing(.bodyMedium)
-        $0.text = "MOUP"
     }
     
     private let roleLabel = UILabel().then {
         $0.font = .bodyMedium(14)
         $0.setLineSpacing(.bodyMedium)
         $0.textColor = .gray700
-        $0.text = "알바생"
     }
     
     fileprivate let editButton = UIButton().then {
@@ -107,6 +122,33 @@ final class MyPageView: UIView {
     
     // MARK: - Public Methods
     
+    func showLoading() {
+        loadingIndicator.startAnimating()
+        loadingLabel.isHidden = false
+        contentView.alpha = 0
+    }
+    
+    func hideLoading() {
+        loadingIndicator.stopAnimating()
+        loadingLabel.isHidden = true
+        
+        UIView.animate(withDuration: 0.3) {
+            self.contentView.alpha = 1
+        }
+    }
+    
+    func updateProfile(_ profile: UserProfile) {
+        nicknameLabel.text = profile.nickname
+        roleLabel.text = profile.role == .worker ? "알바생" : "사장님"
+        
+        if let imageURL = profile.profileImageURL {
+            // TODO: - Kingfisher 등으로 이미지 로드
+            print("프로필 이미지 URL: \(imageURL)")
+        } else {
+            profileImageView.image = profile.role == .worker ? .worker : .owner
+        }
+    }
+    
     func updateNickname(_ nickname: String) {
         nicknameLabel.text = nickname
     }
@@ -123,6 +165,12 @@ private extension MyPageView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            loadingIndicator,
+            loadingLabel,
+            contentView
+        )
+        
+        contentView.addSubviews(
             profileImageFrame,
             nicknameRoleStackView,
             editButton,
@@ -156,9 +204,22 @@ private extension MyPageView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        loadingIndicator.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
+        
+        loadingLabel.snp.makeConstraints {
+            $0.top.equalTo(loadingIndicator.snp.bottom).offset(16)
+            $0.centerX.equalToSuperview()
+        }
+        
+        contentView.snp.makeConstraints {
+            $0.edges.equalTo(safeAreaLayoutGuide)
+        }
+        
         profileImageFrame.snp.makeConstraints {
             $0.size.equalTo(80)
-            $0.top.equalTo(safeAreaLayoutGuide).offset(32)
+            $0.top.equalToSuperview().offset(32)
             $0.leading.equalToSuperview().offset(16)
         }
         
@@ -182,7 +243,7 @@ private extension MyPageView {
         
         menuStackView.snp.makeConstraints {
             $0.top.equalTo(profileImageFrame.snp.bottom).offset(32)
-            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
         }
         
         logoutButton.snp.makeConstraints {

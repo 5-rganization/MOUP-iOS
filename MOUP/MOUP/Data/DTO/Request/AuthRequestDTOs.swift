@@ -25,3 +25,8 @@ struct RegisterRequestDTO: Encodable {
 struct RefreshTokenRequestDTO: Encodable {
     let refreshToken: String
 }
+
+/// FCM 토큰 업데이트 API 요청 DTO
+struct UpdateFCMTokenRequestDTO: Encodable {
+    let fcmToken: String
+}

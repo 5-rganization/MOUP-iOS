@@ -84,6 +84,20 @@ final class TabBarCoordinator: Coordinator {
         
         window.makeKeyAndVisible()
     }
+    
+    func moveToNotificationList() {
+        tabBarController.selectedIndex = 2
+        
+        guard let myPageCoordinator = childCoordinators.first(where: { $0 is MyPageCoordinator }) as? MyPageCoordinator else {
+            print("MypageCoordinator를 찾을 수 없습니다.")
+            return
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            myPageCoordinator.showNotificationList()
+            print("알림 리스트 화면으로 이동 완료")
+        }
+    }
 }
 
 

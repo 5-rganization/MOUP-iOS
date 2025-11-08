@@ -24,3 +24,13 @@ struct RefreshTokenResponseDTO: Decodable {
     let accessToken: String
     let refreshToken: String
 }
+
+/// FCM 토큰 업데이트 API 응답 DTO
+struct UpdateFCMTokenResponseDTO: Decodable {
+    let userId: Int
+}
+
+/// 로그아웃 API 응답 DTO
+struct LogoutResponseDTO: Decodable {
+    let userId: Int
+}

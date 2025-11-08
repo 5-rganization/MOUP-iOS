@@ -10,6 +10,6 @@ import Foundation
 struct DraftRoutine: Codable {
     let title: String
     let alarmTime: DateComponents?
-    let items: [TodoItem]
+    let items: [RoutineTaskItem]
     let savedAt: Date
 }

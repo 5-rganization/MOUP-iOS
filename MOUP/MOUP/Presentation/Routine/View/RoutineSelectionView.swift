@@ -102,6 +102,10 @@ private extension RoutineSelectionView {
 }
 
 extension Reactive where Base: RoutineSelectionView {
+    var backButtonDidTap: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
+    }
+    
     var plusButtonDidTap: ControlEvent<Void> {
         return base.navigationBar.rx.rightBtnTapped
     }

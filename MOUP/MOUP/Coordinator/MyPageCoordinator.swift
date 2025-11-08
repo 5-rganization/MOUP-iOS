@@ -11,11 +11,49 @@ final class MyPageCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     let navigationController: UINavigationController
     
-    private lazy var viewModel = MyPageViewModel()
-    private lazy var myPageVC = MyPageViewController(viewModel: viewModel)
+    private let userService: UserServiceProtocol
+    private let userRepository: UserRepositoryProtocol
+    private let userUseCase: UserUseCaseProtocol
+    
+    private let authService: AuthServiceProtocol
+    private let authRepository: AuthRepositoryProtocol
+    private let authUseCase: AuthUseCaseProtocol
+    
+    private let noticeService: NoticeServiceProtocol
+    private let noticeRepository: NoticeRepositoryProtocol
+    private let noticeUseCase: NoticeUseCaseProtocol
+    
+    private let notificationService: NotificationServiceProtocol
+    private let notificationRepository: NotificationRepositoryProtocol
+    private let notificationUseCase: NotificationUseCaseProtocol
+    
+    private lazy var myPageVC: MyPageViewController = {
+        let viewModel = MyPageViewModel(
+            userUseCase: userUseCase,
+            authUseCase: authUseCase
+        )
+        let vc = MyPageViewController(viewModel: viewModel)
+        return vc
+    }()
 
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
+        
+        self.userService = UserService()
+        self.userRepository = UserRepository(userService: userService)
+        self.userUseCase = UserUseCase(userRepository: userRepository)
+        
+        self.authService = AuthService()
+        self.authRepository = AuthRepository(authService: authService)
+        self.authUseCase = AuthUseCase(authRepository: authRepository)
+        
+        self.noticeService = NoticeService()
+        self.noticeRepository = NoticeRepository(noticeService: noticeService)
+        self.noticeUseCase = NoticeUseCase(noticeRepository: noticeRepository)
+        
+        self.notificationService = NotificationService()
+        self.notificationRepository = NotificationRepository(notificationService: notificationService)
+        self.notificationUseCase = NotificationUseCase(notificationRepository: notificationRepository)
     }
 
     func start() {
@@ -24,7 +62,7 @@ final class MyPageCoordinator: Coordinator {
     }
     
     func showEditNicknameModal() {
-        let viewModel = EditModalViewModel()
+        let viewModel = EditModalViewModel(userUseCase: userUseCase)
         let editModalVC = EditModalViewController(viewModel: viewModel)
         editModalVC.modalPresentationStyle = .overFullScreen
         editModalVC.modalTransitionStyle = .crossDissolve
@@ -42,10 +80,23 @@ final class MyPageCoordinator: Coordinator {
     }
     
     func showDeleteAccountModal() {
-        let viewModel = DeleteAccountViewModel()
+        let viewModel = DeleteAccountViewModel(userUseCase: userUseCase)
         let deleteAccountModalVC = DeleteAccountModalViewController(viewModel: viewModel)
         deleteAccountModalVC.modalPresentationStyle = .overFullScreen
         navigationController.present(deleteAccountModalVC, animated: false)
+    }
+    
+    func showNoticeList() {
+        let viewModel = NoticeListViewModel(noticeUseCase: noticeUseCase)
+        let noticeListVC = NoticeListViewController(viewModel: viewModel)
+        noticeListVC.coordinator = self
+        navigationController.pushViewController(noticeListVC, animated: true)
+    }
+    
+    func showNoticeDetail(_ notice: Notice) {
+        let noticeDetailVC = NoticeDetailViewController(notice: notice)
+        noticeDetailVC.coordinator = self
+        navigationController.pushViewController(noticeDetailVC, animated: true)
     }
     
     func showInfoViewController() {
@@ -93,5 +144,11 @@ final class MyPageCoordinator: Coordinator {
         )
         logoutFailVC.onDeleteConfirmed = onConfirm
         vc.present(logoutFailVC, animated: true)
+    }
+    
+    func showNotificationList() {
+        let viewModel = NotificationListViewModel(notificationUseCase: notificationUseCase)
+        let notificationListVC = NotificationListViewController(viewModel: viewModel)
+        navigationController.pushViewController(notificationListVC, animated: true)
     }
 }

@@ -73,12 +73,10 @@ final class RoutineCell: UITableViewCell {
     // MARK: - Public Methods
     
     func update(with viewState: RoutineRowViewState) {
-        nameLabel.text = viewState.routine.title
+        nameLabel.text = viewState.routine.routineName
         
-        if let time = viewState.routine.alarmTime,
-           let hour = time.hour,
-           let minute = time.minute {
-            timeLabel.text = String(format: "%02d : %02d", hour, minute)
+        if let timeString = viewState.routine.alarmTime {
+            timeLabel.text = timeString
         } else {
             timeLabel.text = "알림 없음"
         }

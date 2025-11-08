@@ -25,4 +25,40 @@ final class RoutineUseCase: RoutineUseCaseProtocol {
     func fetchAllRoutines() async throws -> [RoutineSummary] {
         try await routineRepository.fetchAllRoutines()
     }
+    
+    func fetchRoutineDetail(routineId: Int) async throws -> RoutineDetail {
+        try await routineRepository.fetchRoutineDetail(routineId: routineId)
+    }
+
+    func createRoutine(
+        name: String,
+        alarmTime: String,
+        tasks: [(content: String, orderIndex: Int)]
+    ) async throws -> RoutineSummary {
+        let routineId = try await routineRepository.createRoutine(
+            name: name,
+            alarmTime: alarmTime,
+            tasks: tasks
+        )
+
+        return RoutineSummary(
+            routineId: routineId,
+            routineName: name,
+            alarmTime: alarmTime
+        )
+    }
+
+    func updateRoutine(
+        routineId: Int,
+        name: String,
+        alarmTime: String,
+        tasks: [(content: String, orderIndex: Int)]
+    ) async throws {
+        try await routineRepository.updateRoutine(
+            routineId: routineId,
+            name: name,
+            alarmTime: alarmTime,
+            tasks: tasks
+        )
+    }
 }

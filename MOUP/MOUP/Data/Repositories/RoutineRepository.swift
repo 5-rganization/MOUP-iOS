@@ -58,4 +58,46 @@ final class RoutineRepository: RoutineRepositoryProtocol {
         
         return routines
     }
+    
+    func fetchRoutineDetail(routineId: Int) async throws -> RoutineDetail {
+        let response = try await routineService.fetchRoutineDetail(routineId: routineId)
+        return response.toDomain()
+    }
+
+    func createRoutine(
+        name: String,
+        alarmTime: String,
+        tasks: [(content: String, orderIndex: Int)]
+    ) async throws -> Int {
+        let request = CreateRoutineRequestDTO(
+            routineName: name,
+            alarmTime: alarmTime,
+            routineTaskList: tasks.map {
+                RoutineTaskDTO(
+                    content: $0.content,
+                    orderIndex: $0.orderIndex
+                )
+            })
+
+        return try await routineService.createRoutine(request: request)
+    }
+
+    func updateRoutine(
+        routineId: Int,
+        name: String,
+        alarmTime: String,
+        tasks: [(content: String, orderIndex: Int)]
+    ) async throws {
+        let request = UpdateRoutineRequestDTO(
+            routineName: name,
+            alarmTime: alarmTime,
+            routineTaskList: tasks.map {
+                RoutineTaskDTO(
+                    content: $0.content,
+                    orderIndex: $0.orderIndex
+                )
+            })
+
+        try await routineService.updateRoutine(routineId: routineId, request: request)
+    }
 }

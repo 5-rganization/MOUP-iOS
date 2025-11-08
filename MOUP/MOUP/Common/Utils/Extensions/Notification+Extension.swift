@@ -9,4 +9,9 @@ import Foundation
 
 extension Notification.Name {
     static let unauthorizedAccessDetected = Notification.Name("unauthorizedAccessDetected")
+    static let logoutSuccess = Notification.Name("logoutSuccess")
+    static let deleteAccountSuccess = Notification.Name("deleteAccountSuccess")
+    
+    static let pushNotificationReceived = Notification.Name("pushNotificationReceived")
+    static let pushNotificationTapped = Notification.Name("pushNotificationTapped")
 }

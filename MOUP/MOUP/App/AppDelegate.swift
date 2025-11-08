@@ -66,6 +66,7 @@ extension AppDelegate: MessagingDelegate {
         
         if let token = fcmToken {
             UserDefaultsManager.shared.fcmToken = token
+            FCMTokenManager.shared.syncTokenToServer()
         }
     }
 }
@@ -76,6 +77,11 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         let userInfo = notification.request.content.userInfo
         self.logger.debug("포그라운드 알림: \(userInfo)")
+        NotificationCenter.default.post(
+            name: .pushNotificationReceived,
+            object: nil,
+            userInfo: userInfo
+        )
         completionHandler([.banner, .sound, .badge])
     }
     
@@ -85,7 +91,59 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
         self.logger.debug("알림 탭: \(userInfo)")
-        // TODO: - 알림 타입에 따라 화면 이동 구현 필요, userInfo["type"]을 통한 분기
+        
+        handleNotificationTap(userInfo)
+        
         completionHandler()
+    }
+    
+    private func handleNotificationTap(_ userInfo: [AnyHashable: Any]) {
+        let notificationTypeString = userInfo[PushNotificationKey.type] as? String
+        let notificationType = PushNotificationType(from: notificationTypeString)
+        
+        if let notificationType = notificationType {
+            self.logger.debug("알림 타입: \(notificationType.rawValue)")
+        } else {
+            self.logger.warning("알림 타입이 없거나 알 수 없는 타입입니다: \(notificationTypeString ?? "nil")")
+        }
+        
+        let destination = determineDestination(for: notificationType)
+        
+        postNotificationTappedEvent(
+            destination: destination,
+            type: notificationTypeString
+        )
+    }
+    
+    private func determineDestination(
+        for type: PushNotificationType?
+    ) -> PushNotificationDestination {
+        guard let type else {
+            return .notificationList
+        }
+        
+        switch type {
+        case .inviteApproved, .inviteRejected, .inviteRequest, .paydayReminder:
+            return .notificationList
+        }
+    }
+    
+    private func postNotificationTappedEvent(
+        destination: PushNotificationDestination,
+        type: String?
+    ) {
+        var userInfo: [String: Any] = [
+            PushNotificationKey.destination: destination.rawValue
+        ]
+        
+        if let type = type {
+            userInfo[PushNotificationKey.type] = type
+        }
+        
+        NotificationCenter.default.post(
+            name: .pushNotificationTapped,
+            object: nil,
+            userInfo: userInfo
+        )
     }
 }

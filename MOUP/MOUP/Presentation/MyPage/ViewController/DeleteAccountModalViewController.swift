@@ -16,6 +16,8 @@ final class DeleteAccountModalViewController: UIViewController {
     private let viewModel: DeleteAccountViewModel
     private let disposeBag = DisposeBag()
     
+    private let viewDidLoadSubject = PublishSubject<Void>()
+    
     // MARK: - UI Components
     
     private let deleteAccountModal = DeleteAccountModal().then {
@@ -33,6 +35,8 @@ final class DeleteAccountModalViewController: UIViewController {
         super.viewDidLoad()
 
         configure()
+        
+        viewDidLoadSubject.onNext(())
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -106,27 +110,48 @@ private extension DeleteAccountModalViewController {
             .disposed(by: disposeBag)
         
         let input = DeleteAccountViewModel.Input(
+            viewDidLoad: viewDidLoadSubject.asObservable(),
             deleteTap: deleteAccountModal.rx.deleteAccountButtonTapped.asObservable()
         )
         
         let output = viewModel.transform(input)
         
+        output.nickname
+            .filter { !$0.isEmpty }
+            .drive(with: self) { owner, nickname in
+                owner.deleteAccountModal.updateNickname(nickname)
+            }
+            .disposed(by: disposeBag)
+        
         output.deleteSuccess
             .withUnretained(self)
             .emit(onNext: { owner, _ in
                 owner.animateModalOut {
-                    print("회원탈퇴 성공")
-                    // TODO: - 로그인 화면으로 이동
-                    owner.dismiss(animated: false)
+                    owner.dismiss(animated: false) {
+                        NotificationCenter.default.post(
+                            name: .deleteAccountSuccess,
+                            object: nil
+                        )
+                    }
                 }
             })
             .disposed(by: disposeBag)
         
         output.errorMessage
             .withUnretained(self)
-            .emit(onNext: { owner, _ in
-                print("회원탈퇴 실패")
+            .emit(onNext: { owner, errorMessage in
+                let alert = NoticeModalViewController(
+                    title: "회원 탈퇴 실패",
+                    comment: errorMessage
+                )
+                owner.present(alert, animated: false)
             })
+            .disposed(by: disposeBag)
+        
+        output.isDeleting
+            .drive(with: self) { owner, isDeleting in
+                print(isDeleting ? "회원 탈퇴 중..." : "처리 완료")
+            }
             .disposed(by: disposeBag)
     }
     
