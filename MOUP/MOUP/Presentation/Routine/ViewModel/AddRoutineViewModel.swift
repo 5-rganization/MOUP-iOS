@@ -234,11 +234,9 @@ final class AddRoutineViewModel {
                                 tasks: tasks
                             )
                             
-                            print("루틴 생성 성공: \(routineSummary)")
                             observer.onNext(routineSummary)
                             observer.onCompleted()
                         } catch {
-                            print("루틴 생성 실패: \(error)")
                             errorRelay.accept("루틴 생성에 실패했습니다.")
                             observer.onCompleted()
                         }

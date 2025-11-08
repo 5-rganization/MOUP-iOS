@@ -68,7 +68,6 @@ final class NotificationRepository: NotificationRepositoryProtocol {
             }
         }
         
-        print("날짜 파싱 실패: \(dateString), 현재 시간 사용")
         return Date()
     }
 }

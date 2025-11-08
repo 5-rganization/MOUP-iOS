@@ -6,9 +6,14 @@
 //
 
 import Foundation
+import os
 
 final class UserRepository: UserRepositoryProtocol {
     private let userService: UserServiceProtocol
+    private let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier!,
+        category: "UserRepository"
+    )
     
     init(userService: UserServiceProtocol) {
         self.userService = userService
@@ -53,6 +58,6 @@ final class UserRepository: UserRepositoryProtocol {
         
         UserDefaultsManager.shared.clearAllData()
         
-        print("🗑️ 로컬 데이터 정리 완료 (회원 탈퇴)")
+        logger.info("로컬 데이터 정리 완료(회원 탈퇴)")
     }
 }

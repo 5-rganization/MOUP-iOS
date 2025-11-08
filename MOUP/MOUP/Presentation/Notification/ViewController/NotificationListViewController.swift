@@ -144,7 +144,6 @@ private extension NotificationListViewController {
     }
     
     @objc func handlePushNotificationReceived() {
-        print("푸시 알림 수신 -> 알림 목록 새로고침")
         refreshSubject.onNext(())
     }
 }

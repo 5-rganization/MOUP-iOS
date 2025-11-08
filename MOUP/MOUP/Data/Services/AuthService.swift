@@ -81,9 +81,6 @@ final class AuthService: AuthServiceProtocol {
             .serializingDecodable(UpdateFCMTokenResponseDTO.self)
             .response
         
-        print(response.value)
-        print("statusCode: \(response.response?.statusCode)")
-        
         guard let statusCode = response.response?.statusCode else {
             throw NetworkError.noResponse
         }
@@ -112,18 +109,6 @@ final class AuthService: AuthServiceProtocol {
     func logout() async throws -> LogoutResponseDTO {
         let request = session.request(AuthRouter.logout)
         let response = await request.serializingDecodable(LogoutResponseDTO.self).response
-        
-        print("========== 로그아웃 ==========")
-        print("statusCode: \(response.response?.statusCode ?? -1)")
-        
-        if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
-            print("응답: \(jsonString)")
-        }
-        
-        if let dto = response.value {
-            print("✅ 로그아웃 성공: userId \(dto.userId)")
-        }
-        print("============================")
         
         guard let statusCode = response.response?.statusCode else {
             throw NetworkError.noResponse

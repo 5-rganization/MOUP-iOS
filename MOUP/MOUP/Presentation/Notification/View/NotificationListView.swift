@@ -196,9 +196,6 @@ extension NotificationListView: UITableViewDelegate {
             guard let self else { return }
             let notification = self.notifications[indexPath.row]
             
-            // TODO: 삭제 처리
-            print("삭제: \(notification.id)")
-            
             completion(true)
         }
         

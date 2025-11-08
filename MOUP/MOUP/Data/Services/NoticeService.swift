@@ -14,52 +14,10 @@ protocol NoticeServiceProtocol: AnyObject {
 
 final class NoticeService: NoticeServiceProtocol {
     private lazy var session = NetworkManager.shared.session
-    private let useDummyData = true
     
     func fetchNotices() async throws -> [NoticeResponseDTO] {
-        if useDummyData {
-            return try await fetchDummyNotices()
-        } else {
-            return try await fetchRealNotices()
-        }
-    }
-    
-    // ✅ 더미 데이터 로드
-    private func fetchDummyNotices() async throws -> [NoticeResponseDTO] {
-        print("========== 공지사항 조회 (더미 데이터) ==========")
-        
-        // 네트워크 딜레이 시뮬레이션
-        try await Task.sleep(nanoseconds: 500_000_000)  // 0.5초
-        
-        guard let url = Bundle.main.url(forResource: "DummyNotice", withExtension: "json") else {
-            print("❌ DummyNotice.json 파일을 찾을 수 없습니다")
-            throw NetworkError.noResponse
-        }
-        
-        let data = try Data(contentsOf: url)
-        let dtos = try JSONDecoder().decode([NoticeResponseDTO].self, from: data)
-        
-        print("✅ 공지사항 \(dtos.count)개 조회 성공 (더미)")
-        print("==========================================")
-        
-        return dtos
-    }
-    
-    func fetchRealNotices() async throws -> [NoticeResponseDTO] {
         let request = session.request(NoticeRouter.fetchNotices)
         let response = await request.serializingDecodable([NoticeResponseDTO].self).response
-        
-        print("========== 공지사항 조회 ==========")
-        print("statusCode: \(response.response?.statusCode ?? -1)")
-        
-        if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
-            print("응답: \(jsonString)")
-        }
-        
-        if let dtos = response.value {
-            print("✅ 공지사항 \(dtos.count)개 조회 성공")
-        }
-        print("==================================")
         
         guard let statusCode = response.response?.statusCode else {
             throw NetworkError.noResponse

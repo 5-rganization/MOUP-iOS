@@ -148,8 +148,6 @@ private extension MyPageViewController {
         
         output.logoutSuccess
             .emit(with: self) { owner, _ in
-                print("로그아웃 성공")
-                
                 NotificationCenter.default.post(
                     name: .logoutSuccess,
                     object: nil

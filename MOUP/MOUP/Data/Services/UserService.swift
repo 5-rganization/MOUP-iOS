@@ -55,18 +55,6 @@ final class UserService: UserServiceProtocol {
             .serializingDecodable(UpdateNicknameResponseDTO.self)
             .response
         
-        print("========== 닉네임 수정 ==========")
-        print("statusCode: \(response.response?.statusCode ?? -1)")
-        
-        if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
-            print("응답: \(jsonString)")
-        }
-        
-        if let dto = response.value {
-            print("✅ 닉네임 수정 성공: \(dto.nickname)")
-        }
-        print("================================")
-        
         guard let statusCode = response.response?.statusCode else {
             throw NetworkError.noResponse
         }
@@ -98,18 +86,6 @@ final class UserService: UserServiceProtocol {
     func deleteAccount() async throws -> DeleteAccountResponseDTO {
         let request = session.request(UserRouter.deleteAccount)
         let response = await request.serializingDecodable(DeleteAccountResponseDTO.self).response
-        
-        print("========== 회원 탈퇴 ==========")
-        print("statusCode: \(response.response?.statusCode ?? -1)")
-        
-        if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
-            print("응답: \(jsonString)")
-        }
-        
-        if let dto = response.value {
-            print("✅ 회원 탈퇴 성공: userId \(dto.userId), deletedAt: \(dto.deletedAt)")
-        }
-        print("============================")
         
         guard let statusCode = response.response?.statusCode else {
             throw NetworkError.noResponse

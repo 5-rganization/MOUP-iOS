@@ -102,7 +102,6 @@ private extension RoutineSelectionViewController {
         
         output.error
             .emit(with: self) { owner, message in
-                print("❌ 에러: \(message)")
                 // TODO: - 에러 알림 표시
             }
             .disposed(by: disposeBag)

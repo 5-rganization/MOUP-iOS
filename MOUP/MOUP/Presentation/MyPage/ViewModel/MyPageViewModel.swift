@@ -103,7 +103,6 @@ final class MyPageViewModel {
                     successRelay.accept(())
                 case .failure(let error):
                     errorRelay.accept("로그아웃에 실패했습니다. 잠시 후 다시 시도해주세요.")
-                    print("로그아웃 에러: \(error.localizedDescription)")
                 }
             })
             .disposed(by: disposeBag)

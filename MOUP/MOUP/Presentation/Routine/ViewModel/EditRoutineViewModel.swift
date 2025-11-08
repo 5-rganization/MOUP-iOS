@@ -63,7 +63,6 @@ final class EditRoutineViewModel {
             value: initialTasks.isEmpty ? [RoutineTaskItem(content: "", orderIndex: 0)] : initialTasks
         )
 
-        // alarmTime 파싱
         let initialAlarmTime: DateComponents? = {
             guard let alarmTime = initialRoutine.alarmTime else { return nil }
             let components = alarmTime.split(separator: ":")
@@ -115,7 +114,6 @@ final class EditRoutineViewModel {
                 let (index, text) = change
                 guard newItems.indices.contains(index) else { return newItems }
 
-                // content만 변경하고 id와 orderIndex는 보존
                 newItems[index] = RoutineTaskItem(
                     content: text,
                     orderIndex: newItems[index].orderIndex,
@@ -137,7 +135,6 @@ final class EditRoutineViewModel {
                 let itemToMove = newItems.remove(at: sourceIndex)
                 newItems.insert(itemToMove, at: destinationIndex)
 
-                // orderIndex만 재정렬하고 id는 보존
                 return newItems.enumerated().map { index, item in
                     RoutineTaskItem(content: item.content, orderIndex: index, id: item.id)
                 }
@@ -155,7 +152,6 @@ final class EditRoutineViewModel {
                 if newItems.isEmpty {
                     newItems.append(RoutineTaskItem(content: "", orderIndex: 0))
                 } else {
-                    // orderIndex만 재정렬하고 id는 보존
                     newItems = newItems.enumerated().map { index, item in
                         RoutineTaskItem(content: item.content, orderIndex: index, id: item.id)
                     }
@@ -212,12 +208,9 @@ final class EditRoutineViewModel {
                                 routineName: title,
                                 alarmTime: alarmTimeString
                             )
-
-                            print("루틴 업데이트 성공: \(updatedRoutine)")
                             observer.onNext(updatedRoutine)
                             observer.onCompleted()
                         } catch {
-                            print("루틴 업데이트 실패: \(error)")
                             errorRelay.accept("루틴 업데이트에 실패했습니다.")
                             observer.onCompleted()
                         }

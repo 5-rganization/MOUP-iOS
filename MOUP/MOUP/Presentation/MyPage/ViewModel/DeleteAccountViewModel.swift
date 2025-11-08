@@ -56,7 +56,6 @@ final class DeleteAccountViewModel {
                             observer.onNext(profile.nickname)
                             observer.onCompleted()
                         } catch {
-                            print("❌ 프로필 조회 실패: \(error.localizedDescription)")
                             observer.onNext("회원")
                             observer.onCompleted()
                         }
@@ -95,7 +94,6 @@ final class DeleteAccountViewModel {
                     successRelay.accept(())
                 case .failure(let error):
                     errorRelay.accept("회원 탈퇴에 실패했습니다. 잠시 후 다시 시도해주세요.")
-                    print("❌ 회원 탈퇴 에러: \(error.localizedDescription)")
                 }
             })
             .disposed(by: disposeBag)

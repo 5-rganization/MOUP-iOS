@@ -96,7 +96,6 @@ final class NotificationListViewModel {
                             observer.onNext(tappedNotification.id)
                             observer.onCompleted()
                         } catch {
-                            print("읽음 처리 실패: \(error)")
                             observer.onCompleted()
                         }
                     }

@@ -6,10 +6,15 @@
 //
 
 import Foundation
+import os
 
 final class AuthRepository: AuthRepositoryProtocol {
     // MARK: - Properties
     private let authService: AuthServiceProtocol
+    private let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier!,
+        category: "AuthRepository"
+    )
     init(authService: AuthServiceProtocol) {
         self.authService = authService
     }
@@ -48,6 +53,6 @@ final class AuthRepository: AuthRepositoryProtocol {
         
         UserDefaultsManager.shared.clearAllData()
         
-        print("🗑️ 로컬 데이터 정리 완료")
+        logger.info("로컬 데이터 정리 완료")
     }
 }

@@ -126,7 +126,6 @@ private extension DeleteAccountModalViewController {
         output.deleteSuccess
             .withUnretained(self)
             .emit(onNext: { owner, _ in
-                print("✅ 회원 탈퇴 성공")
                 owner.animateModalOut {
                     owner.dismiss(animated: false) {
                         NotificationCenter.default.post(
@@ -141,8 +140,6 @@ private extension DeleteAccountModalViewController {
         output.errorMessage
             .withUnretained(self)
             .emit(onNext: { owner, errorMessage in
-                print("❌ 회원 탈퇴 실패: \(errorMessage)")
-                
                 let alert = NoticeModalViewController(
                     title: "회원 탈퇴 실패",
                     comment: errorMessage

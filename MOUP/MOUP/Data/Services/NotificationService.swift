@@ -23,18 +23,6 @@ final class NotificationService: NotificationServiceProtocol {
         let request = session.request(NotificationRouter.fetchNotifications)
         let response = await request.serializingDecodable([NotificationResponseDTO].self).response
         
-        print("========== 알림 목록 조회 ==========")
-        print("statusCode: \(response.response?.statusCode ?? -1)")
-        
-        if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
-            print("응답: \(jsonString)")
-        }
-        
-        if let dtos = response.value {
-            print("✅ 알림 \(dtos.count)개 조회 성공")
-        }
-        print("===================================")
-        
         guard let statusCode = response.response?.statusCode else {
             throw NetworkError.noResponse
         }
@@ -61,11 +49,6 @@ final class NotificationService: NotificationServiceProtocol {
         let request = session.request(NotificationRouter.markAsRead(id: id))
         let response = await request.serializingData().response
         
-        print("========== 알림 읽음 처리 ==========")
-        print("statusCode: \(response.response?.statusCode ?? -1)")
-        print("알림 ID: \(id)")
-        print("===================================")
-        
         guard let statusCode = response.response?.statusCode else {
             throw NetworkError.noResponse
         }
@@ -78,10 +61,6 @@ final class NotificationService: NotificationServiceProtocol {
     func markAllAsRead() async throws {
         let request = session.request(NotificationRouter.markAllAsRead)
         let response = await request.serializingData().response
-        
-        print("========== 알림 모두 읽음 처리 ==========")
-        print("statusCode: \(response.response?.statusCode ?? -1)")
-        print("======================================")
         
         guard let statusCode = response.response?.statusCode else {
             throw NetworkError.noResponse
@@ -96,11 +75,6 @@ final class NotificationService: NotificationServiceProtocol {
         let request = session.request(NotificationRouter.deleteNotification(id: id))
         let response = await request.serializingData().response
         
-        print("========== 알림 삭제 ==========")
-        print("statusCode: \(response.response?.statusCode ?? -1)")
-        print("알림 ID: \(id)")
-        print("==============================")
-        
         guard let statusCode = response.response?.statusCode else {
             throw NetworkError.noResponse
         }
@@ -113,10 +87,6 @@ final class NotificationService: NotificationServiceProtocol {
     func deleteAllNotifications() async throws {
         let request = session.request(NotificationRouter.deleteAllNotifications)
         let response = await request.serializingData().response
-        
-        print("========== 알림 모두 삭제 ==========")
-        print("statusCode: \(response.response?.statusCode ?? -1)")
-        print("==================================")
         
         guard let statusCode = response.response?.statusCode else {
             throw NetworkError.noResponse
