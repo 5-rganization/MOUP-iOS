@@ -47,7 +47,7 @@ final class LoadingAnimationView: UIView {
         startRotation()
     }
     
-    func stopAnimation() {
+    func stopAnimation(completion: (() -> Void)? = nil) {
         // 애니메이션 정지
         logoImageView.layer.removeAllAnimations()
         
@@ -57,6 +57,7 @@ final class LoadingAnimationView: UIView {
             self.logoImageView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
         } completion: { _ in
             self.removeFromSuperview()
+            completion?()
         }
     }
     

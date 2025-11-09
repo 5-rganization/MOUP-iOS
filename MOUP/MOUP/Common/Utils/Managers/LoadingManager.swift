@@ -48,8 +48,9 @@ final class LoadingManager {
     private func hide() {
         guard let loading = loadingView else { return }
         
-        loading.stopAnimation()
-        self.loadingView = nil
+        loading.stopAnimation() {
+            self.loadingView = nil
+        }
     }
     
     private func getKeyWindow() -> UIWindow? {

@@ -111,8 +111,8 @@ final class HomeViewModel {
 private extension HomeViewModel {
     func fetchHomeWorkerData() {
         Task {
-            await MainActor.run { LoadingManager.start() }
-            defer { Task { @MainActor in LoadingManager.stop() } }
+            LoadingManager.start()
+            defer { LoadingManager.stop() }
             
             do {
                 let result = try await homeUseCase.fetchWorkerHomeData()
@@ -152,8 +152,8 @@ private extension HomeViewModel {
     
     func fetchHomeOwnerData() {
         Task {
-            await MainActor.run { LoadingManager.start() }
-            defer { Task { @MainActor in LoadingManager.stop() } }
+            LoadingManager.start()
+            defer { LoadingManager.stop() }
             
             do {
                 let result = try await homeUseCase.fetchOwnerHomeData()
