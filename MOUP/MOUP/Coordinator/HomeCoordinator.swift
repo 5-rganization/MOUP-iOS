@@ -80,20 +80,6 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(vc, animated: true)
     }
     
-    func showAddRoutineViewController(onSave: @escaping (Routine) -> Void) {
-        let viewModel = AddRoutineViewModel()
-        let addRoutineVC = AddRoutineViewController(viewModel: viewModel)
-        addRoutineVC.onSave = onSave
-        navigationController.pushViewController(addRoutineVC, animated: true)
-    }
-    
-    func showEditRoutineViewController(routine: Routine, onEdit: @escaping (Routine) -> Void) {
-        let vm = EditRoutineViewModel(routine: routine)
-        let vc = EditRoutineViewController(viewModel: vm)
-        vc.onEdit = onEdit
-        navigationController.pushViewController(vc, animated: true)
-    }
-    
     func moveToTodayRoutine() {
         let viewModel = TodayRoutineViewModel(routineUseCase: routineUseCase)
         let vc = TodayRoutineViewController(viewModel: viewModel)
