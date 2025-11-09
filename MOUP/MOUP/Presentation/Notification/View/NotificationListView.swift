@@ -18,6 +18,7 @@ final class NotificationListView: UIView {
     fileprivate let notificationTappedSubject = PublishSubject<UserNotification>()
     fileprivate let markAllAsReadSubject = PublishSubject<Void>()
     fileprivate let deleteAllSubject = PublishSubject<Void>()
+    fileprivate let deleteSubject = PublishSubject<UserNotification>()
     private var notifications: [UserNotification] = []
     
     // MARK: - UI Components
@@ -193,9 +194,13 @@ extension NotificationListView: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let deleteAction = UIContextualAction(style: .destructive, title: "삭제") { [weak self] _, _, completion in
-            guard let self else { return }
+            guard let self else {
+                completion(false)
+                return
+            }
             let notification = self.notifications[indexPath.row]
             
+            self.deleteSubject.onNext(notification)
             completion(true)
         }
         
@@ -218,5 +223,9 @@ extension Reactive where Base: NotificationListView {
     
     var deleteAllTapped: ControlEvent<Void> {
         base.deleteAllButton.rx.tap
+    }
+    
+    var deleteTapped: ControlEvent<UserNotification> {
+        ControlEvent(events: base.deleteSubject)
     }
 }

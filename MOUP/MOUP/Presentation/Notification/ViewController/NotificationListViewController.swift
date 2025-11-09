@@ -91,7 +91,8 @@ private extension NotificationListViewController {
             notificationTapped: notificationListView.rx.notificationTapped.asObservable(),
             markAllReadTapped: notificationListView.rx.markAllReadTapped.asObservable(),
             deleteAllTapped: deleteAllConfirmed,
-            refreshTrigger: refreshSubject.asObservable()
+            refreshTrigger: refreshSubject.asObservable(),
+            deleteTapped: notificationListView.rx.deleteTapped.asObservable()
         )
         
         let output = viewModel.transform(input)
