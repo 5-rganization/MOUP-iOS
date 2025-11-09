@@ -5,6 +5,8 @@
 //  Created by shinyoungkim on 9/16/25.
 //
 
+import OSLog
+
 import UIKit
 import RxSwift
 import RxCocoa
@@ -17,6 +19,11 @@ final class EditRoutineViewController: UIViewController {
     private let viewModel: EditRoutineViewModel
     private let disposeBag = DisposeBag()
     var onEdit: ((RoutineSummary) -> Void)?
+    private let viewDidLoadSubject = PublishSubject<Void>()
+    private let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier!,
+        category: "EditRoutineViewController"
+    )
     
     // MARK: - Lifecycle
 
@@ -28,6 +35,7 @@ final class EditRoutineViewController: UIViewController {
         super.viewDidLoad()
 
         configure()
+        viewDidLoadSubject.onNext(())
     }
     
     // MARK: - Initializer
@@ -82,6 +90,7 @@ private extension EditRoutineViewController {
             .disposed(by: disposeBag)
 
         let input = EditRoutineViewModel.Input(
+            viewDidLoad: viewDidLoadSubject.asObservable(),
             titleChanged: editRoutineView.rx.titleText
                 .orEmpty
                 .skip(1)
@@ -148,6 +157,32 @@ private extension EditRoutineViewController {
                 alert.modalTransitionStyle = .crossDissolve
 
                 owner.present(alert, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        output.isLoading
+            .drive(with: self) { owner, isLoading in
+                if isLoading {
+                    // TODO: - 로딩 인디케이터 표시
+                } else {
+                    // TODO: - 로딩 인디케이터 숨김
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        output.fetchError
+            .emit(with: self) { owner, message in
+                owner.logger.error("Fetch 에러: \(message)")
+                
+                let alert = NoticeModalViewController(
+                    title: "오류",
+                    comment: message
+                )
+                alert.modalTransitionStyle = .crossDissolve
+                
+                owner.present(alert, animated: true) {
+                    owner.navigationController?.popViewController(animated: true)
+                }
             }
             .disposed(by: disposeBag)
     }

@@ -11,6 +11,7 @@ import RxDataSources
 
 class WorkplaceRoutineListViewController: UIViewController {
     // MARK: - Properties
+    weak var coordinator: HomeCoordinator?
     private let disposeBag = DisposeBag()
     private let viewModel: WorkplaceRoutineListViewModel
     private let workplaceRoutineListView: WorkplaceRoutineListView
@@ -89,7 +90,13 @@ private extension WorkplaceRoutineListViewController {
         )
         .withUnretained(self)
         .subscribe(onNext: { owner, result in
-            print(result)
+            let (_, routine) = result
+            
+            owner.coordinator?.showEditRoutineViewController(
+                routine: routine
+            ) { [weak owner] updatedRoutine in
+                owner?.viewModel.updateRoutine(updatedRoutine)
+            }
         })
         .disposed(by: disposeBag)
     }

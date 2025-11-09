@@ -32,6 +32,12 @@ final class HomeView: UIView {
         $0.configuration = config
     }
     
+    fileprivate let bellButton = UIButton().then {
+        var config = UIButton.Configuration.plain()
+        config.image = .bellButton
+        $0.configuration = config
+    }
+    
     fileprivate lazy var tableHeaderView = HomeHeaderContainerView(userRole: userRole) // TODO: - 실제 받아온 userRole 반영 필요
     
     fileprivate lazy var tableView = UITableView().then {
@@ -87,6 +93,13 @@ final class HomeView: UIView {
             cell.updateAttendanceState(activatedId: active?.homeWorkplace.workplace.id)
         }
     }
+    
+    func updateBellButton(hasUnread: Bool) {
+        let imageName: UIImage? = hasUnread ? .bellButtonWithDot : .bellButton
+        var config = bellButton.configuration
+        config?.image = imageName
+        bellButton.configuration = config
+    }
 }
 
 private extension HomeView {
@@ -100,7 +113,7 @@ private extension HomeView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(topBar, tableView)
-        topBar.addSubviews(logoImageView, refreshButton)
+        topBar.addSubviews(logoImageView, refreshButton, bellButton)
     }
     
     // MARK: - setStyles
@@ -124,8 +137,14 @@ private extension HomeView {
         }
         
         refreshButton.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(8)
+            $0.trailing.equalTo(bellButton.snp.leading)
             $0.centerY.equalToSuperview()
+            $0.size.equalTo(44)
+        }
+        
+        bellButton.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(8)
+            $0.centerY.equalTo(refreshButton.snp.centerY)
             $0.size.equalTo(44)
         }
         
@@ -140,7 +159,6 @@ private extension HomeView {
         tableHeaderView.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 332)
         tableView.tableHeaderView = tableHeaderView
     }
-    
 }
 
 extension Reactive where Base: HomeView {
@@ -158,5 +176,9 @@ extension Reactive where Base: HomeView {
     
     var refreshBtnTap: ControlEvent<Void> {
         return base.refreshButton.rx.tap
+    }
+    
+    var bellButtonTap: ControlEvent<Void> {
+        return base.bellButton.rx.tap
     }
 }

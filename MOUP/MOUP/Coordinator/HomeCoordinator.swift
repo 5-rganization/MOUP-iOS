@@ -22,6 +22,9 @@ final class HomeCoordinator: Coordinator {
     private let attendanceRepository: AttendanceRepositoryProtocol
     private let attendanceUseCase: AttendanceUseCaseProtocol
     private var userRole: UserRole
+    private let notificationService: NotificationServiceProtocol
+    private let notificationRepository: NotificationRepositoryProtocol
+    private let notificationUseCase: NotificationUseCaseProtocol
     
     init(navigationController: UINavigationController, userRole: UserRole) {
         self.navigationController = navigationController
@@ -38,14 +41,17 @@ final class HomeCoordinator: Coordinator {
         self.attendanceRepository = AttendanceRepository(attendanceService: attendanceService)
         self.attendanceUseCase = AttendanceUseCase(attendanceRepository: attendanceRepository)
         self.userRole = userRole
-        
+        self.notificationService = NotificationService()
+        self.notificationRepository = NotificationRepository(notificationService: notificationService)
+        self.notificationUseCase = NotificationUseCase(notificationRepository: notificationRepository)
     }
     
     func start() {
         let homeVM = HomeViewModel(
             userRole: userRole,
             homeUseCase: homeUseCase,
-            attendanceUseCase: attendanceUseCase
+            attendanceUseCase: attendanceUseCase,
+            notificationUseCase: notificationUseCase
         )
         let homeVC = HomeViewController(
             coordinator: self,
@@ -77,6 +83,7 @@ final class HomeCoordinator: Coordinator {
     func moveToAllRoutine() {
         let viewModel = AllRoutineViewModel(routineUseCase: routineUseCase)
         let vc = AllRoutineViewController(viewModel: viewModel)
+        vc.coordinator = self
         navigationController.pushViewController(vc, animated: true)
     }
     
@@ -161,5 +168,24 @@ final class HomeCoordinator: Coordinator {
     
     func removeChildCoordinator(_ coordinator: Coordinator) {
         childCoordinators.removeAll { $0 === coordinator }
+    }
+    
+    func showNotificationList() {
+        let viewModel = NotificationListViewModel(notificationUseCase: notificationUseCase)
+        let notificationListVC = NotificationListViewController(viewModel: viewModel)
+        navigationController.pushViewController(notificationListVC, animated: true)
+    }
+    
+    func showEditRoutineViewController(
+        routine: RoutineSummary,
+        onEdit: @escaping (RoutineSummary) -> Void
+    ) {
+        let vm = EditRoutineViewModel(
+            routineId: routine.routineId,
+            routineUseCase: routineUseCase
+        )
+        let vc = EditRoutineViewController(viewModel: vm)
+        vc.onEdit = onEdit
+        navigationController.pushViewController(vc, animated: true)
     }
 }

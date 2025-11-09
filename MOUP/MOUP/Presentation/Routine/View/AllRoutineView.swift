@@ -90,8 +90,8 @@ extension Reactive where Base: AllRoutineView {
         return base.tableView.rx.itemSelected
     }
     
-    var modelSeleted: ControlEvent<Routine> {
-        return base.tableView.rx.modelSelected(Routine.self)
+    var modelSeleted: ControlEvent<RoutineSummary> {
+        return base.tableView.rx.modelSelected(RoutineSummary.self)
     }
     
     var navBackBtnTapped: ControlEvent<Void> {
