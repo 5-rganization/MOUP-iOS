@@ -7,16 +7,6 @@
 
 import UIKit
 
-/// `YearMonthPickerCoordinator`의 이벤트를 `CalendarCoordinator`에 전달하는 Delegate
-protocol YearMonthPickerCoordinatorDelegate: AnyObject {
-    /// 연/월 Picker 화면 내림
-    func dismissed(_ coordinator: YearMonthPickerCoordinator)
-    /// 연/월 이동 취소
-    func cancelled(_ coordinator: YearMonthPickerCoordinator)
-    /// 선택한 연/월로 이동
-    func changeYearMonth(_ coordinator: YearMonthPickerCoordinator, focusedYear: Int, focusedMonth: Int)
-}
-
 /// `YearMonthPickerModalViewController` Coordinator
 final class YearMonthPickerCoordinator: Coordinator {
     
@@ -24,15 +14,14 @@ final class YearMonthPickerCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     
     // Initializer Injections
+    weak var parentCoordinator: CalendarCoordinator?
     private let navigationController: UINavigationController
     private let currYear: Int
     private let currMonth: Int
     
-    // Property Injections
-    weak var delegate: YearMonthPickerCoordinatorDelegate?
-    
     // MARK: - Initialzier
-    init(navigationController: UINavigationController, currYear: Int, currMonth: Int) {
+    init(parentCoordinator: CalendarCoordinator?, navigationController: UINavigationController, currYear: Int, currMonth: Int) {
+        self.parentCoordinator = parentCoordinator
         self.navigationController = navigationController
         self.currYear = currYear
         self.currMonth = currMonth
@@ -40,8 +29,7 @@ final class YearMonthPickerCoordinator: Coordinator {
     
     // MARK: - Coordinator Methods
     func start() {
-        let yearMonthPickerVC = YearMonthPickerModalViewController(currYear: currYear, currMonth: currMonth)
-        yearMonthPickerVC.delegate = self
+        let yearMonthPickerVC = YearMonthPickerModalViewController(coordinator: self, currYear: currYear, currMonth: currMonth)
         
         if let sheet = yearMonthPickerVC.sheetPresentationController {
             sheet.detents = [.medium()]
@@ -53,17 +41,17 @@ final class YearMonthPickerCoordinator: Coordinator {
     }
 }
 
-// MARK: - YearMonthPickerModalVCDelegate
-extension YearMonthPickerCoordinator: YearMonthPickerModalVCDelegate {
+// MARK: - Parent Coordinator Methods
+extension YearMonthPickerCoordinator {
     func dismissReceived() {
-        delegate?.dismissed(self)
+        parentCoordinator?.dismissed(self)
     }
     
     func cancelButtonTapped() {
-        delegate?.cancelled(self)
+        parentCoordinator?.cancelled(self)
     }
     
     func gotoButtonTapped(focusedYear: Int, focusedMonth: Int) {
-        delegate?.changeYearMonth(self, focusedYear: focusedYear, focusedMonth: focusedMonth)
+        parentCoordinator?.changeYearMonth(self, focusedYear: focusedYear, focusedMonth: focusedMonth)
     }
 }
