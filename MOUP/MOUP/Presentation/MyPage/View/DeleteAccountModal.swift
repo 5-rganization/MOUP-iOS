@@ -39,7 +39,7 @@ final class DeleteAccountModal: UIView {
     }
     
     private let descriptionLabel = UILabel().then {
-        $0.text = "탈퇴일 포함 3일 동안은 재가입할 수 없으며,\n재가입하더라도 이전 이용 내역은 복구되지 않습니다."
+        $0.text = "3일 이내 재가입 시 기존 데이터를 복구할 수 있어요.\n기간이 지나면 모든 정보가 영구 삭제됩니다."
         $0.font = .bodyMedium(16)
         $0.setLineSpacing(.bodyMedium)
         $0.textColor = .gray700
