@@ -25,6 +25,7 @@ final class HomeCoordinator: Coordinator {
     private let notificationService: NotificationServiceProtocol
     private let notificationRepository: NotificationRepositoryProtocol
     private let notificationUseCase: NotificationUseCaseProtocol
+    private let draftRoutineStorage: DraftRoutineStorageProtocol
     
     init(navigationController: UINavigationController, userRole: UserRole) {
         self.navigationController = navigationController
@@ -44,6 +45,7 @@ final class HomeCoordinator: Coordinator {
         self.notificationService = NotificationService()
         self.notificationRepository = NotificationRepository(notificationService: notificationService)
         self.notificationUseCase = NotificationUseCase(notificationRepository: notificationRepository)
+        self.draftRoutineStorage = DraftRoutineStorage()
     }
     
     func start() {
@@ -166,6 +168,16 @@ final class HomeCoordinator: Coordinator {
         let viewModel = NotificationListViewModel(notificationUseCase: notificationUseCase)
         let notificationListVC = NotificationListViewController(viewModel: viewModel)
         navigationController.pushViewController(notificationListVC, animated: true)
+    }
+    
+    func showAddRoutineViewController(onSave: @escaping (RoutineSummary) -> Void) {
+        let viewModel = AddRoutineViewModel(
+            routineUseCase: routineUseCase,
+            storage: draftRoutineStorage
+        )
+        let addRoutineVC = AddRoutineViewController(viewModel: viewModel)
+        addRoutineVC.onSave = onSave
+        navigationController.pushViewController(addRoutineVC, animated: true)
     }
     
     func showEditRoutineViewController(
