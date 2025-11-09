@@ -18,40 +18,15 @@ final class NicknameView: UIView {
     private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     
     private let defaultNoticeAttributedString: NSAttributedString = {
-        let boldTargets = [
-            "✅ 사용할 수 있어요",
-            "• 길이",
-            "• 문자",
-            "❌ 사용할 수 없어요",
-            "• 혼용",
-            "• 공백",
-            "• 특수문자",
-            "• 불완전한 한글"
-        ]
-        
         let fullText = """
-            ✅ 사용할 수 있어요
-            • 길이: 1자 이상 8자 이하
-            • 문자: 한글, 영문, 숫자
-            
-            ❌ 사용할 수 없어요
-            • 혼용: 한글과 영문은 함께 쓸 수 없어요.
-              • (예: Moup모업 ❌, Moup ✅, 모업 ✅)
-            • 공백: 띄어쓰기(공백)는 사용할 수 없어요.
-            • 특수문자: 사용할 수 없어요.
-            • 불완전한 한글: 완성되지 않은 글자는 사용할 수 없어요.
-              • (예: 'ㄱㄴ', 'ㅏㅑ' ❌)
+            1~8자 한글·영문·숫자 사용가능
+            한글·영문 혼용, 띄어쓰기, 특수문자 사용 불가
             """
         
         var attributedString = AttributedString(fullText)
         attributedString.font = .fieldsRegular(12)
         attributedString.foregroundColor = .gray700
         
-        for target in boldTargets {
-            if let range = attributedString.range(of: target) {
-                attributedString[range].font = .headBold(12)
-            }
-        }
         return NSAttributedString(attributedString)
     }()
     
