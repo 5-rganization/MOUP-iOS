@@ -14,6 +14,7 @@ final class EditRoutineViewModel {
     // MARK: - Input
 
     struct Input {
+        let viewDidLoad: Observable<Void>
         let titleChanged: Observable<String>
         let alarmTimeChanged: Observable<DateComponents?>
         let editButtonTapped: Observable<Void>
@@ -35,53 +36,84 @@ final class EditRoutineViewModel {
         let validationFocus: Signal<ValidationFocusTarget>
         let editCompleted: Signal<RoutineSummary>
         let error: Signal<String>
+        let isLoading: Driver<Bool>
+        let fetchError: Signal<String>
     }
 
     // MARK: - Properties
 
-    private let initialRoutine: RoutineSummary
-    private let initialTasks: [RoutineTaskItem]
+    private let routineId: Int
     private let routineUseCase: RoutineUseCaseProtocol
     private let disposeBag = DisposeBag()
 
     // MARK: - Initializer
 
     init(
-        routine: RoutineSummary,
-        tasks: [RoutineTaskItem],
+        routineId: Int,
         routineUseCase: RoutineUseCaseProtocol
     ) {
-        self.initialRoutine = routine
-        self.initialTasks = tasks
+        self.routineId = routineId
         self.routineUseCase = routineUseCase
     }
 
     // MARK: - Transform
 
     func transform(input: Input) -> Output {
-        let itemsRelay = BehaviorRelay<[RoutineTaskItem]>(
-            value: initialTasks.isEmpty ? [RoutineTaskItem(content: "", orderIndex: 0)] : initialTasks
-        )
-
-        let initialAlarmTime: DateComponents? = {
-            guard let alarmTime = initialRoutine.alarmTime else { return nil }
-            let components = alarmTime.split(separator: ":")
-            guard components.count == 2,
-                  let hour = Int(components[0]),
-                  let minute = Int(components[1]) else { return nil }
-            var dateComponents = DateComponents()
-            dateComponents.hour = hour
-            dateComponents.minute = minute
-            return dateComponents
-        }()
-
-        let titleRelay = BehaviorRelay<String>(value: initialRoutine.routineName)
-        let alarmTimeRelay = BehaviorRelay<DateComponents?>(value: initialAlarmTime)
-
+        let itemsRelay = BehaviorRelay<[RoutineTaskItem]>(value: [])
+        let titleRelay = BehaviorRelay<String>(value: "")
+        let alarmTimeRelay = BehaviorRelay<DateComponents?>(value: nil)
+        let loadingRelay = BehaviorRelay<Bool>(value: false)
         let focusRelay = PublishRelay<Int>()
         let validationFocusRelay = PublishRelay<ValidationFocusTarget>()
         let saveCompletedRelay = PublishRelay<RoutineSummary>()
         let errorRelay = PublishRelay<String>()
+        let fetchErrorRelay = PublishRelay<String>()
+        
+        input.viewDidLoad
+            .do(onNext: { _ in
+                loadingRelay.accept(true)
+            })
+            .flatMapLatest { [weak self] _ -> Observable<RoutineDetail> in
+                guard let self else { return .empty() }
+                
+                return Observable.create { observer in
+                    Task {
+                        do {
+                            let routineDetail = try await self.routineUseCase.fetchRoutineDetail(
+                                routineId: self.routineId
+                            )
+                            observer.onNext(routineDetail)
+                            observer.onCompleted()
+                        } catch {
+                            fetchErrorRelay.accept("루틴 정보를 불러올 수 없습니다.")
+                            observer.onError(error)
+                        }
+                        loadingRelay.accept(false)
+                    }
+                    return Disposables.create()
+                }
+            }
+            .subscribe(onNext: { routineDetail in
+                titleRelay.accept(routineDetail.summary.routineName)
+                
+                if let alarmTime = routineDetail.summary.alarmTime {
+                    let components = alarmTime.split(separator: ":")
+                    if components.count == 2,
+                       let hour = Int(components[0]),
+                       let minute = Int(components[1]) {
+                        var dateComponents = DateComponents()
+                        dateComponents.hour = hour
+                        dateComponents.minute = minute
+                        alarmTimeRelay.accept(dateComponents)
+                    }
+                }
+                
+                let tasks = routineDetail.tasks.isEmpty
+                    ? [RoutineTaskItem(content: "", orderIndex: 0)]
+                    : routineDetail.tasks
+                itemsRelay.accept(tasks)
+            })
+            .disposed(by: disposeBag)
 
         input.titleChanged
             .bind(to: titleRelay)
@@ -197,14 +229,14 @@ final class EditRoutineViewModel {
                     Task {
                         do {
                             try await self.routineUseCase.updateRoutine(
-                                routineId: self.initialRoutine.routineId,
+                                routineId: self.routineId,
                                 name: title,
                                 alarmTime: alarmTimeString,
                                 tasks: tasks
                             )
 
                             let updatedRoutine = RoutineSummary(
-                                routineId: self.initialRoutine.routineId,
+                                routineId: self.routineId,
                                 routineName: title,
                                 alarmTime: alarmTimeString
                             )
@@ -228,7 +260,9 @@ final class EditRoutineViewModel {
             alarmTime: alarmTimeRelay.asDriver(),
             validationFocus: validationFocusRelay.asSignal(),
             editCompleted: saveCompletedRelay.asSignal(),
-            error: errorRelay.asSignal()
+            error: errorRelay.asSignal(),
+            isLoading: loadingRelay.asDriver(),
+            fetchError: fetchErrorRelay.asSignal()
         )
     }
 }
