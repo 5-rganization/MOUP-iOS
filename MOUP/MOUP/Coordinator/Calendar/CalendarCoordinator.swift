@@ -133,6 +133,9 @@ extension CalendarCoordinator {
             dump(work)
         } else {
             logger.debug("WorkRegisterVC 표시 - 근무 등록")
+            let coordinator = WorkRegisterCoordinator(navigationController: navigationController)
+            childCoordinators.append(coordinator)
+            coordinator.start()
         }
     }
     

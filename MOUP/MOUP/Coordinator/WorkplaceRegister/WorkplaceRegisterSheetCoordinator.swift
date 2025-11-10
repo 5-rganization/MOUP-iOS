@@ -47,14 +47,9 @@ final class WorkplaceRegisterSheetCoordinator: Coordinator {
 
     func moveToDirectRegistration() {
         print("moveToDirectRegistration")
-
-        sheetNav?.dismiss(animated: true) { [weak self] in
-            guard let self = self else { return }
-
-            let coordinator = WorkplaceRegisterCoordinator(navigationController: self.navigationController)
-            self.childCoordinators.append(coordinator)
-            coordinator.start()
-        }
+        let coordinator = WorkplaceRegisterCoordinator(navigationController: self.navigationController)
+        self.childCoordinators.append(coordinator)
+        coordinator.start()
     }
 
     
