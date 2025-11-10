@@ -167,7 +167,10 @@ private extension InfoRowView {
             
         case .colorWithChevron:
             addSubviews(colorDotView, titleLabel, chevronButton)
+            
         }
+        
+        
     }
     
     // MARK: - setStyles
