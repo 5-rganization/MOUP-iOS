@@ -25,7 +25,7 @@ enum RadioButtonType {
     )
     case none(
         selectedRadioButton: UIImage,
-        unselectedRadioButton: UIImage
+        unselectedRadioButton: UIImage?
     )
 }
 
