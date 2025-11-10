@@ -21,13 +21,21 @@ final class HomeViewController: UIViewController {
     private let endBtnRelay = PublishRelay<Int>()
     private let viewWillAppearRelay = PublishRelay<Void>()
     
-    private lazy var dataSource = RxTableViewSectionedAnimatedDataSource<HomeTableViewFirstSection>(animationConfiguration: AnimationConfiguration(deleteAnimation: .automatic)) { dataSource, tableView, indexPath, item in
+    private lazy var dataSource = RxTableViewSectionedAnimatedDataSource<HomeTableViewFirstSection>(animationConfiguration: AnimationConfiguration(deleteAnimation: .automatic)) {
+        dataSource,
+        tableView,
+        indexPath,
+        item in
         switch item {
         case .owner(let ownerInfo):
             guard let cell = tableView.dequeueReusableCell(withIdentifier: OwnerWorkplaceCell.identifier, for: indexPath) as? OwnerWorkplaceCell else {
                 return UITableViewCell()
             }
-            let menu = self.setMenu(role: .owner, workplaceId: ownerInfo.workplace.id)
+            let menu = self.setMenu(
+                role: .owner,
+                workplaceId: ownerInfo.workplace.id,
+                workplaceName: ownerInfo.workplace.name
+            )
             cell.update(info: ownerInfo, menu: menu)
             cell.delegate = self
             return cell
@@ -35,7 +43,11 @@ final class HomeViewController: UIViewController {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: WorkerWorkplaceCell.identifier, for: indexPath) as? WorkerWorkplaceCell else {
                 return UITableViewCell()
             }
-            let menu = self.setMenu(role: .worker, workplaceId: workerInfo.homeWorkplace.workplace.id)
+            let menu = self.setMenu(
+                role: .worker,
+                workplaceId: workerInfo.homeWorkplace.workplace.id,
+                workplaceName: workerInfo.homeWorkplace.workplace.name
+            )
             cell.update(info: workerInfo, menu: menu)
             cell.delegate = self
             return cell
@@ -174,7 +186,7 @@ private extension HomeViewController {
 
 private extension HomeViewController {
     // MARK: - UIMenu Methods
-    func setMenu(role: UserRole, workplaceId: Int) -> UIMenu {
+    func setMenu(role: UserRole, workplaceId: Int, workplaceName: String) -> UIMenu {
         let children: [UIAction] = { [weak self] in
             guard let self else { return [] }
             switch role {
@@ -182,7 +194,7 @@ private extension HomeViewController {
                 return [
                     edit(id: workplaceId),
                     delete(id: workplaceId),
-                    attendanceHistory(id: workplaceId)
+                    attendanceHistory(id: workplaceId, name: workplaceName)
                 ]
             case .owner:
                 return [
@@ -219,11 +231,11 @@ private extension HomeViewController {
         return action
     }
     
-    func attendanceHistory(id workplaceId: Int) -> UIAction {
+    func attendanceHistory(id workplaceId: Int, name workplaceName: String) -> UIAction {
         let action = UIAction(title: "출퇴근 기록") { [weak self] _ in
             guard let self else { return }
             print("출퇴근 기록 확인")
-            self.coordinator?.moveToAttendanceHistory(navTitle: "송눈섭", workplaceId: workplaceId) // TODO: - 알바 기준 UserDefault 등에 저장되어있는 닉네임 호출 필요
+            self.coordinator?.moveToAttendanceHistory(workplaceId: workplaceId, navTitle: workplaceName) // TODO: - 알바 기준 UserDefault 등에 저장되어있는 닉네임 호출 필요
         }
         return action
     }

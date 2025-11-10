@@ -50,6 +50,9 @@ final class InviteCodeSheetViewModel {
 private extension InviteCodeSheetViewModel {
     func fetchInviteCode(workplaceId: Int) {
         Task {
+            LoadingManager.start()
+            defer { LoadingManager.stop() }
+            
             do {
                 let response = try await workplaceUseCase.fetchInviteCode(workplaceId: workplaceId, forceGenerate: false)
                 inviteCodeRelay.accept(response.inviteCode)

@@ -87,14 +87,6 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(vc, animated: true)
     }
     
-//    func moveToAllRoutine() {
-//        let coordinator = RoutineSelectionCoordinator(navigationController: navigationController)
-//        childCoordinators.append(coordinator)
-//        DispatchQueue.main.async {
-//            coordinator.start()
-//        }
-//    }
-    
     func moveToTodayRoutine() {
         let viewModel = TodayRoutineViewModel(routineUseCase: routineUseCase)
         let vc = TodayRoutineViewController(viewModel: viewModel)
@@ -124,7 +116,7 @@ final class HomeCoordinator: Coordinator {
         navigationController.pushViewController(vc, animated: true)
     }
     
-    func moveToAttendanceHistory(navTitle: String, workplaceId: Int, workerId: Int? = nil) {
+    func moveToAttendanceHistory(workplaceId: Int, workerId: Int? = nil, navTitle: String) {
         
         let viewModel = AttendanceHistoryViewModel(
             userRole: userRole,
@@ -134,7 +126,7 @@ final class HomeCoordinator: Coordinator {
         )
         let vc = AttendanceHistoryViewController(
             viewModel: viewModel,
-            navTitle: navTitle
+            workplaceName: navTitle,
         )
         navigationController.pushViewController(vc, animated: true) // TODO: - 애니메이션 자연스러운지 다같이 확인해봐야함.
     }

@@ -140,6 +140,9 @@ final class HomeViewModel {
 private extension HomeViewModel {
     func fetchHomeWorkerData() {
         Task {
+            LoadingManager.start()
+            defer { LoadingManager.stop() }
+            
             do {
                 let result = try await homeUseCase.fetchWorkerHomeData()
                 await MainActor.run {
@@ -167,6 +170,7 @@ private extension HomeViewModel {
                         $0.homeWorkplace.isNowWorking == true
                     }
                     activeWorkplaceRelay.accept(activeWorkplace)
+                    
                 }
             } catch {
                 // TODO: - 잘못된 역할 등 예상치 못한 오류 발생 시 대책 강구 필요
@@ -177,6 +181,9 @@ private extension HomeViewModel {
     
     func fetchHomeOwnerData() {
         Task {
+            LoadingManager.start()
+            defer { LoadingManager.stop() }
+            
             do {
                 let result = try await homeUseCase.fetchOwnerHomeData()
                 await MainActor.run {
