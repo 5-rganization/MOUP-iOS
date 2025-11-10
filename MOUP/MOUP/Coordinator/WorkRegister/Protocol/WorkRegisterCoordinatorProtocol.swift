@@ -7,4 +7,5 @@
 
 protocol WorkRegisterCoordinatorProtocol: Coordinator {
     func showSelectColorLabel()
+    func showSelectWorkplace()
 }

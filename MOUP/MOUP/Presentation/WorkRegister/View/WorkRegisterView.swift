@@ -42,12 +42,13 @@ final class WorkRegisterView: UIView {
     private let workDateContainerView = WorkDateContainerView()
     private let workTimeContainerView = WorkTimeContainerView()
     private let workRoutinContainerView = WorkRoutinContainerView()
-//    private let colorLabelContainerView = ColorLabelContainerView()
     private let memoContainerView = MemoContainerView()
     
     private let registerButton = BaseButton(title: "등록하기", isSecondary: true)
     
-    
+    var getRegisterButton: BaseButton { registerButton }
+    var getMemoContainerView: MemoContainerView { memoContainerView }
+    var getSelectWorkplace: InfoRowView { selectWorkplace }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -135,6 +136,7 @@ private extension WorkRegisterView {
         }
         
         divider.snp.makeConstraints {
+            $0.top.equalTo(selectWorkplace.snp.bottom)
             $0.height.equalTo(1)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
