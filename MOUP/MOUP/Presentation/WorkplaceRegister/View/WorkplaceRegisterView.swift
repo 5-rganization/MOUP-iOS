@@ -81,15 +81,15 @@ private extension WorkplaceRegisterView {
         )
         
         contentView.addSubviews(
-            stackView
+            stackView,
+            registerButton
         )
         
         stackView.addArrangedSubviews(
             workplaceContainerView,
             payContainerView,
             workingConditionsContainerView,
-            colorLabelContainerView,
-            registerButton
+            colorLabelContainerView
         )
     }
     
@@ -101,7 +101,8 @@ private extension WorkplaceRegisterView {
     // MARK: - setConstraints
     func setConstraints() {
         scrollView.snp.makeConstraints {
-            $0.edges.equalTo(safeAreaLayoutGuide)
+            $0.top.trailing.leading.equalTo(safeAreaLayoutGuide)
+            $0.bottom.equalToSuperview()
         }
         
         contentView.snp.makeConstraints {
@@ -112,12 +113,13 @@ private extension WorkplaceRegisterView {
         stackView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(32)
             $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(12)
         }
         
         registerButton.snp.makeConstraints {
+            $0.top.equalTo(stackView.snp.bottom).offset(71)
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(45)
+            $0.bottom.equalToSuperview().inset(12)
         }
     }
 }
