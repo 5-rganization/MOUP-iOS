@@ -155,6 +155,7 @@ direction LR
 
 ```
 
+
 #### Cloud Firestore ERD
 
 ``` mermaid
@@ -280,7 +281,9 @@ erDiagram
 
 ## 🔧 트러블 슈팅
 
-### 프로젝트 개발 과정(Cloud Firestore)
+<details>
+	<summary><h3>개발 과정(Cloud Firestore)</h3></summary>
+<div markdown="1">
 
 #### DisposeBag으로 인한 onNext 미방출 현상
 ##### 문제 상황
@@ -443,7 +446,12 @@ if !hasLaunchedBefore {
 }
 ```
 
+</details>
+
 ---
+
+### 리팩토링 과정([Spring Boot](https://github.com/5-rganization/MOUP-Server))
+
 
 <br><br>
 
