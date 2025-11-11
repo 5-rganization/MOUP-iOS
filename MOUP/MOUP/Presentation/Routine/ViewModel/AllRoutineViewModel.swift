@@ -49,7 +49,7 @@ final class AllRoutineViewModel {
     // MARK: - Public Methods
     
     func updateRoutine(_ updatedRoutine: RoutineSummary) {
-        var currentItems = allRoutinesRelay.value
+        let currentItems = allRoutinesRelay.value
         
         guard !currentItems.isEmpty else { return }
         
@@ -58,7 +58,19 @@ final class AllRoutineViewModel {
         }
         
         allRoutinesRelay.accept([RoutineItem(items: updatedRoutines)])
-    }    
+    }
+    
+    func addRoutine(_ newRoutine: RoutineSummary) {
+        var currentItems = allRoutinesRelay.value
+        
+        if currentItems.isEmpty {
+            allRoutinesRelay.accept([RoutineItem(items: [newRoutine])])
+        } else {
+            var updatedRoutines = currentItems[0].items
+            updatedRoutines.append(newRoutine)
+            allRoutinesRelay.accept([RoutineItem(items: updatedRoutines)])
+        }
+    }
 }
 
 private extension AllRoutineViewModel {

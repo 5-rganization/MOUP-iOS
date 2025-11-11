@@ -118,7 +118,7 @@ private extension HomeView {
     
     // MARK: - setStyles
     func setStyles() {
-        
+        backgroundColor = .primaryBackground
     }
     
     // MARK: - setConstraints
