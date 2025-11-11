@@ -457,7 +457,7 @@ if !hasLaunchedBefore {
 | 범위 | 기술 이름 |
 |:---------:|:----------|
 | 의존성 관리 도구 | `SPM`, `CocoaPods` |
-| 형상 관리 도구 | `GitHub`, `Git` |
+| 형상 관리 도구 | `Git`, `GitHub` |
 | 아키텍처 | `MVVM`, `Clean Architecture` |
 | 디자인 패턴 | `Singleton`, `Delegate` |
 | 인터페이스 | `UIKit` |
@@ -466,7 +466,7 @@ if !hasLaunchedBefore {
 | 레이아웃 구성 | `SnapKit`, `Then` |
 | 내부 저장소 | `UserDefaults` |
 | 외부 저장소 | `Cloud Firestore` ➡️ [`Spring Boot`](https://github.com/5-rganization/MOUP-Server) |
-| 외부 인증 | `Firebase Auth`, `Sign in with Apple`, `Google Sign in` |
+| 외부 인증 | `Firebase Auth` ➡️ [`Spring Boot`](https://github.com/5-rganization/MOUP-Server), `Sign in with Apple`, `Google Sign in` |
 | 코드 컨벤션 | `StyleShare - Swift Style Guide` |
 | 커밋 컨벤션 | `Udacity Git Commit Message Style Guide` |
 
@@ -521,7 +521,9 @@ if !hasLaunchedBefore {
 
 ## 🔨 개발 환경
 
-<img src="https://img.shields.io/badge/Xcode-16.3-blue?logo=xcode"> <img src="https://img.shields.io/badge/iOS-16.0-white.svg">
+![Static Badge](https://img.shields.io/badge/Xcode%2016.3-147EFB?logo=xcode&logoColor=white&logoSize=auto)
+![Static Badge](https://img.shields.io/badge/16.0-000000?logo=ios&logoColor=white&logoSize=auto)
+
 
 <br><br>
 
