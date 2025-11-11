@@ -122,7 +122,8 @@ private extension WorkRegisterView {
     // MARK: - setConstraints
     func setConstraints() {
         scrollView.snp.makeConstraints {
-            $0.edges.equalTo(safeAreaLayoutGuide)
+            $0.top.trailing.leading.equalTo(safeAreaLayoutGuide)
+            $0.bottom.equalToSuperview()
         }
         
         contentView.snp.makeConstraints {
