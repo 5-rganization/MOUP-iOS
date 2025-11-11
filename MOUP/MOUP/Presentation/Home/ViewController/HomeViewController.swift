@@ -83,6 +83,7 @@ final class HomeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         viewWillAppearRelay.accept(())
+        self.navigationController?.navigationBar.isHidden = true
     }
 }
 
@@ -93,7 +94,7 @@ private extension HomeViewController {
     }
     
     func setStyles() {
-        self.navigationController?.navigationBar.isHidden = true
+        
     }
     
     func setBindings() {
