@@ -54,10 +54,8 @@
 
 ## 📊 다이어그램
 
-<details>
-	<summary><h3>개발 과정(Cloud Firestore)</h3></summary>
-<div markdown="1">
-		
+### 개발 과정(Cloud Firestore)
+
 #### 의존성 다이어그램
 
 ``` mermaid
@@ -227,8 +225,6 @@ erDiagram
     }
     
 ```
-
-</details>
 
 ---
 
