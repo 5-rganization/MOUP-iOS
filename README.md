@@ -458,15 +458,16 @@ if !hasLaunchedBefore {
 |:---------:|:----------|
 | 의존성 관리 도구 | `SPM`, `CocoaPods` |
 | 형상 관리 도구 | `Git`, `GitHub` |
-| 아키텍처 | `MVVM`, `Clean Architecture` |
-| 디자인 패턴 | `Singleton`, `Delegate` |
+| 아키텍처 | `Clean Architecture`, `MVVM` |
+| 디자인 패턴 | `Delegate`, `Singleton` |
 | 인터페이스 | `UIKit` |
-| 비동기 처리 | `RxSwift`, `RxCocoa`, `RxDataSources` |
+| 네트워크 | `Alamofire` |
+| 비동기 처리 | `Swift Concurrency`, `RxSwift`, `RxCocoa`, `RxDataSources` |
 | UI 라이브러리 | `JTAppleCalendar` |
 | 레이아웃 구성 | `SnapKit`, `Then` |
 | 내부 저장소 | `UserDefaults` |
 | 외부 저장소 | `Cloud Firestore` ➡️ [`Spring Boot`](https://github.com/5-rganization/MOUP-Server) |
-| 외부 인증 | `Firebase Auth` ➡️ [`Spring Boot`](https://github.com/5-rganization/MOUP-Server), `Sign in with Apple`, `Google Sign in` |
+| 외부 인증 | `Sign in with Apple`, `Google Sign in`, `Firebase Auth` ➡️ [`Spring Boot`](https://github.com/5-rganization/MOUP-Server) |
 | 코드 컨벤션 | `StyleShare - Swift Style Guide` |
 | 커밋 컨벤션 | `Udacity Git Commit Message Style Guide` |
 
