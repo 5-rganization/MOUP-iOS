@@ -33,6 +33,11 @@ final class FCMTokenManager {
             return
         }
         
+        guard KeychainManager.shared.read(key: "accessToken") != nil else {
+            logger.info("로그인 전이므로 FCM 토큰 동기화를 보류합니다.")
+            return
+        }
+        
         Task {
             do {
                 try await authUseCase.updateFCMToken(token)
