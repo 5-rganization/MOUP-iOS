@@ -44,7 +44,6 @@ final class AddRoutineView: UIView {
     fileprivate let itemTextChangeRelay = PublishRelay<(index: Int, text: String)>()
     fileprivate let itemMovedRelay = PublishRelay<(source: Int, destination: Int)>()
     fileprivate let itemDeleteRelay = PublishRelay<Int>()
-    fileprivate var isHandlingDragDrop = false
 
     // MARK: - UI Components
     
@@ -340,22 +339,10 @@ extension AddRoutineView: UITableViewDropDelegate {
         _ tableView: UITableView,
         performDropWith coordinator: UITableViewDropCoordinator
     ) {
-        let destinationIndexPath: IndexPath
-        if let indexPath = coordinator.destinationIndexPath {
-            destinationIndexPath = indexPath
-        } else {
-            let section = tableView.numberOfSections - 1
-            let row = tableView.numberOfRows(inSection: section)
-            destinationIndexPath = IndexPath(row: row, section: section)
-        }
-
-        guard let item = coordinator.items.first,
+        guard let destinationIndexPath = coordinator.destinationIndexPath,
+              let item = coordinator.items.first,
               let sourceIndexPath = item.sourceIndexPath else { return }
-
-        coordinator.drop(item.dragItem, toRowAt: destinationIndexPath)
-
-        self.isHandlingDragDrop = true
-
+        
         self.itemMovedRelay.accept(
             (source: sourceIndexPath.row, destination: destinationIndexPath.row)
         )
@@ -385,10 +372,7 @@ extension Reactive where Base: AddRoutineView {
             snapshot.appendSections([.main])
             snapshot.appendItems(items, toSection: .main)
 
-            let shouldAnimate = !view.isHandlingDragDrop
-            view.dataSource.apply(snapshot, animatingDifferences: shouldAnimate)
-
-            view.isHandlingDragDrop = false
+            view.dataSource.apply(snapshot, animatingDifferences: false)
         }
     }
     
