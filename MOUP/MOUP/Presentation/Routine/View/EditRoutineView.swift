@@ -20,7 +20,8 @@ final class EditRoutineView: UIView {
         tableView: tableView
     ) { tableView, indexPath, item in
         guard let cell = tableView.dequeueReusableCell(withIdentifier: TodoCell.id, for: indexPath) as? TodoCell else {
-            fatalError("TodoCell을 생성할 수 없습니다.")
+            assertionFailure("TodoCell 생성 실패 - 셀이 등록되지 않았거나 타입이 잘못됨")
+            return UITableViewCell()
         }
         cell.textField.text = item.content
         return cell
