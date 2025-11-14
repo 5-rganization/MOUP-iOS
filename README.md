@@ -54,19 +54,24 @@
 
 ## 📊 다이어그램
 
-### 개발 과정(Cloud Firestore)
-
+<details>
+	<summary><h3>개발 과정(Cloud Firestore)</h3></summary>
+	<div markdown="1">
+		
 #### 의존성 다이어그램
-
 ``` mermaid
----
-config:
-  class:
-    hideEmptyMembersBox: true
-  layout: elk
-  look: neo
-  theme: redux
----
+%%{
+  init: {
+    "theme": "default",
+    "fontFamily": "monospace",
+    "elk": {
+        "mergeEdges": false,
+        "nodePlacementStrategy": "BRANDES_KOEPF",
+        "forceNodeModelOrder": false,
+        "considerModelOrder": "NODES_AND_EDGES"
+    }
+  }
+}%%
 classDiagram
 direction LR
     CalendarService ..|> CalendarServiceProtocol
@@ -130,33 +135,43 @@ direction LR
     AuthUseCase ..|> AuthUseCaseProtocol
     AuthUseCaseProtocol <.. DeleteAccountViewModel
 
-	class CalendarServiceProtocol:::MOUP_primary100
-	class CalendarUseCaseProtocol:::MOUP_primary100
-	class EventServiceProtocol:::MOUP_primary100
-	class EventRepositoryProtocol:::MOUP_primary100
-	class EventUseCaseProtocol:::MOUP_primary100
-	class RoutineServiceProtocol:::MOUP_primary100
-	class RoutineRepositoryProtocol:::MOUP_primary100
-	class RoutineUseCaseProtocol:::MOUP_primary100
-	class UserServiceProtocol:::MOUP_primary100
-	class UserRepositoryProtocol:::MOUP_primary100
-	class UserUseCaseProtocol:::MOUP_primary100
-	class WorkplaceServiceProtocol:::MOUP_primary100
-	class WorkplaceRepositoryProtocol:::MOUP_primary100
-	class WorkplaceUseCaseProtocol:::MOUP_primary100
-	class AuthServiceProtocol:::MOUP_primary100
-	class AuthRepositoryProtocol:::MOUP_primary100
-	class AuthUseCaseProtocol:::MOUP_primary100
-	class CalendarRepositoryProtocol:::MOUP_primary100
+	class CalendarServiceProtocol:::MOUP_primary100 { <<protocol>> }
+	class CalendarUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+	class EventServiceProtocol:::MOUP_primary100 { <<protocol>> }
+	class EventRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+	class EventUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+	class RoutineServiceProtocol:::MOUP_primary100 { <<protocol>> }
+	class RoutineRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+	class RoutineUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+	class UserServiceProtocol:::MOUP_primary100 { <<protocol>> }
+	class UserRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+	class UserUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+	class WorkplaceServiceProtocol:::MOUP_primary100 { <<protocol>> }
+	class WorkplaceRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+	class WorkplaceUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+	class AuthServiceProtocol:::MOUP_primary100 { <<protocol>> }
+	class AuthRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+	class AuthUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+	class CalendarRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
 
 	classDef MOUP_primary100 fill:#FFE0D5
-
 ```
 
 
 #### Cloud Firestore ERD
-
 ``` mermaid
+%%{
+  init: {
+    "theme": "default",
+    "fontFamily": "monospace",
+    "elk": {
+        "mergeEdges": false,
+        "nodePlacementStrategy": "BRANDES_KOEPF",
+        "forceNodeModelOrder": false,
+        "considerModelOrder": "NODES_AND_EDGES"
+    }
+  }
+}%%
 erDiagram
     calendars ||--o{ calendarId: calendarIds
     calendarId ||--o{ eventId: events
@@ -223,8 +238,10 @@ erDiagram
         Bool weeklyAllowance
         String color
     }
-    
 ```
+</details>
+
+
 
 ---
 
@@ -242,34 +259,36 @@ erDiagram
 <br>
 
 <details>
-<summary> 급여, 인건비 계산 </summary>
-<div markdown="1">
+<summary>급여, 인건비 계산</summary>
+	<div markdown="1">
 
 ![알바생 급여 계산1](https://github.com/user-attachments/assets/43d014b0-479f-4230-bfbf-b2d915d3c438)
 ![알바생 급여 계산2](https://github.com/user-attachments/assets/eb00f77b-78b7-493a-b9ea-e82426e81a08)
 
-> **급여/인건비 계산**
->
-> - 근무지 등록시 해당 근무지에 대한 시급/고정급을 입력하면 실제 근무한 시간에 맞춰 자동으로 급여/인건비를 계산합니다.
-> - (알바생) 한 근무지에서 이번달 오늘까지 번 돈과 모든 근무지에서 총 급여를 계산하여 제공합니다.
-> - (사장님) 나의 매장에 속한 알바생들 각각의 인건비, 총 인건비를 계산하여 제공합니다.
+**급여/인건비 계산**
+
+- 근무지 등록시 해당 근무지에 대한 시급/고정급을 입력하면 실제 근무한 시간에 맞춰 자동으로 급여/인건비를 계산합니다.
+- (알바생) 한 근무지에서 이번달 오늘까지 번 돈과 모든 근무지에서 총 급여를 계산하여 제공합니다.
+- (사장님) 나의 매장에 속한 알바생들 각각의 인건비, 총 인건비를 계산하여 제공합니다.
 
 <br>
+
 </details>
 
 <details>
-<summary> 개인/공유 캘린더 </summary>
-<div markdown="1">
+	<summary>개인/공유 캘린더</summary>
+	<div markdown="1">
 
 ![알바생 캘린더](https://github.com/user-attachments/assets/59badc09-b03a-458a-a620-6a6101b85491)
 
-> **개인/공유 캘린더**
->
-> - 개인 캘린더는 사용자가 언제 근무가 있는지, 해당 근무의 급여는 얼마인지 보여주는 캘린더 입니다.
-> - 공유 캘린더에선 근무지/매장마다 근무하는 모든 인원의 근무 일정을 알 수 있습니다.
-> - 필터 기능을 통해 사용자가 원하는 근무지의 일정만 선택하여 보는것이 가능합니다.
+**개인/공유 캘린더**
+
+- 개인 캘린더는 사용자가 언제 근무가 있는지, 해당 근무의 급여는 얼마인지 보여주는 캘린더 입니다.
+- 공유 캘린더에선 근무지/매장마다 근무하는 모든 인원의 근무 일정을 알 수 있습니다.
+- 필터 기능을 통해 사용자가 원하는 근무지의 일정만 선택하여 보는것이 가능합니다.
 
 <br>
+
 </details>
 
 <br><br>
@@ -279,7 +298,7 @@ erDiagram
 
 <details>
 	<summary><h3>개발 과정(Cloud Firestore)</h3></summary>
-<div markdown="1">
+	<div markdown="1">
 
 #### DisposeBag으로 인한 onNext 미방출 현상
 ##### 문제 상황
