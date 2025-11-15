@@ -273,7 +273,9 @@ private extension WorkRegisterViewController {
 
         // MARK: - 루틴
         workRegisterView.rx.routinTap
-            .bind(onNext: { print("루틴 추가 버튼 클릭") })
+            .bind(onNext: { [weak self] in
+                self?.coordinator?.showRoutineSelection()
+            })
             .disposed(by: disposeBag)
 
         // MARK: - 메모
