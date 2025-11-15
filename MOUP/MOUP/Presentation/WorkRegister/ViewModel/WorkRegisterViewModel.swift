@@ -44,7 +44,7 @@ final class WorkRegisterViewModel:
     let repeatInfo = BehaviorRelay<RepeatInfo?>(value: nil)
     
     // MARK: - Selected Routine IDs
-    let selectedRoutineIDs = BehaviorRelay<[Int]>(value: [])
+    let selectedRoutines = BehaviorRelay<[RoutineSummary]>(value: [])
 
     // MARK: - Input
     let didTapRegister = PublishRelay<Void>()
@@ -124,17 +124,19 @@ private extension WorkRegisterViewModel {
                     breakPickerVM.confirmSelectedBreak.startWith(0),
                     memoText.asObservable(),
                     repeatInfo.asObservable(),
-                    selectedRoutineIDs.asObservable()
+                    selectedRoutines.asObservable()
                 )
             )
             .subscribe(onNext: { [weak self]
-                (workplace, date, clockIn, clockOut, breakMin, memo, repeatInfo, routineIDs) in
+                (workplace, date, clockIn, clockOut, breakMin, memo, repeatInfo, routines) in
 
                 guard let self else { return }
 
                 let dateStr = DateFormatter.dataSourceDateFormatter.string(from: date)
                 let clockInStr = DateFormatter.ko12hTimeFormatter.string(from: clockIn)
                 let clockOutStr = DateFormatter.ko12hTimeFormatter.string(from: clockOut)
+                
+                let routineIDs = routines.map { $0.routineId }
 
                 print("--------------------------------------------------")
                 print("근무 등록 요청")

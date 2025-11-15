@@ -17,7 +17,7 @@ final class RoutineSelectionCoordinator: Coordinator {
     
     private let draftRoutineStorage: DraftRoutineStorageProtocol
     
-    var onRoutinesSelected: (([Int]) -> Void)?
+    var onRoutinesSelected: (([RoutineSummary]) -> Void)?
     
     private lazy var viewModel: RoutineSelectionViewModel = {
         return RoutineSelectionViewModel(routineUseCase: routineUseCase)
