@@ -44,7 +44,7 @@ final class RoutineSelectionViewModel {
     struct Output {
         let rows: Driver<[RoutineSectionModel]>
         let error: Signal<String>
-        let selectedRoutineIDs: Signal<[Int]>
+        let selectedRoutines: Signal<[RoutineSummary]>
     }
     
     // MARK: - Properties
@@ -119,15 +119,17 @@ final class RoutineSelectionViewModel {
             .distinctUntilChanged()
             .asDriver(onErrorJustReturn: [])
         
-        let selectedRoutineIDs = input.applyButtonTapped
-            .withLatestFrom(checkedIDsRelay)
-            .map { Array($0).sorted() }
+        let selectedRoutines = input.applyButtonTapped
+            .withLatestFrom(Observable.combineLatest(routinesRelay, checkedIDsRelay))
+            .map { routines, checkedIDs -> [RoutineSummary] in
+                routines.filter { checkedIDs.contains($0.routineId) }
+            }
             .asSignal(onErrorJustReturn: [])
         
         return Output(
             rows: rows,
             error: errorRelay.asSignal(),
-            selectedRoutineIDs: selectedRoutineIDs
+            selectedRoutines: selectedRoutines
         )
     }
 }

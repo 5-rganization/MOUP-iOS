@@ -76,10 +76,10 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
     func showRoutineSelection() {
         let coordinator = RoutineSelectionCoordinator(navigationController: navigationController)
         childCoordinators.append(coordinator)
-        coordinator.onRoutinesSelected = { [weak self] routineIDs in
+        coordinator.onRoutinesSelected = { [weak self] routines in
             guard let self else { return }
             
-            self.workRegisterViewModel?.selectedRoutineIDs.accept(routineIDs)
+            self.workRegisterViewModel?.selectedRoutines.accept(routines)
         }
         
         coordinator.start()

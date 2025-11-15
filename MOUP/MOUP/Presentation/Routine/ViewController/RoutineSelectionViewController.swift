@@ -24,7 +24,7 @@ final class RoutineSelectionViewController: UIViewController {
     private let routineUpdatedRelay = PublishRelay<RoutineSummary>()
     private let applyButtonTappedRelay = PublishRelay<Void>()
     
-    var onRoutineSelected: (([Int]) -> Void)?
+    var onRoutineSelected: (([RoutineSummary]) -> Void)?
     
     // MARK: - Lifecycle
     
@@ -114,9 +114,9 @@ private extension RoutineSelectionViewController {
             }
             .disposed(by: disposeBag)
         
-        output.selectedRoutineIDs
-            .emit(with: self) { owner, routineIDs in
-                owner.onRoutineSelected?(routineIDs)
+        output.selectedRoutines
+            .emit(with: self) { owner, routines in
+                owner.onRoutineSelected?(routines)
                 owner.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)

@@ -277,6 +277,11 @@ private extension WorkRegisterViewController {
                 self?.coordinator?.showRoutineSelection()
             })
             .disposed(by: disposeBag)
+        
+        viewModel.selectedRoutines
+            .observe(on: MainScheduler.instance)
+            .bind(to: workRegisterView.rx.selectedRoutines)
+            .disposed(by: disposeBag)
 
         // MARK: - 메모
         workRegisterView.getMemoContainerView.rx.text
