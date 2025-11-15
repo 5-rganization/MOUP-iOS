@@ -29,10 +29,20 @@ final class InviteCodeInputCoordinator: Coordinator {
         navigationController.pushViewController(vc, animated: true)
     }
     
-    func moveToInviteCodeResult(workplace: InviteCodeWorkplace) {
+    func moveToInviteCodeResult(workplace: InviteCodeWorkplace, inviteCode: String) {
         DispatchQueue.main.async {
-            let viewModel = InviteCodeResultViewModel(workplace: workplace)
-            let vc = InviteCodeResultViewController(viewModel: viewModel)
+            let viewModel = InviteCodeResultViewModel(workplace: workplace, inviteCode: inviteCode)
+            let vc = InviteCodeResultViewController(viewModel: viewModel, coordinator: self)
+            self.navigationController.pushViewController(vc, animated: true)
+        }
+    }
+    
+    func moveToInviteCodeWorkplaceRegister(workplaceName: String, inviteCode: String) {
+        DispatchQueue.main.async {
+            let vc = InviteCodeWorkplaceRegisterViewController(
+                workplaceName: workplaceName,
+                inviteCode: inviteCode
+            )
             self.navigationController.pushViewController(vc, animated: true)
         }
     }
