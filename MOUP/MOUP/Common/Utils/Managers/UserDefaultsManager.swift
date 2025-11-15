@@ -44,6 +44,11 @@ final class UserDefaultsManager {
         }
     }
     
+    
+    func removeHasSignIn() {
+        UserDefaults.standard.removeObject(forKey: "has_sign_in")
+    }
+    
     func removeUserRole() {
         UserDefaults.standard.removeObject(forKey: "user_role")
     }
@@ -53,6 +58,7 @@ final class UserDefaultsManager {
     }
     
     func clearAllData() {
+        removeHasSignIn()
         removeUserRole()
         removeFCMToken()
     }
