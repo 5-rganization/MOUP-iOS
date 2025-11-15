@@ -77,6 +77,10 @@ final class WorkRegisterView: UIView {
         workTimeContainerView.setLunchBreakText(text)
     }
     
+    func setRepetitionText(_ text: String) {
+        workDateContainerView.setRepetitionText(text)
+    }
+    
 }
 
 private extension WorkRegisterView {
