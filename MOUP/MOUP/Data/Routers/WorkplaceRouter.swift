@@ -13,6 +13,7 @@ enum WorkplaceRouter {
     case fetchWorkplaceByInviteCode(inviteCode: String)
     case fetchInviteCode(workplaceId: Int, requestDTO: InviteCodeRequestDTO)
     case createWorkplace(request: WorkplaceCreateRequestDTO)
+    case createOwnerWorkplace(request: OwnerWorkplaceCreateRequestDTO)
 }
 
 extension WorkplaceRouter: URLRequestConvertible {
@@ -33,6 +34,8 @@ extension WorkplaceRouter: URLRequestConvertible {
             return "/workplaces/\(workplaceId)/invite-code"
         case .createWorkplace:
             return "/workplaces"
+        case .createOwnerWorkplace:
+            return "/workplaces"
         }
     }
 
@@ -42,7 +45,7 @@ extension WorkplaceRouter: URLRequestConvertible {
             return .get
         case .fetchInviteCode:
             return .put
-        case .createWorkplace:
+        case .createWorkplace, .createOwnerWorkplace:
             return .post
         }
     }
@@ -51,7 +54,7 @@ extension WorkplaceRouter: URLRequestConvertible {
         switch self {
         case .fetchWorkplaceList(let isSharedOnly):
             return ["isSharedOnly": isSharedOnly]
-        case .createWorkplace, .fetchWorkplaceByInviteCode, .fetchInviteCode:
+        case .createWorkplace, .createOwnerWorkplace, .fetchWorkplaceByInviteCode, .fetchInviteCode:
             return nil
         }
     }
@@ -64,6 +67,8 @@ extension WorkplaceRouter: URLRequestConvertible {
             return requestDTO
         case .createWorkplace(let request):
             return request
+        case .createOwnerWorkplace(let request):
+            return request
         }
     }
 
@@ -71,7 +76,7 @@ extension WorkplaceRouter: URLRequestConvertible {
         switch self {
         case .fetchWorkplaceList, .fetchWorkplaceByInviteCode:
             return URLEncoding.default
-        case .createWorkplace, .fetchInviteCode:
+        case .createWorkplace, .createOwnerWorkplace, .fetchInviteCode:
             return JSONEncoding.default
         }
     }
