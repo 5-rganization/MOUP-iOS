@@ -10,6 +10,13 @@ import RxSwift
 import RxRelay
 import RxCocoa
 
+// MARK: - Repeat Info Model
+struct RepeatInfo {
+    let endDate: Date
+    let daysEN: [String]      // ex: ["MONDAY", "FRIDAY"]
+    let daysIndex: [Int]      // ex: [1, 5]   ← UI 표시용
+}
+
 // MARK: - Input / Output
 protocol WorkRegisterViewModelInput {
     var didTapRegister: PublishRelay<Void> { get }
@@ -21,7 +28,6 @@ protocol WorkRegisterViewModelOutput {
     var didCompleteRegister: PublishRelay<Void> { get }
 }
 
-// MARK: - ViewModel
 final class WorkRegisterViewModel:
     WorkRegisterViewModelInput,
     WorkRegisterViewModelOutput {
@@ -32,13 +38,28 @@ final class WorkRegisterViewModel:
     let clockInVM: WorkTimePickerViewModel
     let clockOutVM: WorkTimePickerViewModel
     let breakPickerVM: WorkBreakPickerViewModel
+    let repeatSettingVM: RepeatSettingViewModel
+
+    // MARK: - Repeat Info (Optional)
+    let repeatInfo = BehaviorRelay<RepeatInfo?>(value: nil)
 
     // MARK: - Input
     let didTapRegister = PublishRelay<Void>()
     let memoText = BehaviorRelay<String>(value: "")
 
-    // MARK: - Output
-    let isFormValid: Driver<Bool>
+    // MARK: - Output (lazy 로 변경 → 초기화 순서 문제 해결)
+    lazy var isFormValid: Driver<Bool> = {
+        return Observable
+            .combineLatest(
+                selectedWorkplaceVM.confirmSelectedWorkplace.map { _ in true }.startWith(false),
+                datePickerVM.confirmSelectedDate.map { _ in true }.startWith(false),
+                clockInVM.confirmSelectedTime.map { _ in true }.startWith(false),
+                clockOutVM.confirmSelectedTime.map { _ in true }.startWith(false)
+            )
+            .map { $0 && $1 && $2 && $3 }
+            .asDriver(onErrorJustReturn: false)
+    }()
+
     let didCompleteRegister = PublishRelay<Void>()
 
     // MARK: - Dependencies
@@ -52,6 +73,7 @@ final class WorkRegisterViewModel:
         clockInVM: WorkTimePickerViewModel,
         clockOutVM: WorkTimePickerViewModel,
         breakPickerVM: WorkBreakPickerViewModel,
+        repeatSettingVM: RepeatSettingViewModel,
         workUseCase: WorkUseCaseProtocol
     ) {
         self.selectedWorkplaceVM = selectedWorkplaceVM
@@ -59,31 +81,36 @@ final class WorkRegisterViewModel:
         self.clockInVM = clockInVM
         self.clockOutVM = clockOutVM
         self.breakPickerVM = breakPickerVM
+        self.repeatSettingVM = repeatSettingVM
         self.workUseCase = workUseCase
 
-        // MARK: - Validation
-        let workplaceSelected = selectedWorkplaceVM.confirmSelectedWorkplace
-            .map { _ in true }
-            .startWith(false)
+        bindRepeatSetting()
+        bindRegisterAction()
+    }
+}
 
-        let dateSelected = datePickerVM.confirmSelectedDate
-            .map { _ in true }
-            .startWith(false)
+// MARK: - Bindings
+private extension WorkRegisterViewModel {
 
-        let clockInSelected = clockInVM.confirmSelectedTime
-            .map { _ in true }
-            .startWith(false)
+    /// 반복 설정 값 바인딩 (RepeatSettingVC → RegisterViewModel)
+    func bindRepeatSetting() {
+        // RepeatSetting 결과 받아서 repeatInfo 저장
+        repeatSettingVM.didCompleteRepeatSetting
+            .map { endDate, daysIndex -> RepeatInfo in
+                let weekEN = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY",
+                              "THURSDAY", "FRIDAY", "SATURDAY"]
 
-        let clockOutSelected = clockOutVM.confirmSelectedTime
-            .map { _ in true }
-            .startWith(false)
+                let daysEN = daysIndex.map { weekEN[$0] }
 
-        self.isFormValid = Observable
-            .combineLatest(workplaceSelected, dateSelected, clockInSelected, clockOutSelected)
-            .map { $0 && $1 && $2 && $3 }
-            .asDriver(onErrorJustReturn: false)
+                return RepeatInfo(endDate: endDate, daysEN: daysEN, daysIndex: daysIndex)
+            }
+            .bind(to: repeatInfo)
+            .disposed(by: disposeBag)
 
-        // MARK: - Register Action
+    }
+
+    /// 등록 버튼 처리
+    func bindRegisterAction() {
         didTapRegister
             .withLatestFrom(
                 Observable.combineLatest(
@@ -92,27 +119,38 @@ final class WorkRegisterViewModel:
                     clockInVM.confirmSelectedTime,
                     clockOutVM.confirmSelectedTime,
                     breakPickerVM.confirmSelectedBreak.startWith(0),
-                    memoText.asObservable()
+                    memoText.asObservable(),
+                    repeatInfo.asObservable()
                 )
             )
-            .subscribe(onNext: { [weak self] (workplace, date, clockIn, clockOut, breakMinutes, memo) in
+            .subscribe(onNext: { [weak self]
+                (workplace, date, clockIn, clockOut, breakMin, memo, repeatInfo) in
+
+                guard let self else { return }
+
                 let dateStr = DateFormatter.dataSourceDateFormatter.string(from: date)
                 let clockInStr = DateFormatter.ko12hTimeFormatter.string(from: clockIn)
                 let clockOutStr = DateFormatter.ko12hTimeFormatter.string(from: clockOut)
 
-                print("""
-                근무 등록 요청 ---------------------------------
-                근무지 ID: \(workplace.id)
-                근무지 이름: \(workplace.name)
-                근무 날짜: \(dateStr)
-                출근 시간: \(clockInStr)
-                퇴근 시간: \(clockOutStr)
-                휴게 시간: \(breakMinutes)분
-                메모: \(memo)
-                --------------------------------------------------
-                """)
+                print("--------------------------------------------------")
+                print("근무 등록 요청")
+                print("근무지: \(workplace.id) - \(workplace.name)")
+                print("근무 날짜: \(dateStr)")
+                print("출근 시간: \(clockInStr)")
+                print("퇴근 시간: \(clockOutStr)")
+                print("휴게 시간: \(breakMin)분")
+                print("메모: \(memo)")
 
-                self?.didCompleteRegister.accept(())
+                if let r = repeatInfo {
+                    print("반복 종료 날짜: \(r.endDate)")
+                    print("반복 요일(EN): \(r.daysEN)")
+                } else {
+                    print("반복 없음")
+                }
+                print("--------------------------------------------------")
+
+                // TODO: 서버 요청 예정
+                self.didCompleteRegister.accept(())
             })
             .disposed(by: disposeBag)
     }
