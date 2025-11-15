@@ -17,6 +17,8 @@ final class RoutineSelectionCoordinator: Coordinator {
     
     private let draftRoutineStorage: DraftRoutineStorageProtocol
     
+    var onRoutinesSelected: (([Int]) -> Void)?
+    
     private lazy var viewModel: RoutineSelectionViewModel = {
         return RoutineSelectionViewModel(routineUseCase: routineUseCase)
     }()
@@ -37,6 +39,7 @@ final class RoutineSelectionCoordinator: Coordinator {
     
     func start() {
         routineSelectionVC.coordinator = self
+        routineSelectionVC.onRoutineSelected = onRoutinesSelected
         navigationController.pushViewController(routineSelectionVC, animated: true)
     }
     
