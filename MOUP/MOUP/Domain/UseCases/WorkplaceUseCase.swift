@@ -33,4 +33,8 @@ final class WorkplaceUseCase: WorkplaceUseCaseProtocol {
     func createWorkplace(request: WorkplaceCreateRequestDTO) async throws -> WorkplaceCreate {
         try await workplaceRepository.createWorkplace(request: request)
     }
+    
+    func createOwnerWorkplace(request: OwnerWorkplaceCreateRequestDTO) async throws -> WorkplaceCreate {
+        try await workplaceRepository.createOwnerWorkplace(request: request)
+    }
 }
