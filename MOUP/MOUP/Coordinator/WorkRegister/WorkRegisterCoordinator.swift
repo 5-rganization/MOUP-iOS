@@ -69,4 +69,10 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
         let vc = RepeatSettingViewController(viewModel: repeatSettingViewModel)
         navigationController.pushViewController(vc, animated: true)
     }
+    
+    func showRoutineSelection() {
+        let coordinator = RoutineSelectionCoordinator(navigationController: navigationController)
+        childCoordinators.append(coordinator)
+        coordinator.start()
+    }
 }
