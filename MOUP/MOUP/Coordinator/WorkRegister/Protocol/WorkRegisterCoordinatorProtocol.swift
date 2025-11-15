@@ -8,4 +8,5 @@
 protocol WorkRegisterCoordinatorProtocol: Coordinator {
     func showSelectColorLabel()
     func showSelectWorkplace()
+    func showRepeatSetting()
 }

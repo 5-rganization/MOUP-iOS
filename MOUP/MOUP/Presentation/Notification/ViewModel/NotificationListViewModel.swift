@@ -19,6 +19,7 @@ final class NotificationListViewModel {
         let markAllReadTapped: Observable<Void>
         let deleteAllTapped: Observable<Void>
         let refreshTrigger: Observable<Void>
+        let deleteTapped: Observable<UserNotification>
     }
     
     // MARK: - Output
@@ -181,6 +182,30 @@ final class NotificationListViewModel {
             .map { notifications in
                 notifications.filter { !$0.isRead }.count
             }
+        
+        input.deleteTapped
+            .flatMapLatest { [weak self] notification -> Observable<Int> in
+                guard let self else { return .empty() }
+                
+                return Observable.create { observer in
+                    Task {
+                        do {
+                            try await self.notificationUseCase.deleteNotification(id: notification.id)
+                            observer.onNext(notification.id)
+                            observer.onCompleted()
+                        } catch {
+                            errorRelay.accept("알림 삭제에 실패했습니다.")
+                            observer.onCompleted()
+                        }
+                    }
+                    return Disposables.create()
+                }
+            }
+            .withLatestFrom(notificationsRelay) { deletedId, notifications -> [UserNotification] in
+                return notifications.filter { $0.id != deletedId }
+            }
+            .bind(to: notificationsRelay)
+            .disposed(by: disposeBag)
         
         return Output(
             notifications: notificationsRelay.asDriver(),

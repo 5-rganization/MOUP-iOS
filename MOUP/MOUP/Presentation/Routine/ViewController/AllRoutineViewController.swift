@@ -97,5 +97,13 @@ private extension AllRoutineViewController {
             })
             .disposed(by: disposeBag)
         
+        allRoutineView.rx.navRightBtnTapped
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.coordinator?.showAddRoutineViewController(onSave: { newRoutine in
+                    owner.viewModel.addRoutine(newRoutine)
+                })
+            })
+            .disposed(by: disposeBag)
     }
 }
