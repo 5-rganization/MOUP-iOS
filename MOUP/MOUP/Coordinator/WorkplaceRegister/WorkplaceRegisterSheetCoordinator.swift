@@ -47,9 +47,18 @@ final class WorkplaceRegisterSheetCoordinator: Coordinator {
 
     func moveToDirectRegistration() {
         print("moveToDirectRegistration")
-        let coordinator = WorkplaceRegisterCoordinator(navigationController: self.navigationController)
-        self.childCoordinators.append(coordinator)
-        coordinator.start()
+        
+        let isOwner = (UserDefaultsManager.shared.userRole == "OWNER")
+        
+        let coordinator = WorkplaceRegisterCoordinator(
+            navigationController: navigationController,
+            isOwner: isOwner
+        )
+        
+        childCoordinators.append(coordinator)
+        DispatchQueue.main.async {
+            coordinator.start()
+        }
     }
 
     
