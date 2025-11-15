@@ -24,6 +24,7 @@ final class InviteCodeInputCoordinator: Coordinator {
     func start() {
         let viewModel = InviteCodeInputViewModel(workplaceUseCase: workplaceUseCase)
         let vc = InviteCodeInputViewController(viewModel: viewModel)
+        vc.hidesBottomBarWhenPushed = true
         vc.coordinator = self
         navigationController.pushViewController(vc, animated: true)
     }
