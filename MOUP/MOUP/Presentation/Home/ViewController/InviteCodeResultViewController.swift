@@ -13,6 +13,7 @@ class InviteCodeResultViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private let inviteCodeResultView = InviteCodeResultView()
     private let viewModel: InviteCodeResultViewModel
+    private let coordinator: InviteCodeInputCoordinator
     
     // MARK: - loadView
     override func loadView() {
@@ -20,7 +21,8 @@ class InviteCodeResultViewController: UIViewController {
     }
     
     // MARK: - Initializer
-    init(viewModel: InviteCodeResultViewModel) {
+    init(viewModel: InviteCodeResultViewModel, coordinator: InviteCodeInputCoordinator) {
+        self.coordinator = coordinator
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -62,10 +64,16 @@ private extension InviteCodeResultViewController {
             })
             .disposed(by: disposeBag)
         
-        inviteCodeResultView.rx.registerInfoBtnTapped
+        inviteCodeResultView.rx.registerInfoBtnTapped // TODO: - workplacename, inviteCode 넘겨주기
+            .withLatestFrom(output.workplace)
             .withUnretained(self)
-            .subscribe(onNext: { owner, _ in
-                print("등록하기 버튼 탭")
+            .subscribe(
+                onNext: { owner, workplace in
+                    print("등록하기 버튼 탭")
+                    owner.coordinator.moveToInviteCodeWorkplaceRegister(
+                        workplaceName: workplace.workplaceName,
+                        inviteCode: output.inviteCode
+                    )
             })
             .disposed(by: disposeBag)
     }
