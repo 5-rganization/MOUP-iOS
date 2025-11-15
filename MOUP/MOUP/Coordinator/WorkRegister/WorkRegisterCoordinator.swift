@@ -25,6 +25,7 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
     private lazy var clockOutViewModel = WorkTimePickerViewModel()
     private lazy var breakPickerViewModel = WorkBreakPickerViewModel()
     private lazy var selectColorLabelViewModel = SelectColorLabelViewModel()
+    private lazy var repeatSettingViewModel = RepeatSettingViewModel()
 
     // MARK: - Init
     init(navigationController: UINavigationController) {
@@ -40,6 +41,7 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
             clockInVM: clockInViewModel,
             clockOutVM: clockOutViewModel,
             breakPickerVM: breakPickerViewModel,
+            repeatSettingVM: repeatSettingViewModel,
             workUseCase: WorkUseCase(workRepository: WorkRepository(workService: WorkService()))
         )
 
@@ -60,6 +62,11 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
 
     func showSelectColorLabel() {
         let vc = SelectColorLabelViewController(viewModel: selectColorLabelViewModel)
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showRepeatSetting() {
+        let vc = RepeatSettingViewController(viewModel: repeatSettingViewModel)
         navigationController.pushViewController(vc, animated: true)
     }
 }

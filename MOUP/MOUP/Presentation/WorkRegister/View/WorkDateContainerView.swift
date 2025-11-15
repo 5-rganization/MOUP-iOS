@@ -42,7 +42,7 @@ final class WorkDateContainerView: UIView {
     }
     
     private let date = InfoRowView(title: "날짜", type: .labelWithButton(title: "선택"), frame: .zero)
-    private let repetition = InfoRowView(title: "반복", type: .labelWithChevron(value: "선택"), frame: .zero)
+    private let repetition = InfoRowView(title: "반복", type: .labelWithChevron(value: "없음"), frame: .zero)
     
     private let container = ContainerView()
     private let divider = UIView().then {
@@ -65,6 +65,10 @@ final class WorkDateContainerView: UIView {
     // MARK: - Public Methods
     func setDateText(_ text: String) {
         date.updateButtonTitle(to: text)
+    }
+    
+    func setRepetitionText(_ text: String) {
+        repetition.updateLabelValue(text)
     }
 
 }
