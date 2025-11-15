@@ -88,6 +88,7 @@ private extension InviteCodeInputView {
                 .foregroundColor: UIColor.gray400
             ]
         )
+        backgroundColor = .white
     }
     
     // MARK: - setConstraints
