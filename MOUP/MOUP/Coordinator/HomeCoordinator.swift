@@ -75,12 +75,23 @@ final class HomeCoordinator: Coordinator {
     
     func moveToDirectRegistration() { // 직접 등록
         print("moveToDirectRegistration")
-        let coordinator = WorkplaceRegisterCoordinator(navigationController: navigationController)
+        let role = UserDefaultsManager.shared.userRole
+        let isOwner = (role == "ROLE_OWNER")
+
+        print("UserRole: \(role ?? "nil"), isOwner: \(isOwner)")
+
+        let coordinator = WorkplaceRegisterCoordinator(
+            navigationController: navigationController,
+            isOwner: isOwner
+        )
+        
         childCoordinators.append(coordinator)
+
         DispatchQueue.main.async {
             coordinator.start()
         }
     }
+
     
     func moveToAllRoutine() {
         let viewModel = AllRoutineViewModel(routineUseCase: routineUseCase)

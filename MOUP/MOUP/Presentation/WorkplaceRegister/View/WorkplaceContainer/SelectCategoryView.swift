@@ -42,7 +42,7 @@ final class SelectCategoryView: UIView {
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+        setupRoleTitle()
         configure()
     }
     
@@ -52,6 +52,15 @@ final class SelectCategoryView: UIView {
     }
     
     // MARK: - Public Methods
+    func setupRoleTitle() {
+        let role = UserDefaultsManager.shared.userRole
+        
+        if role == "OWNER" {
+            title.text = "매장 카테고리를 선택해주세요."
+        } else {
+            title.text = "근무지 카테고리를 선택해주세요."
+        }
+    }
 }
 
 private extension SelectCategoryView {
