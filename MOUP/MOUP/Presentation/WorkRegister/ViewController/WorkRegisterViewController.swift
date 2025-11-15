@@ -120,6 +120,48 @@ private extension WorkRegisterViewController {
                 present(vc, animated: true)
             })
             .disposed(by: disposeBag)
+        
+        // MARK: - 반복 선택
+        workRegisterView.rx.repetitionTap
+            .bind(onNext: { [weak self] in
+                guard let self else { return }
+
+                let vm = self.viewModel.repeatSettingVM
+                let info = self.viewModel.repeatInfo.value
+
+                // 기존 반복값을 RepeatViewModel 에 전달
+                vm.configureInitial(
+                    endDate: info?.endDate,
+                    daysIndex: info?.daysIndex
+                )
+
+                self.coordinator?.showRepeatSetting()
+            })
+            .disposed(by: disposeBag)
+
+        
+        // 반복 설정 완료 값 구독
+        viewModel.repeatInfo
+            .observe(on: MainScheduler.instance)
+            .bind(onNext: { [weak self] repeatInfo in
+                guard let self else { return }
+
+                // repeatInfo == nil → "없음" 처리
+                guard let info = repeatInfo else {
+                    self.workRegisterView.setRepetitionText("없음")
+                    return
+                }
+
+                let days = info.daysIndex
+                let weekKR = ["일", "월", "화", "수", "목", "금", "토"]
+
+                let krText = days.map { weekKR[$0] }.joined(separator: " / ")
+
+                self.workRegisterView.setRepetitionText(krText)
+            })
+            .disposed(by: disposeBag)
+
+
 
         // MARK: - 출근 시간
         workRegisterView.rx.clockInTap
