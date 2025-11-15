@@ -58,6 +58,10 @@ final class InviteCodeInputView: UIView {
     func setTextFieldDelegate(_ delegate: UITextFieldDelegate) {
         self.codeInputTextField.delegate = delegate
     }
+    
+    func getInviteCode() -> String? {
+        return self.codeInputTextField.text
+    }
 }
 
 private extension InviteCodeInputView {

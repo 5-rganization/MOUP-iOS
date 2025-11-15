@@ -54,9 +54,11 @@ private extension InviteCodeInputViewController {
         
         output.searchResult
             .withUnretained(self)
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { owner, workplace in
-                guard let workplace else { return }
-                owner.coordinator?.moveToInviteCodeResult(workplace: workplace)
+                guard let workplace,
+                let inviteCode = owner.inviteCodeInputView.getInviteCode() else { return }
+                owner.coordinator?.moveToInviteCodeResult(workplace: workplace, inviteCode: inviteCode)
             })
             .disposed(by: disposeBag)
         
