@@ -69,6 +69,9 @@
         "nodePlacementStrategy": "BRANDES_KOEPF",
         "forceNodeModelOrder": false,
         "considerModelOrder": "NODES_AND_EDGES"
+    },
+    "class": {
+        "hideEmptyMembersBox": true
     }
   }
 }%%
@@ -242,11 +245,163 @@ erDiagram
 </details>
 
 
-
 ---
 
 ### 리팩토링 과정([Spring Boot](https://github.com/5-rganization/MOUP-Server))
+#### 의존성 다이어그램
+``` mermaid
+%%{
+  init: {
+    "theme": "default",
+    "fontFamily": "monospace",
+    "elk": {
+        "mergeEdges": false,
+        "nodePlacementStrategy": "BRANDES_KOEPF",
+        "forceNodeModelOrder": false,
+        "considerModelOrder": "NODES_AND_EDGES"
+    },
+    "class": {
+        "hideEmptyMembersBox": true
+    }
+  }
+}%%
+classDiagram
+direction LR
 
+    AttendanceService ..|> AttendanceServiceProtocol
+    AttendanceServiceProtocol <.. AttendanceRepository
+    AttendanceRepository ..|> AttendanceRepositoryProtocol
+    AttendanceRepositoryProtocol <.. AttendanceUseCase
+    AttendanceUseCase ..|> AttendanceUseCaseProtocol
+    AttendanceUseCaseProtocol <.. AttendanceHistoryViewModel
+    AttendanceUseCaseProtocol <.. ManageAttendanceViewModel
+    AttendanceUseCaseProtocol <.. HomeViewModel
+
+    AuthService ..|> AuthServiceProtocol
+    AuthServiceProtocol <.. AuthRepository
+    AuthRepository ..|> AuthRepositoryProtocol
+    AuthRepositoryProtocol <.. AuthUseCase
+    AuthUseCase ..|> AuthUseCaseProtocol
+    AuthUseCaseProtocol <.. SignInViewModel
+    AuthUseCaseProtocol <.. UserRoleViewModel
+    AuthUseCaseProtocol <.. MyPageViewModel
+    AuthUseCaseProtocol <.. TabBarViewModel
+
+    HomeService ..|> HomeServiceProtocol
+    HomeServiceProtocol <.. HomeRepository
+    HomeRepository ..|> HomeRepositoryProtocol
+    HomeRepositoryProtocol <.. HomeUseCase
+    HomeUseCase ..|> HomeUseCaseProtocol
+    HomeUseCaseProtocol <.. HomeViewModel
+
+    NoticeService ..|> NoticeServiceProtocol
+    NoticeServiceProtocol <.. NoticeRepository
+    NoticeRepository ..|> NoticeRepositoryProtocol
+    NoticeRepositoryProtocol <.. NoticeUseCase
+    NoticeUseCase ..|> NoticeUseCaseProtocol
+    NoticeUseCaseProtocol <.. NoticeListViewModel
+
+    NotificationService ..|> NotificationServiceProtocol
+    NotificationServiceProtocol <.. NotificationRepository
+    NotificationRepository ..|> NotificationRepositoryProtocol
+    NotificationRepositoryProtocol <.. NotificationUseCase
+    NotificationUseCase ..|> NotificationUseCaseProtocol
+    NotificationUseCaseProtocol <.. HomeViewModel
+    NotificationUseCaseProtocol <.. NotificationListViewModel
+    
+    RoutineService ..|> RoutineServiceProtocol
+    RoutineServiceProtocol <.. RoutineRepository
+    RoutineRepository ..|> RoutineRepositoryProtocol
+    RoutineRepositoryProtocol <.. RoutineUseCase
+    RoutineUseCase ..|> RoutineUseCaseProtocol
+    RoutineUseCaseProtocol <.. AddRoutineViewModel
+    RoutineUseCaseProtocol <.. AllRoutineViewModel
+    RoutineUseCaseProtocol <.. EditRoutineViewModel
+    RoutineUseCaseProtocol <.. RoutineSelectionViewModel
+    RoutineUseCaseProtocol <.. TodayRoutineViewModel
+    RoutineUseCaseProtocol <.. WorkplaceRoutineListViewModel
+
+    TokenService ..|> TokenServiceProtocol
+    TokenServiceProtocol <.. TokenRepository
+    TokenRepository ..|> TokenRepositoryProtocol
+    TokenRepositoryProtocol <.. TokenUseCase
+    TokenUseCase ..|> TokenUseCaseProtocol
+    TokenUseCaseProtocol <.. AuthInterceptor
+
+    UserService ..|> UserServiceProtocol
+    UserServiceProtocol <.. UserRepository
+    UserRepository ..|> UserRepositoryProtocol
+    UserRepositoryProtocol <.. UserUseCase
+    UserUseCase ..|> UserUseCaseProtocol
+    UserUseCaseProtocol <.. DeleteAccountViewModel
+    UserUseCaseProtocol <.. EditModalViewModel
+    UserUseCaseProtocol <.. MyPageViewModel
+
+    WorkplaceService ..|> WorkplaceServiceProtocol
+    WorkplaceServiceProtocol <.. WorkplaceRepository
+    WorkplaceRepository ..|> WorkplaceRepositoryProtocol
+    WorkplaceRepositoryProtocol <.. WorkplaceUseCase
+    WorkplaceUseCase ..|> WorkplaceUseCaseProtocol
+    WorkplaceUseCaseProtocol <.. CalendarViewModel
+    WorkplaceUseCaseProtocol <.. FilterViewModel
+    WorkplaceUseCaseProtocol <.. InviteCodeInputViewModel
+    WorkplaceUseCaseProtocol <.. InviteCodeSheetViewModel
+    WorkplaceUseCaseProtocol <.. OwnerWorkplaceRegisterViewModel
+    WorkplaceUseCaseProtocol <.. WorkplaceRegisterViewModel
+    WorkplaceUseCaseProtocol <.. SelectedWorkplaceViewModel
+
+    WorkService ..|> WorkServiceProtocol
+    WorkServiceProtocol <.. WorkRepository
+    WorkRepository ..|> WorkRepositoryProtocol
+    WorkRepositoryProtocol <.. WorkUseCase
+    WorkUseCase ..|> WorkUseCaseProtocol
+    WorkUseCaseProtocol <.. CalendarViewModel
+    WorkUseCaseProtocol <.. CalendarWorkListViewModel
+    WorkUseCaseProtocol <.. WorkRegisterViewModel
+
+	  class AttendanceServiceProtocol:::MOUP_primary100 { <<protocol>> }
+	  class AttendanceRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+	  class AttendanceUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+	  class AuthServiceProtocol:::MOUP_primary100 { <<protocol>> }
+	  class AuthRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+	  class AuthUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class HomeServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class HomeRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class HomeUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class NoticeServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class NoticeRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class NoticeUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class NotificationServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class NotificationRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class NotificationUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class RoutineServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class RoutineRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class RoutineUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class TokenServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class TokenRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class TokenUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class UserServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class UserRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class UserUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class WorkplaceServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class WorkplaceRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class WorkplaceUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class WorkServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class WorkRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class WorkUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+	classDef MOUP_primary100 fill:#FFE0D5
+
+```
 
 <br><br>
 
@@ -259,7 +414,7 @@ erDiagram
 <br>
 
 <details>
-<summary>급여, 인건비 계산</summary>
+	<summary>급여, 인건비 계산</summary>
 	<div markdown="1">
 
 ![알바생 급여 계산1](https://github.com/user-attachments/assets/43d014b0-479f-4230-bfbf-b2d915d3c438)
