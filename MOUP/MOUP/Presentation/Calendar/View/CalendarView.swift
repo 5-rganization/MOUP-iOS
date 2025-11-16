@@ -16,6 +16,9 @@ import Then
 /// 캘린더 UI
 final class CalendarView: UIView {
     
+    // MARK: - Properties
+    private var calendarWidthConstraint: Constraint?
+    
     // MARK: - UI Components
     /// 캘린더 상단 헤더
     private let calendarHeaderView = CalendarHeaderView()
@@ -43,6 +46,18 @@ final class CalendarView: UIView {
     @available(*, unavailable, message: "storyboard is not supported.")
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented.")
+    }
+    
+    // MARK: - Lifecycle
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        let availableLayoutWidth = self.safeAreaLayoutGuide.layoutFrame.width
+        if availableLayoutWidth <= 0 { return }
+        let availableDayCellWidth = floor(availableLayoutWidth / 7.0)
+        let availableCalendarWidth = availableDayCellWidth * 7
+        if calendarWidthConstraint?.layoutConstraints.first?.constant == availableCalendarWidth { return }
+        calendarWidthConstraint?.update(offset: availableCalendarWidth)
     }
 }
 
@@ -76,14 +91,16 @@ private extension CalendarView {
         
         dayOfTheWeekHStackView.snp.makeConstraints {
             $0.top.equalTo(calendarHeaderView.snp.bottom)
-            $0.leading.trailing.equalTo(self.safeAreaLayoutGuide)
+            $0.centerX.equalTo(self.safeAreaLayoutGuide)
+            $0.width.equalTo(monthCalendarView)
             $0.height.equalTo(20)
         }
         
         monthCalendarView.snp.makeConstraints {
             $0.top.equalTo(dayOfTheWeekHStackView.snp.bottom)
-            $0.leading.trailing.equalTo(self.safeAreaLayoutGuide)
+            $0.centerX.equalTo(self.safeAreaLayoutGuide)
             $0.bottom.equalTo(self.safeAreaLayoutGuide)
+            self.calendarWidthConstraint = $0.width.equalTo(self.safeAreaLayoutGuide.layoutFrame.width).constraint
         }
     }
 }
