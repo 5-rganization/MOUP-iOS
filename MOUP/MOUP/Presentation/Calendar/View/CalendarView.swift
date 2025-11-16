@@ -56,8 +56,10 @@ final class CalendarView: UIView {
         if availableLayoutWidth <= 0 { return }
         let availableDayCellWidth = floor(availableLayoutWidth / 7.0)
         let availableCalendarWidth = availableDayCellWidth * 7
-        if calendarWidthConstraint?.layoutConstraints.first?.constant == availableCalendarWidth { return }
-        calendarWidthConstraint?.update(offset: availableCalendarWidth)
+        guard let calendarWidthConstraintConstant = calendarWidthConstraint?.layoutConstraints.first?.constant else { return }
+        if !calendarWidthConstraintConstant.isEqual(to: availableCalendarWidth) {
+            calendarWidthConstraint?.update(offset: availableCalendarWidth)
+        }
     }
 }
 
