@@ -16,8 +16,8 @@
 > *알바생에게는 복잡할 수 있는 근무 시간 • 급여 계산을 돕고, 사장님의 인건비 • 근무 일정의 효율적인 관리를 지원합니다 !*
 >
 > 개발 기간(Cloud Firestore): 2025.05.29 ~ 2025.07.07  
-> 리팩토링 기간([Spring Boot](https://github.com/5-rganization/MOUP-Server)): 2025.07.12 ~ 2025.11.11  
-> 유비보수 기간: 2025.11.12 ~
+> 리팩토링 기간([Spring Boot](https://github.com/5-rganization/MOUP-Server)): 2025.07.12 ~ 2025.11.23  
+> 유비보수 기간: 2025.11.24 ~
 
 <br>
 
