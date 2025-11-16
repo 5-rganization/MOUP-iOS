@@ -635,8 +635,8 @@ if !hasLaunchedBefore {
 | 아키텍처 | `Clean Architecture`, `MVVM` |
 | 디자인 패턴 | `Delegate`, `Singleton` |
 | 인터페이스 | `UIKit` |
-| 네트워크 | `Alamofire` |
-| 비동기 처리 | `Swift Concurrency`, `RxSwift`, `RxCocoa`, `RxDataSources` |
+| 네트워크 | `Swift Concurrency`, `Alamofire` |
+| 비동기 처리 | `RxSwift`, `RxCocoa`, `RxDataSources` |
 | UI 라이브러리 | `JTAppleCalendar` |
 | 레이아웃 구성 | `SnapKit`, `Then` |
 | 내부 저장소 | `UserDefaults` |
