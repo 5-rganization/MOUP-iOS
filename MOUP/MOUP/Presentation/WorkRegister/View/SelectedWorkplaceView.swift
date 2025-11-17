@@ -23,6 +23,8 @@ final class SelectedWorkplaceView: UIView {
     private var currentSelectedId: Int?
     
     // MARK: - UI Components
+    fileprivate let navigationBar = BaseNavigationBar(title: "근무지 선택")
+    
     private let title = UILabel().then {
         $0.text = "등록할 근무지를 선택해 주세요"
         $0.textColor = .black
@@ -65,6 +67,7 @@ private extension SelectedWorkplaceView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             title,
             radioStackView,
             registerButton
@@ -80,8 +83,13 @@ private extension SelectedWorkplaceView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalToSuperview()
+        }
+        
         title.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(32)
+            $0.top.equalTo(navigationBar.snp.bottom).offset(32)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
@@ -142,5 +150,11 @@ extension SelectedWorkplaceView {
             
             radioStackView.addArrangedSubview(radioButton)
         }
+    }
+}
+
+extension Reactive where Base: SelectedWorkplaceView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
     }
 }

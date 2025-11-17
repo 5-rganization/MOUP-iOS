@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import RxCocoa
 import RxSwift
 
 final class SelectCategoryViewController: UIViewController {
@@ -66,9 +67,7 @@ private extension SelectCategoryViewController {
     
     // MARK: - setBinding
     func setHierarchy() { }
-    func setStyles() {
-        setNavigationBar(title: "카테고리", backAction: #selector(didTapBack))
-    }
+    func setStyles() { }
     func setConstraints() { }
     func setActions() {
         let radioButtons: [(RadioButtonView, String)] = [
@@ -96,6 +95,11 @@ private extension SelectCategoryViewController {
             (selectCategoryView.getTheaterRadioButton, "영화관"),
             (selectCategoryView.getEtcRadioButton, "기타")
         ]
+        
+        selectCategoryView.rx.navBackBtnTapped.asDriver()
+            .drive(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposeBag)
 
         // 완료 버튼 탭 처리
         selectCategoryView.getRegisterButton.rx.tap

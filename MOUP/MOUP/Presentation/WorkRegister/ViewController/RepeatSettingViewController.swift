@@ -56,12 +56,7 @@ private extension RepeatSettingViewController {
 
     func setHierarchy() { }
     
-    func setStyles() {
-        setNavigationBar(
-            title: "반복",
-            backAction: #selector(didTapBack)
-        )
-    }
+    func setStyles() { }
     
     func setConstraints() { }
     
@@ -100,6 +95,10 @@ private extension RepeatSettingViewController {
         }
         
     func setBinding() {
+        repeatSettingView.rx.navBackBtnTapped.asDriver()
+            .drive(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposeBag)
 
         // 기존 날짜 유지 → UI 표시
         viewModel.selectedDate
