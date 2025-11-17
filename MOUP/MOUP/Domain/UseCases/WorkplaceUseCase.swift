@@ -41,4 +41,8 @@ final class WorkplaceUseCase: WorkplaceUseCaseProtocol {
     func joinWorkplace(request: WorkplaceJoinRequestDTO) async throws -> WorkplaceJoinResponseDTO {
         try await workplaceRepository.joinWorkplace(request: request)
     }
+    
+    func deleteWorkplace(workplaceId: Int) async throws {
+        try await workplaceRepository.deleteWorkplace(workplaceId: workplaceId)
+    }
 }

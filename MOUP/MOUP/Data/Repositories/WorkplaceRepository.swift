@@ -56,4 +56,8 @@ final class WorkplaceRepository: WorkplaceRepositoryProtocol {
             workerId: response.workerId
         )
     }
+    
+    func deleteWorkplace(workplaceId: Int) async throws {
+        try await workplaceService.deleteWorkplace(workplaceId: workplaceId)
+    }
 }

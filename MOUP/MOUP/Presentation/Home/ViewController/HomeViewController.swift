@@ -20,6 +20,7 @@ final class HomeViewController: UIViewController {
     private let startBtnRelay = PublishRelay<Int>() // 근무지 id
     private let endBtnRelay = PublishRelay<Int>()
     private let viewWillAppearRelay = PublishRelay<Void>()
+    private let deleteWorkplaceRelay = PublishRelay<Int>() // 근무지 id
     
     private lazy var dataSource = RxTableViewSectionedAnimatedDataSource<HomeTableViewFirstSection>(animationConfiguration: AnimationConfiguration(deleteAnimation: .automatic)) {
         dataSource,
@@ -103,7 +104,8 @@ private extension HomeViewController {
             didRefresh: refreshRelay.asObservable(),
             startWorkTapped: startBtnRelay.asObservable(),
             endWorkTapped: endBtnRelay.asObservable(),
-            viewWillAppear: viewWillAppearRelay.asObservable()
+            viewWillAppear: viewWillAppearRelay.asObservable(),
+            deleteWorkplace: deleteWorkplaceRelay.asObservable()
         )
         let output = homeViewModel.transform(input: input)
         
@@ -219,6 +221,7 @@ private extension HomeViewController {
     func delete(id workplaceId: Int) -> UIAction {
         let action = UIAction(title: "삭제하기") { _ in
             print("삭제하기")
+            self.deleteWorkplaceRelay.accept(workplaceId)
         }
         return action
     }

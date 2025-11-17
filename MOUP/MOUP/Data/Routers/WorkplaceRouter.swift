@@ -15,6 +15,7 @@ enum WorkplaceRouter {
     case createWorkplace(request: WorkplaceCreateRequestDTO)
     case createOwnerWorkplace(request: OwnerWorkplaceCreateRequestDTO)
     case joinWorkplace(request: WorkplaceJoinRequestDTO)
+    case deleteWorkplace(workplaceId: Int)
 }
 
 extension WorkplaceRouter: URLRequestConvertible {
@@ -39,6 +40,8 @@ extension WorkplaceRouter: URLRequestConvertible {
             return "/workplaces"
         case .joinWorkplace:
             return "/workplaces/join"
+        case .deleteWorkplace(let workplaceId):
+            return "/workplaces/\(workplaceId)"
         }
     }
 
@@ -50,6 +53,8 @@ extension WorkplaceRouter: URLRequestConvertible {
             return .put
         case .createWorkplace, .createOwnerWorkplace, .joinWorkplace:
             return .post
+        case .deleteWorkplace:
+            return .delete
         }
     }
     
@@ -57,14 +62,14 @@ extension WorkplaceRouter: URLRequestConvertible {
         switch self {
         case .fetchWorkplaceList(let isSharedOnly):
             return ["isSharedOnly": isSharedOnly]
-        case .createWorkplace, .createOwnerWorkplace, .fetchWorkplaceByInviteCode, .fetchInviteCode, .joinWorkplace:
+        case .createWorkplace, .createOwnerWorkplace, .fetchWorkplaceByInviteCode, .fetchInviteCode, .joinWorkplace, .deleteWorkplace:
             return nil
         }
     }
 
     var requestBody: Encodable? {
         switch self {
-        case .fetchWorkplaceList, .fetchWorkplaceByInviteCode:
+        case .fetchWorkplaceList, .fetchWorkplaceByInviteCode, .deleteWorkplace:
             return nil
         case .fetchInviteCode(_, let requestDTO):
             return requestDTO
@@ -79,7 +84,7 @@ extension WorkplaceRouter: URLRequestConvertible {
 
     var encoding: ParameterEncoding {
         switch self {
-        case .fetchWorkplaceList, .fetchWorkplaceByInviteCode:
+        case .fetchWorkplaceList, .fetchWorkplaceByInviteCode, .deleteWorkplace:
             return URLEncoding.default
         case .createWorkplace, .createOwnerWorkplace, .fetchInviteCode, .joinWorkplace:
             return JSONEncoding.default

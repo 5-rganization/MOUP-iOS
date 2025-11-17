@@ -53,7 +53,8 @@ final class HomeCoordinator: Coordinator {
             userRole: userRole,
             homeUseCase: homeUseCase,
             attendanceUseCase: attendanceUseCase,
-            notificationUseCase: notificationUseCase
+            notificationUseCase: notificationUseCase,
+            workplaceUseCase: workplaceUseCase
         )
         let homeVC = HomeViewController(
             coordinator: self,
