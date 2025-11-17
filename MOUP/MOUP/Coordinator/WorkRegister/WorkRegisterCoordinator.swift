@@ -11,6 +11,7 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
     // MARK: - Properties
     var childCoordinators = [Coordinator]()
     private let navigationController: UINavigationController
+    private var workRegisterViewModel: WorkRegisterViewModel?
 
     // MARK: - Sub ViewModels
     private lazy var selectedWorkplaceViewModel = SelectedWorkplaceViewModel(
@@ -44,6 +45,8 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
             repeatSettingVM: repeatSettingViewModel,
             workUseCase: WorkUseCase(workRepository: WorkRepository(workService: WorkService()))
         )
+        
+        self.workRegisterViewModel = viewModel
 
         let vc = WorkRegisterViewController(
             viewModel: viewModel,
@@ -68,5 +71,17 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
     func showRepeatSetting() {
         let vc = RepeatSettingViewController(viewModel: repeatSettingViewModel)
         navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func showRoutineSelection() {
+        let coordinator = RoutineSelectionCoordinator(navigationController: navigationController)
+        childCoordinators.append(coordinator)
+        coordinator.onRoutinesSelected = { [weak self] routines in
+            guard let self else { return }
+            
+            self.workRegisterViewModel?.selectedRoutines.accept(routines)
+        }
+        
+        coordinator.start()
     }
 }

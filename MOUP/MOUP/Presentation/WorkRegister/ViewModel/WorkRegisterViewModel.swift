@@ -42,6 +42,9 @@ final class WorkRegisterViewModel:
 
     // MARK: - Repeat Info (Optional)
     let repeatInfo = BehaviorRelay<RepeatInfo?>(value: nil)
+    
+    // MARK: - Selected Routine IDs
+    let selectedRoutines = BehaviorRelay<[RoutineSummary]>(value: [])
 
     // MARK: - Input
     let didTapRegister = PublishRelay<Void>()
@@ -120,17 +123,20 @@ private extension WorkRegisterViewModel {
                     clockOutVM.confirmSelectedTime,
                     breakPickerVM.confirmSelectedBreak.startWith(0),
                     memoText.asObservable(),
-                    repeatInfo.asObservable()
+                    repeatInfo.asObservable(),
+                    selectedRoutines.asObservable()
                 )
             )
             .subscribe(onNext: { [weak self]
-                (workplace, date, clockIn, clockOut, breakMin, memo, repeatInfo) in
+                (workplace, date, clockIn, clockOut, breakMin, memo, repeatInfo, routines) in
 
                 guard let self else { return }
 
                 let dateStr = DateFormatter.dataSourceDateFormatter.string(from: date)
                 let clockInStr = DateFormatter.ko12hTimeFormatter.string(from: clockIn)
                 let clockOutStr = DateFormatter.ko12hTimeFormatter.string(from: clockOut)
+                
+                let routineIDs = routines.map { $0.routineId }
 
                 print("--------------------------------------------------")
                 print("근무 등록 요청")
@@ -147,6 +153,7 @@ private extension WorkRegisterViewModel {
                 } else {
                     print("반복 없음")
                 }
+                print("선택된 루틴 IDs: \(routineIDs)")
                 print("--------------------------------------------------")
 
                 // TODO: 서버 요청 예정
