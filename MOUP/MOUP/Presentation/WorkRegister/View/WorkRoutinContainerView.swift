@@ -31,6 +31,13 @@ final class WorkRoutinContainerView: UIView {
     
     private let container = ContainerView()
     
+    private let additionalRoutineLabel = UILabel().then {
+        $0.text = ""
+        $0.textColor = .gray700
+        $0.font = .fieldsRegular(16)
+        $0.isHidden = true
+    }
+    
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -45,6 +52,26 @@ final class WorkRoutinContainerView: UIView {
     }
     
     // MARK: - Public Methods
+    
+    func updateRoutines(_ routines: [RoutineSummary]) {
+        let count = routines.count
+        let isSelected = count > 0
+        
+        if isSelected {
+            let firstName = routines.first?.routineName ?? "루틴 선택 완료"
+            routin.updateTitle(to: firstName)
+            
+            if count > 1 {
+                additionalRoutineLabel.text = "+ \(count - 1)"
+                additionalRoutineLabel.isHidden = false
+            } else {
+                additionalRoutineLabel.isHidden = true
+            }
+        } else {
+            routin.updateTitle(to: "루틴 추가")
+            additionalRoutineLabel.isHidden = true
+        }
+    }
 }
 
 private extension WorkRoutinContainerView {
@@ -64,7 +91,8 @@ private extension WorkRoutinContainerView {
             )
         
         container.addSubviews(
-            routin
+            routin,
+            additionalRoutineLabel
         )
     }
     
@@ -89,6 +117,11 @@ private extension WorkRoutinContainerView {
         routin.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.horizontalEdges.equalToSuperview()
+        }
+        
+        additionalRoutineLabel.snp.makeConstraints {
+            $0.centerY.equalTo(routin)
+            $0.trailing.equalTo(routin.snp.trailing).offset(-52)
         }
         
         self.snp.makeConstraints {

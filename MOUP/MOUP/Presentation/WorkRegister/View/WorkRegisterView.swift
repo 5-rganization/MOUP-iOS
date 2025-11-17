@@ -81,6 +81,9 @@ final class WorkRegisterView: UIView {
         workDateContainerView.setRepetitionText(text)
     }
     
+    func updateRoutines(_ routines: [RoutineSummary]) {
+        workRoutinContainerView.updateRoutines(routines)
+    }
 }
 
 private extension WorkRegisterView {
@@ -243,6 +246,12 @@ extension Reactive where Base: WorkRegisterView {
     var selectedLunchBreakTimeText: Binder<String> {
         Binder(base) { view, text in
             view.setLunchBreakText(text)
+        }
+    }
+    
+    var selectedRoutines: Binder<[RoutineSummary]> {
+        Binder(base) { view, routines in
+            view.updateRoutines(routines)
         }
     }
 }

@@ -22,6 +22,9 @@ final class RoutineSelectionViewController: UIViewController {
     private let addNewRoutineRelay = PublishRelay<RoutineSummary>()
     private let checkboxToggledRelay = PublishRelay<Int>()
     private let routineUpdatedRelay = PublishRelay<RoutineSummary>()
+    private let applyButtonTappedRelay = PublishRelay<Void>()
+    
+    var onRoutineSelected: (([RoutineSummary]) -> Void)?
     
     // MARK: - Lifecycle
     
@@ -85,13 +88,18 @@ private extension RoutineSelectionViewController {
             }
             .disposed(by: disposeBag)
         
+        routineSelectionView.rx.applyButtonDidTap
+            .bind(to: applyButtonTappedRelay)
+            .disposed(by: disposeBag)
+        
         let input = RoutineSelectionViewModel.Input(
             appear: self.rx.sentMessage(#selector(UIViewController.viewWillAppear(_:)))
                 .map { _ in () }
                 .take(1),
             checkboxToggled: checkboxToggledRelay.asObservable(),
             addNewRoutine: addNewRoutineRelay.asObservable(),
-            routineUpdated: routineUpdatedRelay.asObservable()
+            routineUpdated: routineUpdatedRelay.asObservable(),
+            applyButtonTapped: applyButtonTappedRelay.asObservable()
         )
         
         let output = viewModel.transform(input)
@@ -103,6 +111,13 @@ private extension RoutineSelectionViewController {
         output.error
             .emit(with: self) { owner, message in
                 // TODO: - 에러 알림 표시
+            }
+            .disposed(by: disposeBag)
+        
+        output.selectedRoutines
+            .emit(with: self) { owner, routines in
+                owner.onRoutineSelected?(routines)
+                owner.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
         

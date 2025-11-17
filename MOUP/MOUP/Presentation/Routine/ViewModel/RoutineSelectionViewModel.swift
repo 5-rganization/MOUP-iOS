@@ -38,11 +38,13 @@ final class RoutineSelectionViewModel {
         let checkboxToggled: Observable<Int>
         let addNewRoutine: Observable<RoutineSummary>
         let routineUpdated: Observable<RoutineSummary>
+        let applyButtonTapped: Observable<Void>
     }
     
     struct Output {
         let rows: Driver<[RoutineSectionModel]>
         let error: Signal<String>
+        let selectedRoutines: Signal<[RoutineSummary]>
     }
     
     // MARK: - Properties
@@ -117,9 +119,17 @@ final class RoutineSelectionViewModel {
             .distinctUntilChanged()
             .asDriver(onErrorJustReturn: [])
         
+        let selectedRoutines = input.applyButtonTapped
+            .withLatestFrom(Observable.combineLatest(routinesRelay, checkedIDsRelay))
+            .map { routines, checkedIDs -> [RoutineSummary] in
+                routines.filter { checkedIDs.contains($0.routineId) }
+            }
+            .asSignal(onErrorJustReturn: [])
+        
         return Output(
             rows: rows,
-            error: errorRelay.asSignal()
+            error: errorRelay.asSignal(),
+            selectedRoutines: selectedRoutines
         )
     }
 }
