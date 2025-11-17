@@ -22,6 +22,8 @@ final class RepeatSettingView: UIView {
     private var daySelections: [Bool] = Array(repeating: false, count: 7)
     
     // MARK: - UI Components
+    fileprivate let navigationBar = BaseNavigationBar(title: "반복")
+    
     private let dayStackView = UIStackView().then {
         $0.axis = .vertical
         $0.spacing = 12
@@ -95,6 +97,7 @@ private extension RepeatSettingView {
     
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             dayStackView,
             dateTitleLabel,
             container,
@@ -114,8 +117,13 @@ private extension RepeatSettingView {
     }
     
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalToSuperview()
+        }
+        
         dayStackView.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(20)
+            $0.top.equalTo(navigationBar.snp.bottom).offset(20)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
 
@@ -166,6 +174,10 @@ private extension RepeatSettingView {
     }
 }
 extension Reactive where Base: RepeatSettingView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
+    }
+    
     var dateTap: ControlEvent<Void> {
         ControlEvent(events: base.dateTapSubject.asObservable())
     }

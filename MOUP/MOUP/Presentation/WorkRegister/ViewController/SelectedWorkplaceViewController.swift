@@ -62,12 +62,7 @@ private extension SelectedWorkplaceViewController {
     func setHierarchy() { }
     
     // MARK: - setStyles
-    func setStyles() {
-        setNavigationBar(
-            title: "근무지 선택",
-            backAction: #selector(didTapBack)
-        )
-    }
+    func setStyles() { }
     
     // MARK: - setConstraints
     func setConstraints() { }
@@ -81,6 +76,11 @@ private extension SelectedWorkplaceViewController {
     
     // MARK: - setBinding
     func setBinding() {
+        selectedWorkplaceView.rx.navBackBtnTapped.asDriver()
+            .drive(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposeBag)
+        
         // 근무지 목록 바인딩
         viewModel.workplaces
             .asDriver()

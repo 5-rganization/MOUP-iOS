@@ -82,12 +82,7 @@ private extension OwnerWorkplaceRegisterViewController {
     
     func setHierarchy() { }
     
-    func setStyles() {
-        setNavigationBar(
-            title: "매장 등록",
-            backAction: #selector(didTapBack)
-        )
-    }
+    func setStyles() { }
     
     func setConstraints() { }
     
@@ -95,6 +90,10 @@ private extension OwnerWorkplaceRegisterViewController {
     
     // MARK: - Binding
     func setBinding() {
+        ownerView.rx.navBackBtnTapped.asDriver()
+            .drive(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposeBag)
         
         // 버튼 활성화
         viewModel.isFormValid

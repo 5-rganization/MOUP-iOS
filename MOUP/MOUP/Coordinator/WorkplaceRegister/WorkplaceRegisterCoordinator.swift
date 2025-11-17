@@ -83,7 +83,7 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
         }
 
         vc.hidesBottomBarWhenPushed = true
-        navigationController.navigationBar.isHidden = false
+        navigationController.navigationBar.isHidden = true
         navigationController.pushViewController(vc, animated: true)
     }
 

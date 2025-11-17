@@ -5,6 +5,9 @@
 //  Created by 양원식 on 7/24/25.
 //
 import UIKit
+
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 
@@ -12,6 +15,8 @@ final class SelectCategoryView: UIView {
     // MARK: - Properties
     
     // MARK: - UI Components
+    fileprivate let navigationBar = BaseNavigationBar(title: "카테고리")
+    
     private let title = UILabel().then {
         $0.text = "근무지 카테고리를 선택해주세요."
         $0.textColor = .gray900
@@ -74,6 +79,7 @@ private extension SelectCategoryView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             title,
             restaurantRadioButton,
             cafeRadioButton,
@@ -91,8 +97,13 @@ private extension SelectCategoryView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalToSuperview()
+        }
+        
         title.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(32)
+            $0.top.equalTo(navigationBar.snp.bottom).offset(32)
             $0.leading.equalToSuperview().offset(16)
         }
         restaurantRadioButton.snp.makeConstraints {
@@ -128,3 +139,8 @@ private extension SelectCategoryView {
     }
 }
 
+extension Reactive where Base: SelectCategoryView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
+    }
+}
