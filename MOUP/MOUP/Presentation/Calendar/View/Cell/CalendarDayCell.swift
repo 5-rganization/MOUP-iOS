@@ -76,6 +76,14 @@ final class CalendarDayCell: JTACDayCell {
                 let reducedCount = Int(possibleMaxHeight / (WorkRowSize.baseComponentHeight + self.workContainerVStackView.spacing))
                 
                 self.workContainerVStackView.reduceHeight(displayCount: reducedCount)
+                
+                if self.workContainerVStackView.alpha.isEqual(to: 0.0) {
+                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.1, delay: 0) {
+                        self.workContainerVStackView.alpha = 1.0
+                    }
+                }
+            } else {
+                self.workContainerVStackView.alpha = 1.0
             }
         }
     }
@@ -103,12 +111,13 @@ final class CalendarDayCell: JTACDayCell {
         dayLabel.isHidden = !dateBelongsToThisMonth
         workContainerVStackView.isHidden = !dateBelongsToThisMonth
         
-        let displayCount = 4
+        workContainerVStackView.alpha = 0.0
+        
         switch calendarMode {
         case .personal:
-            workContainerVStackView.updatePersonalModeWorkRows(workList: workList, displayCount: displayCount)
+            workContainerVStackView.updatePersonalModeWorkRows(workList: workList)
         case .shared:
-            workContainerVStackView.updateSharedModeWorkRows(workList: workList, displayCount: displayCount)
+            workContainerVStackView.updateSharedModeWorkRows(workList: workList)
         }
         
         setNeedsLayout()

@@ -40,13 +40,15 @@ final class WorkContainerVStackView: UIStackView {
     /// - Parameters:
     ///   - workList: 근무 Entity 배열 `[WorkSummary]`
     ///   - displayCount: 표시할 근무 UI 개수 `Int`
-    func updatePersonalModeWorkRows(workList: [WorkSummary], displayCount: Int) {
+    func updatePersonalModeWorkRows(workList: [WorkSummary]) {
         self.arrangedSubviews.forEach { $0.isHidden = true }
         
+        var displayedCount = 0
         for (index, work) in workList.enumerated() {
-            if index < displayCount {
+            if index < personalModeWorkRows.count {
                 personalModeWorkRows[index].update(work: work)
                 personalModeWorkRows[index].isHidden = false
+                displayedCount += 1
             } else {
                 break
             }
@@ -58,20 +60,22 @@ final class WorkContainerVStackView: UIStackView {
             personalModeWorkRows.forEach { $0.reduceSize() }
         }
         
-        showRestWorkCountRowIfRemain(displayedCount: displayCount)
+        showRestWorkCountRowIfRemain(displayedCount: displayedCount)
     }
     
     /// 공유 캘린더 모드일 때 근무 표시 UI를 업데이트하는 메서드
     /// - Parameters:
     ///   - workList: 근무 Entity 배열 `[WorkSummary]`
     ///   - displayCount: 표시할 근무 UI 개수 `Int`
-    func updateSharedModeWorkRows(workList: [WorkSummary], displayCount: Int) {
+    func updateSharedModeWorkRows(workList: [WorkSummary]) {
         self.arrangedSubviews.forEach { $0.isHidden = true }
         
+        var displayedCount = 0
         for (index, work) in workList.enumerated() {
-            if index < displayCount {
+            if index < sharedModeWorkRows.count {
                 sharedModeWorkRows[index].update(work: work)
                 sharedModeWorkRows[index].isHidden = false
+                displayedCount += 1
             } else {
                 break
             }
@@ -79,7 +83,7 @@ final class WorkContainerVStackView: UIStackView {
         
         workListCount = workList.count
         
-        showRestWorkCountRowIfRemain(displayedCount: displayCount)
+        showRestWorkCountRowIfRemain(displayedCount: displayedCount)
     }
     
     /// `CalendarDayCell`이 공간 부족일 경우 UI 중 일부를 숨김 처리하는 메서드
