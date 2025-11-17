@@ -149,6 +149,7 @@ final class HomeCoordinator: Coordinator {
         let vc = InviteCodeSheetViewController(
             viewModel: viewModel,
             workplaceId: workplaceId
+            homeCoordinator: self
         )
         vc.modalPresentationStyle = .pageSheet
         

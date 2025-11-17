@@ -11,6 +11,8 @@ import RxSwift
 final class InviteCodeInputCoordinator: Coordinator, WorkplaceRegisterCoordinatorProtocol {
     
     weak var coordinator: WorkplaceRegisterSheetCoordinator?
+    weak var homeCoordinator: HomeCoordinator?
+    
     var childCoordinators = [Coordinator]()
     
     private let navigationController: UINavigationController
@@ -36,7 +38,8 @@ final class InviteCodeInputCoordinator: Coordinator, WorkplaceRegisterCoordinato
 
     init(
         navigationController: UINavigationController,
-        workplaceUseCase: WorkplaceUseCaseProtocol
+        workplaceUseCase: WorkplaceUseCaseProtocol,
+        homeCoordinator: HomeCoordinator
     ) {
         self.navigationController = navigationController
         self.workplaceUseCase = workplaceUseCase
