@@ -17,6 +17,12 @@ final class CalendarDayCell: JTACDayCell {
     // MARK: - Properties
     static let identifier = String(describing: CalendarDayCell.self)
     
+    override var isSelected: Bool {
+        didSet {
+            selectedView.isHidden = !isSelected
+        }
+    }
+    
     // MARK: - UI Components
     /// 구분선
     private let seperatorView = UIView().then {
@@ -54,34 +60,36 @@ final class CalendarDayCell: JTACDayCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        // workContainerVStackView의 minY 계산
-        let workContainerMinY = dayLabel.frame.maxY + 4
-        
-        // workContainerVStackView의 너비 계산
-        let targetWidth = self.contentView.bounds.width - 4
-        // systemLayoutSizeFitting에 전달할 목표 크기 계산 - 너비는 targetWidth, 높이는 시스템이 계산
-        let targetSize = CGSize(width: targetWidth, height: UIView.layoutFittingCompressedSize.height)
-        // targetSize를 이용하여 workContainerVStackView의 잠재적인 최대 높이 계산
-        let requiredHeight = workContainerVStackView.systemLayoutSizeFitting(targetSize,
-                                                                             withHorizontalFittingPriority: .required,
-                                                                             verticalFittingPriority: .fittingSizeLevel).height
-        // workContainerVStackView의 잠재적인 maxY 계산
-        let potentialMaxY = workContainerMinY + requiredHeight
-        
-        // workContainerVStackView의 최대 maxY 계산(여백 4 포함)
-        let possibleMaxY = self.contentView.bounds.height - 4
-        
-        // 근무 컨테이너 UI가 캘린더 셀을 벗어나거나 여백이 4 미만일 때
-        if potentialMaxY >= possibleMaxY {
-            let possibleMaxHeight = possibleMaxY - workContainerMinY
-            let reducedCount = Int(possibleMaxHeight / (WorkRowSize.baseComponentHeight + workContainerVStackView.spacing))
-            // 근무 UI 크기 줄임
-            workContainerVStackView.reduceHeight(displayCount: reducedCount)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            
+            let workContainerMaxY = self.workContainerVStackView.frame.maxY
+            
+            // 근무 컨테이너 UI의 maxY가 가능한 최댓값
+            let possibleMaxY = self.contentView.bounds.height - 4  // 하단 여백 4 포함
+            
+            // 근무 컨테이너 UI와 캘린더 셀 하단 사이 여백이 4 미만일 때
+            if workContainerMaxY >= possibleMaxY {
+                let workContainerMinY = self.workContainerVStackView.frame.minY
+                let possibleMaxHeight = possibleMaxY - workContainerMinY
+                
+                let reducedCount = Int(possibleMaxHeight / (WorkRowSize.baseComponentHeight + self.workContainerVStackView.spacing))
+                
+                self.workContainerVStackView.reduceHeight(displayCount: reducedCount)
+                
+                if self.workContainerVStackView.alpha.isEqual(to: 0.0) {
+                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.1, delay: 0) {
+                        self.workContainerVStackView.alpha = 1.0
+                    }
+                }
+            } else {
+                self.workContainerVStackView.alpha = 1.0
+            }
         }
     }
     
     // MARK: - Internal Methods
-    func update(dateStr: String, isToday: Bool, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, calendarMode: CalendarMode, workList: [WorkSummary]) {
+    func update(dateStr: String, isToday: Bool, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, calendarMode: CalendarMode, workList: [WorkSummary]) {
         dayLabel.text = dateStr
         
         if isToday {
@@ -101,16 +109,18 @@ final class CalendarDayCell: JTACDayCell {
         
         self.isUserInteractionEnabled = dateBelongsToThisMonth
         dayLabel.isHidden = !dateBelongsToThisMonth
-        selectedView.isHidden = !isSelected
         workContainerVStackView.isHidden = !dateBelongsToThisMonth
         
-        let displayCount = 4
+        workContainerVStackView.alpha = 0.0
+        
         switch calendarMode {
         case .personal:
-            workContainerVStackView.updatePersonalModeWorkRows(workList: workList, displayCount: displayCount)
+            workContainerVStackView.updatePersonalModeWorkRows(workList: workList)
         case .shared:
-            workContainerVStackView.updateSharedModeWorkRows(workList: workList, displayCount: displayCount)
+            workContainerVStackView.updateSharedModeWorkRows(workList: workList)
         }
+        
+        setNeedsLayout()
     }
 }
 

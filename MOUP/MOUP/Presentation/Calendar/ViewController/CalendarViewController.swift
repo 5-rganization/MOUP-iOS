@@ -256,7 +256,6 @@ private extension CalendarViewController {
                     isToday: isToday,
                     daysOfWeek: cellState.day,
                     dateBelongsToThisMonth: dateBelongsToThisMonth,
-                    isSelected: isSelected,
                     calendarMode: calendarMode,
                     workList: workList)
     }
@@ -343,13 +342,13 @@ extension CalendarViewController: JTACMonthViewDelegate {
     
     func calendar(_ calendar: JTACMonthView, didSelectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
         selectedDate = date
-        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workSet: calendarWorkDataSourceRelay.value[date] ?? [])
+        cell?.isSelected = true
         didSelectCell(selectedDate: date)
     }
     
     func calendar(_ calendar: JTACMonthView, didDeselectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
         selectedDate = nil
-        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workSet: calendarWorkDataSourceRelay.value[date] ?? [])
+        cell?.isSelected = false
         didDeselectCell()
     }
 }
