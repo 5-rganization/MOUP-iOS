@@ -69,12 +69,6 @@ final class WorkplaceRegisterViewController: UIViewController {
         add(child: colorLabelContainerVC, to: workplaceRegisterView.getColorLabelContainerView)
         configure()
     }
-
-    @objc
-    private func didTapBack() {
-        navigationController?.popViewController(animated: true)
-    }
-
 }
 
 // MARK: - UI Methods

@@ -37,10 +37,6 @@ final class RepeatSettingViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError()
     }
-    
-    @objc private func didTapBack() {
-        navigationController?.popViewController(animated: true)
-    }
 }
 
 

@@ -61,11 +61,6 @@ final class OwnerWorkplaceRegisterViewController: UIViewController {
         
         configure()
     }
-    
-    @objc
-    private func didTapBack() {
-        navigationController?.popViewController(animated: true)
-    }
 }
 
 

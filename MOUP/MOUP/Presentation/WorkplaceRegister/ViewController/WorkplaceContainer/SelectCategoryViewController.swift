@@ -45,13 +45,6 @@ final class SelectCategoryViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError()
     }
-    
-    @objc
-    private func didTapBack() {
-        print("Back 버튼 클릭")
-        viewModel.resetSelectedCategory()
-        navigationController?.popViewController(animated: true)
-    }
 }
 
 // MARK: - UI Methods

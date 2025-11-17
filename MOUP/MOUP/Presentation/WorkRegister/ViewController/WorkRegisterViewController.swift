@@ -47,10 +47,6 @@ final class WorkRegisterViewController: UIViewController {
         super.viewDidLoad()
         configure()
     }
-
-    @objc private func didTapBack() {
-        navigationController?.popViewController(animated: true)
-    }
 }
 
 // MARK: - Private

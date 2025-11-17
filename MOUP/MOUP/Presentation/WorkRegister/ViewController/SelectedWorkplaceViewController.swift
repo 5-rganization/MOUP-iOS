@@ -42,10 +42,6 @@ final class SelectedWorkplaceViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError()
     }
-    
-    @objc private func didTapBack() {
-        navigationController?.popViewController(animated: true)
-    }
 }
 
 // MARK: - UI Methods
