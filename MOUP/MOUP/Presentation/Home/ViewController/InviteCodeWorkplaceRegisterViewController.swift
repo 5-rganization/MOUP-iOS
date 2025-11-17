@@ -6,33 +6,65 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 final class InviteCodeWorkplaceRegisterViewController: UIViewController {
     
-    // MARK: - Properties
-    private let workplaceName: String
-    private let inviteCode: String
-    //private let viewModel: <#ViewModel#>
+    // MARK: - UI
+    private let rootView = InviteCodeWorkplaceRegisterView()
+
+    // MARK: - DI
+    private let viewModel: InviteCodeWorkplaceRegisterViewModel
+    private weak var coordinator: InviteCodeInputCoordinator?
+    private let disposeBag = DisposeBag()
     
-    // MARK: - Lifecycle
-    
-    // VC일 때
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        configure()
-    }
-    
-    // MARK: - Initializer
-    
-    init(workplaceName: String, inviteCode: String) {
-        self.workplaceName = workplaceName
-        self.inviteCode = inviteCode
+    // MARK: - Container ViewControllers
+    private let payContainerVC: PayContainerViewController
+    private let workingConditionsContainerVC: WorkingConditionsContainerViewController
+    private let colorLabelContainerVC: ColorLabelContainerViewController
+
+    // MARK: - Init
+    init(
+        workplaceName: String,
+        inviteCode: String,
+        viewModel: InviteCodeWorkplaceRegisterViewModel,
+        coordinator: InviteCodeInputCoordinator
+    ) {
+        self.viewModel = viewModel
+        self.coordinator = coordinator
+
+        self.payContainerVC = PayContainerViewController(
+            viewModel: viewModel.payVM,
+            coordinator: coordinator
+        )
+        self.workingConditionsContainerVC = WorkingConditionsContainerViewController(
+            viewModel: viewModel.workingConditionsVM
+        )
+        self.colorLabelContainerVC = ColorLabelContainerViewController(
+            viewModel: viewModel.colorLabelVM,
+            coordinator: coordinator
+        )
+
         super.init(nibName: nil, bundle: nil)
+
+        self.title = workplaceName
     }
     
-    @available(*, unavailable, message: "compile error")
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError()
+    }
+
+    // MARK: - Lifecycle
+    override func loadView() {
+        self.view = rootView
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        addChildViewControllers()
+        configure()
     }
     
     @objc private func didTapBack() {
@@ -40,27 +72,47 @@ final class InviteCodeWorkplaceRegisterViewController: UIViewController {
     }
 }
 
-// MARK: - UI Methods
-
+// MARK: - Setup
 private extension InviteCodeWorkplaceRegisterViewController {
+
+    func addChildViewControllers() {
+        add(child: payContainerVC, to: rootView.getPayContainerView)
+        add(child: workingConditionsContainerVC, to: rootView.getWorkingConditionsContainerView)
+        add(child: colorLabelContainerVC, to: rootView.getColorLabelContainerView)
+    }
+
     func configure() {
-        setHierarchy()
         setStyles()
-        setConstraints()
-        setActions()
         setBinding()
     }
     
-    // MARK: - setBinding
-    func setHierarchy() { }
     func setStyles() {
         setNavigationBar(
-            title: workplaceName,
+            title: self.title ?? "",
             backAction: #selector(didTapBack)
         )
     }
-    func setConstraints() { }
-    func setActions() { }
-    func setBinding() { }
     
+    func setBinding() {
+        viewModel.isFormValid
+            .drive(onNext: { [weak self] isValid in
+                self?.rootView.getRegisterButton.isEnabled = isValid
+                self?.rootView.getRegisterButton.update(
+                    title: "등록",
+                    isSecondary: !isValid
+                )
+            })
+            .disposed(by: disposeBag)
+        
+        rootView.getRegisterButton.rx.tap
+            .bind(to: viewModel.didTapRegisterButton)
+            .disposed(by: disposeBag)
+        
+        viewModel.didCompleteRegister
+            .observe(on: MainScheduler.instance)
+            .bind(onNext: { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
+            })
+            .disposed(by: disposeBag)
+    }
 }
