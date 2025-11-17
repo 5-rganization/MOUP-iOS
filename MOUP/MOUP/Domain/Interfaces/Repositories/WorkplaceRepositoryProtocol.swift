@@ -13,4 +13,5 @@ protocol WorkplaceRepositoryProtocol: AnyObject {
     func fetchInviteCode(workplaceId: Int, forceGenerate: Bool) async throws -> InviteCodeInfo
     func createWorkplace(request: WorkplaceCreateRequestDTO) async throws -> WorkplaceCreate
     func createOwnerWorkplace(request: OwnerWorkplaceCreateRequestDTO) async throws -> WorkplaceCreate
+    func joinWorkplace(request: WorkplaceJoinRequestDTO) async throws -> WorkplaceJoinResponseDTO
 }

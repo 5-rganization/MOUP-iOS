@@ -10,12 +10,24 @@
 /// - `fixed`: 고정급
 enum SalaryCalculation: String {
     case hourly = "SALARY_CALCULATION_HOURLY"
-    case fixed = "SALARY_CALCULATION_FIXED"
+    case fixed  = "SALARY_CALCULATION_FIXED"
     
     var displayStr: String {
         switch self {
-        case .hourly: "시급"
-        case .fixed: "고정급"
+        case .hourly: return "시급"
+        case .fixed:  return "고정급"
         }
     }
+
+    /// UI에서 선택한 문자열("시급", "고정급") → ENUM 변환
+    init?(displayStr: String) {
+        switch displayStr {
+        case "시급": self = .hourly
+        case "고정급": self = .fixed
+        default: return nil
+        }
+    }
+
+    /// 서버 전송용 값
+    var serverValue: String { self.rawValue }
 }

@@ -323,6 +323,8 @@
 		};
 		5B5304752E224D220083F7CA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 5B5304612E224D210083F7CA /* MOUP */;
+			baseConfigurationReferenceRelativePath = Resources/DebugConfig.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -387,6 +389,8 @@
 		};
 		5B5304762E224D220083F7CA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 5B5304612E224D210083F7CA /* MOUP */;
+			baseConfigurationReferenceRelativePath = Resources/ReleaseConfig.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
