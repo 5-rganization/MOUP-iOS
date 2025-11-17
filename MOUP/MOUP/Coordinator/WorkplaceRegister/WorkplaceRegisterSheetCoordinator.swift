@@ -36,9 +36,12 @@ final class WorkplaceRegisterSheetCoordinator: Coordinator {
     }
     
     func moveToInviteCodeInput() { // 초대 코드 등록
+        guard let coordinator else { return }
+        
         let inviteCodeInputCoordinator = InviteCodeInputCoordinator(
             navigationController: navigationController,
-            workplaceUseCase: workplaceUseCase
+            workplaceUseCase: workplaceUseCase,
+            homeCoordinator: coordinator
         )
         inviteCodeInputCoordinator.coordinator = self
         childCoordinators.append(inviteCodeInputCoordinator)
