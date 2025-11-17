@@ -17,6 +17,12 @@ final class CalendarDayCell: JTACDayCell {
     // MARK: - Properties
     static let identifier = String(describing: CalendarDayCell.self)
     
+    override var isSelected: Bool {
+        didSet {
+            selectedView.isHidden = !isSelected
+        }
+    }
+    
     // MARK: - UI Components
     /// 구분선
     private let seperatorView = UIView().then {
@@ -73,7 +79,7 @@ final class CalendarDayCell: JTACDayCell {
     }
     
     // MARK: - Internal Methods
-    func update(dateStr: String, isToday: Bool, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, isSelected: Bool, calendarMode: CalendarMode, workList: [WorkSummary]) {
+    func update(dateStr: String, isToday: Bool, daysOfWeek: DaysOfWeek, dateBelongsToThisMonth: Bool, calendarMode: CalendarMode, workList: [WorkSummary]) {
         dayLabel.text = dateStr
         
         if isToday {
@@ -93,7 +99,6 @@ final class CalendarDayCell: JTACDayCell {
         
         self.isUserInteractionEnabled = dateBelongsToThisMonth
         dayLabel.isHidden = !dateBelongsToThisMonth
-        selectedView.isHidden = !isSelected
         workContainerVStackView.isHidden = !dateBelongsToThisMonth
         
         let displayCount = 4
