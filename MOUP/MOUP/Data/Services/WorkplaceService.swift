@@ -18,6 +18,7 @@ protocol WorkplaceServiceProtocol: AnyObject {
     func createWorkplace(request: WorkplaceCreateRequestDTO) async throws -> WorkplaceCreateResponseDTO
     func createOwnerWorkplace(request: OwnerWorkplaceCreateRequestDTO) async throws -> WorkplaceCreateResponseDTO
     func joinWorkplace(request: WorkplaceJoinRequestDTO) async throws -> WorkplaceJoinResponseDTO
+    func deleteWorkplace(workplaceId: Int) async throws
 }
 
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: "WorkplaceService"))
@@ -195,6 +196,24 @@ final class WorkplaceService: WorkplaceServiceProtocol {
             throw WorkplaceError.alreadyExists
         case 422:
             throw WorkplaceError.invalidField
+        default:
+            throw NetworkError.serverError
+        }
+    }
+    
+    func deleteWorkplace(workplaceId: Int) async throws {
+        let request = session.request(WorkplaceRouter.deleteWorkplace(workplaceId: workplaceId))
+        let response = await request.serializingData().response
+        
+        guard let statusCode = response.response?.statusCode else {
+            throw NetworkError.noResponse
+        }
+        
+        switch statusCode {
+        case 204:
+            return
+        case 404:
+            throw WorkplaceError.notFound
         default:
             throw NetworkError.serverError
         }

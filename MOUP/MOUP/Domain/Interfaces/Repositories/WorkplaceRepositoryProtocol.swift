@@ -14,4 +14,5 @@ protocol WorkplaceRepositoryProtocol: AnyObject {
     func createWorkplace(request: WorkplaceCreateRequestDTO) async throws -> WorkplaceCreate
     func createOwnerWorkplace(request: OwnerWorkplaceCreateRequestDTO) async throws -> WorkplaceCreate
     func joinWorkplace(request: WorkplaceJoinRequestDTO) async throws -> WorkplaceJoinResponseDTO
+    func deleteWorkplace(workplaceId: Int) async throws
 }
