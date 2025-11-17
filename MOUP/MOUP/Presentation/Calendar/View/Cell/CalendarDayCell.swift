@@ -60,13 +60,15 @@ final class CalendarDayCell: JTACDayCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            
             let workContainerMaxY = self.workContainerVStackView.frame.maxY
             
             // 근무 컨테이너 UI의 maxY가 가능한 최댓값
             let possibleMaxY = self.contentView.bounds.height - 4  // 하단 여백 4 포함
             
-            // 근무 컨테이너 UI와 캘린더 셀 사이 여백이 4 미만일 때
+            // 근무 컨테이너 UI와 캘린더 셀 하단 사이 여백이 4 미만일 때
             if workContainerMaxY >= possibleMaxY {
                 let workContainerMinY = self.workContainerVStackView.frame.minY
                 let possibleMaxHeight = possibleMaxY - workContainerMinY
