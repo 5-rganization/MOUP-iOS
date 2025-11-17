@@ -100,14 +100,14 @@ final class CalendarViewModel {
                             return startOfMonth...endOfMonth
                         }()
                         
-                        await MainActor.run {
-                            var currentDict = owner.calendarWorkDictRelay.value
-                            if let dateRange {
-                                let datesToRemove = currentDict.keys.filter { dateRange.contains($0) }
-                                datesToRemove.forEach { currentDict[$0] = nil }
-                            }
-                            
-                            currentDict.merge(newChunkDict) { _, newSet in newSet }
+                        var currentDict = owner.calendarWorkDictRelay.value
+                        if let dateRange {
+                            let datesToRemove = currentDict.keys.filter { dateRange.contains($0) }
+                            datesToRemove.forEach { currentDict[$0] = nil }
+                        }
+                        currentDict.merge(newChunkDict) { _, newSet in newSet }
+                        
+                        await MainActor.run { [currentDict] in
                             owner.calendarWorkDictRelay.accept(currentDict)
                         }
                         
