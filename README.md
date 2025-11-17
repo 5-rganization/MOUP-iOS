@@ -16,8 +16,8 @@
 > *알바생에게는 복잡할 수 있는 근무 시간 • 급여 계산을 돕고, 사장님의 인건비 • 근무 일정의 효율적인 관리를 지원합니다 !*
 >
 > 개발 기간(Cloud Firestore): 2025.05.29 ~ 2025.07.07  
-> 리팩토링 기간([Spring Boot](https://github.com/5-rganization/MOUP-Server)): 2025.07.12 ~ 2025.11.11  
-> 유비보수 기간: 2025.11.12 ~
+> 리팩토링 기간([Spring Boot](https://github.com/5-rganization/MOUP-Server)): 2025.07.12 ~ 2025.11.23  
+> 유비보수 기간: 2025.11.24 ~
 
 <br>
 
@@ -69,6 +69,9 @@
         "nodePlacementStrategy": "BRANDES_KOEPF",
         "forceNodeModelOrder": false,
         "considerModelOrder": "NODES_AND_EDGES"
+    },
+    "class": {
+        "hideEmptyMembersBox": true
     }
   }
 }%%
@@ -242,11 +245,163 @@ erDiagram
 </details>
 
 
-
 ---
 
 ### 리팩토링 과정([Spring Boot](https://github.com/5-rganization/MOUP-Server))
+#### 의존성 다이어그램
+``` mermaid
+%%{
+  init: {
+    "theme": "default",
+    "fontFamily": "monospace",
+    "elk": {
+        "mergeEdges": false,
+        "nodePlacementStrategy": "BRANDES_KOEPF",
+        "forceNodeModelOrder": false,
+        "considerModelOrder": "NODES_AND_EDGES"
+    },
+    "class": {
+        "hideEmptyMembersBox": true
+    }
+  }
+}%%
+classDiagram
+direction LR
 
+    AttendanceService ..|> AttendanceServiceProtocol
+    AttendanceServiceProtocol <.. AttendanceRepository
+    AttendanceRepository ..|> AttendanceRepositoryProtocol
+    AttendanceRepositoryProtocol <.. AttendanceUseCase
+    AttendanceUseCase ..|> AttendanceUseCaseProtocol
+    AttendanceUseCaseProtocol <.. AttendanceHistoryViewModel
+    AttendanceUseCaseProtocol <.. ManageAttendanceViewModel
+    AttendanceUseCaseProtocol <.. HomeViewModel
+
+    AuthService ..|> AuthServiceProtocol
+    AuthServiceProtocol <.. AuthRepository
+    AuthRepository ..|> AuthRepositoryProtocol
+    AuthRepositoryProtocol <.. AuthUseCase
+    AuthUseCase ..|> AuthUseCaseProtocol
+    AuthUseCaseProtocol <.. SignInViewModel
+    AuthUseCaseProtocol <.. UserRoleViewModel
+    AuthUseCaseProtocol <.. MyPageViewModel
+    AuthUseCaseProtocol <.. TabBarViewModel
+
+    HomeService ..|> HomeServiceProtocol
+    HomeServiceProtocol <.. HomeRepository
+    HomeRepository ..|> HomeRepositoryProtocol
+    HomeRepositoryProtocol <.. HomeUseCase
+    HomeUseCase ..|> HomeUseCaseProtocol
+    HomeUseCaseProtocol <.. HomeViewModel
+
+    NoticeService ..|> NoticeServiceProtocol
+    NoticeServiceProtocol <.. NoticeRepository
+    NoticeRepository ..|> NoticeRepositoryProtocol
+    NoticeRepositoryProtocol <.. NoticeUseCase
+    NoticeUseCase ..|> NoticeUseCaseProtocol
+    NoticeUseCaseProtocol <.. NoticeListViewModel
+
+    NotificationService ..|> NotificationServiceProtocol
+    NotificationServiceProtocol <.. NotificationRepository
+    NotificationRepository ..|> NotificationRepositoryProtocol
+    NotificationRepositoryProtocol <.. NotificationUseCase
+    NotificationUseCase ..|> NotificationUseCaseProtocol
+    NotificationUseCaseProtocol <.. HomeViewModel
+    NotificationUseCaseProtocol <.. NotificationListViewModel
+    
+    RoutineService ..|> RoutineServiceProtocol
+    RoutineServiceProtocol <.. RoutineRepository
+    RoutineRepository ..|> RoutineRepositoryProtocol
+    RoutineRepositoryProtocol <.. RoutineUseCase
+    RoutineUseCase ..|> RoutineUseCaseProtocol
+    RoutineUseCaseProtocol <.. AddRoutineViewModel
+    RoutineUseCaseProtocol <.. AllRoutineViewModel
+    RoutineUseCaseProtocol <.. EditRoutineViewModel
+    RoutineUseCaseProtocol <.. RoutineSelectionViewModel
+    RoutineUseCaseProtocol <.. TodayRoutineViewModel
+    RoutineUseCaseProtocol <.. WorkplaceRoutineListViewModel
+
+    TokenService ..|> TokenServiceProtocol
+    TokenServiceProtocol <.. TokenRepository
+    TokenRepository ..|> TokenRepositoryProtocol
+    TokenRepositoryProtocol <.. TokenUseCase
+    TokenUseCase ..|> TokenUseCaseProtocol
+    TokenUseCaseProtocol <.. AuthInterceptor
+
+    UserService ..|> UserServiceProtocol
+    UserServiceProtocol <.. UserRepository
+    UserRepository ..|> UserRepositoryProtocol
+    UserRepositoryProtocol <.. UserUseCase
+    UserUseCase ..|> UserUseCaseProtocol
+    UserUseCaseProtocol <.. DeleteAccountViewModel
+    UserUseCaseProtocol <.. EditModalViewModel
+    UserUseCaseProtocol <.. MyPageViewModel
+
+    WorkplaceService ..|> WorkplaceServiceProtocol
+    WorkplaceServiceProtocol <.. WorkplaceRepository
+    WorkplaceRepository ..|> WorkplaceRepositoryProtocol
+    WorkplaceRepositoryProtocol <.. WorkplaceUseCase
+    WorkplaceUseCase ..|> WorkplaceUseCaseProtocol
+    WorkplaceUseCaseProtocol <.. CalendarViewModel
+    WorkplaceUseCaseProtocol <.. FilterViewModel
+    WorkplaceUseCaseProtocol <.. InviteCodeInputViewModel
+    WorkplaceUseCaseProtocol <.. InviteCodeSheetViewModel
+    WorkplaceUseCaseProtocol <.. OwnerWorkplaceRegisterViewModel
+    WorkplaceUseCaseProtocol <.. WorkplaceRegisterViewModel
+    WorkplaceUseCaseProtocol <.. SelectedWorkplaceViewModel
+
+    WorkService ..|> WorkServiceProtocol
+    WorkServiceProtocol <.. WorkRepository
+    WorkRepository ..|> WorkRepositoryProtocol
+    WorkRepositoryProtocol <.. WorkUseCase
+    WorkUseCase ..|> WorkUseCaseProtocol
+    WorkUseCaseProtocol <.. CalendarViewModel
+    WorkUseCaseProtocol <.. CalendarWorkListViewModel
+    WorkUseCaseProtocol <.. WorkRegisterViewModel
+
+	  class AttendanceServiceProtocol:::MOUP_primary100 { <<protocol>> }
+	  class AttendanceRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+	  class AttendanceUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+	  class AuthServiceProtocol:::MOUP_primary100 { <<protocol>> }
+	  class AuthRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+	  class AuthUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class HomeServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class HomeRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class HomeUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class NoticeServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class NoticeRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class NoticeUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class NotificationServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class NotificationRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class NotificationUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class RoutineServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class RoutineRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class RoutineUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class TokenServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class TokenRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class TokenUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class UserServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class UserRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class UserUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class WorkplaceServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class WorkplaceRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class WorkplaceUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+    class WorkServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class WorkRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class WorkUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+
+	classDef MOUP_primary100 fill:#FFE0D5
+
+```
 
 <br><br>
 
@@ -259,7 +414,7 @@ erDiagram
 <br>
 
 <details>
-<summary>급여, 인건비 계산</summary>
+	<summary>급여, 인건비 계산</summary>
 	<div markdown="1">
 
 ![알바생 급여 계산1](https://github.com/user-attachments/assets/43d014b0-479f-4230-bfbf-b2d915d3c438)
@@ -480,8 +635,8 @@ if !hasLaunchedBefore {
 | 아키텍처 | `Clean Architecture`, `MVVM` |
 | 디자인 패턴 | `Delegate`, `Singleton` |
 | 인터페이스 | `UIKit` |
-| 네트워크 | `Alamofire` |
-| 비동기 처리 | `Swift Concurrency`, `RxSwift`, `RxCocoa`, `RxDataSources` |
+| 네트워크 | `Swift Concurrency`, `Alamofire` |
+| 비동기 처리 | `RxSwift`, `RxCocoa`, `RxDataSources` |
 | UI 라이브러리 | `JTAppleCalendar` |
 | 레이아웃 구성 | `SnapKit`, `Then` |
 | 내부 저장소 | `UserDefaults` |
@@ -494,6 +649,7 @@ if !hasLaunchedBefore {
 
 
 ## 🤔 기술적 의사결정
+### 공통
 **MVVM**, **Clean Architecture**: 각 계층간의 책임을 분리하고, 의존성을 최소화 및 UseCase의 재사용성을 높임
 - 문제 상황
   - 하나의 화면 수정 시 다양한 책임들이 얽혀 코드 변경 범위가 커짐. 비즈니스 로직, 네트워크 처리, 상태 관리, UI 처리가 모두 강하게 결합되는 문제가 발생
@@ -505,7 +661,7 @@ if !hasLaunchedBefore {
   - ViewModel은 UseCase에만 의존하기 때문에 앱의 핵심 로직 추상화 가능
   - 상위 계층(Presentation)이 하위 계층(Data)의 구현체가 아니라 추상 타입에 의존하여 구체적인 구현을 몰라도 되는 구조
   - 인터페이스(Protocol)를 가운데에 두고, 상위 계층과 하위 계층이 인터페이스를 바라보기 때문에 의존성 역전이 발생함
-
+ 
 **SwiftUI** vs **JTAppleCalendar**
 - 캘린더의 구현 방법을 정할 때 SwiftUI와 외부 라이브러리 사이에서 고민
 - UIKit+RxSwift의 일관성과 커스텀 자유도를 높이기 위해 JTAppleCalendar 채택
@@ -520,21 +676,42 @@ if !hasLaunchedBefore {
 - `transform()` 메서드 내부에서 `.flatMap` 등 다양한 연산자를 사용해 이벤트 흐름을 구성하고 코드의 가독성과 유지보수성 향상 가능. 비동기 데이터 흐름과 에러처리, 사이드 이펙트 처리 가능
 - Output으로 정의한 데이터를 View에서는 UI만 반응하게 하여 상태 변화와 UI 이벤트 처리 분리 가능
 
-**Cloud Firestore**: 백엔드 구현 없이 사용자가 입력한 근무지/매장 정보, 근무 정보를 DB에 저장하기 위해 사용
-- 의사결정 당시 팀 내 상황
-  - 짧은 일정으로 빠른 MVP 개발 및 배포를 진행하고 유저 테스트를 거쳐 앱 업데이트를 목표로 삼음
-- 도입시 장점
-  - Firestore는 문서(document)와 컬렉션(collection) 구조로 되어 있어 유연한 데이터 모델링 가능
-  - 로그인/인증과 연동이 필요했고 팀원 모두가 동시에 접근하고 협업 가능한 구조 필요
-  - 따로 백엔드를 관리하거나 서버 인프라를 관리하지 않아도 되고, 콘솔에서 바로 데이터 확인/수정 가능
-
-**Firebase Auth**, **Google Auth SDK**, **Apple Auth SDK**: 구글, 애플 로그인 기능을 지원하고, 이를 통한 인증을 통합하여 처리
+**Google Auth SDK**, **Apple Auth SDK**: 구글 로그인, 애플 로그인을 구현하기 위해 사용
 
 **UserDefaults**: 앱 설치 이후 최초 실행인지 확인하고, 최초 실행인 경우 사용 안내 이미지를 표시하기 위해 사용
 
 **SnapKit**: Auto Layout을 보다 직관적이고 간결하게 작성하기 위해 사용
 
 **Then**: 초기화 직후 속성 설정을 간결하게 작성할 수 있는 라이브러리
+
+<details>
+	<summary><h3>개발 과정</h3></summary>
+	<div markdown="1">
+
+**Cloud Firestore**: 백엔드 구현 없이 사용자가 입력한 근무지/매장 정보, 근무 정보를 DB에 저장하기 위해 사용
+- 의사결정 당시 팀 내 상황
+  - 짧은 일정으로 빠른 MVP 개발 및 배포를 진행하고 유저 테스트를 거쳐 앱 업데이트를 목표로 삼음
+- 도입 시 장점
+  - Firestore는 문서(document)와 컬렉션(collection) 구조로 되어 있어 유연한 데이터 모델링 가능
+  - 로그인/인증과 연동이 필요했고 팀원 모두가 동시에 접근하고 협업 가능한 구조 필요
+  - 따로 백엔드를 관리하거나 서버 인프라를 관리하지 않아도 되고, 콘솔에서 바로 데이터 확인/수정 가능
+
+**Firebase Auth**: 구글, 애플 로그인의 인증을 통합하여 처리
+
+</details>
+
+### 리팩토링 과정
+
+**Spring Boot**: 백엔드 프레임워크
+- NoSQL 기반인 Cloud Firestore로는 알바생의 개인 캘린더, 알바생-사장님 간의 공유 캘린더, 루틴 등을 구현하는 데에 한계를 느낌
+	- 하나의 document에 다른 collection과 연결된 부분이 많아지면서 Cloud Firestore 관련 코드의 클로저 깊이가 깊어짐
+- Spring Boot를 백엔드 프레임워크로, MySQL을 DB로 채택
+- 소셜 로그인 시 백엔드와 Authorization Code를 사용하여 사용자 정보 인증
+
+**Alamofire**: Parameter 인코딩, 응답 유효성 검사, 토큰 재발급 로직의 체계적 구현을 위해 사용
+- `URLRequestConvertible` 프로토콜을 사용하여 Router 패턴 구현
+- `RequestInterceptor` 프로토콜을 사용하여 액세스 토큰 전달 및 요청 실패 시 토큰 재발급 로직 구현
+- Swift Concurrency(`async`/`await`)와 같이 사용하여 네트워크 코드의 가독성을 높임
 
 <br><br>
 

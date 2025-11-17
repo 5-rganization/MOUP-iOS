@@ -17,6 +17,7 @@ protocol WorkplaceServiceProtocol: AnyObject {
     func fetchInviteCode(workplaceId: Int, forceGenerate: Bool) async throws -> InviteCodeResponseDTO
     func createWorkplace(request: WorkplaceCreateRequestDTO) async throws -> WorkplaceCreateResponseDTO
     func createOwnerWorkplace(request: OwnerWorkplaceCreateRequestDTO) async throws -> WorkplaceCreateResponseDTO
+    func joinWorkplace(request: WorkplaceJoinRequestDTO) async throws -> WorkplaceJoinResponseDTO
 }
 
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: "WorkplaceService"))
@@ -164,6 +165,36 @@ final class WorkplaceService: WorkplaceServiceProtocol {
         case 422:
             throw WorkplaceError.invalidField
             
+        default:
+            throw NetworkError.serverError
+        }
+    }
+    
+    func joinWorkplace(request: WorkplaceJoinRequestDTO) async throws -> WorkplaceJoinResponseDTO {
+        let request = session.request(WorkplaceRouter.joinWorkplace(request: request))
+        let response = await request.serializingDecodable(WorkplaceJoinResponseDTO.self).response
+
+        print("statusCode: \(response.response?.statusCode ?? 0)")
+
+        guard let statusCode = response.response?.statusCode else {
+            throw NetworkError.noResponse
+        }
+
+        switch statusCode {
+        case 200, 201:
+            guard let dto = response.value else {
+                throw NetworkError.noResponse
+            }
+            return dto
+
+        case 403:
+            throw WorkplaceError.invalidRole
+        case 404:
+            throw WorkplaceError.notFound
+        case 409:
+            throw WorkplaceError.alreadyExists
+        case 422:
+            throw WorkplaceError.invalidField
         default:
             throw NetworkError.serverError
         }

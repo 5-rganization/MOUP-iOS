@@ -14,6 +14,7 @@ enum WorkplaceRouter {
     case fetchInviteCode(workplaceId: Int, requestDTO: InviteCodeRequestDTO)
     case createWorkplace(request: WorkplaceCreateRequestDTO)
     case createOwnerWorkplace(request: OwnerWorkplaceCreateRequestDTO)
+    case joinWorkplace(request: WorkplaceJoinRequestDTO)
 }
 
 extension WorkplaceRouter: URLRequestConvertible {
@@ -36,6 +37,8 @@ extension WorkplaceRouter: URLRequestConvertible {
             return "/workplaces"
         case .createOwnerWorkplace:
             return "/workplaces"
+        case .joinWorkplace:
+            return "/workplaces/join"
         }
     }
 
@@ -45,7 +48,7 @@ extension WorkplaceRouter: URLRequestConvertible {
             return .get
         case .fetchInviteCode:
             return .put
-        case .createWorkplace, .createOwnerWorkplace:
+        case .createWorkplace, .createOwnerWorkplace, .joinWorkplace:
             return .post
         }
     }
@@ -54,7 +57,7 @@ extension WorkplaceRouter: URLRequestConvertible {
         switch self {
         case .fetchWorkplaceList(let isSharedOnly):
             return ["isSharedOnly": isSharedOnly]
-        case .createWorkplace, .createOwnerWorkplace, .fetchWorkplaceByInviteCode, .fetchInviteCode:
+        case .createWorkplace, .createOwnerWorkplace, .fetchWorkplaceByInviteCode, .fetchInviteCode, .joinWorkplace:
             return nil
         }
     }
@@ -69,6 +72,8 @@ extension WorkplaceRouter: URLRequestConvertible {
             return request
         case .createOwnerWorkplace(let request):
             return request
+        case .joinWorkplace(let request):
+            return request
         }
     }
 
@@ -76,7 +81,7 @@ extension WorkplaceRouter: URLRequestConvertible {
         switch self {
         case .fetchWorkplaceList, .fetchWorkplaceByInviteCode:
             return URLEncoding.default
-        case .createWorkplace, .createOwnerWorkplace, .fetchInviteCode:
+        case .createWorkplace, .createOwnerWorkplace, .fetchInviteCode, .joinWorkplace:
             return JSONEncoding.default
         }
     }
