@@ -89,17 +89,16 @@ private extension WorkplaceRegisterViewController {
     }
 
     func setHierarchy() { }
-    func setStyles() {
-        setNavigationBar(
-            title: "새 근무지 등록",
-            backAction: #selector(didTapBack)
-        )
-    }
+    func setStyles() { }
 
     func setConstraints() { }
     func setActions() { }
 
     func setBinding() {
+        workplaceRegisterView.rx.navBackBtnTapped.asDriver()
+            .drive(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposeBag)
         
         viewModel.isFormValid
             .drive(onNext: { [weak self] isValid in

@@ -6,6 +6,9 @@
 //
 
 import UIKit
+
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 
@@ -28,6 +31,7 @@ final class WorkplaceRegisterView: UIView {
     private let colorLabelContainerView = ColorLabelContainerView()
     
     // MARK: - UI Components
+    fileprivate let navigationBar = BaseNavigationBar(title: "새 근무지 등록")
     private let registerButton = BaseButton(title: "등록하기", isSecondary: true)
     
     // MARK: - Getter
@@ -73,6 +77,7 @@ private extension WorkplaceRegisterView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             scrollView
         )
         
@@ -100,8 +105,14 @@ private extension WorkplaceRegisterView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalToSuperview()
+        }
+        
         scrollView.snp.makeConstraints {
-            $0.top.trailing.leading.equalTo(safeAreaLayoutGuide)
+            $0.top.equalTo(navigationBar.snp.bottom)
+            $0.trailing.leading.equalTo(safeAreaLayoutGuide)
             $0.bottom.equalToSuperview()
         }
         
@@ -124,3 +135,8 @@ private extension WorkplaceRegisterView {
     }
 }
 
+extension Reactive where Base: WorkplaceRegisterView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
+    }
+}

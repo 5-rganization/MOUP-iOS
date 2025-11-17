@@ -23,6 +23,7 @@ final class WorkRegisterView: UIView {
 //    fileprivate let colorTapSubject = PublishSubject<Void>()
     
     // MARK: - UI Components
+    fileprivate let navigationBar = BaseNavigationBar(title: "새 근무 등록")
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     private let stackView = UIStackView().then {
@@ -98,6 +99,7 @@ private extension WorkRegisterView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             scrollView
         )
         
@@ -128,8 +130,14 @@ private extension WorkRegisterView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalToSuperview()
+        }
+        
         scrollView.snp.makeConstraints {
-            $0.top.trailing.leading.equalTo(safeAreaLayoutGuide)
+            $0.top.equalTo(navigationBar.snp.bottom)
+            $0.trailing.leading.equalTo(safeAreaLayoutGuide)
             $0.bottom.equalToSuperview()
         }
         
@@ -195,6 +203,10 @@ private extension WorkRegisterView {
 }
 
 extension Reactive where Base: WorkRegisterView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
+    }
+    
     var selectWorkplaceTap: ControlEvent<Void> {
         return ControlEvent(events: base.selectWorkplaceSubject.asObservable())
     }

@@ -66,12 +66,7 @@ private extension WorkRegisterViewController {
 
     func setHierarchy() { }
 
-    func setStyles() {
-        setNavigationBar(
-            title: "새 근무 등록",
-            backAction: #selector(didTapBack)
-        )
-    }
+    func setStyles() { }
 
     func setConstraints() { }
     func setActions() { }
@@ -87,6 +82,11 @@ private extension WorkRegisterViewController {
 
     // MARK: - Binding
     func setBinding() {
+        workRegisterView.rx.navBackBtnTapped.asDriver()
+            .drive(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposeBag)
+        
         // MARK: - 근무지
         workRegisterView.rx.selectWorkplaceTap
             .bind(onNext: { [weak self] in
