@@ -53,4 +53,18 @@ final class WorkplaceUseCase: WorkplaceUseCaseProtocol {
     func updateWorkplace(workplaceId: Int, request: UpdateWorkplaceRequestDTO) async throws {
         try await workplaceRepository.updateWorkplace(workplaceId: workplaceId, request: request)
     }
+    
+    func approveJoinRequest(workplaceId: Int, workerId: Int) async throws {
+        try await workplaceRepository.approveJoinRequest(
+            workplaceId: workplaceId,
+            workerId: workerId
+        )
+    }
+    
+    func rejectJoinRequest(workplaceId: Int, workerId: Int) async throws {
+        try await workplaceRepository.rejectJoinRequest(
+            workplaceId: workplaceId,
+            workerId: workerId
+        )
+    }
 }

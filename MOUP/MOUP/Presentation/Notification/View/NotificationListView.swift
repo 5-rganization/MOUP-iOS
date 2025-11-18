@@ -19,6 +19,8 @@ final class NotificationListView: UIView {
     fileprivate let markAllAsReadSubject = PublishSubject<Void>()
     fileprivate let deleteAllSubject = PublishSubject<Void>()
     fileprivate let deleteSubject = PublishSubject<UserNotification>()
+    fileprivate let approveSubject = PublishSubject<(workplaceId: Int, workerId: Int)>()
+    fileprivate let rejectSubject = PublishSubject<(workplaceId: Int, workerId: Int)>()
     private var notifications: [UserNotification] = []
     
     // MARK: - UI Components
@@ -182,6 +184,20 @@ extension NotificationListView: UITableViewDataSource {
         let notification = notifications[indexPath.row]
         cell.configure(with: notification)
         
+        if notification.type == .inviteRequest,
+           let metadata = notification.metadata,
+           let workplaceId = metadata.workplaceId,
+           let workerId = metadata.workerId {
+
+            cell.onApprove = { [weak self] in
+                self?.approveSubject.onNext((workplaceId, workerId))
+            }
+
+            cell.onReject = { [weak self] in
+                self?.rejectSubject.onNext((workplaceId, workerId))
+            }
+        }
+        
         return cell
     }
 }
@@ -227,5 +243,13 @@ extension Reactive where Base: NotificationListView {
     
     var deleteTapped: ControlEvent<UserNotification> {
         ControlEvent(events: base.deleteSubject)
+    }
+    
+    var approveTapped: Observable<(workplaceId: Int, workerId: Int)> {
+        return base.approveSubject.asObservable()
+    }
+
+    var rejectTapped: Observable<(workplaceId: Int, workerId: Int)> {
+        return base.rejectSubject.asObservable()
     }
 }

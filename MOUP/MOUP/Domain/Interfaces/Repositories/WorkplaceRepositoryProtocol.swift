@@ -17,4 +17,6 @@ protocol WorkplaceRepositoryProtocol: AnyObject {
     func deleteWorkplace(workplaceId: Int) async throws
     func fetchWorkplaceDetail(workplaceId: Int) async throws -> WorkplaceDetailResponseDTO
     func updateWorkplace(workplaceId: Int, request: UpdateWorkplaceRequestDTO) async throws
+    func approveJoinRequest(workplaceId: Int, workerId: Int) async throws
+    func rejectJoinRequest(workplaceId: Int, workerId: Int) async throws
 }

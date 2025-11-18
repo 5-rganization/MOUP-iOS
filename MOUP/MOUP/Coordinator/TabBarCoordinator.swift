@@ -85,7 +85,11 @@ final class TabBarCoordinator: Coordinator {
         window.makeKeyAndVisible()
     }
     
-    func moveToNotificationList() {
+    func moveToNotificationList(
+        pushType: String? = nil,
+        pushWorkerId: Int? = nil,
+        pushWorkplaceId: Int? = nil
+    ) {
         tabBarController.selectedIndex = 0
         
         guard let homeCoordinator = childCoordinators.first(where: {
@@ -93,8 +97,14 @@ final class TabBarCoordinator: Coordinator {
         }) as? HomeCoordinator else {
             return
         }
-        
-        homeCoordinator.showNotificationList()
+
+        DispatchQueue.main.async {
+            homeCoordinator.showNotificationList(
+                pushType: pushType,
+                pushWorkerId: pushWorkerId,
+                pushWorkplaceId: pushWorkplaceId
+            )
+        }
     }
 }
 

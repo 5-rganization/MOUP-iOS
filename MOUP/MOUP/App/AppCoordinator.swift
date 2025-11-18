@@ -117,7 +117,15 @@ final class AppCoordinator: Coordinator {
         
         switch destination {
         case .notificationList:
-            moveToNotificationList()
+            let type = userInfo[PushNotificationKey.type] as? String
+            let workerId = userInfo[PushNotificationKey.workerId] as? Int
+            let workplaceId = userInfo[PushNotificationKey.workplaceId] as? Int
+
+            moveToNotificationList(
+                pushType: type,
+                pushWorkerId: workerId,
+                pushWorkplaceId: workplaceId
+            )
         case .routineDetail:
             break
         case .workDetail:
@@ -152,13 +160,21 @@ final class AppCoordinator: Coordinator {
         tabBarCoordinator.start()
     }
     
-    private func moveToNotificationList() {
+    private func moveToNotificationList(
+        pushType: String? = nil,
+        pushWorkerId: Int? = nil,
+        pushWorkplaceId: Int? = nil
+    ) {
         guard let tabBarCoordinator = childCoordinators.first(where: { $0 is TabBarCoordinator }) as? TabBarCoordinator else {
             self.logger.error("TabBarCoordinator를 찾을 수 없습니다.")
             return
         }
-        
-        tabBarCoordinator.moveToNotificationList()
+
+        tabBarCoordinator.moveToNotificationList(
+            pushType: pushType,
+            pushWorkerId: pushWorkerId,
+            pushWorkplaceId: pushWorkplaceId
+        )
         self.logger.debug("알림 리스트로 이동 완료")
     }
     

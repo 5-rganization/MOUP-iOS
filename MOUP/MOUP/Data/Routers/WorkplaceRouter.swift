@@ -18,6 +18,8 @@ enum WorkplaceRouter {
     case deleteWorkplace(workplaceId: Int)
     case fetchWorkplaceDetail(id: Int)
     case updateWorkplace(workplaceId: Int, request: UpdateWorkplaceRequestDTO)
+    case approveJoinRequest(workplaceId: Int, workerId: Int)
+    case rejectJoinRequest(workplaceId: Int, workerId: Int)
 }
 
 extension WorkplaceRouter: URLRequestConvertible {
@@ -48,6 +50,9 @@ extension WorkplaceRouter: URLRequestConvertible {
             return "/workplaces/\(id)"
         case .updateWorkplace(let workplaceId, _):
             return "/workplaces/\(workplaceId)"
+        case .approveJoinRequest(let workplaceId, let workerId),
+             .rejectJoinRequest(let workplaceId, let workerId):
+            return "/workplaces/\(workplaceId)/workers/\(workerId)/accept"
         }
     }
 
@@ -62,6 +67,9 @@ extension WorkplaceRouter: URLRequestConvertible {
         case .updateWorkplace:
             return .patch
         case .deleteWorkplace:
+        case .approveJoinRequest:
+            return .patch
+        case .rejectJoinRequest:
             return .delete
         }
     }
@@ -73,6 +81,8 @@ extension WorkplaceRouter: URLRequestConvertible {
         case .fetchWorkplaceDetail:
             return ["view": "detail"]
         case .createWorkplace, .createOwnerWorkplace, .fetchWorkplaceByInviteCode, .fetchInviteCode, .joinWorkplace, .deleteWorkplace, .updateWorkplace:
+        case .approveJoinRequest,
+             .rejectJoinRequest:
             return nil
         }
     }
@@ -80,6 +90,8 @@ extension WorkplaceRouter: URLRequestConvertible {
     var requestBody: Encodable? {
         switch self {
         case .fetchWorkplaceList, .fetchWorkplaceByInviteCode, .deleteWorkplace, .fetchWorkplaceDetail:
+        case .approveJoinRequest,
+             .rejectJoinRequest:
             return nil
         case .fetchInviteCode(_, let requestDTO):
             return requestDTO
@@ -99,6 +111,8 @@ extension WorkplaceRouter: URLRequestConvertible {
         case .fetchWorkplaceList, .fetchWorkplaceByInviteCode, .deleteWorkplace, .fetchWorkplaceDetail:
             return URLEncoding.default
         case .createWorkplace, .createOwnerWorkplace, .fetchInviteCode, .joinWorkplace, .updateWorkplace:
+        case .approveJoinRequest,
+             .rejectJoinRequest:
             return JSONEncoding.default
         }
     }

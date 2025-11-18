@@ -18,6 +18,8 @@ final class NotificationListViewController: UIViewController {
     
     private let viewDidLoadSubject = PublishSubject<Void>()
     private let refreshSubject = PublishSubject<Void>()
+
+    private var pushNotificationMetadata: (type: String?, workerId: Int?, workplaceId: Int?)?
     
     // MARK: - Lifecycle
     
@@ -34,10 +36,19 @@ final class NotificationListViewController: UIViewController {
     }
     
     // MARK: - Initializer
-    
-    init(viewModel: NotificationListViewModel) {
+
+    init(
+        viewModel: NotificationListViewModel,
+        pushType: String? = nil,
+        pushWorkerId: Int? = nil,
+        pushWorkplaceId: Int? = nil
+    ) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
+
+        if pushType != nil || pushWorkerId != nil || pushWorkplaceId != nil {
+            self.pushNotificationMetadata = (pushType, pushWorkerId, pushWorkplaceId)
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -92,7 +103,9 @@ private extension NotificationListViewController {
             markAllReadTapped: notificationListView.rx.markAllReadTapped.asObservable(),
             deleteAllTapped: deleteAllConfirmed,
             refreshTrigger: refreshSubject.asObservable(),
-            deleteTapped: notificationListView.rx.deleteTapped.asObservable()
+            deleteTapped: notificationListView.rx.deleteTapped.asObservable(),
+            approveTapped: notificationListView.rx.approveTapped.asObservable(),
+            rejectTapped: notificationListView.rx.rejectTapped.asObservable()
         )
         
         let output = viewModel.transform(input)
@@ -109,7 +122,8 @@ private extension NotificationListViewController {
         
         output.notifications
             .drive(with: self) { owner, notifications in
-                owner.notificationListView.updateNotifications(notifications)
+                let updatedNotifications = owner.applyPushMetadata(to: notifications)
+                owner.notificationListView.updateNotifications(updatedNotifications)
             }
             .disposed(by: disposeBag)
         
@@ -126,6 +140,20 @@ private extension NotificationListViewController {
                 // TODO: - 배지 업데이트
             }
             .disposed(by: disposeBag)
+        
+        output.approveSuccess
+            .emit(with: self) { owner, _ in
+                print("승인 완료")
+                // TODO: - 성공 메시지 표시
+            }
+            .disposed(by: disposeBag)
+        
+        output.rejectSuccess
+            .emit(with: self) { owner, _ in
+                print("거절 완료")
+                // TODO: - 성공 메시지 표시
+            }
+            .disposed(by: disposeBag)
     }
     
     func observerPushNotifications() {
@@ -135,16 +163,68 @@ private extension NotificationListViewController {
             name: .pushNotificationReceived,
             object: nil
         )
-        
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handlePushNotificationReceived),
             name: UIApplication.didBecomeActiveNotification,
             object: nil
         )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handlePushNotificationTapped),
+            name: .pushNotificationTapped,
+            object: nil
+        )
     }
-    
+
     @objc func handlePushNotificationReceived() {
         refreshSubject.onNext(())
+    }
+
+    @objc func handlePushNotificationTapped(_ notification: Notification) {
+        guard let userInfo = notification.userInfo else { return }
+
+        let type = userInfo[PushNotificationKey.type] as? String
+        let workerId = userInfo[PushNotificationKey.workerId] as? Int
+        let workplaceId = userInfo[PushNotificationKey.workplaceId] as? Int
+
+        pushNotificationMetadata = (type, workerId, workplaceId)
+
+        refreshSubject.onNext(())
+    }
+
+    private func applyPushMetadata(to notifications: [UserNotification]) -> [UserNotification] {
+        guard let metadata = pushNotificationMetadata,
+              let pushWorkerId = metadata.workerId,
+              let pushWorkplaceId = metadata.workplaceId,
+              let pushType = metadata.type else {
+            return notifications
+        }
+
+        return notifications.map { notification in
+            if notification.senderId == pushWorkerId {
+                let notificationType = PushNotificationType(from: pushType)
+                let notificationMetadata = NotificationMetadata(
+                    workerId: pushWorkerId,
+                    workplaceId: pushWorkplaceId
+                )
+
+                return UserNotification(
+                    id: notification.id,
+                    senderId: notification.senderId,
+                    receiverId: notification.receiverId,
+                    title: notification.title,
+                    content: notification.content,
+                    sentAt: notification.sentAt,
+                    readAt: notification.readAt,
+                    type: notificationType,
+                    metadata: notificationMetadata
+                )
+            }
+
+            return notification
+        }
     }
 }

@@ -113,9 +113,18 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         
         let destination = determineDestination(for: notificationType)
         
+        // 푸시 알림 페이로드에서 workerId, workplaceId 추출 (String으로 전달됨)
+        let workerIdString = userInfo[PushNotificationKey.workerId] as? String
+        let workplaceIdString = userInfo[PushNotificationKey.workplaceId] as? String
+
+        let workerId = workerIdString.flatMap { Int($0) }
+        let workplaceId = workplaceIdString.flatMap { Int($0) }
+
         postNotificationTappedEvent(
             destination: destination,
-            type: notificationTypeString
+            type: notificationTypeString,
+            workerId: workerId,
+            workplaceId: workplaceId
         )
     }
     
@@ -134,7 +143,9 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     
     private func postNotificationTappedEvent(
         destination: PushNotificationDestination,
-        type: String?
+        type: String?,
+        workerId: Int?,
+        workplaceId: Int?
     ) {
         var userInfo: [String: Any] = [
             PushNotificationKey.destination: destination.rawValue
@@ -144,6 +155,14 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             userInfo[PushNotificationKey.type] = type
         }
         
+        if let workerId = workerId {
+            userInfo[PushNotificationKey.workerId] = workerId
+        }
+
+        if let workplaceId = workplaceId {
+            userInfo[PushNotificationKey.workplaceId] = workplaceId
+        }
+
         NotificationCenter.default.post(
             name: .pushNotificationTapped,
             object: nil,

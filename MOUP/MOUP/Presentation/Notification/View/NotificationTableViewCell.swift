@@ -14,6 +14,8 @@ final class NotificationTableViewCell: UITableViewCell {
     // MARK: - Properties
     
     static let identifier = "NotificationTableViewCell"
+    var onApprove: (() -> Void)?
+    var onReject:(() -> Void)?
     
     // MARK: - UI Components
     
@@ -39,6 +41,31 @@ final class NotificationTableViewCell: UITableViewCell {
         $0.textColor = .gray400
     }
     
+    private lazy var actionButtonStackView = UIStackView().then {
+        $0.axis = .horizontal
+        $0.spacing = 8
+        $0.distribution = .fillEqually
+        $0.isHidden = true
+    }
+
+    private lazy var rejectButton = UIButton().then {
+        $0.setTitle("거절", for: .normal)
+        $0.setTitleColor(.gray700, for: .normal)
+        $0.titleLabel?.font = .buttonSemibold(14)
+        $0.backgroundColor = .gray200
+        $0.layer.cornerRadius = 8
+        $0.clipsToBounds = true
+    }
+
+    private lazy var approveButton = UIButton().then {
+        $0.setTitle("승인", for: .normal)
+        $0.setTitleColor(.white, for: .normal)
+        $0.titleLabel?.font = .buttonSemibold(14)
+        $0.backgroundColor = .primary500
+        $0.layer.cornerRadius = 8
+        $0.clipsToBounds = true
+    }
+    
     // MARK: - Initializer
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -59,6 +86,10 @@ final class NotificationTableViewCell: UITableViewCell {
         titleLabel.text = nil
         contentLabel.text = nil
         timeLabel.text = nil
+        
+        actionButtonStackView.isHidden = true
+        onApprove = nil
+        onReject = nil
     }
     
     // MARK: - Public Methods
@@ -76,6 +107,33 @@ final class NotificationTableViewCell: UITableViewCell {
         }
         
         timeLabel.text = formatTimeAgo(notification.sentAt)
+        
+        if notification.type == .inviteRequest {
+              actionButtonStackView.isHidden = false
+
+              contentLabel.snp.remakeConstraints {
+                  $0.top.equalTo(titleLabel.snp.bottom).offset(4)
+                  $0.leading.equalTo(titleLabel)
+                  $0.trailing.equalToSuperview().inset(16)
+              }
+
+              actionButtonStackView.snp.remakeConstraints {
+                  $0.top.equalTo(contentLabel.snp.bottom).offset(12)
+                  $0.leading.equalTo(titleLabel)
+                  $0.trailing.equalToSuperview().inset(16)
+                  $0.height.equalTo(36)
+                  $0.bottom.equalToSuperview().inset(12)
+              }
+          } else {
+              actionButtonStackView.isHidden = true
+
+              contentLabel.snp.remakeConstraints {
+                  $0.top.equalTo(titleLabel.snp.bottom).offset(4)
+                  $0.leading.equalTo(titleLabel)
+                  $0.trailing.equalToSuperview().inset(16)
+                  $0.bottom.equalToSuperview().inset(12)
+              }
+          }
     }
     
     private func formatTimeAgo(_ date: Date) -> String {
@@ -108,6 +166,7 @@ private extension NotificationTableViewCell {
         setHierarchy()
         setStyles()
         setConstraints()
+        setActions()
     }
     
     func setHierarchy() {
@@ -115,7 +174,13 @@ private extension NotificationTableViewCell {
             statusIcon,
             titleLabel,
             contentLabel,
-            timeLabel
+            timeLabel,
+            actionButtonStackView
+        )
+        
+        actionButtonStackView.addArrangedSubviews(
+            rejectButton,
+            approveButton
         )
     }
     
@@ -147,5 +212,26 @@ private extension NotificationTableViewCell {
             $0.trailing.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview().inset(12)
         }
+    }
+    
+    func setActions() {
+        approveButton.addTarget(
+            self,
+            action: #selector(handleApprove),
+            for: .touchUpInside
+        )
+        rejectButton.addTarget(
+            self,
+            action: #selector(handleReject),
+            for: .touchUpInside
+        )
+    }
+
+    @objc func handleApprove() {
+        onApprove?()
+    }
+
+    @objc func handleReject() {
+        onReject?()
     }
 }

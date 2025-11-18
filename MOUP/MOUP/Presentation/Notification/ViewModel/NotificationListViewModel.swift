@@ -20,6 +20,8 @@ final class NotificationListViewModel {
         let deleteAllTapped: Observable<Void>
         let refreshTrigger: Observable<Void>
         let deleteTapped: Observable<UserNotification>
+        let approveTapped: Observable<(workplaceId: Int, workerId: Int)>
+        let rejectTapped: Observable<(workplaceId: Int, workerId: Int)>
     }
     
     // MARK: - Output
@@ -29,17 +31,24 @@ final class NotificationListViewModel {
         let isLoading: Driver<Bool>
         let error: Signal<String>
         let unreadCount: Driver<Int>
+        let approveSuccess: Signal<Void>
+        let rejectSuccess: Signal<Void>
     }
     
     // MARK: - Properties
     
     private let notificationUseCase: NotificationUseCaseProtocol
+    private let workplaceUseCase: WorkplaceUseCaseProtocol
     private let disposeBag = DisposeBag()
     
     // MARK: - Initializer
     
-    init(notificationUseCase: NotificationUseCaseProtocol) {
+    init(
+        notificationUseCase: NotificationUseCaseProtocol,
+        workplaceUseCase: WorkplaceUseCaseProtocol
+    ) {
         self.notificationUseCase = notificationUseCase
+        self.workplaceUseCase = workplaceUseCase
     }
     
     // MARK: - Transform
@@ -48,6 +57,9 @@ final class NotificationListViewModel {
         let loadingRelay = BehaviorRelay<Bool>(value: false)
         let notificationsRelay = BehaviorRelay<[UserNotification]>(value: [])
         let errorRelay = PublishRelay<String>()
+        
+        let approveSuccessRelay = PublishRelay<Void>()
+        let rejectSuccessRelay = PublishRelay<Void>()
         
         let fetchTrigger = Observable.merge(
             input.viewDidLoad,
@@ -113,7 +125,9 @@ final class NotificationListViewModel {
                             title: notification.title,
                             content: notification.content,
                             sentAt: notification.sentAt,
-                            readAt: Date()
+                            readAt: Date(),
+                            type: notification.type,
+                            metadata: notification.metadata
                         )
                     }
                     return notification
@@ -149,7 +163,9 @@ final class NotificationListViewModel {
                         title: notification.title,
                         content: notification.content,
                         sentAt: notification.sentAt,
-                        readAt: notification.readAt ?? Date()
+                        readAt: notification.readAt ?? Date(),
+                        type: notification.type,
+                        metadata: notification.metadata
                     )
                 }
             }
@@ -207,11 +223,85 @@ final class NotificationListViewModel {
             .bind(to: notificationsRelay)
             .disposed(by: disposeBag)
         
+        input.approveTapped
+            .flatMapLatest { [weak self] (workplaceId, workerId) -> Observable<Void> in
+                guard let self else { return .empty() }
+                
+                return Observable.create { observer in
+                    Task {
+                        do {
+                            try await self.workplaceUseCase.approveJoinRequest(
+                                workplaceId: workplaceId,
+                                workerId: workerId
+                            )
+                            observer.onNext(())
+                            observer.onCompleted()
+                        } catch {
+                            errorRelay.accept("승인에 실패했습니다.")
+                            observer.onCompleted()
+                        }
+                    }
+                    return Disposables.create()
+                }
+            }
+            .do(onNext: { [weak self] _ in
+                guard let self else { return }
+                Task {
+                    do {
+                        let notifications = try await self.notificationUseCase.fetchNotifications()
+                        let sortedNotification = notifications.sorted { $0.sentAt > $1.sentAt }
+                        notificationsRelay.accept(sortedNotification)
+                    } catch {
+                        // 에러
+                    }
+                }
+            })
+            .bind(to: approveSuccessRelay)
+            .disposed(by: disposeBag)
+        
+        input.rejectTapped
+            .flatMapLatest { [weak self] (workplaceId, workerId) -> Observable<Void> in
+                guard let self else { return .empty() }
+                
+                return Observable.create { observer in
+                    Task {
+                        do {
+                            try await self.workplaceUseCase.rejectJoinRequest(
+                                workplaceId: workplaceId,
+                                workerId: workerId
+                            )
+                            observer.onNext(())
+                            observer.onCompleted()
+                        } catch {
+                            errorRelay.accept("거절에 실패했습니다.")
+                            observer.onCompleted()
+                        }
+                    }
+                    return Disposables.create()
+                }
+            }
+            .do(onNext: { [weak self] _ in
+                guard let self else { return }
+                Task {
+                    do {
+                        let notifications = try await self.notificationUseCase.fetchNotifications()
+                        let sortedNotification = notifications.sorted { $0.sentAt > $1.sentAt }
+                        notificationsRelay.accept(sortedNotification)
+                    } catch {
+                        // 에러
+                    }
+                }
+            })
+            .bind(to: rejectSuccessRelay)
+            .disposed(by: disposeBag)
+        
         return Output(
             notifications: notificationsRelay.asDriver(),
             isLoading: loadingRelay.asDriver(),
             error: errorRelay.asSignal(),
-            unreadCount: unreadCount.asDriver(onErrorJustReturn: 0)
+            unreadCount: unreadCount.asDriver(onErrorJustReturn: 0),
+            approveSuccess: approveSuccessRelay.asSignal(),
+            rejectSuccess: rejectSuccessRelay.asSignal()
         )
     }
 }

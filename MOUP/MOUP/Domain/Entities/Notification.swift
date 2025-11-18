@@ -16,7 +16,20 @@ struct UserNotification {
     let sentAt: Date
     let readAt: Date?
     
+    let type: PushNotificationType?
+    let metadata: NotificationMetadata?
+    
     var isRead: Bool {
         return readAt != nil
+    }
+}
+
+struct NotificationMetadata {
+    let workerId: Int?
+    let workplaceId: Int?
+    
+    init(workerId: Int? = nil, workplaceId: Int? = nil) {
+        self.workerId = workerId
+        self.workplaceId = workplaceId
     }
 }

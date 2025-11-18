@@ -193,9 +193,30 @@ final class HomeCoordinator: Coordinator {
         childCoordinators.removeAll { $0 === coordinator }
     }
     
-    func showNotificationList() {
-        let viewModel = NotificationListViewModel(notificationUseCase: notificationUseCase)
-        let notificationListVC = NotificationListViewController(viewModel: viewModel)
+    func showNotificationList(
+        pushType: String? = nil,
+        pushWorkerId: Int? = nil,
+        pushWorkplaceId: Int? = nil
+    ) {
+        let workplaceService = WorkplaceService()
+        let workplaceRepository = WorkplaceRepository(workplaceService: workplaceService)
+        let workplaceUseCase = WorkplaceUseCase(workplaceRepository: workplaceRepository)
+
+        let notificationService = NotificationService()
+        let notificationRepository = NotificationRepository(notificationService: notificationService)
+        let notificationUseCase = NotificationUseCase(notificationRepository: notificationRepository)
+
+        let viewModel = NotificationListViewModel(
+            notificationUseCase: notificationUseCase,
+            workplaceUseCase: workplaceUseCase
+        )
+
+        let notificationListVC = NotificationListViewController(
+            viewModel: viewModel,
+            pushType: pushType,
+            pushWorkerId: pushWorkerId,
+            pushWorkplaceId: pushWorkplaceId
+        )
         navigationController.pushViewController(notificationListVC, animated: true)
     }
     

@@ -21,6 +21,8 @@ protocol WorkplaceServiceProtocol: AnyObject {
     func deleteWorkplace(workplaceId: Int) async throws
     func fetchWorkplaceDetail(workplaceId: Int) async throws -> WorkplaceDetailResponseDTO
     func updateWorkplace(workplaceId: Int, request: UpdateWorkplaceRequestDTO) async throws -> Void
+    func approveJoinRequest(workplaceId: Int, workerId: Int) async throws
+    func rejectJoinRequest(workplaceId: Int, workerId: Int) async throws
 }
 
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: "WorkplaceService"))
@@ -287,5 +289,67 @@ final class WorkplaceService: WorkplaceServiceProtocol {
         default:
             throw NetworkError.serverError
         }
+    }
+
+    func approveJoinRequest(workplaceId: Int, workerId: Int) async throws {
+        let request = session.request(
+            WorkplaceRouter.approveJoinRequest(
+                workplaceId: workplaceId,
+                workerId: workerId
+            )
+        )
+        let response = await request.serializingData().response
+
+        guard let statusCode = response.response?.statusCode else {
+            throw NetworkError.noResponse
+        }
+
+        switch statusCode {
+        case 202:
+            return
+        case 400:
+            throw NetworkError.badRequest
+        case 403:
+            throw NetworkError.forbidden
+        case 404:
+            throw NetworkError.notFound
+        case 422:
+            throw NetworkError.invalidField
+        case 500:
+            throw NetworkError.serverError
+        default:
+            throw NetworkError.unknown
+        }
+    }
+    
+    func rejectJoinRequest(workplaceId: Int, workerId: Int) async throws {
+        let request = session.request(
+            WorkplaceRouter.rejectJoinRequest(
+                workplaceId: workplaceId,
+                workerId: workerId
+            )
+        )
+        let response = await request.serializingData().response
+
+        guard let statusCode = response.response?.statusCode else {
+            throw NetworkError.noResponse
+        }
+
+        switch statusCode {
+         case 202:
+             return
+         case 400:
+             throw NetworkError.badRequest
+         case 403:
+             throw NetworkError.forbidden
+         case 404:
+             throw NetworkError.notFound
+         case 422:
+             throw NetworkError.invalidField
+         case 500:
+             throw NetworkError.serverError
+         default:
+             throw NetworkError.unknown
+         }
     }
 }

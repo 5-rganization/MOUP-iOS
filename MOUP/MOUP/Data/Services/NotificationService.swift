@@ -9,7 +9,7 @@ import Foundation
 import Alamofire
 
 protocol NotificationServiceProtocol: AnyObject {
-    func fetchNotifications() async throws -> [NotificationResponseDTO]
+    func fetchNotifications() async throws -> NotificationListResponseDTO
     func markAsRead(id: Int) async throws
     func markAllAsRead() async throws
     func deleteNotification(id: Int) async throws
@@ -19,9 +19,9 @@ protocol NotificationServiceProtocol: AnyObject {
 final class NotificationService: NotificationServiceProtocol {
     private lazy var session = NetworkManager.shared.session
     
-    func fetchNotifications() async throws -> [NotificationResponseDTO] {
+    func fetchNotifications() async throws -> NotificationListResponseDTO {
         let request = session.request(NotificationRouter.fetchNotifications)
-        let response = await request.serializingDecodable([NotificationResponseDTO].self).response
+        let response = await request.serializingDecodable([NotificationItemDTO].self).response
         
         guard let statusCode = response.response?.statusCode else {
             throw NetworkError.noResponse
@@ -29,16 +29,16 @@ final class NotificationService: NotificationServiceProtocol {
         
         switch statusCode {
         case 200:
-            guard let dtos = response.value else {
+            guard let dtoArray = response.value else {
                 throw NetworkError.noResponse
             }
-            return dtos
+            return NotificationListResponseDTO(notificationList: dtoArray)
         case 401:
             print("알림 조회 실패: 인증 실패")
             throw NetworkError.serverError
         case 404:
             print("알림 조회 실패: 조회 결과 없음")
-            return []
+            return NotificationListResponseDTO(notificationList: [])
         default:
             print(NetworkError.serverError.debugDescription!)
             throw NetworkError.serverError
