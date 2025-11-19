@@ -20,6 +20,7 @@ final class NotificationListViewController: UIViewController {
     private let refreshSubject = PublishSubject<Void>()
 
     private var pushNotificationMetadata: (type: String?, workerId: Int?, workplaceId: Int?)?
+    private var pendingPushData: (id: Int, metadata: NotificationMetadata?)?
     
     // MARK: - Lifecycle
     
@@ -41,13 +42,23 @@ final class NotificationListViewController: UIViewController {
         viewModel: NotificationListViewModel,
         pushType: String? = nil,
         pushWorkerId: Int? = nil,
-        pushWorkplaceId: Int? = nil
+        pushWorkplaceId: Int? = nil,
+        pushNotificationId: Int? = nil
     ) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
 
-        if pushType != nil || pushWorkerId != nil || pushWorkplaceId != nil {
-            self.pushNotificationMetadata = (pushType, pushWorkerId, pushWorkplaceId)
+        if let pushNotificationId {
+            let metadata: NotificationMetadata?
+            if let workerId = pushWorkerId,
+               let workplaceId = pushWorkplaceId {
+                metadata = NotificationMetadata(
+                    workerId: workerId, workplaceId: workplaceId
+                )
+            } else {
+                metadata = nil
+            }
+            pendingPushData = (id: pushNotificationId, metadata: metadata)
         }
     }
     
@@ -184,47 +195,40 @@ private extension NotificationListViewController {
     }
 
     @objc func handlePushNotificationTapped(_ notification: Notification) {
-        guard let userInfo = notification.userInfo else { return }
+        guard let userInfo = notification.userInfo,
+              let notificationId = userInfo[PushNotificationKey.notificationId] as? Int
+        else { return }
 
-        let type = userInfo[PushNotificationKey.type] as? String
         let workerId = userInfo[PushNotificationKey.workerId] as? Int
         let workplaceId = userInfo[PushNotificationKey.workplaceId] as? Int
 
-        pushNotificationMetadata = (type, workerId, workplaceId)
-
+        let metadata = (workerId != nil && workplaceId != nil)
+            ? NotificationMetadata(workerId: workerId, workplaceId: workplaceId)
+            : nil
+        
+        pendingPushData = (id: notificationId, metadata: metadata)
         refreshSubject.onNext(())
     }
 
     private func applyPushMetadata(to notifications: [UserNotification]) -> [UserNotification] {
-        guard let metadata = pushNotificationMetadata,
-              let pushWorkerId = metadata.workerId,
-              let pushWorkplaceId = metadata.workplaceId,
-              let pushType = metadata.type else {
-            return notifications
-        }
+        guard let pending = pendingPushData else { return notifications }
+        
+        defer { pendingPushData = nil }
 
         return notifications.map { notification in
-            if notification.senderId == pushWorkerId {
-                let notificationType = PushNotificationType(from: pushType)
-                let notificationMetadata = NotificationMetadata(
-                    workerId: pushWorkerId,
-                    workplaceId: pushWorkplaceId
-                )
+            guard notification.id == pending.id else { return notification }
 
-                return UserNotification(
-                    id: notification.id,
-                    senderId: notification.senderId,
-                    receiverId: notification.receiverId,
-                    title: notification.title,
-                    content: notification.content,
-                    sentAt: notification.sentAt,
-                    readAt: notification.readAt,
-                    type: notificationType,
-                    metadata: notificationMetadata
-                )
-            }
-
-            return notification
+            return UserNotification(
+                id: notification.id,
+                senderId: notification.senderId,
+                receiverId: notification.receiverId,
+                title: notification.title,
+                content: notification.content,
+                sentAt: notification.sentAt,
+                readAt: notification.readAt,
+                type: notification.type ?? .inviteRequest,
+                metadata: pending.metadata ?? notification.metadata
+            )
         }
     }
 }

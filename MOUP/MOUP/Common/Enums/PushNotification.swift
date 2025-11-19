@@ -35,4 +35,5 @@ enum PushNotificationKey {
     static let destination = "destination"
     static let workerId = "workerId"
     static let workplaceId = "workplaceId"
+    static let notificationId = "notificationId"
 }

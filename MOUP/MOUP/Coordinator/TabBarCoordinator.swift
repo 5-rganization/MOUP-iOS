@@ -88,7 +88,8 @@ final class TabBarCoordinator: Coordinator {
     func moveToNotificationList(
         pushType: String? = nil,
         pushWorkerId: Int? = nil,
-        pushWorkplaceId: Int? = nil
+        pushWorkplaceId: Int? = nil,
+        pushNotificationId: Int? = nil
     ) {
         tabBarController.selectedIndex = 0
         

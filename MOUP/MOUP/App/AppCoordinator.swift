@@ -163,7 +163,8 @@ final class AppCoordinator: Coordinator {
     private func moveToNotificationList(
         pushType: String? = nil,
         pushWorkerId: Int? = nil,
-        pushWorkplaceId: Int? = nil
+        pushWorkplaceId: Int? = nil,
+        pushNotificationId: Int? = nil
     ) {
         guard let tabBarCoordinator = childCoordinators.first(where: { $0 is TabBarCoordinator }) as? TabBarCoordinator else {
             self.logger.error("TabBarCoordinator를 찾을 수 없습니다.")
@@ -173,7 +174,8 @@ final class AppCoordinator: Coordinator {
         tabBarCoordinator.moveToNotificationList(
             pushType: pushType,
             pushWorkerId: pushWorkerId,
-            pushWorkplaceId: pushWorkplaceId
+            pushWorkplaceId: pushWorkplaceId,
+            pushNotificationId: pushNotificationId
         )
         self.logger.debug("알림 리스트로 이동 완료")
     }
