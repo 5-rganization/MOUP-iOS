@@ -10,6 +10,7 @@ import Then
 import SnapKit
 import RxSwift
 import RxCocoa
+import OSLog
 
 final class NotificationListView: UIView {
     
@@ -102,6 +103,7 @@ final class NotificationListView: UIView {
     }
     
     func updateNotifications(_ notifications: [UserNotification]) {
+        let readCount = notifications.filter { $0.isRead }.count
         self.notifications = notifications
         emptyLabel.isHidden = !notifications.isEmpty
         actionButtonStackView.isHidden = notifications.isEmpty

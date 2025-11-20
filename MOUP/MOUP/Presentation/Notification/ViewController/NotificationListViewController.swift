@@ -10,7 +10,7 @@ import RxSwift
 
 final class NotificationListViewController: UIViewController {
     
-    // MARK; - Properties
+    // MARK: - Properties
     
     private let notificationListView = NotificationListView()
     private let viewModel: NotificationListViewModel
@@ -20,7 +20,7 @@ final class NotificationListViewController: UIViewController {
     private let refreshSubject = PublishSubject<Void>()
 
     private var pushNotificationMetadata: (type: String?, workerId: Int?, workplaceId: Int?)?
-    private var pendingPushData: (id: Int, metadata: NotificationMetadata?)?
+    private var pendingPushData: (id: Int?, metadata: NotificationMetadata?)?
     
     // MARK: - Lifecycle
     
@@ -48,16 +48,13 @@ final class NotificationListViewController: UIViewController {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
 
-        if let pushNotificationId {
-            let metadata: NotificationMetadata?
-            if let workerId = pushWorkerId,
-               let workplaceId = pushWorkplaceId {
-                metadata = NotificationMetadata(
-                    workerId: workerId, workplaceId: workplaceId
-                )
-            } else {
-                metadata = nil
-            }
+        let pushNotificationType = PushNotificationType(from: pushType)
+        if pushNotificationType != nil || pushWorkerId != nil || pushWorkplaceId != nil {
+            let metadata = NotificationMetadata(
+                type: pushNotificationType,
+                workerId: pushWorkerId,
+                workplaceId: pushWorkplaceId
+            )
             pendingPushData = (id: pushNotificationId, metadata: metadata)
         }
     }
@@ -133,35 +130,34 @@ private extension NotificationListViewController {
         
         output.notifications
             .drive(with: self) { owner, notifications in
+                let readCount = notifications.filter { $0.isRead }.count
                 let updatedNotifications = owner.applyPushMetadata(to: notifications)
+                let updatedReadCount = updatedNotifications.filter { $0.isRead }.count
+
                 owner.notificationListView.updateNotifications(updatedNotifications)
             }
             .disposed(by: disposeBag)
         
         output.error
             .emit(with: self) { owner, message in
-                print("에러: \(message)")
                 // TODO: - 에러 알림 표시
             }
             .disposed(by: disposeBag)
         
         output.unreadCount
             .drive(with: self) { owner, count in
-                print("읽지 않은 알림: \(count)개")
                 // TODO: - 배지 업데이트
             }
             .disposed(by: disposeBag)
         
         output.approveSuccess
             .emit(with: self) { owner, _ in
-                print("승인 완료")
                 // TODO: - 성공 메시지 표시
             }
             .disposed(by: disposeBag)
         
         output.rejectSuccess
             .emit(with: self) { owner, _ in
-                print("거절 완료")
                 // TODO: - 성공 메시지 표시
             }
             .disposed(by: disposeBag)
@@ -199,11 +195,13 @@ private extension NotificationListViewController {
               let notificationId = userInfo[PushNotificationKey.notificationId] as? Int
         else { return }
 
+        let typeString = userInfo[PushNotificationKey.type] as? String
+        let pushNotificationType = PushNotificationType(from: typeString)
         let workerId = userInfo[PushNotificationKey.workerId] as? Int
         let workplaceId = userInfo[PushNotificationKey.workplaceId] as? Int
 
-        let metadata = (workerId != nil && workplaceId != nil)
-            ? NotificationMetadata(workerId: workerId, workplaceId: workplaceId)
+        let metadata = (pushNotificationType != nil || workerId != nil || workplaceId != nil)
+            ? NotificationMetadata(type: pushNotificationType, workerId: workerId, workplaceId: workplaceId)
             : nil
         
         pendingPushData = (id: notificationId, metadata: metadata)
@@ -212,11 +210,47 @@ private extension NotificationListViewController {
 
     private func applyPushMetadata(to notifications: [UserNotification]) -> [UserNotification] {
         guard let pending = pendingPushData else { return notifications }
-        
-        defer { pendingPushData = nil }
+
+        guard !notifications.isEmpty else {
+            return notifications
+        }
+
+        defer {
+            pendingPushData = nil
+        }
 
         return notifications.map { notification in
-            guard notification.id == pending.id else { return notification }
+            let shouldApplyMetadata: Bool
+            if let pendingId = pending.id {
+                shouldApplyMetadata = notification.id == pendingId
+            } else if let pushMeta = pending.metadata {
+                let typeMatch = pushMeta.type != nil && notification.title.contains("참가 요청")
+                let workerIdMatch = pushMeta.workerId != nil
+                let workplaceIdMatch = pushMeta.workplaceId != nil
+
+                shouldApplyMetadata = typeMatch && workerIdMatch && workplaceIdMatch
+            } else {
+                shouldApplyMetadata = false
+            }
+
+            guard shouldApplyMetadata else { return notification }
+
+            let finalMetadata: NotificationMetadata?
+            if let pushMeta = pending.metadata {
+                let mergedType = pushMeta.type ?? notification.type
+                let mergedWorkerId = pushMeta.workerId ?? notification.metadata?.workerId
+                let mergedWorkplaceId = pushMeta.workplaceId ?? notification.metadata?.workplaceId
+
+                finalMetadata = NotificationMetadata(
+                    type: mergedType,
+                    workerId: mergedWorkerId,
+                    workplaceId: mergedWorkplaceId
+                )
+            } else {
+                finalMetadata = notification.metadata
+            }
+
+            let finalType = pending.metadata?.type ?? notification.type
 
             return UserNotification(
                 id: notification.id,
@@ -226,8 +260,8 @@ private extension NotificationListViewController {
                 content: notification.content,
                 sentAt: notification.sentAt,
                 readAt: notification.readAt,
-                type: notification.type ?? .inviteRequest,
-                metadata: pending.metadata ?? notification.metadata
+                type: finalType,
+                metadata: finalMetadata
             )
         }
     }

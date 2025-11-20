@@ -305,7 +305,7 @@ final class WorkplaceService: WorkplaceServiceProtocol {
         }
 
         switch statusCode {
-        case 202:
+        case 200...209:
             return
         case 400:
             throw NetworkError.badRequest
@@ -336,7 +336,7 @@ final class WorkplaceService: WorkplaceServiceProtocol {
         }
 
         switch statusCode {
-         case 202:
+         case 200...209:
              return
          case 400:
              throw NetworkError.badRequest

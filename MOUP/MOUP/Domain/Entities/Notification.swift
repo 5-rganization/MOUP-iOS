@@ -25,10 +25,16 @@ struct UserNotification {
 }
 
 struct NotificationMetadata {
+    let type: PushNotificationType?
     let workerId: Int?
     let workplaceId: Int?
     
-    init(workerId: Int? = nil, workplaceId: Int? = nil) {
+    init(
+        type: PushNotificationType? = nil,
+        workerId: Int? = nil,
+        workplaceId: Int? = nil
+    ) {
+        self.type = type
         self.workerId = workerId
         self.workplaceId = workplaceId
     }

@@ -25,9 +25,14 @@ struct NotificationItemDTO: Decodable {
     let workplaceId: Int?
     
     func toDomain() -> UserNotification {
-        let dateFormatter = ISO8601DateFormatter()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        dateFormatter.timeZone = TimeZone(identifier: "Asia/Seoul")
+
         let sentDate = dateFormatter.date(from: sentAt) ?? Date()
-        let readDate = readAt.flatMap { dateFormatter.date(from:  $0) }
+        let readDate = readAt.flatMap { readAtString in
+            dateFormatter.date(from: readAtString)
+        }
         
         let notificationType = PushNotificationType(from: type)
         
@@ -54,13 +59,3 @@ struct NotificationItemDTO: Decodable {
         )
     }
 }
-
-//struct NotificationResponseDTO: Decodable {
-//    let id: Int
-//    let senderId: Int?
-//    let receiverId: Int?
-//    let title: String
-//    let content: String
-//    let sentAt: String
-//    let readAt: String?
-//}

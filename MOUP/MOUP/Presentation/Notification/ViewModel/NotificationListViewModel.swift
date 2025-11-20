@@ -76,10 +76,11 @@ final class NotificationListViewModel {
                 return Observable.create { observer in
                     Task {
                         do {
-                            let notifications = try await self.notificationUseCase.fetchNotifications()
-                            
-                            let sortedNotification = notifications.sorted { $0.sentAt > $1.sentAt }
-                            
+                            let fetchedNotifications = try await self.notificationUseCase.fetchNotifications()
+
+                            let sortedNotification = fetchedNotifications.sorted { $0.sentAt > $1.sentAt }
+                            let mergedReadCount = sortedNotification.filter { $0.isRead }.count
+
                             observer.onNext(sortedNotification)
                             observer.onCompleted()
                         } catch {
@@ -116,8 +117,9 @@ final class NotificationListViewModel {
                 }
             }
             .withLatestFrom(notificationsRelay) { tappedNotificationId, notifications -> [UserNotification] in
-                return notifications.map { notification in
-                    if notification.id == tappedNotificationId && !notification.isRead {
+
+                let updatedNotifications = notifications.map { notification in
+                    if notification.id == tappedNotificationId {
                         return UserNotification(
                             id: notification.id,
                             senderId: notification.senderId,
@@ -132,6 +134,10 @@ final class NotificationListViewModel {
                     }
                     return notification
                 }
+
+                let readCount = updatedNotifications.filter { $0.isRead }.count
+
+                return updatedNotifications
             }
             .bind(to: notificationsRelay)
             .disposed(by: disposeBag)
@@ -248,8 +254,31 @@ final class NotificationListViewModel {
                 guard let self else { return }
                 Task {
                     do {
-                        let notifications = try await self.notificationUseCase.fetchNotifications()
-                        let sortedNotification = notifications.sorted { $0.sentAt > $1.sentAt }
+                        let currentNotifications = notificationsRelay.value
+                        let fetchedNotifications = try await self.notificationUseCase.fetchNotifications()
+                        let mergedNotifications = fetchedNotifications.map { fetched -> UserNotification in
+                            if let current = currentNotifications.first(
+                                where: { $0.id == fetched.id }
+                            ),
+                               current.isRead {
+                                return UserNotification(
+                                    id: fetched.id,
+                                    senderId: fetched.senderId,
+                                    receiverId: fetched.receiverId,
+                                    title: fetched.title,
+                                    content: fetched.content,
+                                    sentAt: fetched.sentAt,
+                                    readAt: current.readAt,
+                                    type: fetched.type,
+                                    metadata: fetched.metadata
+                                )
+                            }
+                            return fetched
+                        }
+
+                        let sortedNotification = mergedNotifications.sorted { $0.sentAt > $1.sentAt }
+                        let readCount = sortedNotification.filter { $0.isRead }.count
+
                         notificationsRelay.accept(sortedNotification)
                     } catch {
                         // 에러
@@ -284,8 +313,33 @@ final class NotificationListViewModel {
                 guard let self else { return }
                 Task {
                     do {
-                        let notifications = try await self.notificationUseCase.fetchNotifications()
-                        let sortedNotification = notifications.sorted { $0.sentAt > $1.sentAt }
+                        let currentNotifications = notificationsRelay.value
+
+                        let fetchedNotifications = try await self.notificationUseCase.fetchNotifications()
+
+                        let mergedNotifications = fetchedNotifications.map { fetched -> UserNotification in
+                            if let current = currentNotifications.first(
+                                where: { $0.id == fetched.id }
+                            ),
+                               current.isRead {
+                                return UserNotification(
+                                    id: fetched.id,
+                                    senderId: fetched.senderId,
+                                    receiverId: fetched.receiverId,
+                                    title: fetched.title,
+                                    content: fetched.content,
+                                    sentAt: fetched.sentAt,
+                                    readAt: current.readAt,
+                                    type: fetched.type,
+                                    metadata: fetched.metadata
+                                )
+                            }
+                            return fetched
+                        }
+
+                        let sortedNotification = mergedNotifications.sorted { $0.sentAt > $1.sentAt }
+                        let readCount = sortedNotification.filter { $0.isRead }.count
+
                         notificationsRelay.accept(sortedNotification)
                     } catch {
                         // 에러
