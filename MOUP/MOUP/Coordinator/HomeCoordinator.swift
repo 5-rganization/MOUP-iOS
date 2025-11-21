@@ -26,6 +26,12 @@ final class HomeCoordinator: Coordinator {
     private let notificationRepository: NotificationRepositoryProtocol
     private let notificationUseCase: NotificationUseCaseProtocol
     private let draftRoutineStorage: DraftRoutineStorageProtocol
+    private lazy var notificationListViewModel: NotificationListViewModel = {
+        return NotificationListViewModel(
+            notificationUseCase: notificationUseCase,
+            workplaceUseCase: workplaceUseCase
+        )
+    }()
     
     init(navigationController: UINavigationController, userRole: UserRole) {
         self.navigationController = navigationController
@@ -198,21 +204,8 @@ final class HomeCoordinator: Coordinator {
         pushWorkerId: Int? = nil,
         pushWorkplaceId: Int? = nil
     ) {
-        let workplaceService = WorkplaceService()
-        let workplaceRepository = WorkplaceRepository(workplaceService: workplaceService)
-        let workplaceUseCase = WorkplaceUseCase(workplaceRepository: workplaceRepository)
-
-        let notificationService = NotificationService()
-        let notificationRepository = NotificationRepository(notificationService: notificationService)
-        let notificationUseCase = NotificationUseCase(notificationRepository: notificationRepository)
-
-        let viewModel = NotificationListViewModel(
-            notificationUseCase: notificationUseCase,
-            workplaceUseCase: workplaceUseCase
-        )
-
         let notificationListVC = NotificationListViewController(
-            viewModel: viewModel,
+            viewModel: notificationListViewModel,
             pushType: pushType,
             pushWorkerId: pushWorkerId,
             pushWorkplaceId: pushWorkplaceId

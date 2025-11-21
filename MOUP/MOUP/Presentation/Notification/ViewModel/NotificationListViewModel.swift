@@ -20,8 +20,12 @@ final class NotificationListViewModel {
         let deleteAllTapped: Observable<Void>
         let refreshTrigger: Observable<Void>
         let deleteTapped: Observable<UserNotification>
-        let approveTapped: Observable<(workplaceId: Int, workerId: Int)>
-        let rejectTapped: Observable<(workplaceId: Int, workerId: Int)>
+        let approveTapped: Observable<(
+            notificationId: Int, workplaceId: Int, workerId: Int
+        )>
+        let rejectTapped: Observable<(
+            notificationId: Int, workplaceId: Int, workerId: Int
+        )>
     }
     
     // MARK: - Output
@@ -40,6 +44,8 @@ final class NotificationListViewModel {
     private let notificationUseCase: NotificationUseCaseProtocol
     private let workplaceUseCase: WorkplaceUseCaseProtocol
     private let disposeBag = DisposeBag()
+    private var approvedNotificationIds: Set<Int> = []
+    private var rejectedNotificationIds: Set<Int> = []
     
     // MARK: - Initializer
     
@@ -50,6 +56,39 @@ final class NotificationListViewModel {
         self.notificationUseCase = notificationUseCase
         self.workplaceUseCase = workplaceUseCase
     }
+
+    // MARK: - Helper Methods
+
+    private func applyLocalState(to notifications: [UserNotification]) -> [UserNotification] {
+        return notifications.map { notification in
+            if approvedNotificationIds.contains(notification.id) {
+                return UserNotification(
+                    id: notification.id,
+                    senderId: notification.senderId,
+                    receiverId: notification.receiverId,
+                    title: notification.title,
+                    content: notification.content,
+                    sentAt: notification.sentAt,
+                    readAt: notification.readAt,
+                    type: .inviteApproved,
+                    metadata: notification.metadata
+                )
+            } else if rejectedNotificationIds.contains(notification.id) {
+                return UserNotification(
+                    id: notification.id,
+                    senderId: notification.senderId,
+                    receiverId: notification.receiverId,
+                    title: notification.title,
+                    content: notification.content,
+                    sentAt: notification.sentAt,
+                    readAt: notification.readAt,
+                    type: .inviteRejected,
+                    metadata: notification.metadata
+                )
+            }
+            return notification
+        }
+    }
     
     // MARK: - Transform
     
@@ -57,10 +96,8 @@ final class NotificationListViewModel {
         let loadingRelay = BehaviorRelay<Bool>(value: false)
         let notificationsRelay = BehaviorRelay<[UserNotification]>(value: [])
         let errorRelay = PublishRelay<String>()
-        
         let approveSuccessRelay = PublishRelay<Void>()
         let rejectSuccessRelay = PublishRelay<Void>()
-        
         let fetchTrigger = Observable.merge(
             input.viewDidLoad,
             input.refreshTrigger
@@ -79,7 +116,7 @@ final class NotificationListViewModel {
                             let fetchedNotifications = try await self.notificationUseCase.fetchNotifications()
 
                             let sortedNotification = fetchedNotifications.sorted { $0.sentAt > $1.sentAt }
-                            let mergedReadCount = sortedNotification.filter { $0.isRead }.count
+                            _ = sortedNotification.filter { $0.isRead }.count
 
                             observer.onNext(sortedNotification)
                             observer.onCompleted()
@@ -92,6 +129,10 @@ final class NotificationListViewModel {
                     }
                     return Disposables.create()
                 }
+            }
+            .map { [weak self] notifications -> [UserNotification] in
+                guard let self else { return notifications }
+                return self.applyLocalState(to: notifications)
             }
             .bind(to: notificationsRelay)
             .disposed(by: disposeBag)
@@ -135,7 +176,7 @@ final class NotificationListViewModel {
                     return notification
                 }
 
-                let readCount = updatedNotifications.filter { $0.isRead }.count
+                _ = updatedNotifications.filter { $0.isRead }.count
 
                 return updatedNotifications
             }
@@ -230,7 +271,10 @@ final class NotificationListViewModel {
             .disposed(by: disposeBag)
         
         input.approveTapped
-            .flatMapLatest { [weak self] (workplaceId, workerId) -> Observable<Void> in
+            .do(onNext: { [weak self] (notificationId, _, _) in
+                self?.approvedNotificationIds.insert(notificationId)
+            })
+            .flatMapLatest { [weak self] (_, workplaceId, workerId) -> Observable<Void> in
                 guard let self else { return .empty() }
                 
                 return Observable.create { observer in
@@ -277,9 +321,9 @@ final class NotificationListViewModel {
                         }
 
                         let sortedNotification = mergedNotifications.sorted { $0.sentAt > $1.sentAt }
-                        let readCount = sortedNotification.filter { $0.isRead }.count
+                        let notificationsWithLocalState = self.applyLocalState(to: sortedNotification)
 
-                        notificationsRelay.accept(sortedNotification)
+                        notificationsRelay.accept(notificationsWithLocalState)
                     } catch {
                         // 에러
                     }
@@ -289,7 +333,10 @@ final class NotificationListViewModel {
             .disposed(by: disposeBag)
         
         input.rejectTapped
-            .flatMapLatest { [weak self] (workplaceId, workerId) -> Observable<Void> in
+            .do(onNext: { [weak self] (notificationId, _, _) in
+                self?.rejectedNotificationIds.insert(notificationId)
+            })
+            .flatMapLatest { [weak self] (_, workplaceId, workerId) -> Observable<Void> in
                 guard let self else { return .empty() }
                 
                 return Observable.create { observer in
@@ -338,9 +385,9 @@ final class NotificationListViewModel {
                         }
 
                         let sortedNotification = mergedNotifications.sorted { $0.sentAt > $1.sentAt }
-                        let readCount = sortedNotification.filter { $0.isRead }.count
+                        let notificationsWithLocalState = self.applyLocalState(to: sortedNotification)
 
-                        notificationsRelay.accept(sortedNotification)
+                        notificationsRelay.accept(notificationsWithLocalState)
                     } catch {
                         // 에러
                     }
