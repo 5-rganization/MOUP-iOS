@@ -20,6 +20,7 @@ final class MyPageViewController: UIViewController {
     private let disposeBag = DisposeBag()
 
     private let viewDidLoadSubject = PublishSubject<Void>()
+    private var userId: Int?
 
     private var routineSelectionCoordinator: RoutineSelectionCoordinator?
     
@@ -117,6 +118,7 @@ private extension MyPageViewController {
         output.profile
             .compactMap { $0 }
             .drive(with: self) { owner, profile in
+                owner.userId = profile.userId
                 owner.mypageView.updateProfile(profile)
             }
             .disposed(by: disposeBag)
@@ -181,13 +183,15 @@ private extension MyPageViewController {
         mailComposer.setMessageBody(
             """
             
-            문의 내용:
+            [문의 내용]
+            여기에 문의 내용을 작성해주세요.
             
-            --------------------------
-            UID: \("uid")
+            ---------------------------------------
+            [기기 정보]
+            User ID: \(userId ?? -1)
             iOS Version: \(UIDevice.current.systemVersion)
             App Version: \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")
-            --------------------------
+            ---------------------------------------
             """,
             isHTML: false
         )
