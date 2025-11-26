@@ -52,6 +52,7 @@ private extension BaseButton {
         let baseBackgroundColor: UIColor = isSecondary ? .gray200 : .accent
         config.attributedTitle = AttributedString(title, attributes: normalAttribute)
         config.baseBackgroundColor = baseBackgroundColor
+        config.background.cornerRadius = 12
         
         let handler: UIButton.ConfigurationUpdateHandler = { button in
             switch button.state {
