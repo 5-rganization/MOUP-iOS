@@ -22,15 +22,15 @@ final class SelectCategoryView: UIView {
         $0.textColor = .gray900
         $0.font = .headBold(18)
     }
-    private let restaurantRadioButton = RadioButtonView(title: "음식점", type: .icon(selectedIcon: UIImage(named:"RestaurantSelected")!, unselectedIcon: UIImage(named:"RestaurantUnselected")!, selectedRadioButton: UIImage(named:"selectedRadioButton")!, unselectedRadioButton: UIImage(named:"unselectedRadioButton")!))
+    private let restaurantRadioButton = RadioButtonView(title: "음식점", type: .icon(selectedIcon: .restaurantSelected, unselectedIcon: .restaurantUnselected, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
     
-    private let cafeRadioButton = RadioButtonView(title: "카페", type: .icon(selectedIcon: UIImage(named:"CafeSelected")!, unselectedIcon: UIImage(named:"CafeUnselected")!, selectedRadioButton: UIImage(named:"selectedRadioButton")!, unselectedRadioButton: UIImage(named:"unselectedRadioButton")!))
+    private let cafeRadioButton = RadioButtonView(title: "카페", type: .icon(selectedIcon: .cafeSelected, unselectedIcon: .cafeUnselected, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
     
-    private let cvsRadioButton = RadioButtonView(title: "편의점", type: .icon(selectedIcon: UIImage(named:"CVSSelected")!, unselectedIcon: UIImage(named:"CVSUnselected")!, selectedRadioButton: UIImage(named:"selectedRadioButton")!, unselectedRadioButton: UIImage(named:"unselectedRadioButton")!))
+    private let cvsRadioButton = RadioButtonView(title: "편의점", type: .icon(selectedIcon: .cvsSelected, unselectedIcon: .cvsUnselected, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
     
-    private let theaterRadioButton = RadioButtonView(title: "영화관", type: .icon(selectedIcon: UIImage(named:"TheaterSelected")!, unselectedIcon: UIImage(named:"TheaterUnselected")!, selectedRadioButton: UIImage(named:"selectedRadioButton")!, unselectedRadioButton: UIImage(named:"unselectedRadioButton")!))
+    private let theaterRadioButton = RadioButtonView(title: "영화관", type: .icon(selectedIcon: .theaterSelected, unselectedIcon: .theaterUnselected, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
     
-    private let etcRadioButton = RadioButtonView(title: "기타", type: .icon(selectedIcon: UIImage(named:"EtcSelected")!, unselectedIcon: UIImage(named:"EtcUnselected")!, selectedRadioButton: UIImage(named:"selectedRadioButton")!, unselectedRadioButton: UIImage(named:"unselectedRadioButton")!))
+    private let etcRadioButton = RadioButtonView(title: "기타", type: .icon(selectedIcon: .etcSelected, unselectedIcon: .etcUnselected, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
     
     
     private let registerButton = BaseButton(title: "완료").then {

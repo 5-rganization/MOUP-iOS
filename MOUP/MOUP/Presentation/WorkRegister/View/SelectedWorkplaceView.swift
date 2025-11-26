@@ -121,7 +121,7 @@ extension SelectedWorkplaceView {
             let radioButton = RadioButtonView(
                 title: workplace.name,
                 type: .none(
-                    selectedRadioButton: UIImage(named: "Check")!,
+                    selectedRadioButton: .check,
                     unselectedRadioButton: nil
                 )
             )

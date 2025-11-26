@@ -27,13 +27,13 @@ final class SelectColorLabelView: UIView {
     private let registerButton = BaseButton(title: "완료").then {
         $0.isEnabled = false
     }
-    private let redRadioButton = RadioButtonView(title: "빨강색", type: .colorDot(.labelRed, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let orangeRadioButton = RadioButtonView(title: "주황색", type: .colorDot(.labelOrange, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let yellowRadioButton = RadioButtonView(title: "노란색", type: .colorDot(.labelYellow, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let greenRadioButton = RadioButtonView(title: "초록색", type: .colorDot(.labelGreen, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let blueRadioButton = RadioButtonView(title: "파란색", type: .colorDot(.labelBlue, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let purpleRadioButton = RadioButtonView(title: "보라색", type: .colorDot(.labelPurple, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let indigoRadioButton = RadioButtonView(title: "남색", type: .colorDot(.indigoText, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
+    private let redRadioButton = RadioButtonView(title: "빨강색", type: .colorDot(.labelRed, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
+    private let orangeRadioButton = RadioButtonView(title: "주황색", type: .colorDot(.labelOrange, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
+    private let yellowRadioButton = RadioButtonView(title: "노란색", type: .colorDot(.labelYellow, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
+    private let greenRadioButton = RadioButtonView(title: "초록색", type: .colorDot(.labelGreen, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
+    private let blueRadioButton = RadioButtonView(title: "파란색", type: .colorDot(.labelBlue, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
+    private let purpleRadioButton = RadioButtonView(title: "보라색", type: .colorDot(.labelPurple, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
+    private let indigoRadioButton = RadioButtonView(title: "남색", type: .colorDot(.indigoText, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
     
     // MARK: - Getter
     var getRedRadioButton: RadioButtonView { redRadioButton }

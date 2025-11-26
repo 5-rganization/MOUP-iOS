@@ -27,8 +27,8 @@ final class SelectPayCalculationView: UIView {
     private let registerButton = BaseButton(title: "완료").then {
         $0.isEnabled = false
     }
-    private let hourlyRadioButton = RadioButtonView(title: "시급", type: .none(selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let fixedRadioButton = RadioButtonView(title: "고정급", type: .none(selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
+    private let hourlyRadioButton = RadioButtonView(title: "시급", type: .none(selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
+    private let fixedRadioButton = RadioButtonView(title: "고정급", type: .none(selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
     
     // MARK: - Getter
     var getHourlyRadioButton: RadioButtonView { hourlyRadioButton }

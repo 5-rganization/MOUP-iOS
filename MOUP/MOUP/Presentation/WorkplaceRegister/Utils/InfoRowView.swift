@@ -34,13 +34,13 @@ final class InfoRowView: UIView {
     }
     
     private let chevronButton = UIButton().then {
-        $0.setImage(UIImage(named: "ChevronRight"), for: .normal)
+        $0.setImage(.chevronRight, for: .normal)
         $0.isUserInteractionEnabled = true
     }
     
     private let checkBox = UIButton().then {
-        $0.setImage(UIImage(named: "CheckboxUnselected"), for: .normal)
-        $0.setImage(UIImage(named: "CheckboxSelected"), for: .selected)
+        $0.setImage(.checkboxUnselected, for: .normal)
+        $0.setImage(.checkboxSelected, for: .selected)
     }
     
     private let actionButton = UIButton(configuration: .filled()).then {

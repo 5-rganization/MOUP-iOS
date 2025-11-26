@@ -31,13 +31,13 @@ final class RepeatSettingView: UIView {
     }
     
     private lazy var dayButtons: [RadioButtonView] = [
-        RadioButtonView(title: "일요일마다", type: .none(selectedRadioButton: UIImage(named: "Check")!, unselectedRadioButton: nil)),
-        RadioButtonView(title: "월요일마다", type: .none(selectedRadioButton: UIImage(named: "Check")!, unselectedRadioButton: nil)),
-        RadioButtonView(title: "화요일마다", type: .none(selectedRadioButton: UIImage(named: "Check")!, unselectedRadioButton: nil)),
-        RadioButtonView(title: "수요일마다", type: .none(selectedRadioButton: UIImage(named: "Check")!, unselectedRadioButton: nil)),
-        RadioButtonView(title: "목요일마다", type: .none(selectedRadioButton: UIImage(named: "Check")!, unselectedRadioButton: nil)),
-        RadioButtonView(title: "금요일마다", type: .none(selectedRadioButton: UIImage(named: "Check")!, unselectedRadioButton: nil)),
-        RadioButtonView(title: "토요일마다", type: .none(selectedRadioButton: UIImage(named: "Check")!, unselectedRadioButton: nil))
+        RadioButtonView(title: "일요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
+        RadioButtonView(title: "월요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
+        RadioButtonView(title: "화요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
+        RadioButtonView(title: "수요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
+        RadioButtonView(title: "목요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
+        RadioButtonView(title: "금요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
+        RadioButtonView(title: "토요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil))
     ]
     
     private let dateTitleLabel = UILabel().then {
