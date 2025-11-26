@@ -107,7 +107,7 @@ private extension WorkplaceRegisterView {
     func setConstraints() {
         navigationBar.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide)
-            $0.directionalHorizontalEdges.equalToSuperview()
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
         }
         
         scrollView.snp.makeConstraints {

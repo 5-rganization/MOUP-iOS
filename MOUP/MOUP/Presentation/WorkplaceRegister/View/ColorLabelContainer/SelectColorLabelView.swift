@@ -6,6 +6,9 @@
 //
 
 import UIKit
+
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 
@@ -13,6 +16,8 @@ final class SelectColorLabelView: UIView {
     // MARK: - Properties
     
     // MARK: - UI Components
+    fileprivate let navigationBar = BaseNavigationBar(title: "라벨 색상")
+    
     private let title = UILabel().then {
         $0.text = "라벨 색상을 선택해주세요."
         $0.textColor = .gray900
@@ -64,6 +69,7 @@ private extension SelectColorLabelView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             title,
             redRadioButton,
             orangeRadioButton,
@@ -83,8 +89,13 @@ private extension SelectColorLabelView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
+        }
+        
         title.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(32)
+            $0.top.equalTo(navigationBar).offset(32)
             $0.leading.equalToSuperview().offset(16)
         }
         
@@ -128,5 +139,11 @@ private extension SelectColorLabelView {
             $0.height.equalTo(45)
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(12)
         }
+    }
+}
+
+extension Reactive where Base: SelectColorLabelView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
     }
 }

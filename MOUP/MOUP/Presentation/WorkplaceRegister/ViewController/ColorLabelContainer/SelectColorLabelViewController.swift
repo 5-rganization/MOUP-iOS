@@ -6,8 +6,10 @@
 //
 
 import UIKit
-import SnapKit
+
+import RxCocoa
 import RxSwift
+import SnapKit
 
 final class SelectColorLabelViewController: UIViewController {
     
@@ -43,13 +45,6 @@ final class SelectColorLabelViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError()
     }
-
-    @objc
-    private func didTapBack() {
-        print("Back 버튼 클릭")
-        viewModel.resetSelectedColor()
-        navigationController?.popViewController(animated: true)
-    }
 }
 
 // MARK: - UI Methods
@@ -65,9 +60,7 @@ private extension SelectColorLabelViewController {
     
     // MARK: - setBinding
     func setHierarchy() { }
-    func setStyles() {
-        setNavigationBar(title: "라벨 색상", backAction: #selector(didTapBack))
-    }
+    func setStyles() {}
     func setConstraints() { }
     func setActions() {
         let radioButtons: [(RadioButtonView, String)] = [
@@ -97,6 +90,12 @@ private extension SelectColorLabelViewController {
     }
     
     func setBinding() {
+        selectColorLabelView.rx.navBackBtnTapped.asDriver()
+            .drive(with: self) { owner, _ in
+                owner.viewModel.resetSelectedColor()
+                owner.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposeBag)
+        
         let radioButtons: [(RadioButtonView, String)] = [
             (selectColorLabelView.getRedRadioButton, "빨강색"),
             (selectColorLabelView.getOrangeRadioButton, "주황색"),

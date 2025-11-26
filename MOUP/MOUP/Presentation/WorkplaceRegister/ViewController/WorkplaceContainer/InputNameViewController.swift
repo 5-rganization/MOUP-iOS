@@ -40,12 +40,6 @@ final class InputNameViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError()
     }
-    
-    @objc
-    private func didTapBack() {
-        print("Back 버튼 클릭")
-        navigationController?.popViewController(animated: true)
-    }
 }
 
 // MARK: - UI Methods
@@ -61,12 +55,15 @@ private extension InputNameViewController {
     
     // MARK: - setBinding
     func setHierarchy() { }
-    func setStyles() {
-        setNavigationBar(title: "근무지 입력", backAction: #selector(didTapBack))
-    }
+    func setStyles() {}
     func setConstraints() { }
     func setActions() { }
     func setBinding() {
+        inputNameView.rx.navBackBtnTapped.asDriver()
+            .drive(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposeBag)
+        
         inputNameView.getTextField.rx.text.orEmpty
             .bind(to: viewModel.nameText)
             .disposed(by: disposeBag)

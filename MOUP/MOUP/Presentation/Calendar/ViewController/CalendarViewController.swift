@@ -51,10 +51,6 @@ final class CalendarViewController: UIViewController {
     private let fetchThresholdInDays = 110
     
     // MARK: - UI Components
-    private let todayButton = UIBarButtonItem(title: "오늘").then {
-        $0.setTitleTextAttributes([.font: UIFont.headBold(14), .foregroundColor: UIColor.gray900], for: .normal)
-        $0.setTitleTextAttributes([.font: UIFont.headBold(14), .foregroundColor: UIColor.gray900], for: .selected)
-    }
     private let calendarView = CalendarView()
     /// `CalendarWorkListModalViewController` 이외 영역의 터치를 제한
     private lazy var calendarViewTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(didCalendarViewTap(_:))).then {
@@ -122,9 +118,7 @@ private extension CalendarViewController {
     
     // MARK: - setStyles
     func setStyles() {
-        // TODO: BaseNavigationBar로 교체
-        self.setNavigationBar(title: "캘린더")
-        self.navigationItem.rightBarButtonItem = todayButton
+        self.navigationController?.navigationBar.isHidden = true
         
         self.view.backgroundColor = .primaryBackground
     }
@@ -143,7 +137,7 @@ private extension CalendarViewController {
     // MARK: - setBindings
     func setBindings() {
         // View 바인딩
-        todayButton.rx.tap
+        calendarView.getNavigationBar.rx.rightBtnTapped
             .subscribe(with: self) { owner, _ in
                 owner.deselectCell()
                 owner.scrollToDate(.now)
@@ -247,7 +241,6 @@ private extension CalendarViewController {
         guard let cell = cell as? CalendarDayCell else { return }
         
         let dateBelongsToThisMonth = (cellState.dateBelongsTo == .thisMonth)
-        let isSelected = cellState.isSelected
         let isToday = Calendar.current.isDateInToday(cellState.date)
         
         let workList = Array(workSet).sorted(by: sortCalendarWorkList)

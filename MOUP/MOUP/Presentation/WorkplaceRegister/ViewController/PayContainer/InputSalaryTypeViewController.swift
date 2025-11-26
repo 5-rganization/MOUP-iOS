@@ -6,8 +6,10 @@
 //
 
 import UIKit
-import SnapKit
+
+import RxCocoa
 import RxSwift
+import SnapKit
 
 final class InputSalaryTypeViewController: UIViewController {
     
@@ -45,12 +47,6 @@ final class InputSalaryTypeViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError()
     }
-    
-    @objc
-    private func didTapBack() {
-        print("Back 버튼 클릭")
-        navigationController?.popViewController(animated: true)
-    }
 }
 
 // MARK: - UI Methods
@@ -66,17 +62,19 @@ private extension InputSalaryTypeViewController {
     
     // MARK: - setBinding
     func setHierarchy() { }
-    func setStyles() {
-        setNavigationBar(title: "시급", backAction: #selector(didTapBack))
-    }
+    func setStyles() {}
     func setConstraints() { }
     func setActions() { }
     func setBinding() {
+        inputSalaryTypeView.rx.navBackBtnTapped.asDriver()
+            .drive(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposeBag)
+        
         inputSalaryTypeView.getTextField.rx.controlEvent(.editingChanged)
             .withLatestFrom(inputSalaryTypeView.getTextField.rx.text.orEmpty)
             .map { $0.replacingOccurrences(of: ",", with: "") }
             .do(onNext: { [weak self] raw in
-                guard let number = Int(raw) else { return }
                 let formatted = NumberFormatter.formattedDecimal(from: raw)
                 
                 // 커서 위치 보존 없이 setText만 수행

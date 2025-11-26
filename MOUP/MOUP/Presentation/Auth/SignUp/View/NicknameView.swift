@@ -17,6 +17,10 @@ final class NicknameView: UIView {
     // MARK: - Properties
     private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     
+    fileprivate let navigationBar = BaseNavigationBar(title: "닉네임 설정").then {
+        $0.configureBackButton(isHidden: true)
+    }
+    
     private let defaultNoticeAttributedString: NSAttributedString = {
         let fullText = """
             1~8자 한글·영문·숫자 사용가능
@@ -105,6 +109,7 @@ private extension NicknameView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             nicknameTitleLabel,
             nicknameTextField,
             noticeLabel,
@@ -119,8 +124,13 @@ private extension NicknameView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
+        }
+        
         nicknameTitleLabel.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).inset(32)
+            $0.top.equalTo(navigationBar.snp.bottom).inset(32)
             $0.directionalHorizontalEdges.equalToSuperview().inset(16)
         }
         

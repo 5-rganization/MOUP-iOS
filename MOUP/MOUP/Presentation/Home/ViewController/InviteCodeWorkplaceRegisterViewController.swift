@@ -66,10 +66,6 @@ final class InviteCodeWorkplaceRegisterViewController: UIViewController {
         addChildViewControllers()
         configure()
     }
-    
-    @objc private func didTapBack() {
-        navigationController?.popViewController(animated: true)
-    }
 }
 
 // MARK: - Setup
@@ -86,14 +82,14 @@ private extension InviteCodeWorkplaceRegisterViewController {
         setBinding()
     }
     
-    func setStyles() {
-        setNavigationBar(
-            title: self.title ?? "",
-            backAction: #selector(didTapBack)
-        )
-    }
+    func setStyles() {}
     
     func setBinding() {
+        rootView.rx.navBackBtnTapped.asDriver()
+            .drive(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposeBag)
+        
         viewModel.isFormValid
             .drive(onNext: { [weak self] isValid in
                 self?.rootView.getRegisterButton.isEnabled = isValid

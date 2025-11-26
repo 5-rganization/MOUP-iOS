@@ -6,8 +6,10 @@
 //
 
 import UIKit
-import SnapKit
+
+import RxCocoa
 import RxSwift
+import SnapKit
 
 final class SelectPayTypeViewController: UIViewController {
     
@@ -43,13 +45,6 @@ final class SelectPayTypeViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError()
     }
-    
-    @objc
-    private func didTapBack() {
-        print("Back 버튼 클릭")
-        viewModel.resetSelectedPayType()
-        navigationController?.popViewController(animated: true)
-    }
 }
 
 // MARK: - UI Methods
@@ -65,9 +60,7 @@ private extension SelectPayTypeViewController {
     
     // MARK: - setBinding
     func setHierarchy() { }
-    func setStyles() {
-        setNavigationBar(title: "급여 유형", backAction: #selector(didTapBack))
-    }
+    func setStyles() {}
     func setConstraints() { }
     func setActions() {
         let radioButtons: [(RadioButtonView, String)] = [
@@ -92,6 +85,12 @@ private extension SelectPayTypeViewController {
             .disposed(by: disposeBag)
     }
     func setBinding() {
+        selectPayTypeView.rx.navBackBtnTapped.asDriver()
+            .drive(with: self) { owner, _ in
+                owner.viewModel.resetSelectedPayType()
+                owner.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposeBag)
+        
         let radioButtons: [(RadioButtonView, String)] = [
             (selectPayTypeView.getMonthlyRadioButton, "매월"),
             (selectPayTypeView.getWeeklyRadioButton, "매주"),

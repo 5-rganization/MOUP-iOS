@@ -78,7 +78,7 @@ private extension OwnerWorkplaceRegisterView {
     func setConstraints() {
         navigationBar.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide)
-            $0.directionalHorizontalEdges.equalToSuperview()
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
         }
         
         // 버튼은 safeArea bottom 고정

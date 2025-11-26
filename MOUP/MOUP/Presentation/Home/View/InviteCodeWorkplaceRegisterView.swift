@@ -6,6 +6,9 @@
 //
 
 import UIKit
+
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 
@@ -27,6 +30,7 @@ final class InviteCodeWorkplaceRegisterView: UIView {
     private let colorLabelContainerView = ColorLabelContainerView()
     
     // MARK: - UI Components
+    fileprivate let navigationBar = BaseNavigationBar(title: "")
     private let registerButton = BaseButton(title: "등록하기", isSecondary: true)
     
     // MARK: - Getter
@@ -69,6 +73,7 @@ private extension InviteCodeWorkplaceRegisterView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             scrollView
         )
         
@@ -95,8 +100,14 @@ private extension InviteCodeWorkplaceRegisterView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
+        }
+        
         scrollView.snp.makeConstraints {
-            $0.top.trailing.leading.equalTo(safeAreaLayoutGuide)
+            $0.top.equalTo(navigationBar.snp.bottom)
+            $0.trailing.leading.equalTo(safeAreaLayoutGuide)
             $0.bottom.equalToSuperview()
         }
         
@@ -119,3 +130,8 @@ private extension InviteCodeWorkplaceRegisterView {
     }
 }
 
+extension Reactive where Base: InviteCodeWorkplaceRegisterView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
+    }
+}
