@@ -28,7 +28,9 @@ final class InputNameView: UIView {
         $0.returnKeyType = .done
     }
     
-    private let registerButton = BaseButton(title: "완료", isSecondary: true)
+    private let registerButton = BaseButton(title: "완료").then {
+        $0.isEnabled = false
+    }
     
     // MARK: - Getter
     var getTextField: CustomTextField { textField }

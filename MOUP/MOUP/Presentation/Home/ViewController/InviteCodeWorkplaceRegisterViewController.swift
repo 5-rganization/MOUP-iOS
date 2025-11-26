@@ -93,10 +93,6 @@ private extension InviteCodeWorkplaceRegisterViewController {
         viewModel.isFormValid
             .drive(onNext: { [weak self] isValid in
                 self?.rootView.getRegisterButton.isEnabled = isValid
-                self?.rootView.getRegisterButton.update(
-                    title: "등록",
-                    isSecondary: !isValid
-                )
             })
             .disposed(by: disposeBag)
         

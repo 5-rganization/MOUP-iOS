@@ -109,7 +109,6 @@ private extension SelectColorLabelViewController {
         viewModel.isColorSelected
             .drive(onNext: { [weak self] isSelected in
                 self?.selectColorLabelView.getRegisterButton.isEnabled = isSelected
-                self?.selectColorLabelView.getRegisterButton.update(title: "완료", isSecondary: false)
             })
             .disposed(by: disposeBag)
 

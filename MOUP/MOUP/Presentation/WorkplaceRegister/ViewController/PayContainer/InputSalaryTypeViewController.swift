@@ -93,7 +93,6 @@ private extension InputSalaryTypeViewController {
         viewModel.isValidSalary
             .drive(onNext: { [weak self] isValid in
                 self?.inputSalaryTypeView.getRegisterButton.isEnabled = isValid
-                self?.inputSalaryTypeView.getRegisterButton.update(title: "완료", isSecondary: false)
             })
             .disposed(by: disposeBag)
 

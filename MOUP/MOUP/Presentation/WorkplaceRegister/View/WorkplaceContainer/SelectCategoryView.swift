@@ -33,7 +33,9 @@ final class SelectCategoryView: UIView {
     private let etcRadioButton = RadioButtonView(title: "기타", type: .icon(selectedIcon: UIImage(named:"EtcSelected")!, unselectedIcon: UIImage(named:"EtcUnselected")!, selectedRadioButton: UIImage(named:"selectedRadioButton")!, unselectedRadioButton: UIImage(named:"unselectedRadioButton")!))
     
     
-    private let registerButton = BaseButton(title: "완료", isSecondary: true)
+    private let registerButton = BaseButton(title: "완료").then {
+        $0.isEnabled = false
+    }
     
     // MARK: - Getter
     

@@ -78,7 +78,6 @@ private extension InputNameViewController {
         viewModel.isValidName
             .drive(onNext: { [weak self] isValid in
                 self?.inputNameView.getRegisterButton.isEnabled = isValid
-                self?.inputNameView.getRegisterButton.update(title: "완료", isSecondary: false)
             })
             .disposed(by: disposeBag)
     }

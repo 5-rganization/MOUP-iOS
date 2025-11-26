@@ -97,7 +97,6 @@ private extension SelectPayCalculationViewController {
         viewModel.isPayCalculationSelected
             .drive(onNext: { [weak self] isSelected in
                 self?.selectPayCalculationView.getRegisterButton.isEnabled = isSelected
-                self?.selectPayCalculationView.getRegisterButton.update(title: "완료", isSecondary: false)
             })
             .disposed(by: disposeBag)
 

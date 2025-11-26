@@ -24,7 +24,9 @@ final class SelectPayTypeView: UIView {
         $0.font = .headBold(18)
     }
     
-    private let registerButton = BaseButton(title: "완료", isSecondary: true)
+    private let registerButton = BaseButton(title: "완료").then {
+        $0.isEnabled = false
+    }
     private let monthlyRadioButton = RadioButtonView(title: "매월", type: .none(selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
     private let weeklyRadioButton = RadioButtonView(title: "매주", type: .none(selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
     private let dailyRadioButton = RadioButtonView(title: "매일", type: .none(selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))

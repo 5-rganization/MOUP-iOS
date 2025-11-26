@@ -24,7 +24,9 @@ final class SelectPayCalculationView: UIView {
         $0.font = .headBold(18)
     }
     
-    private let registerButton = BaseButton(title: "완료", isSecondary: true)
+    private let registerButton = BaseButton(title: "완료").then {
+        $0.isEnabled = false
+    }
     private let hourlyRadioButton = RadioButtonView(title: "시급", type: .none(selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
     private let fixedRadioButton = RadioButtonView(title: "고정급", type: .none(selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
     

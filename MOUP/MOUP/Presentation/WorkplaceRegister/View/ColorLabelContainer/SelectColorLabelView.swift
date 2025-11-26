@@ -24,7 +24,9 @@ final class SelectColorLabelView: UIView {
         $0.font = .headBold(18)
     }
     
-    private let registerButton = BaseButton(title: "완료", isSecondary: true)
+    private let registerButton = BaseButton(title: "완료").then {
+        $0.isEnabled = false
+    }
     private let redRadioButton = RadioButtonView(title: "빨강색", type: .colorDot(.labelRed, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
     private let orangeRadioButton = RadioButtonView(title: "주황색", type: .colorDot(.labelOrange, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
     private let yellowRadioButton = RadioButtonView(title: "노란색", type: .colorDot(.labelYellow, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))

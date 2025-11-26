@@ -97,7 +97,6 @@ private extension WorkplaceRegisterViewController {
         viewModel.isFormValid
             .drive(onNext: { [weak self] isValid in
                 self?.workplaceRegisterView.getRegisterButton.isEnabled = isValid
-                self?.workplaceRegisterView.getRegisterButton.update(title: "완료", isSecondary: false)
             })
             .disposed(by: disposeBag)
         

@@ -106,7 +106,6 @@ private extension SelectCategoryViewController {
         viewModel.isCategorySelected
             .drive(onNext: { [weak self] isSelected in
                 self?.selectCategoryView.getRegisterButton.isEnabled = isSelected
-                self?.selectCategoryView.getRegisterButton.update(title: "완료", isSecondary: false)
             })
             .disposed(by: disposeBag)
 

@@ -100,7 +100,6 @@ private extension SelectPayTypeViewController {
         viewModel.isPayTypeSelected
             .drive(onNext: { [weak self] isSelected in
                 self?.selectPayTypeView.getRegisterButton.isEnabled = isSelected
-                self?.selectPayTypeView.getRegisterButton.update(title: "완료", isSecondary: false)
             })
             .disposed(by: disposeBag)
 

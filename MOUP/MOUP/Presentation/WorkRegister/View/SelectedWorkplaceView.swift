@@ -39,7 +39,9 @@ final class SelectedWorkplaceView: UIView {
         $0.distribution = .equalSpacing
     }
     
-    private let registerButton = BaseButton(title: "완료", isSecondary: true)
+    private let registerButton = BaseButton(title: "완료").then {
+        $0.isEnabled = false
+    }
     
     var getRegisterButton: BaseButton { registerButton }
     
@@ -78,7 +80,6 @@ private extension SelectedWorkplaceView {
     func setStyles() {
         backgroundColor = .white
         registerButton.isEnabled = false
-        registerButton.update(title: "완료", isSecondary: true)
     }
     
     // MARK: - setConstraints
@@ -141,7 +142,6 @@ extension SelectedWorkplaceView {
                         .forEach { $0.setSelected($0 === radioButton) }
                     
                     self.registerButton.isEnabled = true
-                    self.registerButton.update(title: "완료", isSecondary: false)
 
                     // 선택된 근무지 정보 전달
                     self.selectedWorkplace.accept((id: workplace.id, name: workplace.name))
