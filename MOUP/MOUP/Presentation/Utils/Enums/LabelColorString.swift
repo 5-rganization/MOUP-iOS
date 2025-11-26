@@ -100,5 +100,15 @@ enum LabelColorString: String, CaseIterable {
             return .purpleText
         }
     }
+    
+    // MARK: - Initializer by displayStr
+    init(displayStr: String) {
+        if let matchedCase = LabelColorString.allCases.first(where: { $0.displayStr == displayStr }) {
+            self = matchedCase
+        } else {
+            assertionFailure("displayStr에 맞는 case를 찾을 수 없습니다.")
+            self = ._default
+        }
+    }
 }
 

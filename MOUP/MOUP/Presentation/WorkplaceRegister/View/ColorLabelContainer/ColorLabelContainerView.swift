@@ -31,11 +31,6 @@ final class ColorLabelContainerView: UIView {
         attributed.addAttribute(.font, value: UIFont.headBold(18), range: NSRange(location: 0, length: fullText.count))
         attributed.addAttribute(.foregroundColor, value: UIColor.gray900, range: NSRange(location: 0, length: fullText.count))
 
-        if let starRange = fullText.range(of: "*") {
-            let nsRange = NSRange(starRange, in: fullText)
-            attributed.addAttribute(.foregroundColor, value: UIColor.accent, range: nsRange)
-        }
-
         $0.attributedText = attributed
     }
     

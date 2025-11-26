@@ -84,19 +84,4 @@ extension SalaryCreateRequest {
             }
         }
     }
-    
-    enum WorkerLabelColor: String {
-        case 빨강색, 주황색, 노란색, 초록색, 파란색, 보라색
-
-        var serverValue: String {
-            switch self {
-            case .빨강색: return "RED"
-            case .주황색: return "ORANGE"
-            case .노란색: return "YELLOW"
-            case .초록색: return "GREEN"
-            case .파란색: return "BLUE"
-            case .보라색: return "PURPLE"
-            }
-        }
-    }
 }
