@@ -63,12 +63,12 @@ extension CalendarWorkListCoordinator {
     }
     
     func editButtonTapped(work: WorkSummary) {
-        parentCoordinator?.dismissed(self)
+        parentCoordinator?.dismissCalendarWorkList()
         parentCoordinator?.showWorkRegister(work: work)
     }
     
     func registerButtonTapped() {
-        parentCoordinator?.dismissed(self)
+        parentCoordinator?.dismissCalendarWorkList()
         parentCoordinator?.showWorkRegister(work: nil)
     }
     

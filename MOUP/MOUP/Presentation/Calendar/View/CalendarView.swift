@@ -34,7 +34,6 @@ final class CalendarView: UIView {
         $0.minimumInteritemSpacing = 0
         $0.scrollDirection = .horizontal
         $0.scrollingMode = .stopAtEachCalendarFrame
-        $0.isPagingEnabled = true
         $0.showsHorizontalScrollIndicator = false
         $0.showsVerticalScrollIndicator = false
     }
