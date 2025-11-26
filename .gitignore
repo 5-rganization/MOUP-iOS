@@ -152,5 +152,6 @@ Secrets-Release.xcconfig
 # Google Login custom gitignore
 credentials.plist
 GoogleConfig.xcconfig
-NetworkConfig.xcconfig
+NetworkConfig-Debug.xcconfig
+NetworkConfig-Release.xcconfig
 GoogleService-Info.plist
