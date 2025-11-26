@@ -30,7 +30,9 @@ final class OwnerWorkplaceRegisterView: UIView {
     
     // MARK: - UI Components
     fileprivate let navigationBar = BaseNavigationBar(title: "매장 등록")
-    private let registerButton = BaseButton(title: "등록하기", isSecondary: true)
+    private let registerButton = BaseButton(title: "등록하기").then {
+        $0.isEnabled = false
+    }
     
     // MARK: - Getter
     var getOwnerWorkplaceContainerView: OwnerWorkplaceContainerView { ownerWorkplaceContainerView }

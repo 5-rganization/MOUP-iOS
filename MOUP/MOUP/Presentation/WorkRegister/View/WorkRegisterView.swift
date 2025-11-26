@@ -45,7 +45,9 @@ final class WorkRegisterView: UIView {
     private let workRoutinContainerView = WorkRoutinContainerView()
     private let memoContainerView = MemoContainerView()
     
-    private let registerButton = BaseButton(title: "등록하기", isSecondary: true)
+    private let registerButton = BaseButton(title: "등록하기").then {
+        $0.isEnabled = false
+    }
     
     var getRegisterButton: BaseButton { registerButton }
     var getMemoContainerView: MemoContainerView { memoContainerView }
