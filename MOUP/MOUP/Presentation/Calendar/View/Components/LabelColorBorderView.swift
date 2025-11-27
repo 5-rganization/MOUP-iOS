@@ -11,7 +11,7 @@ import UIKit
 final class LabelColorBorderView: UIView {
     
     // MARK: - Properties
-    private var borderColor: LabelColorString = ._default {
+    private var borderColor: LabelColor = ._default {
         didSet {
             setNeedsDisplay()
         }
@@ -44,7 +44,7 @@ final class LabelColorBorderView: UIView {
     }
     
     // MARK: - Internal Methods
-    func update(borderColor: LabelColorString) {
+    func update(borderColor: LabelColor) {
         self.borderColor = borderColor
     }
 }

@@ -21,7 +21,7 @@ final class ManageAttendanceViewController: UIViewController {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: ManageAttendanceCell.identifier, for: indexPath) as? ManageAttendanceCell else {
                 return UITableViewCell()
             }
-            let color = LabelColorString.init(rawValue: item.workerBasedLabelColorStr ?? "기본색") ?? ._default
+            let color = LabelColor(serverStr: item.workerBasedLabelColorStr ?? LabelColor._default.serverStr) ?? ._default
             cell.update(color: color.labelColor, name: item.nickname)
             return cell
     })

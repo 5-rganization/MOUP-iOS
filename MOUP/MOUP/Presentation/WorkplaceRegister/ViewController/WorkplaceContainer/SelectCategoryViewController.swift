@@ -67,8 +67,8 @@ private extension SelectCategoryViewController {
             (selectCategoryView.getRestaurantRadioButton, "음식점"),
             (selectCategoryView.getCafeRadioButton, "카페"),
             (selectCategoryView.getCvsRadioButton, "편의점"),
-            (selectCategoryView.getTheaterRadioButton, "영화관"),
-            (selectCategoryView.getEtcRadioButton, "기타")
+            (selectCategoryView.getMovieTheaterRadioButton, "영화관"),
+            (selectCategoryView.getOthersRadioButton, "기타")
         ]
         
         radioButtons.forEach { (button, category) in
@@ -85,8 +85,8 @@ private extension SelectCategoryViewController {
             (selectCategoryView.getRestaurantRadioButton, "음식점"),
             (selectCategoryView.getCafeRadioButton, "카페"),
             (selectCategoryView.getCvsRadioButton, "편의점"),
-            (selectCategoryView.getTheaterRadioButton, "영화관"),
-            (selectCategoryView.getEtcRadioButton, "기타")
+            (selectCategoryView.getMovieTheaterRadioButton, "영화관"),
+            (selectCategoryView.getOthersRadioButton, "기타")
         ]
         
         selectCategoryView.rx.navBackBtnTapped.asDriver()
@@ -95,7 +95,7 @@ private extension SelectCategoryViewController {
             }.disposed(by: disposeBag)
 
         // 완료 버튼 탭 처리
-        selectCategoryView.getRegisterButton.rx.tap
+        selectCategoryView.getConfirmButton.rx.tap
             .bind { [weak self] in
                 self?.viewModel.didTapConfirm.onNext(())
                 self?.navigationController?.popViewController(animated: true)
@@ -105,7 +105,7 @@ private extension SelectCategoryViewController {
         // 완료 버튼 활성화 상태
         viewModel.isCategorySelected
             .drive(onNext: { [weak self] isSelected in
-                self?.selectCategoryView.getRegisterButton.isEnabled = isSelected
+                self?.selectCategoryView.getConfirmButton.isEnabled = isSelected
             })
             .disposed(by: disposeBag)
 

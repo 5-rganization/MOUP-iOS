@@ -156,7 +156,7 @@ private extension WorkRegisterViewModel {
                 print("선택된 루틴 IDs: \(routineIDs)")
                 print("--------------------------------------------------")
 
-                // TODO: 서버 요청 예정
+                
                 self.didCompleteRegister.accept(())
             })
             .disposed(by: disposeBag)

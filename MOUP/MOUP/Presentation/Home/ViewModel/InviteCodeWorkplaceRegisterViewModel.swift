@@ -89,12 +89,12 @@ final class InviteCodeWorkplaceRegisterViewModel:
                 ) = second
 
                 let mappedSalaryType =
-                    SalaryType(displayText: payTypeText)?.serverValue ?? ""
+                SalaryType(displayText: payTypeText)?.serverValue ?? SalaryType.monthly.serverValue
 
                 let mappedSalaryCalculation =
-                    SalaryCalculation(displayStr: payCalcText)?.rawValue ?? ""
+                SalaryCalculation(displayStr: payCalcText)?.serverValue ?? SalaryCalculation.hourly.serverValue
 
-                let mappedColor = LabelColorString(displayStr: colorText).rawValue
+                let mappedColor = LabelColor(displayStr: colorText)?.serverStr ?? LabelColor._default.serverStr
 
                 let numericSalary = Int(salaryInput) ?? 0
 

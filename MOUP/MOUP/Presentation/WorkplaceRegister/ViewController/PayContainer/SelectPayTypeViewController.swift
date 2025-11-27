@@ -64,9 +64,9 @@ private extension SelectPayTypeViewController {
     func setConstraints() { }
     func setActions() {
         let radioButtons: [(RadioButtonView, String)] = [
-            (selectPayTypeView.getMonthlyRadioButton, "매월"),
-            (selectPayTypeView.getWeeklyRadioButton, "매주"),
-            (selectPayTypeView.getDailyRadioButton, "매일")
+            (selectPayTypeView.getMonthlyRadioButton, SalaryType.monthly.displayText),
+            (selectPayTypeView.getWeeklyRadioButton, SalaryType.weekly.displayText),
+            (selectPayTypeView.getDailyRadioButton, SalaryType.daily.displayText)
         ]
 
         radioButtons.forEach { (button, type) in
@@ -92,9 +92,9 @@ private extension SelectPayTypeViewController {
             }.disposed(by: disposeBag)
         
         let radioButtons: [(RadioButtonView, String)] = [
-            (selectPayTypeView.getMonthlyRadioButton, "매월"),
-            (selectPayTypeView.getWeeklyRadioButton, "매주"),
-            (selectPayTypeView.getDailyRadioButton, "매일")
+            (selectPayTypeView.getMonthlyRadioButton, SalaryType.monthly.displayText),
+            (selectPayTypeView.getWeeklyRadioButton, SalaryType.weekly.displayText),
+            (selectPayTypeView.getDailyRadioButton, SalaryType.daily.displayText)
         ]
 
         viewModel.isPayTypeSelected

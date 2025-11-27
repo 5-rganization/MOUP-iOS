@@ -73,7 +73,7 @@ final class OwnerWorkplaceRegisterViewModel:
             .flatMapLatest { [weak self] (name, category, color) -> Observable<Int> in
                 guard let self else { return .empty() }
 
-                let mappedColor = LabelColorString(displayStr: color).rawValue
+                let mappedColor = LabelColor(displayStr: color)?.serverStr ?? LabelColor._default.serverStr
 
                 let requestDTO = OwnerWorkplaceCreateRequestDTO(
                     workplaceName: name,

@@ -85,9 +85,9 @@ final class WorkplaceRegisterViewModel: WorkplaceRegisterViewModelInput, Workpla
                 ) = second
 
                 // ENUM 매핑 처리
-                let mappedColor = LabelColorString(displayStr: color).rawValue
-                let mappedPayCalculation = SalaryCreateRequest.SalaryCalculation(rawValue: payCalc)?.serverValue ?? payCalc
-                let mappedPayType = SalaryCreateRequest.SalaryType(rawValue: payType)?.serverValue ?? payType
+                let mappedColor = LabelColor(displayStr: color)?.serverStr ?? LabelColor._default.serverStr
+                let mappedPayCalculation = SalaryCalculation(displayStr: payCalc)?.serverValue ?? payCalc
+                let mappedPayType = SalaryType(displayText: payType)?.serverValue ?? payType
 
                 return WorkplaceCreateRequestDTO(
                     workplaceName: name,

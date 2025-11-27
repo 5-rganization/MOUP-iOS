@@ -64,13 +64,13 @@ private extension SelectColorLabelViewController {
     func setConstraints() { }
     func setActions() {
         let radioButtons: [(RadioButtonView, String)] = [
-            (selectColorLabelView.getRedRadioButton, "빨강색"),
-            (selectColorLabelView.getOrangeRadioButton, "주황색"),
-            (selectColorLabelView.getYellowRadioButton, "노란색"),
-            (selectColorLabelView.getGreenRadioButton, "초록색"),
-            (selectColorLabelView.getBlueRadioButton, "파란색"),
-            (selectColorLabelView.getPurpleRadioButton, "보라색"),
-            (selectColorLabelView.getIndigoRadioButton, "남색")
+            (selectColorLabelView.getRedRadioButton, LabelColor.red.displayStr),
+            (selectColorLabelView.getOrangeRadioButton, LabelColor.orange.displayStr),
+            (selectColorLabelView.getYellowRadioButton, LabelColor.yellow.displayStr),
+            (selectColorLabelView.getGreenRadioButton, LabelColor.green.displayStr),
+            (selectColorLabelView.getBlueRadioButton, LabelColor.blue.displayStr),
+            (selectColorLabelView.getPurpleRadioButton, LabelColor.purple.displayStr),
+            (selectColorLabelView.getIndigoRadioButton, LabelColor.indigo.displayStr)
         ]
 
         radioButtons.forEach { (button, color) in
@@ -81,7 +81,7 @@ private extension SelectColorLabelViewController {
                 .disposed(by: disposeBag)
         }
 
-        selectColorLabelView.getRegisterButton.rx.tap
+        selectColorLabelView.getConfirmButton.rx.tap
             .bind { [weak self] in
                 self?.viewModel.didTapConfirm.onNext(())
                 self?.navigationController?.popViewController(animated: true)
@@ -97,18 +97,18 @@ private extension SelectColorLabelViewController {
             }.disposed(by: disposeBag)
         
         let radioButtons: [(RadioButtonView, String)] = [
-            (selectColorLabelView.getRedRadioButton, "빨강색"),
-            (selectColorLabelView.getOrangeRadioButton, "주황색"),
-            (selectColorLabelView.getYellowRadioButton, "노란색"),
-            (selectColorLabelView.getGreenRadioButton, "초록색"),
-            (selectColorLabelView.getBlueRadioButton, "파란색"),
-            (selectColorLabelView.getPurpleRadioButton, "보라색"),
-            (selectColorLabelView.getIndigoRadioButton, "남색")
+            (selectColorLabelView.getRedRadioButton, LabelColor.red.displayStr),
+            (selectColorLabelView.getOrangeRadioButton, LabelColor.orange.displayStr),
+            (selectColorLabelView.getYellowRadioButton, LabelColor.yellow.displayStr),
+            (selectColorLabelView.getGreenRadioButton, LabelColor.green.displayStr),
+            (selectColorLabelView.getBlueRadioButton, LabelColor.blue.displayStr),
+            (selectColorLabelView.getPurpleRadioButton, LabelColor.purple.displayStr),
+            (selectColorLabelView.getIndigoRadioButton, LabelColor.indigo.displayStr)
         ]
 
         viewModel.isColorSelected
             .drive(onNext: { [weak self] isSelected in
-                self?.selectColorLabelView.getRegisterButton.isEnabled = isSelected
+                self?.selectColorLabelView.getConfirmButton.isEnabled = isSelected
             })
             .disposed(by: disposeBag)
 

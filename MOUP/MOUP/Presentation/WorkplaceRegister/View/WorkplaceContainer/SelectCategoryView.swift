@@ -22,18 +22,38 @@ final class SelectCategoryView: UIView {
         $0.textColor = .gray900
         $0.font = .headBold(18)
     }
-    private let restaurantRadioButton = RadioButtonView(title: "음식점", type: .icon(selectedIcon: .restaurantSelected, unselectedIcon: .restaurantUnselected, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
+    private let restaurantRadioButton = RadioButtonView(title: WorkplaceCategory.restaurant.displayStr,
+                                                        type: .icon(selectedIcon: WorkplaceCategory.restaurant.selectedImage,
+                                                                    unselectedIcon: WorkplaceCategory.restaurant.unselectedImage,
+                                                                    selectedRadioButton: .selectedRadioButton,
+                                                                    unselectedRadioButton: .unselectedRadioButton))
     
-    private let cafeRadioButton = RadioButtonView(title: "카페", type: .icon(selectedIcon: .cafeSelected, unselectedIcon: .cafeUnselected, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
+    private let cafeRadioButton = RadioButtonView(title: WorkplaceCategory.cafe.displayStr,
+                                                  type: .icon(selectedIcon: WorkplaceCategory.cafe.selectedImage,
+                                                              unselectedIcon: WorkplaceCategory.cafe.unselectedImage,
+                                                              selectedRadioButton: .selectedRadioButton,
+                                                              unselectedRadioButton: .unselectedRadioButton))
     
-    private let cvsRadioButton = RadioButtonView(title: "편의점", type: .icon(selectedIcon: .cvsSelected, unselectedIcon: .cvsUnselected, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
+    private let cvsRadioButton = RadioButtonView(title: WorkplaceCategory.cvs.displayStr,
+                                                 type: .icon(selectedIcon: WorkplaceCategory.cvs.selectedImage,
+                                                             unselectedIcon: WorkplaceCategory.cvs.unselectedImage,
+                                                             selectedRadioButton: .selectedRadioButton,
+                                                             unselectedRadioButton: .unselectedRadioButton))
     
-    private let theaterRadioButton = RadioButtonView(title: "영화관", type: .icon(selectedIcon: .theaterSelected, unselectedIcon: .theaterUnselected, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
+    private let movieTheaterRadioButton = RadioButtonView(title: WorkplaceCategory.movieTheater.displayStr,
+                                                          type: .icon(selectedIcon: WorkplaceCategory.movieTheater.selectedImage,
+                                                                      unselectedIcon: WorkplaceCategory.movieTheater.unselectedImage,
+                                                                      selectedRadioButton: .selectedRadioButton,
+                                                                      unselectedRadioButton: .unselectedRadioButton))
     
-    private let etcRadioButton = RadioButtonView(title: "기타", type: .icon(selectedIcon: .etcSelected, unselectedIcon: .etcUnselected, selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
+    private let othersRadioButton = RadioButtonView(title: WorkplaceCategory.others.displayStr,
+                                                    type: .icon(selectedIcon: WorkplaceCategory.others.selectedImage,
+                                                                unselectedIcon: WorkplaceCategory.others.unselectedImage,
+                                                                selectedRadioButton: .selectedRadioButton,
+                                                                unselectedRadioButton: .unselectedRadioButton))
     
     
-    private let registerButton = BaseButton(title: "완료").then {
+    private let confirmButton = BaseButton(title: "완료").then {
         $0.isEnabled = false
     }
     
@@ -42,9 +62,9 @@ final class SelectCategoryView: UIView {
     var getRestaurantRadioButton: RadioButtonView { restaurantRadioButton }
     var getCafeRadioButton: RadioButtonView { cafeRadioButton }
     var getCvsRadioButton: RadioButtonView { cvsRadioButton }
-    var getTheaterRadioButton: RadioButtonView { theaterRadioButton }
-    var getEtcRadioButton: RadioButtonView { etcRadioButton }
-    var getRegisterButton: BaseButton { registerButton }
+    var getMovieTheaterRadioButton: RadioButtonView { movieTheaterRadioButton }
+    var getOthersRadioButton: RadioButtonView { othersRadioButton }
+    var getConfirmButton: BaseButton { confirmButton }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -86,15 +106,15 @@ private extension SelectCategoryView {
             restaurantRadioButton,
             cafeRadioButton,
             cvsRadioButton,
-            theaterRadioButton,
-            etcRadioButton,
-            registerButton
+            movieTheaterRadioButton,
+            othersRadioButton,
+            confirmButton
         )
     }
     
     // MARK: - setStyles
     func setStyles() {
-        backgroundColor = .white
+        backgroundColor = .primaryBackground
     }
     
     // MARK: - setConstraints
@@ -123,17 +143,17 @@ private extension SelectCategoryView {
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
-        theaterRadioButton.snp.makeConstraints {
+        movieTheaterRadioButton.snp.makeConstraints {
             $0.top.equalTo(cvsRadioButton.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
-        etcRadioButton.snp.makeConstraints {
-            $0.top.equalTo(theaterRadioButton.snp.bottom).offset(12)
+        othersRadioButton.snp.makeConstraints {
+            $0.top.equalTo(movieTheaterRadioButton.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
-        registerButton.snp.makeConstraints {
+        confirmButton.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(45)
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(12)

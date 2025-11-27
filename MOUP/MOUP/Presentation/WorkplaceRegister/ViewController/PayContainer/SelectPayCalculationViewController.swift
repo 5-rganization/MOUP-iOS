@@ -64,8 +64,8 @@ private extension SelectPayCalculationViewController {
     func setConstraints() { }
     func setActions() {
         let radioButtons: [(RadioButtonView, String)] = [
-            (selectPayCalculationView.getHourlyRadioButton, "시급"),
-            (selectPayCalculationView.getFixedRadioButton, "고정급"),
+            (selectPayCalculationView.getHourlyRadioButton, SalaryCalculation.hourly.displayStr),
+            (selectPayCalculationView.getFixedRadioButton, SalaryCalculation.fixed.displayStr),
         ]
 
         radioButtons.forEach { (button, type) in
@@ -91,8 +91,8 @@ private extension SelectPayCalculationViewController {
             }.disposed(by: disposeBag)
         
         let radioButtons: [(RadioButtonView, String)] = [
-            (selectPayCalculationView.getHourlyRadioButton, "시급"),
-            (selectPayCalculationView.getFixedRadioButton, "고정급"),
+            (selectPayCalculationView.getHourlyRadioButton, SalaryCalculation.hourly.displayStr),
+            (selectPayCalculationView.getFixedRadioButton, SalaryCalculation.fixed.displayStr),
         ]
         viewModel.isPayCalculationSelected
             .drive(onNext: { [weak self] isSelected in
