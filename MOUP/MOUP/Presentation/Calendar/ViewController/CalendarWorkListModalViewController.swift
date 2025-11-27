@@ -92,12 +92,20 @@ private extension CalendarWorkListModalViewController {
         // View 바인딩
         calendarWorkListView.rx.workTableViewModelSelected.asDriver()
             .drive(with: self) { owner, work in
-                owner.coordinator?.workCellTapped(work: work)
+                if UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) == .worker {
+                    owner.coordinator?.workerWorkCellTapped(work: work)
+                } else {
+                    owner.coordinator?.ownerWorkCellTapped(work: work)
+                }
             }.disposed(by: disposeBag)
         
         calendarWorkListView.rx.registerButtonTap.asDriver()
             .drive(with: self) { owner, _ in
-                owner.coordinator?.registerButtonTapped()
+                if UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) == .worker {
+                    owner.coordinator?.workerWorkregisterButtonTapped()
+                } else {
+                    owner.coordinator?.ownerWorkregisterButtonTapped()
+                }
             }.disposed(by: disposeBag)
         
         // ViewModel 바인딩
@@ -132,8 +140,12 @@ private extension CalendarWorkListModalViewController {
 
 // MARK: - CalendarWorkListViewDelegate
 extension CalendarWorkListModalViewController: CalendarWorkListViewDelegate {
-    func editWork(work: WorkSummary) {
-        coordinator?.editButtonTapped(work: work)
+    func workerEditWork(work: WorkSummary) {
+        coordinator?.workerEditButtonTapped(work: work)
+    }
+    
+    func ownerEditWork(work: WorkSummary) {
+        coordinator?.ownerEditButtonTapped(work: work)
     }
     
     func deleteSingleWork(workId: Int) {

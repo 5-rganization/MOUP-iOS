@@ -1,5 +1,5 @@
 //
-//  WorkRegisterViewController.swift
+//  OwnerWorkRegisterViewController.swift
 //  MOUP
 //
 //  Created by 양원식 on 8/8/25.
@@ -9,10 +9,10 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class WorkRegisterViewController: UIViewController {
+final class OwnerWorkRegisterViewController: UIViewController {
 
     // MARK: - UI
-    private let workRegisterView = WorkRegisterView()
+    private let workRegisterView = OwnerWorkRegisterView()
 
     // MARK: - DI
     private let viewModel: WorkRegisterViewModel
@@ -50,7 +50,7 @@ final class WorkRegisterViewController: UIViewController {
 }
 
 // MARK: - Private
-private extension WorkRegisterViewController {
+private extension OwnerWorkRegisterViewController {
 
     func configure() {
         setHierarchy()

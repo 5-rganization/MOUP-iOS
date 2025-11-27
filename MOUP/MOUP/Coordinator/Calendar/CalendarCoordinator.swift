@@ -126,14 +126,25 @@ extension CalendarCoordinator {
 extension CalendarCoordinator {
     // TODO: 근무 엔티티를 직접 전달 or 근무 ID만 전달
     /// 근무 등록 화면 표시
-    func showWorkRegister(work: WorkSummary?) {
+    func showWorkerWorkRegister(work: WorkSummary?) {
         // TODO: - 근무 수정 화면 연결
         if let work {
             logger.debug("WorkRegisterVC 표시 - 근무 수정")
             dump(work)
         } else {
-            logger.debug("WorkRegisterVC 표시 - 근무 등록")
-            let coordinator = WorkRegisterCoordinator(navigationController: navigationController)
+            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false)
+            childCoordinators.append(coordinator)
+            coordinator.start()
+        }
+    }
+    
+    func showOwnerWorkRegister(work: WorkSummary?) {
+        // TODO: - 근무 수정 화면 연결
+        if let work {
+            logger.debug("WorkRegisterVC 표시 - 근무 수정")
+            dump(work)
+        } else {
+            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: true)
             childCoordinators.append(coordinator)
             coordinator.start()
         }

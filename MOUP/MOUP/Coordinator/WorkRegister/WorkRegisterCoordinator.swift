@@ -12,6 +12,8 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
     var childCoordinators = [Coordinator]()
     private let navigationController: UINavigationController
     private var workRegisterViewModel: WorkRegisterViewModel?
+    
+    private let isOwnerInjected: Bool
 
     // MARK: - Sub ViewModels
     private lazy var selectedWorkplaceViewModel = SelectedWorkplaceViewModel(
@@ -29,13 +31,13 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
     private lazy var repeatSettingViewModel = RepeatSettingViewModel()
 
     // MARK: - Init
-    init(navigationController: UINavigationController) {
+    init(navigationController: UINavigationController, isOwnerInjected: Bool) {
         self.navigationController = navigationController
+        self.isOwnerInjected = isOwnerInjected
     }
 
     // MARK: - Start
     func start() {
-        
         let viewModel = WorkRegisterViewModel(
             selectedWorkplaceVM: selectedWorkplaceViewModel,
             datePickerVM: workDatePickerViewModel,
@@ -44,14 +46,15 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
             breakPickerVM: breakPickerViewModel,
             repeatSettingVM: repeatSettingViewModel,
             workUseCase: WorkUseCase(workRepository: WorkRepository(workService: WorkService()))
-        )
-        
+            )
+            
+        let vc: UIViewController
+        if isOwnerInjected {
+            vc = OwnerWorkRegisterViewController(viewModel: viewModel, coordinator: self)
+        } else {
+            vc = WorkRegisterViewController(viewModel: viewModel, coordinator: self)
+        }
         self.workRegisterViewModel = viewModel
-
-        let vc = WorkRegisterViewController(
-            viewModel: viewModel,
-            coordinator: self
-        )
 
         vc.hidesBottomBarWhenPushed = true
         navigationController.pushViewController(vc, animated: false)

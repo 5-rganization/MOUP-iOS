@@ -14,8 +14,10 @@ import Then
 
 /// `CalendarWorkListView`의 이벤트를 `CalendarWorkListModalViewController`에 전달하는 Delegate
 protocol CalendarWorkListViewDelegate: AnyObject {
-    /// 근무 수정
-    func editWork(work: WorkSummary)
+    /// 알바생 역할일 때 근무 수정
+    func workerEditWork(work: WorkSummary)
+    /// 사장님 역할일 때 근무 수정
+    func ownerEditWork(work: WorkSummary)
     /// 단일 근무 삭제
     func deleteSingleWork(workId: Int)
     /// 반복 근무 삭제
@@ -171,7 +173,11 @@ extension Reactive where Base: CalendarWorkListView {
     
     private func createMenu(for work: WorkSummary) -> UIMenu {
         let editAction = UIAction(title: "수정하기") { _ in
-            base.delegate?.editWork(work: work)
+            if UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) == .worker {
+                base.delegate?.workerEditWork(work: work)
+            } else {
+                base.delegate?.ownerEditWork(work: work)
+            }
         }
         let singleDeleteAction = UIAction(title: "삭제하기", attributes: .destructive) { _ in
             base.delegate?.deleteSingleWork(workId: work.id)
