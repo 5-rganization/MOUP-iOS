@@ -57,7 +57,7 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
         self.workRegisterViewModel = viewModel
 
         vc.hidesBottomBarWhenPushed = true
-        navigationController.pushViewController(vc, animated: false)
+        navigationController.pushViewController(vc, animated: true)
     }
 
     // MARK: - Navigation

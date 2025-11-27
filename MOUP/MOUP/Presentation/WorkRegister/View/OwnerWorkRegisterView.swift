@@ -146,18 +146,19 @@ private extension OwnerWorkRegisterView {
         }
         
         scrollView.snp.makeConstraints {
-            $0.top.equalTo(toggleSegment.snp.bottom).offset(24)
+            $0.top.equalTo(toggleSegment.snp.bottom).offset(12)
             $0.leading.trailing.equalTo(safeAreaLayoutGuide)
             $0.bottom.equalToSuperview()
         }
         
         contentView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.equalToSuperview().offset(12)
+            $0.leading.trailing.bottom.equalToSuperview()
             $0.width.equalToSuperview()
         }
         
         stackView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(20)
+            $0.top.equalToSuperview()
             $0.horizontalEdges.equalToSuperview()
         }
         
