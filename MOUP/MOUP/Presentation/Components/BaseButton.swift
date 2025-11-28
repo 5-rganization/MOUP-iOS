@@ -72,7 +72,7 @@ private extension BaseButton {
         config.attributedTitle = AttributedString(title, attributes: normalAttribute)
         config.imagePadding = 8
         config.baseBackgroundColor = baseBackgroundColor
-        config.background.cornerRadius = 12
+        config.background.cornerRadius = 12  // iOS 26에서 UIButton.Configuration의 cornerRadius가 적용되지 않는 문제에 대한 workaround
         
         let handler: UIButton.ConfigurationUpdateHandler = { [weak self] button in
             guard let self else { return }
