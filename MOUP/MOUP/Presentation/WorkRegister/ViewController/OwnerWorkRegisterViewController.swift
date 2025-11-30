@@ -310,6 +310,13 @@ private extension OwnerWorkRegisterViewController {
                 self.workRegisterView.showWorkerSection(isWorker)
             })
             .disposed(by: disposeBag)
+        
+        // MARK: - 인원 선택
+        workRegisterView.rx.workerTap
+            .bind(onNext: { [weak self] in
+                self?.coordinator?.showWorkerSelection()
+            })
+            .disposed(by: disposeBag)
     }
 }
 

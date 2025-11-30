@@ -22,6 +22,7 @@ final class OwnerWorkRegisterView: UIView {
     fileprivate let clockOutTapSubject = PublishSubject<Void>()
     fileprivate let lunchBreakTapSubject = PublishSubject<Void>()
     fileprivate let routineTapSubject = PublishSubject<Void>()
+    fileprivate let workerTapSubject = PublishSubject<Void>()
     
     // MARK: - UI Components
     fileprivate let navigationBar = BaseNavigationBar(title: "새 근무 등록")
@@ -56,7 +57,7 @@ final class OwnerWorkRegisterView: UIView {
         $0.attributedText = attributed
     }
     
-    private let repetition = InfoRowView(title: "인원 선택", type: .labelWithChevron(value: ""), frame: .zero)
+    private let selectWorker = InfoRowView(title: "인원 선택", type: .labelWithChevron(value: ""), frame: .zero)
     private let container = ContainerView()
 
     private let workDateContainerView = WorkDateContainerView()
@@ -72,6 +73,7 @@ final class OwnerWorkRegisterView: UIView {
     var getRegisterButton: BaseButton { registerButton }
     var getMemoContainerView: MemoContainerView { memoContainerView }
     var getSelectWorkplace: InfoRowView { selectWorkplace }
+    var getSelectWorker: InfoRowView { selectWorker }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -153,7 +155,7 @@ private extension OwnerWorkRegisterView {
         )
         
         container.addSubviews(
-            repetition
+            selectWorker
         )
     }
     
@@ -203,7 +205,7 @@ private extension OwnerWorkRegisterView {
             $0.height.equalTo(48)
         }
         
-        repetition.snp.makeConstraints {
+        selectWorker.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
         
@@ -243,6 +245,10 @@ private extension OwnerWorkRegisterView {
         
         workRoutinContainerView.rx.routinTap
             .bind(to: routineTapSubject)
+            .disposed(by: disposeBag)
+        
+        selectWorker.rx.tap
+            .bind(to: workerTapSubject)
             .disposed(by: disposeBag)
     }
 }
@@ -306,5 +312,9 @@ extension Reactive where Base: OwnerWorkRegisterView {
         Binder(base) { view, routines in
             view.updateRoutines(routines)
         }
+    }
+    
+    var workerTap: ControlEvent<Void> {
+        ControlEvent(events: base.workerTapSubject.asObservable())
     }
 }

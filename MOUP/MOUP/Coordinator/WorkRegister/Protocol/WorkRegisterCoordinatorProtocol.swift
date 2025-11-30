@@ -10,4 +10,5 @@ protocol WorkRegisterCoordinatorProtocol: Coordinator {
     func showSelectWorkplace()
     func showRepeatSetting()
     func showRoutineSelection()
+    func showWorkerSelection()
 }

@@ -76,6 +76,18 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
         navigationController.pushViewController(vc, animated: true)
     }
     
+    func showWorkerSelection() {
+        
+        // TODO: UI 테스트 용 추후 API 연동 
+        let vc = SelectedWorkerViewController(workers: [
+            (id: 1, name: "테스트 유저1"),
+            (id: 2, name: "테스트 유저2"),
+            (id: 3, name: "테스트 유저3"),
+        ])
+        navigationController.pushViewController(vc, animated: true)
+    }
+
+    
     func showRoutineSelection() {
         let coordinator = RoutineSelectionCoordinator(navigationController: navigationController)
         childCoordinators.append(coordinator)
