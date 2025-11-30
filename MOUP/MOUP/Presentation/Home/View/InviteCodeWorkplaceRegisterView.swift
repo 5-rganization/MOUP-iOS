@@ -15,7 +15,7 @@ import Then
 final class InviteCodeWorkplaceRegisterView: UIView {
     
     // MARK: - Properties
-    private let navigationBar = BaseNavigationBar(title: "초대코드 근무지 추가")
+    fileprivate let navigationBar = BaseNavigationBar(title: "초대코드 근무지 추가")
     
     private let scrollView = UIScrollView()
     private let contentView = UIView()
@@ -32,7 +32,6 @@ final class InviteCodeWorkplaceRegisterView: UIView {
     private let colorLabelContainerView = ColorLabelContainerView()
     
     // MARK: - UI Components
-    fileprivate let navigationBar = BaseNavigationBar(title: "")
     private let registerButton = BaseButton(title: "등록하기").then {
         $0.isEnabled = false
     }

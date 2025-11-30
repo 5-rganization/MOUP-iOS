@@ -40,6 +40,24 @@ final class OwnerWorkRegisterView: UIView {
     private let divider = UIView().then {
         $0.backgroundColor = .gray400
     }
+    
+    private let workerTitle = UILabel().then {
+        let fullText = "근무자 *"
+        let attributed = NSMutableAttributedString(string: fullText)
+
+        attributed.addAttribute(.font, value: UIFont.headBold(18), range: NSRange(location: 0, length: fullText.count))
+        attributed.addAttribute(.foregroundColor, value: UIColor.gray900, range: NSRange(location: 0, length: fullText.count))
+
+        if let starRange = fullText.range(of: "*") {
+            let nsRange = NSRange(starRange, in: fullText)
+            attributed.addAttribute(.foregroundColor, value: UIColor.accent, range: nsRange)
+        }
+
+        $0.attributedText = attributed
+    }
+    
+    private let repetition = InfoRowView(title: "인원 선택", type: .labelWithChevron(value: ""), frame: .zero)
+    private let container = ContainerView()
 
     private let workDateContainerView = WorkDateContainerView()
     private let workTimeContainerView = WorkTimeContainerView()
@@ -89,6 +107,12 @@ final class OwnerWorkRegisterView: UIView {
     func updateRoutines(_ routines: [RoutineSummary]) {
         workRoutinContainerView.updateRoutines(routines)
     }
+    
+    // MARK: - Show/Hide Worker UI
+    func showWorkerSection(_ show: Bool) {
+        workerTitle.isHidden = !show
+        container.isHidden = !show
+    }
 }
 
 private extension OwnerWorkRegisterView {
@@ -120,10 +144,16 @@ private extension OwnerWorkRegisterView {
         stackView.addArrangedSubviews(
             selectWorkplace,
             divider,
+            workerTitle,
+            container,
             workDateContainerView,
             workTimeContainerView,
             workRoutinContainerView,
             memoContainerView
+        )
+        
+        container.addSubviews(
+            repetition
         )
     }
     
@@ -166,6 +196,15 @@ private extension OwnerWorkRegisterView {
             $0.top.equalTo(selectWorkplace.snp.bottom)
             $0.height.equalTo(1)
             $0.horizontalEdges.equalToSuperview().inset(16)
+        }
+        
+        container.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(48)
+        }
+        
+        repetition.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
         
         registerButton.snp.makeConstraints {

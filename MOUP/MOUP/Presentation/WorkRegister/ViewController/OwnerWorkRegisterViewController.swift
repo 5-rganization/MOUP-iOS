@@ -296,6 +296,20 @@ private extension OwnerWorkRegisterViewController {
                 self?.navigationController?.popViewController(animated: true)
             })
             .disposed(by: disposeBag)
+        
+        // MARK: - 역할(사장/알바) 선택 시 UI 변경
+        workRegisterView.getRoleSegmentedControl.rx.selectedSegmentIndex
+            .distinctUntilChanged()
+            .bind(onNext: { [weak self] index in
+                guard let self else { return }
+
+                // index 기준: 0 = 사장, 1 = 알바
+                let isWorker = (index == 1)
+
+                // 알바일 때만 "근무자*" + "인원 선택" 보이게 함
+                self.workRegisterView.showWorkerSection(isWorker)
+            })
+            .disposed(by: disposeBag)
     }
 }
 
