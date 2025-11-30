@@ -63,6 +63,7 @@ final class InviteCodeWorkplaceRegisterViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        rootView.updateTitle(title: title ?? "초대코드 근무지 등록")
         addChildViewControllers()
         configure()
     }

@@ -15,6 +15,8 @@ import Then
 final class InviteCodeWorkplaceRegisterView: UIView {
     
     // MARK: - Properties
+    private let navigationBar = BaseNavigationBar(title: "초대코드 근무지 추가")
+    
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     private let stackView = UIStackView().then {
@@ -62,6 +64,9 @@ final class InviteCodeWorkplaceRegisterView: UIView {
     }
     
     // MARK: - Public Methods
+    func updateTitle(title: String) {
+        navigationBar.configureTitle(title: title)
+    }
 }
 
 private extension InviteCodeWorkplaceRegisterView {
