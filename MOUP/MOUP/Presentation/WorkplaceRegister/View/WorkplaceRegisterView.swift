@@ -37,6 +37,10 @@ final class WorkplaceRegisterView: UIView {
     }
     
     // MARK: - Getter
+    var getNavigationBar: BaseNavigationBar {
+        navigationBar
+    }
+    
     var getWorkplaceContainerView: WorkplaceContainerView {
         workplaceContainerView
     }

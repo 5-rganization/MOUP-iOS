@@ -80,6 +80,7 @@ private extension WorkplaceRegisterViewController {
         setConstraints()
         setActions()
         setBinding()
+        applyEditModeUIIfNeeded()
     }
 
     func setHierarchy() { }
@@ -87,6 +88,18 @@ private extension WorkplaceRegisterViewController {
 
     func setConstraints() { }
     func setActions() { }
+    
+    func applyEditModeUIIfNeeded() {
+        switch viewModel.mode {
+        case .create:
+            workplaceRegisterView.getNavigationBar.configureTitle(title: "새 근무지 등록")
+            workplaceRegisterView.getRegisterButton.setTitle("등록하기", for: .normal)
+
+        case .edit(_):
+            workplaceRegisterView.getNavigationBar.configureTitle(title: "근무지 수정")
+            workplaceRegisterView.getRegisterButton.setTitle("수정하기", for: .normal)
+        }
+    }
 
     func setBinding() {
         workplaceRegisterView.rx.navBackBtnTapped.asDriver()
