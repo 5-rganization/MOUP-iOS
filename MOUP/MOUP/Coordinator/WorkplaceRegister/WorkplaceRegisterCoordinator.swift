@@ -12,6 +12,7 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
     private let navigationController: UINavigationController
 
     private let isOwnerInjected: Bool
+    private let registerMode: WorkplaceRegisterMode
 
     private lazy var inputNameViewModel = InputNameViewModel()
     private lazy var selectCategoryViewModel = SelectCategoryViewModel()
@@ -38,9 +39,10 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
 
 
     // MARK: - Init
-    init(navigationController: UINavigationController, isOwner: Bool) {
+    init(navigationController: UINavigationController, isOwner: Bool, mode: WorkplaceRegisterMode) {
         self.navigationController = navigationController
         self.isOwnerInjected = isOwner
+        self.registerMode = mode
     }
 
 
@@ -55,7 +57,7 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
         )
 
         let workerVM = WorkplaceRegisterViewModel(
-            mode: .create,
+            mode: registerMode,
             workplaceVM: workplaceContainerviewModel,
             payVM: payContainerViewModel,
             workingConditionsVM: workingConditionsContainerViewModel,
@@ -64,7 +66,14 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
         )
 
         let ownerVM = OwnerWorkplaceRegisterViewModel(
-            mode: .create,
+            mode: {
+                switch self.registerMode {
+                case .create:
+                    return .create
+                case .edit(let workplaceId):
+                    return .edit(workplaceId: workplaceId)
+                }
+            }(),
             workplaceVM: workplaceContainerviewModel,
             colorLabelVM: colorLabelContainerViewModel,
             workplaceUseCase: useCase

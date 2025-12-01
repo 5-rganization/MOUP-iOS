@@ -212,14 +212,17 @@ private extension HomeViewController {
     }
     
     func edit(id workplaceId: Int) -> UIAction {
-        let action = UIAction(title: "수정하기") { _ in
+        let action = UIAction(title: "수정하기") { [weak self] _ in
+            guard let self else { return }
             print("수정하기")
+            self.coordinator?.moveToEditWorkplace(id: workplaceId)
         }
         return action
     }
     
     func delete(id workplaceId: Int) -> UIAction {
-        let action = UIAction(title: "삭제하기") { _ in
+        let action = UIAction(title: "삭제하기") { [weak self] _ in
+            guard let self else { return }
             print("삭제하기")
             self.deleteWorkplaceRelay.accept(workplaceId)
         }

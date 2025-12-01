@@ -55,7 +55,8 @@ final class WorkplaceRegisterSheetCoordinator: Coordinator {
         
         let coordinator = WorkplaceRegisterCoordinator(
             navigationController: navigationController,
-            isOwner: isOwner
+            isOwner: isOwner,
+            mode: .create
         )
         
         childCoordinators.append(coordinator)

@@ -83,7 +83,8 @@ final class HomeCoordinator: Coordinator {
 
         let coordinator = WorkplaceRegisterCoordinator(
             navigationController: navigationController,
-            isOwner: isOwner
+            isOwner: isOwner,
+            mode: .create
         )
         
         childCoordinators.append(coordinator)
@@ -93,6 +94,22 @@ final class HomeCoordinator: Coordinator {
         }
     }
 
+    func moveToEditWorkplace(id: Int) {
+        let role = UserDefaultsManager.shared.userRole
+        let isOwner = (role == "ROLE_OWNER")
+        
+        let coordinator = WorkplaceRegisterCoordinator(
+            navigationController: navigationController,
+            isOwner: isOwner,
+            mode: .edit(workplaceId: id)
+        )
+        
+        childCoordinators.append(coordinator)
+        
+        DispatchQueue.main.async {
+            coordinator.start()
+        }
+    }
     
     func moveToAllRoutine() {
         let viewModel = AllRoutineViewModel(routineUseCase: routineUseCase)
