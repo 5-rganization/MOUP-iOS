@@ -239,8 +239,7 @@
 /* Begin XCBuildConfiguration section */
 		5B5304732E224D220083F7CA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 5B5304612E224D210083F7CA /* MOUP */;
-			baseConfigurationReferenceRelativePath = Resources/DebugConfig.xcconfig;
+			baseConfigurationReference = 2737BDC0FF2CA22A17A4B93F /* Pods-MOUP.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -281,8 +280,7 @@
 		};
 		5B5304742E224D220083F7CA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 5B5304612E224D210083F7CA /* MOUP */;
-			baseConfigurationReferenceRelativePath = Resources/ReleaseConfig.xcconfig;
+			baseConfigurationReference = 7B7683484F9A75F0CC2147BF /* Pods-MOUP.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -324,7 +322,7 @@
 		5B5304752E224D220083F7CA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 5B5304612E224D210083F7CA /* MOUP */;
-			baseConfigurationReferenceRelativePath = Resources/DebugConfig.xcconfig;
+			baseConfigurationReferenceRelativePath = Resources/Debug/DebugConfig.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -390,7 +388,7 @@
 		5B5304762E224D220083F7CA /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 5B5304612E224D210083F7CA /* MOUP */;
-			baseConfigurationReferenceRelativePath = Resources/ReleaseConfig.xcconfig;
+			baseConfigurationReferenceRelativePath = Resources/Release/ReleaseConfig.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;

@@ -44,7 +44,6 @@ private extension NicknameViewController {
     // MARK: - configure
     func configure() {
         setBindings()
-        setNavigationBar(title: "닉네임 설정")
     }
 
     // MARK: - setBindings

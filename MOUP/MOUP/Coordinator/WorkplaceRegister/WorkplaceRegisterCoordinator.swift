@@ -55,6 +55,7 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
         )
 
         let workerVM = WorkplaceRegisterViewModel(
+            mode: .create,
             workplaceVM: workplaceContainerviewModel,
             payVM: payContainerViewModel,
             workingConditionsVM: workingConditionsContainerViewModel,
@@ -63,6 +64,7 @@ final class WorkplaceRegisterCoordinator: WorkplaceRegisterCoordinatorProtocol {
         )
 
         let ownerVM = OwnerWorkplaceRegisterViewModel(
+            mode: .create,
             workplaceVM: workplaceContainerviewModel,
             colorLabelVM: colorLabelContainerViewModel,
             workplaceUseCase: useCase

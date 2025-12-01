@@ -60,17 +60,12 @@ final class WorkingConditionsContainerView: UIView {
     
     // MARK: - 근무 조건 타이틀
     private let workplaceTitle = UILabel().then {
-        let fullText = "근무 조건 *"
+        let fullText = "근무 조건"
         let attributed = NSMutableAttributedString(string: fullText)
 
         attributed.addAttribute(.font, value: UIFont.headBold(18), range: NSRange(location: 0, length: fullText.count))
         attributed.addAttribute(.foregroundColor, value: UIColor.gray900, range: NSRange(location: 0, length: fullText.count))
-
-        if let starRange = fullText.range(of: "*") {
-            let nsRange = NSRange(starRange, in: fullText)
-            attributed.addAttribute(.foregroundColor, value: UIColor.accent, range: nsRange)
-        }
-
+        
         $0.attributedText = attributed
     }
     

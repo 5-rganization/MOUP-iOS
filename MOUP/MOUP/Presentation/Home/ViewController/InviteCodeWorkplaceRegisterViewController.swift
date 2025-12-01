@@ -63,12 +63,9 @@ final class InviteCodeWorkplaceRegisterViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        rootView.updateTitle(title: title ?? "초대코드 근무지 등록")
         addChildViewControllers()
         configure()
-    }
-    
-    @objc private func didTapBack() {
-        navigationController?.popViewController(animated: true)
     }
 }
 
@@ -86,21 +83,17 @@ private extension InviteCodeWorkplaceRegisterViewController {
         setBinding()
     }
     
-    func setStyles() {
-        setNavigationBar(
-            title: self.title ?? "",
-            backAction: #selector(didTapBack)
-        )
-    }
+    func setStyles() {}
     
     func setBinding() {
+        rootView.rx.navBackBtnTapped.asDriver()
+            .drive(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposeBag)
+        
         viewModel.isFormValid
             .drive(onNext: { [weak self] isValid in
                 self?.rootView.getRegisterButton.isEnabled = isValid
-                self?.rootView.getRegisterButton.update(
-                    title: "등록",
-                    isSecondary: !isValid
-                )
             })
             .disposed(by: disposeBag)
         

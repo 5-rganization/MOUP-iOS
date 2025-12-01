@@ -29,7 +29,6 @@ final class OwnerWorkplaceRegisterViewController: UIViewController {
         self.viewModel = viewModel
         self.coordinator = coordinator
         
-        // Owner 전용 VC
         self.ownerWorkplaceContainerVC = OwnerWorkplaceContainerViewController(
             viewModel: viewModel.workplaceVM,
             coordinator: coordinator
@@ -43,10 +42,7 @@ final class OwnerWorkplaceRegisterViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
-    @available(*, unavailable, message: "Storyboard is not supported.")
-    required init?(coder: NSCoder) {
-        fatalError()
-    }
+    required init?(coder: NSCoder) { fatalError() }
     
     // MARK: - Lifecycle
     override func loadView() {
@@ -61,66 +57,46 @@ final class OwnerWorkplaceRegisterViewController: UIViewController {
         
         configure()
     }
-    
-    @objc
-    private func didTapBack() {
-        navigationController?.popViewController(animated: true)
-    }
 }
 
-
-// MARK: - UI Setup
 private extension OwnerWorkplaceRegisterViewController {
     
     func configure() {
-        setHierarchy()
-        setStyles()
-        setConstraints()
-        setActions()
         setBinding()
+
+        // 버튼 텍스트 모드에 따라 변경
+        switch viewModel.mode {
+        case .create:
+            ownerView.getRegisterButton.setTitle("등록하기", for: .normal)
+        case .edit:
+            ownerView.getRegisterButton.setTitle("수정하기", for: .normal)
+        }
     }
-    
-    func setHierarchy() { }
-    
-    func setStyles() { }
-    
-    func setConstraints() { }
-    
-    func setActions() { }
     
     // MARK: - Binding
     func setBinding() {
-        ownerView.rx.navBackBtnTapped.asDriver()
-            .drive(with: self) { owner, _ in
-                owner.navigationController?.popViewController(animated: true)
-            }.disposed(by: disposeBag)
-        
-        // 버튼 활성화
-        viewModel.isFormValid
-            .drive(onNext: { [weak self] isValid in
-                self?.ownerView.getRegisterButton.isEnabled = isValid
-                self?.ownerView.getRegisterButton.update(title: "완료", isSecondary: false)
+        ownerView.rx.navBackBtnTapped
+            .bind(onNext: { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
             })
             .disposed(by: disposeBag)
         
-        // 등록 버튼 실행
+        // 버튼 활성화
+        viewModel.isFormValid
+            .drive(ownerView.getRegisterButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        // 등록/수정 버튼 공통
         ownerView.getRegisterButton.rx.tap
             .bind(to: viewModel.didTapCompleteButton)
             .disposed(by: disposeBag)
         
-        // 등록 완료 후 pop
+        // 완료 후 pop
         viewModel.didCompleteRegister
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] workplaceId in
-                print("매장 등록 성공 - workplaceId: \(workplaceId)")
+            .bind(onNext: { [weak self] workplaceId in
+                print("완료: workplaceId = \(workplaceId)")
                 self?.navigationController?.popViewController(animated: true)
-                
-            }, onError: { error in
-                if let workplaceError = error as? WorkplaceError {
-                    print("매장 등록 실패 - \(workplaceError.debugDescription ?? "알 수 없는 에러")")
-                } else {
-                    print("매장 등록 실패 - \(error.localizedDescription)")
-                }
             })
             .disposed(by: disposeBag)
     }

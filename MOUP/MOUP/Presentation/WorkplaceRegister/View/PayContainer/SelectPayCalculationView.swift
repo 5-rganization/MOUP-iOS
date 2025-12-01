@@ -6,6 +6,9 @@
 //
 
 import UIKit
+
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 
@@ -13,15 +16,19 @@ final class SelectPayCalculationView: UIView {
     // MARK: - Properties
     
     // MARK: - UI Components
+    fileprivate let navigationBar = BaseNavigationBar(title: "급여 계산")
+    
     private let title = UILabel().then {
         $0.text = "급여 계산방법을 선택해주세요."
         $0.textColor = .gray900
         $0.font = .headBold(18)
     }
     
-    private let registerButton = BaseButton(title: "완료", isSecondary: true)
-    private let hourlyRadioButton = RadioButtonView(title: "시급", type: .none(selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let fixedRadioButton = RadioButtonView(title: "고정급", type: .none(selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
+    private let registerButton = BaseButton(title: "완료").then {
+        $0.isEnabled = false
+    }
+    private let hourlyRadioButton = RadioButtonView(title: "시급", type: .none(selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
+    private let fixedRadioButton = RadioButtonView(title: "고정급", type: .none(selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
     
     // MARK: - Getter
     var getHourlyRadioButton: RadioButtonView { hourlyRadioButton }
@@ -54,6 +61,7 @@ private extension SelectPayCalculationView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             title,
             hourlyRadioButton,
             fixedRadioButton,
@@ -68,8 +76,13 @@ private extension SelectPayCalculationView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
+        }
+        
         title.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(32)
+            $0.top.equalTo(navigationBar.snp.bottom).offset(32)
             $0.leading.equalToSuperview().offset(16)
         }
         
@@ -88,5 +101,11 @@ private extension SelectPayCalculationView {
             $0.height.equalTo(45)
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(12)
         }
+    }
+}
+
+extension Reactive where Base: SelectPayCalculationView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
     }
 }

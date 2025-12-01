@@ -6,14 +6,18 @@
 //
 
 import UIKit
+
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
-import RxSwift
 
 final class InputSalaryTypeView: UIView {
     // MARK: - Properties
     
     // MARK: - UI Components
+    fileprivate let navigationBar = BaseNavigationBar(title: "시급")
+    
     private let title = UILabel().then {
         $0.text = "시급을 입력해주세요."
         $0.textColor = .gray900
@@ -25,7 +29,9 @@ final class InputSalaryTypeView: UIView {
         $0.returnKeyType = .done
     }
     
-    private let registerButton = BaseButton(title: "완료", isSecondary: true)
+    private let registerButton = BaseButton(title: "완료").then {
+        $0.isEnabled = false
+    }
     
     // MARK: - Getter
     var getTitle: UILabel { title }
@@ -66,6 +72,7 @@ private extension InputSalaryTypeView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             title,
             textField,
             registerButton
@@ -79,8 +86,13 @@ private extension InputSalaryTypeView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
+        }
+        
         title.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(32)
+            $0.top.equalTo(navigationBar.snp.bottom).offset(32)
             $0.leading.equalToSuperview().offset(16)
         }
         
@@ -97,6 +109,10 @@ private extension InputSalaryTypeView {
     }
 }
 extension Reactive where Base: InputSalaryTypeView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
+    }
+    
     /// 타이틀 텍스트를 바인딩하는 Binder
     var titleText: Binder<String> {
         return Binder(base) { view, text in

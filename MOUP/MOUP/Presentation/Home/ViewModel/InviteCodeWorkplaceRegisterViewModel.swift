@@ -5,9 +5,8 @@
 //  Created by 양원식 on 11/15/25.
 //
 
-import Foundation
-import RxSwift
 import RxCocoa
+import RxSwift
 
 protocol InviteCodeWorkplaceRegisterViewModelInput {
     var didTapRegisterButton: AnyObserver<Void> { get }
@@ -90,13 +89,12 @@ final class InviteCodeWorkplaceRegisterViewModel:
                 ) = second
 
                 let mappedSalaryType =
-                    SalaryType(displayText: payTypeText)?.serverValue ?? ""
+                SalaryType(displayText: payTypeText)?.serverValue ?? SalaryType.monthly.serverValue
 
                 let mappedSalaryCalculation =
-                    SalaryCalculation(displayStr: payCalcText)?.rawValue ?? ""
+                SalaryCalculation(displayStr: payCalcText)?.serverValue ?? SalaryCalculation.hourly.serverValue
 
-                let mappedColor =
-                    WorkerLabelColor(displayText: colorText)?.serverValue ?? ""
+                let mappedColor = LabelColor(displayStr: colorText)?.serverStr ?? LabelColor._default.serverStr
 
                 let numericSalary = Int(salaryInput) ?? 0
 

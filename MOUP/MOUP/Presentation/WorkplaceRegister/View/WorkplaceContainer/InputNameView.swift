@@ -5,14 +5,18 @@
 //  Created by 양원식 on 7/25/25.
 //
 import UIKit
+
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
-import RxCocoa
 
 final class InputNameView: UIView {
     // MARK: - Properties
     
     // MARK: - UI Components
+    fileprivate let navigationBar = BaseNavigationBar(title: "근무지 입력")
+    
     private let title = UILabel().then {
         $0.text = "근무지 이름을 입력해주세요."
         $0.textColor = .gray900
@@ -24,7 +28,9 @@ final class InputNameView: UIView {
         $0.returnKeyType = .done
     }
     
-    private let registerButton = BaseButton(title: "완료", isSecondary: true)
+    private let registerButton = BaseButton(title: "완료").then {
+        $0.isEnabled = false
+    }
     
     // MARK: - Getter
     var getTextField: CustomTextField { textField }
@@ -56,6 +62,7 @@ private extension InputNameView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             title,
             textField,
             registerButton
@@ -69,8 +76,13 @@ private extension InputNameView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
+        }
+        
         title.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(32)
+            $0.top.equalTo(navigationBar.snp.bottom).offset(32)
             $0.leading.equalToSuperview().offset(16)
         }
         textField.snp.makeConstraints {
@@ -83,5 +95,11 @@ private extension InputNameView {
             $0.height.equalTo(45)
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(12)
         }
+    }
+}
+
+extension Reactive where Base: InputNameView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
     }
 }

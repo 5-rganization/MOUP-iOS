@@ -44,8 +44,8 @@ struct SalaryCreateRequest: Codable {
         hasHolidayAllowance: Bool,
         hasNightAllowance: Bool
     ) {
-        self.salaryType = SalaryType(rawValue: salaryType)?.serverValue ?? salaryType
-        self.salaryCalculation = SalaryCalculation(rawValue: salaryCalculation)?.serverValue ?? salaryCalculation
+        self.salaryType = salaryType
+        self.salaryCalculation = salaryCalculation
         self.hourlyRate = hourlyRate
         self.salaryDate = salaryDate
         self.hasNationalPension = hasNationalPension
@@ -55,48 +55,5 @@ struct SalaryCreateRequest: Codable {
         self.hasIncomeTax = hasIncomeTax
         self.hasHolidayAllowance = hasHolidayAllowance
         self.hasNightAllowance = hasNightAllowance
-    }
-}
-
-extension SalaryCreateRequest {
-    enum SalaryType: String {
-        case 매월
-        case 매주
-        case 매일
-
-        var serverValue: String {
-            switch self {
-            case .매월: return "SALARY_MONTHLY"
-            case .매주: return "SALARY_WEEKLY"
-            case .매일: return "SALARY_DAILY"
-            }
-        }
-    }
-
-    enum SalaryCalculation: String {
-        case 시급
-        case 고정급
-
-        var serverValue: String {
-            switch self {
-            case .시급: return "SALARY_CALCULATION_HOURLY"
-            case .고정급: return "SALARY_CALCULATION_FIXED"
-            }
-        }
-    }
-    
-    enum WorkerLabelColor: String {
-        case 빨강색, 주황색, 노란색, 초록색, 파란색, 보라색
-
-        var serverValue: String {
-            switch self {
-            case .빨강색: return "RED"
-            case .주황색: return "ORANGE"
-            case .노란색: return "YELLOW"
-            case .초록색: return "GREEN"
-            case .파란색: return "BLUE"
-            case .보라색: return "PURPLE"
-            }
-        }
     }
 }

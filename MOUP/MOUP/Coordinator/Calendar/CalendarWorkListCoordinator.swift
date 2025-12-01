@@ -58,18 +58,32 @@ extension CalendarWorkListCoordinator {
         parentCoordinator?.dismissed(self)
     }
     
-    func workCellTapped(work: WorkSummary) {
-        parentCoordinator?.showWorkRegister(work: work)
+    func workerWorkCellTapped(work: WorkSummary) {
+        parentCoordinator?.showWorkerWorkRegister(work: work)
     }
     
-    func editButtonTapped(work: WorkSummary) {
-        parentCoordinator?.dismissed(self)
-        parentCoordinator?.showWorkRegister(work: work)
+    func ownerWorkCellTapped(work: WorkSummary) {
+        parentCoordinator?.showOwnerWorkRegister(work: work)
     }
     
-    func registerButtonTapped() {
-        parentCoordinator?.dismissed(self)
-        parentCoordinator?.showWorkRegister(work: nil)
+    func workerEditButtonTapped(work: WorkSummary) {
+        parentCoordinator?.dismissCalendarWorkList()
+        parentCoordinator?.showWorkerWorkRegister(work: work)
+    }
+    
+    func ownerEditButtonTapped(work: WorkSummary) {
+        parentCoordinator?.dismissCalendarWorkList()
+        parentCoordinator?.showOwnerWorkRegister(work: work)
+    }
+    
+    func workerWorkregisterButtonTapped() {
+        parentCoordinator?.dismissCalendarWorkList()
+        parentCoordinator?.showWorkerWorkRegister(work: nil)
+    }
+    
+    func ownerWorkregisterButtonTapped() {
+        parentCoordinator?.dismissCalendarWorkList()
+        parentCoordinator?.showOwnerWorkRegister(work: nil) 
     }
     
     func updateCalendarDataSource() {

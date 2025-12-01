@@ -17,13 +17,15 @@ final class PersonalModeWorkCell: BaseWorkCell {
     override func update(work: WorkSummary) {
         switch UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) {
         case .worker:
-            setGivenLabelColor(work.workerSummary.workerBasedLabelColorStr ?? LabelColorString._default.rawValue)
+            let labelColorStr = work.workerSummary.workerBasedLabelColorStr ?? LabelColor._default.serverStr
+            setGivenLabelColor(labelColorStr)
             dailyIncomeLabel.isHidden = false
         case .owner:
-            setGivenLabelColor(work.workerSummary.ownerBasedLabelColorStr ?? LabelColorString._default.rawValue)
+            let labelColorStr = work.workerSummary.ownerBasedLabelColorStr ?? LabelColor._default.serverStr
+            setGivenLabelColor(labelColorStr)
             dailyIncomeLabel.isHidden = true
         default:
-            setGivenLabelColor(LabelColorString._default.rawValue)
+            setGivenLabelColor(LabelColor._default.serverStr)
             dailyIncomeLabel.isHidden = true
         }
         

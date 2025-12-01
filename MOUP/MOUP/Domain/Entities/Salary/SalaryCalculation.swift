@@ -8,9 +8,16 @@
 /// 급여 유형 Enum
 /// - `hourly`: 시급
 /// - `fixed`: 고정급
-enum SalaryCalculation: String {
-    case hourly = "SALARY_CALCULATION_HOURLY"
-    case fixed  = "SALARY_CALCULATION_FIXED"
+enum SalaryCalculation {
+    case hourly
+    case fixed
+    
+    var serverValue: String {
+        switch self {
+        case .hourly: return "SALARY_CALCULATION_HOURLY"
+        case .fixed:  return "SALARY_CALCULATION_FIXED"
+        }
+    }
     
     var displayStr: String {
         switch self {
@@ -27,7 +34,12 @@ enum SalaryCalculation: String {
         default: return nil
         }
     }
-
-    /// 서버 전송용 값
-    var serverValue: String { self.rawValue }
+    
+    init?(serverValue: String) {
+        switch serverValue {
+        case "SALARY_CALCULATION_HOURLY": self = .hourly
+        case "SALARY_CALCULATION_FIXED": self = .fixed
+        default: return nil
+        }
+    }
 }

@@ -1,5 +1,5 @@
 //
-//  WorkRegisterViewController.swift
+//  OwnerWorkRegisterViewController.swift
 //  MOUP
 //
 //  Created by 양원식 on 8/8/25.
@@ -9,10 +9,10 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class WorkRegisterViewController: UIViewController {
+final class OwnerWorkRegisterViewController: UIViewController {
 
     // MARK: - UI
-    private let workRegisterView = WorkRegisterView()
+    private let workRegisterView = OwnerWorkRegisterView()
 
     // MARK: - DI
     private let viewModel: WorkRegisterViewModel
@@ -50,7 +50,7 @@ final class WorkRegisterViewController: UIViewController {
 }
 
 // MARK: - Private
-private extension WorkRegisterViewController {
+private extension OwnerWorkRegisterViewController {
 
     func configure() {
         setHierarchy()
@@ -294,6 +294,27 @@ private extension WorkRegisterViewController {
             .bind(onNext: { [weak self] in
                 print("근무 등록 완료")
                 self?.navigationController?.popViewController(animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        // MARK: - 역할(사장/알바) 선택 시 UI 변경
+        workRegisterView.getRoleSegmentedControl.rx.selectedSegmentIndex
+            .distinctUntilChanged()
+            .bind(onNext: { [weak self] index in
+                guard let self else { return }
+
+                // index 기준: 0 = 사장, 1 = 알바
+                let isWorker = (index == 1)
+
+                // 알바일 때만 "근무자*" + "인원 선택" 보이게 함
+                self.workRegisterView.showWorkerSection(isWorker)
+            })
+            .disposed(by: disposeBag)
+        
+        // MARK: - 인원 선택
+        workRegisterView.rx.workerTap
+            .bind(onNext: { [weak self] in
+                self?.coordinator?.showWorkerSelection()
             })
             .disposed(by: disposeBag)
     }

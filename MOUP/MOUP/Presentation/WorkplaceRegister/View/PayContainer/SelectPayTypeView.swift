@@ -6,6 +6,9 @@
 //
 
 import UIKit
+
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 
@@ -13,16 +16,20 @@ final class SelectPayTypeView: UIView {
     // MARK: - Properties
     
     // MARK: - UI Components
+    fileprivate let navigationBar = BaseNavigationBar(title: "급여 유형")
+    
     private let title = UILabel().then {
         $0.text = "급여 유형을 선택해주세요."
         $0.textColor = .gray900
         $0.font = .headBold(18)
     }
     
-    private let registerButton = BaseButton(title: "완료", isSecondary: true)
-    private let monthlyRadioButton = RadioButtonView(title: "매월", type: .none(selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let weeklyRadioButton = RadioButtonView(title: "매주", type: .none(selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let dailyRadioButton = RadioButtonView(title: "매일", type: .none(selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
+    private let registerButton = BaseButton(title: "완료").then {
+        $0.isEnabled = false
+    }
+    private let monthlyRadioButton = RadioButtonView(title: "매월", type: .none(selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
+    private let weeklyRadioButton = RadioButtonView(title: "매주", type: .none(selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
+    private let dailyRadioButton = RadioButtonView(title: "매일", type: .none(selectedRadioButton: .selectedRadioButton, unselectedRadioButton: .unselectedRadioButton))
     
     // MARK: - Getter
     var getMonthlyRadioButton: RadioButtonView { monthlyRadioButton }
@@ -56,6 +63,7 @@ private extension SelectPayTypeView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             title,
             monthlyRadioButton,
             weeklyRadioButton,
@@ -71,8 +79,13 @@ private extension SelectPayTypeView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
+        }
+        
         title.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(32)
+            $0.top.equalTo(navigationBar.snp.bottom).offset(32)
             $0.leading.equalToSuperview().offset(16)
         }
         
@@ -96,5 +109,11 @@ private extension SelectPayTypeView {
             $0.height.equalTo(45)
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(12)
         }
+    }
+}
+
+extension Reactive where Base: SelectPayTypeView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
     }
 }

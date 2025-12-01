@@ -8,6 +8,12 @@ import Foundation
 import RxSwift
 import RxCocoa
 
+enum WorkplaceRegisterMode {
+    case create
+    case edit(workplaceId: Int)
+}
+
+// MARK: - Input / Output
 protocol WorkplaceRegisterViewModelInput {
     var didTapCompleteButton: AnyObserver<Void> { get }
 }
@@ -18,8 +24,11 @@ protocol WorkplaceRegisterViewModelOutput {
 }
 
 final class WorkplaceRegisterViewModel: WorkplaceRegisterViewModelInput, WorkplaceRegisterViewModelOutput {
-    
-    // MARK: - Exposed Container ViewModels
+
+    // MARK: - Mode
+    let mode: WorkplaceRegisterMode
+
+    // MARK: - Child ViewModels
     let workplaceVM: WorkplaceContainerViewModel
     let payVM: PayContainerViewModel
     let workingConditionsVM: WorkingConditionsContainerViewModel
@@ -31,26 +40,63 @@ final class WorkplaceRegisterViewModel: WorkplaceRegisterViewModelInput, Workpla
 
     // MARK: - Output
     let isFormValid: Driver<Bool>
-    let didCompleteRegister: Observable<Int>
+
+    lazy var didCompleteRegister: Observable<Int> = {
+        didTapCompleteButtonSubject
+            .withLatestFrom(workplaceData)
+            .flatMapLatest { [weak self] request -> Observable<Int> in
+                guard let self else { return Observable.empty() }
+
+                return Observable<Int>.create { observer in
+                    Task {
+                        do {
+                            switch self.mode {
+                            case .create:
+                                let result = try await self.workplaceUseCase.createWorkplace(request: request)
+                                observer.onNext(result.workplaceId)
+
+                            case .edit(let workplaceId):
+                                // TODO: 수정 API 연동 예정
+                                print("수정모드 — updateWorkplace API workplaceId=\(workplaceId)")
+                                observer.onNext(workplaceId)
+                            }
+
+                            observer.onCompleted()
+                        } catch {
+                            observer.onError(error)
+                        }
+                    }
+                    return Disposables.create()
+                }
+            }
+            .share()
+    }()
 
     // MARK: - Dependencies
-    private let workplaceUseCase: WorkplaceUseCaseProtocol
+    let workplaceUseCase: WorkplaceUseCaseProtocol
     private let disposeBag = DisposeBag()
+
+    // 내부 observable (lazy 에서 사용)
+    private let workplaceData: Observable<WorkplaceCreateRequestDTO>
+
 
     // MARK: - Init
     init(
+        mode: WorkplaceRegisterMode,
         workplaceVM: WorkplaceContainerViewModel,
         payVM: PayContainerViewModel,
         workingConditionsVM: WorkingConditionsContainerViewModel,
         colorLabelVM: ColorLabelContainerViewModel,
         workplaceUseCase: WorkplaceUseCaseProtocol
     ) {
+        self.mode = mode
         self.workplaceVM = workplaceVM
         self.payVM = payVM
         self.workingConditionsVM = workingConditionsVM
         self.colorLabelVM = colorLabelVM
         self.workplaceUseCase = workplaceUseCase
-        
+
+        // MARK: - Combine Inputs
         let firstGroup = Observable.combineLatest(
             workplaceVM.nameTextOutput.asObservable(),
             workplaceVM.categoryTextOutput.asObservable(),
@@ -71,30 +117,25 @@ final class WorkplaceRegisterViewModel: WorkplaceRegisterViewModelInput, Workpla
             colorLabelVM.selectedColorLabel.asObservable()
         )
 
-        // MARK: - DTO 조합
-        let workplaceData = Observable
+        // 내부 observable 저장
+        self.workplaceData = Observable
             .combineLatest(firstGroup, secondGroup)
             .map { first, second -> WorkplaceCreateRequestDTO in
-                let (
-                    name, category, payType, payCalc, salary,
-                    payday, pension, health
-                ) = first
+                let (name, category, payType, payCalc, salary,
+                     payday, pension, health) = first
 
-                let (
-                    employment, industrial, tax, holiday, night, color
-                ) = second
+                let (employment, industrial, tax, holiday, night, color) = second
 
-                // ENUM 매핑 처리
-                let mappedColor = SalaryCreateRequest.WorkerLabelColor(rawValue: color)?.serverValue ?? color
-                let mappedPayCalculation = SalaryCreateRequest.SalaryCalculation(rawValue: payCalc)?.serverValue ?? payCalc
-                let mappedPayType = SalaryCreateRequest.SalaryType(rawValue: payType)?.serverValue ?? payType
+                let mappedColor = LabelColor(displayStr: color)?.serverStr ?? LabelColor._default.serverStr
+                let mappedPayCalculation = SalaryCalculation(displayStr: payCalc)?.serverValue ?? payCalc
+                let mappedPayType = SalaryType(displayText: payType)?.serverValue ?? payType
 
                 return WorkplaceCreateRequestDTO(
                     workplaceName: name,
                     categoryName: category,
-                    address: "기본값", // TODO: 실제 위치 값 연결
-                    latitude: 0.0, // TODO: 실제 위치 값 연결
-                    longitude: 0.0, // TODO: 실제 위치 값 연결
+                    address: "기본값", // TODO: 실제 좌표 연동
+                    latitude: 0.0,
+                    longitude: 0.0,
                     workerBasedLabelColor: mappedColor,
                     salaryCreateRequest: SalaryCreateRequest(
                         salaryType: mappedPayType,
@@ -124,24 +165,5 @@ final class WorkplaceRegisterViewModel: WorkplaceRegisterViewModelInput, Workpla
                 !$0.workerBasedLabelColor.isEmpty
             }
             .asDriver(onErrorJustReturn: false)
-
-        // MARK: - Register Action
-        self.didCompleteRegister = didTapCompleteButtonSubject
-            .withLatestFrom(workplaceData)
-            .flatMapLatest { request in
-                Observable.create { observer in
-                    Task {
-                        do {
-                            let result = try await workplaceUseCase.createWorkplace(request: request)
-                            observer.onNext(result.workplaceId)
-                            observer.onCompleted()
-                        } catch {
-                            observer.onError(error)
-                        }
-                    }
-                    return Disposables.create()
-                }
-            }
-            .share()
     }
 }

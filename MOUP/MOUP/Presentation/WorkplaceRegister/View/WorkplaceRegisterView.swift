@@ -32,9 +32,15 @@ final class WorkplaceRegisterView: UIView {
     
     // MARK: - UI Components
     fileprivate let navigationBar = BaseNavigationBar(title: "새 근무지 등록")
-    private let registerButton = BaseButton(title: "등록하기", isSecondary: true)
+    private let registerButton = BaseButton(title: "등록하기").then {
+        $0.isEnabled = false
+    }
     
     // MARK: - Getter
+    var getNavigationBar: BaseNavigationBar {
+        navigationBar
+    }
+    
     var getWorkplaceContainerView: WorkplaceContainerView {
         workplaceContainerView
     }
@@ -107,7 +113,7 @@ private extension WorkplaceRegisterView {
     func setConstraints() {
         navigationBar.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide)
-            $0.directionalHorizontalEdges.equalToSuperview()
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
         }
         
         scrollView.snp.makeConstraints {

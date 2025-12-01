@@ -6,12 +6,17 @@
 //
 
 import UIKit
+
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 
 final class InviteCodeWorkplaceRegisterView: UIView {
     
     // MARK: - Properties
+    fileprivate let navigationBar = BaseNavigationBar(title: "초대코드 근무지 추가")
+    
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     private let stackView = UIStackView().then {
@@ -27,7 +32,9 @@ final class InviteCodeWorkplaceRegisterView: UIView {
     private let colorLabelContainerView = ColorLabelContainerView()
     
     // MARK: - UI Components
-    private let registerButton = BaseButton(title: "등록하기", isSecondary: true)
+    private let registerButton = BaseButton(title: "등록하기").then {
+        $0.isEnabled = false
+    }
     
     // MARK: - Getter
     var getWorkingConditionsContainerView: WorkingConditionsContainerView {
@@ -56,6 +63,9 @@ final class InviteCodeWorkplaceRegisterView: UIView {
     }
     
     // MARK: - Public Methods
+    func updateTitle(title: String) {
+        navigationBar.configureTitle(title: title)
+    }
 }
 
 private extension InviteCodeWorkplaceRegisterView {
@@ -69,6 +79,7 @@ private extension InviteCodeWorkplaceRegisterView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             scrollView
         )
         
@@ -95,8 +106,14 @@ private extension InviteCodeWorkplaceRegisterView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
+        }
+        
         scrollView.snp.makeConstraints {
-            $0.top.trailing.leading.equalTo(safeAreaLayoutGuide)
+            $0.top.equalTo(navigationBar.snp.bottom)
+            $0.trailing.leading.equalTo(safeAreaLayoutGuide)
             $0.bottom.equalToSuperview()
         }
         
@@ -119,3 +136,8 @@ private extension InviteCodeWorkplaceRegisterView {
     }
 }
 
+extension Reactive where Base: InviteCodeWorkplaceRegisterView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
+    }
+}
