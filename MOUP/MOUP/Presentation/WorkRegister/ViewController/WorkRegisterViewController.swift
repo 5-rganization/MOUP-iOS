@@ -99,6 +99,12 @@ private extension WorkRegisterViewController {
             .disposed(by: disposeBag)
 
         // MARK: - 날짜 선택
+        viewModel.selectedDate.asDriver()
+            .drive(with: self, onNext: { owner, date in
+                let dateStr = DateFormatter.dataSourceDateFormatter.string(from: date)
+                owner.workRegisterView.rx.selectedWorkDateText.onNext(dateStr)
+            }).disposed(by: disposeBag)
+        
         workRegisterView.rx.workDateTap
             .bind(onNext: { [weak self] in
                 guard let self else { return }
@@ -287,14 +293,13 @@ private extension WorkRegisterViewController {
             .disposed(by: disposeBag)
 
         // MARK: - 등록 버튼
+        viewModel.isFormValidForWorker
+            .drive(with: self, onNext: { owner, isValid in
+                owner.workRegisterView.getRegisterButton.isEnabled = isValid
+            }).disposed(by: disposeBag)
+        
         workRegisterView.getRegisterButton.rx.tap
             .bind(to: viewModel.didTapRegister)
-            .disposed(by: disposeBag)
-        
-        viewModel.isFormValid
-            .drive(onNext: { [weak self] isValid in
-                self?.workRegisterView.getRegisterButton.isEnabled = isValid
-            })
             .disposed(by: disposeBag)
 
         viewModel.didCompleteRegister

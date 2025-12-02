@@ -34,7 +34,7 @@ final class CalendarWorkListModalViewController: UIViewController {
     // Initializer Injections
     weak var coordinator: CalendarWorkListCoordinator?
     private let viewModel: CalendarWorkListViewModel
-    private let selectedDay: Int
+    private let selectedDate: Date
     private let calendarMode: CalendarMode
     
     // Input Relays
@@ -47,10 +47,10 @@ final class CalendarWorkListModalViewController: UIViewController {
     }
     
     // MARK: - Initializer
-    init(coordinator: CalendarWorkListCoordinator, viewModel: CalendarWorkListViewModel, selectedDay: Int, calendarMode: CalendarMode) {
+    init(coordinator: CalendarWorkListCoordinator, viewModel: CalendarWorkListViewModel, selectedDate: Date, calendarMode: CalendarMode) {
         self.coordinator = coordinator
         self.viewModel = viewModel
-        self.selectedDay = selectedDay
+        self.selectedDate = selectedDate
         self.calendarMode = calendarMode
         super.init(nibName: nil, bundle: nil)
     }
@@ -68,7 +68,7 @@ final class CalendarWorkListModalViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
-        calendarWorkListView.update(day: selectedDay)
+        calendarWorkListView.update(day: selectedDate.day)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -104,7 +104,7 @@ private extension CalendarWorkListModalViewController {
         calendarWorkListView.rx.registerButtonTap.asDriver()
             .drive(with: self) { owner, _ in
                 if UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) == .worker {
-                    owner.coordinator?.workerWorkregisterButtonTapped()
+                    owner.coordinator?.workerWorkregisterButtonTapped(selectedDate: owner.selectedDate)
                 } else {
                     owner.coordinator?.ownerWorkregisterButtonTapped()
                 }

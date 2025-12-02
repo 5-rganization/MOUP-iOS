@@ -14,6 +14,8 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
     private var workRegisterViewModel: WorkRegisterViewModel?
     
     private let isOwnerInjected: Bool
+    
+    private let selectedDate: Date?
 
     // MARK: - Sub ViewModels
     private lazy var selectedWorkplaceViewModel = SelectedWorkplaceViewModel(
@@ -23,7 +25,7 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
             )
         )
     )
-    private lazy var workDatePickerViewModel = WorkDatePickerViewModel()
+    private lazy var workDatePickerViewModel = WorkDatePickerViewModel(initialDate: selectedDate ?? .now)
     private lazy var clockInViewModel = WorkTimePickerViewModel()
     private lazy var clockOutViewModel = WorkTimePickerViewModel()
     private lazy var breakPickerViewModel = WorkBreakPickerViewModel()
@@ -31,9 +33,10 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
     private lazy var repeatSettingViewModel = RepeatSettingViewModel()
 
     // MARK: - Init
-    init(navigationController: UINavigationController, isOwnerInjected: Bool) {
+    init(navigationController: UINavigationController, isOwnerInjected: Bool, selectedDate: Date?) {
         self.navigationController = navigationController
         self.isOwnerInjected = isOwnerInjected
+        self.selectedDate = selectedDate
     }
 
     // MARK: - Start
@@ -45,7 +48,8 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
             clockOutVM: clockOutViewModel,
             breakPickerVM: breakPickerViewModel,
             repeatSettingVM: repeatSettingViewModel,
-            workUseCase: WorkUseCase(workRepository: WorkRepository(workService: WorkService()))
+            workUseCase: WorkUseCase(workRepository: WorkRepository(workService: WorkService())),
+            selectedDate: selectedDate
             )
             
         let vc: UIViewController

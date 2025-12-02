@@ -19,18 +19,18 @@ final class CalendarWorkListCoordinator: Coordinator {
     weak var parentCoordinator: CalendarCoordinator?
     private let navigationController: UINavigationController
     private let workUseCase: WorkUseCaseProtocol
-    private let selectedDay: Int
+    private let selectedDate: Date
     private let calendarWorkList: Observable<[WorkSummary]>
     private let calendarMode: CalendarMode
     
     
     // MARK: - Initializer
-    init(parentCoordinator: CalendarCoordinator?, navigationController: UINavigationController, workUseCase: WorkUseCaseProtocol, selectedDay: Int, calendarWorkList: Observable<[WorkSummary]>, calendarMode: CalendarMode) {
+    init(parentCoordinator: CalendarCoordinator?, navigationController: UINavigationController, workUseCase: WorkUseCaseProtocol, selectedDate: Date, calendarWorkList: Observable<[WorkSummary]>, calendarMode: CalendarMode) {
         self.parentCoordinator = parentCoordinator
         self.navigationController = navigationController
         self.workUseCase = workUseCase
         
-        self.selectedDay = selectedDay
+        self.selectedDate = selectedDate
         self.calendarWorkList = calendarWorkList
         self.calendarMode = calendarMode
     }
@@ -38,7 +38,7 @@ final class CalendarWorkListCoordinator: Coordinator {
     // MARK: - Coordinator Methods
     func start() {
         let calendarWorkListVM = CalendarWorkListViewModel(workUseCase: workUseCase, calendarWorkList: calendarWorkList)
-        let calendarWorkListVC = CalendarWorkListModalViewController(coordinator: self, viewModel: calendarWorkListVM, selectedDay: selectedDay, calendarMode: calendarMode)
+        let calendarWorkListVC = CalendarWorkListModalViewController(coordinator: self, viewModel: calendarWorkListVM, selectedDate: selectedDate, calendarMode: calendarMode)
         
         if let sheet = calendarWorkListVC.sheetPresentationController {
             sheet.detents = [.medium()]
@@ -59,31 +59,31 @@ extension CalendarWorkListCoordinator {
     }
     
     func workerWorkCellTapped(work: WorkSummary) {
-        parentCoordinator?.showWorkerWorkRegister(work: work)
+        parentCoordinator?.showWorkerWorkRegister(workToEdit: work)
     }
     
     func ownerWorkCellTapped(work: WorkSummary) {
-        parentCoordinator?.showOwnerWorkRegister(work: work)
+        parentCoordinator?.showOwnerWorkRegister(workToEdit: work)
     }
     
     func workerEditButtonTapped(work: WorkSummary) {
         parentCoordinator?.dismissCalendarWorkList()
-        parentCoordinator?.showWorkerWorkRegister(work: work)
+        parentCoordinator?.showWorkerWorkRegister(selectedDate: nil, workToEdit: work)
     }
     
     func ownerEditButtonTapped(work: WorkSummary) {
         parentCoordinator?.dismissCalendarWorkList()
-        parentCoordinator?.showOwnerWorkRegister(work: work)
+        parentCoordinator?.showOwnerWorkRegister(workToEdit: work)
     }
     
-    func workerWorkregisterButtonTapped() {
+    func workerWorkregisterButtonTapped(selectedDate: Date) {
         parentCoordinator?.dismissCalendarWorkList()
-        parentCoordinator?.showWorkerWorkRegister(work: nil)
+        parentCoordinator?.showWorkerWorkRegister(selectedDate: selectedDate, workToEdit: nil)
     }
     
     func ownerWorkregisterButtonTapped() {
         parentCoordinator?.dismissCalendarWorkList()
-        parentCoordinator?.showOwnerWorkRegister(work: nil) 
+        parentCoordinator?.showOwnerWorkRegister(workToEdit: nil)
     }
     
     func updateCalendarDataSource() {

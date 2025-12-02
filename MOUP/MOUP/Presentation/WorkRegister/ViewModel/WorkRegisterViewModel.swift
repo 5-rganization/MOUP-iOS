@@ -25,7 +25,9 @@ protocol WorkRegisterViewModelInput {
 }
 
 protocol WorkRegisterViewModelOutput {
-    var isFormValid: Driver<Bool> { get }
+    var isFormValidForWorker: Driver<Bool> { get }
+    var isFormValidForOwner: Driver<Bool> { get }
+    var selectedDate: BehaviorRelay<Date> { get }
     var didCompleteRegister: PublishRelay<Void> { get }
     var errorMessage: PublishRelay<(title: String, message: String)> { get }
 }
@@ -41,7 +43,7 @@ final class WorkRegisterViewModel:
     let clockOutVM: WorkTimePickerViewModel
     let breakPickerVM: WorkBreakPickerViewModel
     let repeatSettingVM: RepeatSettingViewModel
-
+    
     // MARK: - Repeat Info (Optional)
     let repeatInfo = BehaviorRelay<RepeatInfo?>(value: nil)
     
@@ -53,7 +55,7 @@ final class WorkRegisterViewModel:
     let memoText = BehaviorRelay<String>(value: "")
 
     // MARK: - Output (lazy 로 변경 → 초기화 순서 문제 해결)
-    lazy var isFormValid: Driver<Bool> = {
+    lazy var isFormValidForWorker: Driver<Bool> = {
         return Observable
             .combineLatest(
                 selectedWorkplaceVM.confirmSelectedWorkplace.map { _ in true }.startWith(false),
@@ -64,6 +66,18 @@ final class WorkRegisterViewModel:
             .map { $0 && $1 && $2 && $3 }
             .asDriver(onErrorJustReturn: false)
     }()
+    lazy var isFormValidForOwner: Driver<Bool> = {
+        return Observable
+            .combineLatest(
+                selectedWorkplaceVM.confirmSelectedWorkplace.map { _ in true }.startWith(false),
+                datePickerVM.confirmSelectedDate.map { _ in true }.startWith(false),
+                clockInVM.confirmSelectedTime.map { _ in true }.startWith(false),
+                clockOutVM.confirmSelectedTime.map { _ in true }.startWith(false)
+            )
+            .map { $0 && $1 && $2 && $3 }
+            .asDriver(onErrorJustReturn: false)
+    }()
+    let selectedDate = BehaviorRelay<Date>(value: .now)
     
     private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
     
@@ -84,7 +98,8 @@ final class WorkRegisterViewModel:
         clockOutVM: WorkTimePickerViewModel,
         breakPickerVM: WorkBreakPickerViewModel,
         repeatSettingVM: RepeatSettingViewModel,
-        workUseCase: WorkUseCaseProtocol
+        workUseCase: WorkUseCaseProtocol,
+        selectedDate: Date?
     ) {
         self.selectedWorkplaceVM = selectedWorkplaceVM
         self.datePickerVM = datePickerVM
@@ -93,7 +108,8 @@ final class WorkRegisterViewModel:
         self.breakPickerVM = breakPickerVM
         self.repeatSettingVM = repeatSettingVM
         self.workUseCase = workUseCase
-
+        self.selectedDate.accept(selectedDate ?? .now)
+        
         bindRepeatSetting()
         bindRegisterAction()
     }

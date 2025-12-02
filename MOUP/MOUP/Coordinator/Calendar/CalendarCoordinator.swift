@@ -67,11 +67,11 @@ final class CalendarCoordinator: Coordinator {
         childCoordinators.append(filterCoordinator)
     }
     
-    func showCalendarWorkList(selectedDay: Int, calendarWorkList: Observable<[WorkSummary]>, calendarMode: CalendarMode) {
+    func showCalendarWorkList(selectedDate: Date, calendarWorkList: Observable<[WorkSummary]>, calendarMode: CalendarMode) {
         let calendarWorkListCoordinator = CalendarWorkListCoordinator(parentCoordinator: self,
                                                                       navigationController: navigationController,
                                                                       workUseCase: workUseCase,
-                                                                      selectedDay: selectedDay,
+                                                                      selectedDate: selectedDate,
                                                                       calendarWorkList: calendarWorkList,
                                                                       calendarMode: calendarMode)
         calendarWorkListCoordinator.start()
@@ -122,25 +122,25 @@ extension CalendarCoordinator {
 extension CalendarCoordinator {
     // TODO: 근무 엔티티를 직접 전달 or 근무 ID만 전달
     /// 근무 등록 화면 표시
-    func showWorkerWorkRegister(work: WorkSummary?) {
+    func showWorkerWorkRegister(selectedDate: Date? = nil, workToEdit: WorkSummary?) {
         // TODO: - 근무 수정 화면 연결
-        if let work {
+        if let workToEdit {
             logger.debug("WorkRegisterVC 표시 - 근무 수정")
-            dump(work)
+            dump(workToEdit)
         } else {
-            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false)
+            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate)
             childCoordinators.append(coordinator)
             coordinator.start()
         }
     }
     
-    func showOwnerWorkRegister(work: WorkSummary?) {
+    func showOwnerWorkRegister(selectedDate: Date? = nil, workToEdit: WorkSummary?) {
         // TODO: - 근무 수정 화면 연결
-        if let work {
+        if let workToEdit {
             logger.debug("WorkRegisterVC 표시 - 근무 수정")
-            dump(work)
+            dump(workToEdit)
         } else {
-            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: true)
+            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: true, selectedDate: selectedDate)
             childCoordinators.append(coordinator)
             coordinator.start()
         }

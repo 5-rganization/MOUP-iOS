@@ -257,12 +257,11 @@ private extension CalendarViewController {
     }
     
     func didSelectCell(selectedDate: Date) {
-        let selectedDay = Calendar.current.component(.day, from: selectedDate)
         let calendarWorkList: Observable<[WorkSummary]> = calendarWorkDataSourceRelay.map { [weak self] dict in
             guard let self else { return [] }
             return Array(dict[selectedDate] ?? []).sorted(by: self.sortCalendarWorkList)
         }
-        coordinator?.showCalendarWorkList(selectedDay: selectedDay,
+        coordinator?.showCalendarWorkList(selectedDate: selectedDate,
                                           calendarWorkList: calendarWorkList,
                                           calendarMode: calendarModeRelay.value)
         calendarViewTapRecognizer.isEnabled = true
