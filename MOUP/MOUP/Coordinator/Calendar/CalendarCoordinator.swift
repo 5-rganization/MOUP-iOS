@@ -79,23 +79,19 @@ final class CalendarCoordinator: Coordinator {
     }
     
     func dismissCalendarWorkList() {
-        guard let coordinator = childCoordinators.first(where: { $0 is CalendarWorkListCoordinator }) else {
-            fatalError("\(#function) 실행 실패 - childCoordinators에 CalendarWorkListCoordinator가 존재하지 않습니다.")
-        }
-        removeChildCoordinator(coordinator, needToDismiss: true)
+        navigationController.dismiss(animated: true)
     }
     
-    func dismissed(_ coordinator: Coordinator) {
+    func disappeared(_ coordinator: Coordinator) {
         if coordinator is CalendarWorkListCoordinator { calendarVC.deselectCell() }
-        removeChildCoordinator(coordinator, needToDismiss: false)
+        removeChildCoordinator(coordinator)
     }
 }
 
 // MARK: - Private Methods
 private extension CalendarCoordinator {
-    func removeChildCoordinator(_ coordinator: Coordinator, needToDismiss: Bool) {
+    func removeChildCoordinator(_ coordinator: Coordinator) {
         childCoordinators = childCoordinators.filter { $0 !== coordinator }
-        if needToDismiss { navigationController.dismiss(animated: true) }
     }
 }
 
@@ -103,13 +99,13 @@ private extension CalendarCoordinator {
 extension CalendarCoordinator {
     /// 연/월 이동 취소
     func cancelled(_ coordinator: YearMonthPickerCoordinator) {
-        removeChildCoordinator(coordinator, needToDismiss: true)
+        navigationController.dismiss(animated: true)
     }
     
     /// 선택한 연/월로 이동
     func changeYearMonth(_ coordinator: YearMonthPickerCoordinator, focusedYear: Int, focusedMonth: Int) {
         calendarVC.updateYearMonth(focusedYear: focusedYear, focusedMonth: focusedMonth)
-        removeChildCoordinator(coordinator, needToDismiss: true)
+        navigationController.dismiss(animated: true)
     }
 }
 
@@ -118,7 +114,7 @@ extension CalendarCoordinator {
     /// 선택한 필터 적용
     func applyFilter(_ coordinator: FilterCoordinator, filterWorkplace: WorkplaceSummary?) {
         calendarVC.updateFilter(filterWorkplace: filterWorkplace)
-        removeChildCoordinator(coordinator, needToDismiss: true)
+        navigationController.dismiss(animated: true)
     }
 }
 

@@ -54,8 +54,8 @@ final class CalendarWorkListCoordinator: Coordinator {
 
 // MARK: - Parent Coordinator Methods
 extension CalendarWorkListCoordinator {
-    func dismissReceived() {
-        parentCoordinator?.dismissed(self)
+    func disappeared() {
+        parentCoordinator?.disappeared(self)
     }
     
     func workerWorkCellTapped(work: WorkSummary) {

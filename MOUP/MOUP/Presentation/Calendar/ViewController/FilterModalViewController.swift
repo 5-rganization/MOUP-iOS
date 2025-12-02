@@ -66,13 +66,19 @@ final class FilterModalViewController: UIViewController {
         super.viewWillDisappear(animated)
         viewWillDisappearRelay.accept(())
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if isBeingDismissed || isMovingFromParent {
+            coordinator?.disappeared()
+        }
+    }
 }
 
 private extension FilterModalViewController {
     // MARK: - configure
     func configure() {
         setStyles()
-        setDelegates()
         setBindings()
     }
     
@@ -80,12 +86,7 @@ private extension FilterModalViewController {
     func setStyles() {
         self.view.backgroundColor = .primaryBackground
     }
-    
-    // MARK: - setDelegates
-    func setDelegates() {
-        self.presentationController?.delegate = self
-    }
-    
+        
     // MARK: - setBindings
     func setBindings() {
         // View 바인딩
@@ -157,12 +158,5 @@ private extension FilterModalViewController {
             selectedFilterWorkplace = filterWorkplace
         }
         filterView.selectRow(at: IndexPath(row: 0, section: 0))
-    }
-}
-
-// MARK: - UIAdaptivePresentationControllerDelegate
-extension FilterModalViewController: UIAdaptivePresentationControllerDelegate {
-    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        coordinator?.dismissReceived()
     }
 }

@@ -43,8 +43,8 @@ final class YearMonthPickerCoordinator: Coordinator {
 
 // MARK: - Parent Coordinator Methods
 extension YearMonthPickerCoordinator {
-    func dismissReceived() {
-        parentCoordinator?.dismissed(self)
+    func disappeared() {
+        parentCoordinator?.disappeared(self)
     }
     
     func cancelButtonTapped() {

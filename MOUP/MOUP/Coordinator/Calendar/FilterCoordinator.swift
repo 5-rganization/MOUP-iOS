@@ -47,8 +47,8 @@ final class FilterCoordinator: Coordinator {
 
 // MARK: - Parent Coordinator Methods
 extension FilterCoordinator {
-    func dismissReceived() {
-        parentCoordinator?.dismissed(self)
+    func disappeared() {
+        parentCoordinator?.disappeared(self)
     }
     
     func applyButtonTapped(filterWorkplace: WorkplaceSummary?) {

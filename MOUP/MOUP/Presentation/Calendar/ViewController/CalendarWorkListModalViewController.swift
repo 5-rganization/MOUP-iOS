@@ -70,22 +70,24 @@ final class CalendarWorkListModalViewController: UIViewController {
         configure()
         calendarWorkListView.update(day: selectedDay)
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if isBeingDismissed || isMovingFromParent {
+            coordinator?.disappeared()
+        }
+    }
 }
 
 // MARK: - UI Methods
 private extension CalendarWorkListModalViewController {
     func configure() {
         setStyles()
-        setDelegates()
         setBindings()
     }
     
     func setStyles() {
         self.view.backgroundColor = .primaryBackground
-    }
-    
-    func setDelegates() {
-        self.presentationController?.delegate = self
     }
     
     func setBindings() {
@@ -154,12 +156,5 @@ extension CalendarWorkListModalViewController: CalendarWorkListViewDelegate {
     
     func deleteRecurringWork(workId: Int) {
         deleteRecurringWorkIdRelay.accept(workId)
-    }
-}
-
-// MARK: - UIAdaptivePresentationControllerDelegate
-extension CalendarWorkListModalViewController: UIAdaptivePresentationControllerDelegate {
-    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        coordinator?.dismissReceived()
     }
 }
