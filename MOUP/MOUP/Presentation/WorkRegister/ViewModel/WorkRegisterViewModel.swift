@@ -165,6 +165,7 @@ private extension WorkRegisterViewModel {
                 }
                 dump(requestDTO)
                 
+                self.createTask?.cancel()
                 createTask = Task {
                     do {
                         let createdWorkIdList = try await self.workUseCase.createMyWork(workplaceId: workplace.id, requestDTO: requestDTO)
