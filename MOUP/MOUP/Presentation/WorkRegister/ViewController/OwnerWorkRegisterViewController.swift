@@ -47,6 +47,11 @@ final class OwnerWorkRegisterViewController: UIViewController {
         super.viewDidLoad()
         configure()
     }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        viewModel.viewWillDisappear.accept(())
+    }
 }
 
 // MARK: - Private
@@ -307,6 +312,11 @@ private extension OwnerWorkRegisterViewController {
                 self?.navigationController?.popViewController(animated: true)
             })
             .disposed(by: disposeBag)
+        
+        viewModel.errorMessage.asDriver(onErrorJustReturn: (title: "오류 발생", message: "잠시 후 다시 시도해주세요."))
+            .drive(with: self) { owner, errorMessage in
+                owner.presentNoticeModal(title: errorMessage.title, comment: errorMessage.message)
+            }.disposed(by: disposeBag)
         
         // MARK: - 역할(사장/알바) 선택 시 UI 변경
         workRegisterView.getRoleSegmentedControl.rx.selectedSegmentIndex

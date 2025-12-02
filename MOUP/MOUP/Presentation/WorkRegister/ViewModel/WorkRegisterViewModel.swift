@@ -22,6 +22,7 @@ struct RepeatInfo {
 protocol WorkRegisterViewModelInput {
     var didTapRegister: PublishRelay<Void> { get }
     var memoText: BehaviorRelay<String> { get }
+    var viewWillDisappear: PublishRelay<Void> { get }
 }
 
 protocol WorkRegisterViewModelOutput {
@@ -51,6 +52,7 @@ final class WorkRegisterViewModel:
     let selectedRoutines = BehaviorRelay<[RoutineSummary]>(value: [])
 
     // MARK: - Input
+    let viewWillDisappear = PublishRelay<Void>()
     let didTapRegister = PublishRelay<Void>()
     let memoText = BehaviorRelay<String>(value: "")
 
@@ -69,6 +71,7 @@ final class WorkRegisterViewModel:
     lazy var isFormValidForOwner: Driver<Bool> = {
         return Observable
             .combineLatest(
+                // TODO: 근무자 선택 조건 추가
                 selectedWorkplaceVM.confirmSelectedWorkplace.map { _ in true }.startWith(false),
                 datePickerVM.confirmSelectedDate.map { _ in true }.startWith(false),
                 clockInVM.confirmSelectedTime.map { _ in true }.startWith(false),
@@ -112,6 +115,7 @@ final class WorkRegisterViewModel:
         
         bindRepeatSetting()
         bindRegisterAction()
+        bindViewWillDisappear()
     }
 }
 
@@ -156,6 +160,8 @@ private extension WorkRegisterViewModel {
 
                 let routineIDs = routines.map { $0.routineId }
                 
+                // TODO: 알바생/사장님 역할, 생성/수정 기능에 따라 API 호출 변경 필요
+                // 아래는 알바생/사장님 자신의 근무 등록 기준 API 호출
                 let requestDTO: MyWorkCreateRequestDTO
                 if let repeatEndDate = repeatInfo?.endDate {
                     let repeatEndDateForDTO = DateFormatter.dataSourceDateFormatter.string(from: repeatEndDate)
@@ -185,9 +191,16 @@ private extension WorkRegisterViewModel {
                     }
                 }
                 
-                
                 self.didCompleteRegister.accept(())
             })
             .disposed(by: disposeBag)
+    }
+    
+    func bindViewWillDisappear() {
+        viewWillDisappear
+            .subscribe(with: self) { owner, _ in
+                owner.createTask?.cancel()
+                owner.createTask = nil
+            }.disposed(by: disposeBag)
     }
 }
