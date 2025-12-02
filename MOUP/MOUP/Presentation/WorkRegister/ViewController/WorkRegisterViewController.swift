@@ -290,6 +290,12 @@ private extension WorkRegisterViewController {
         workRegisterView.getRegisterButton.rx.tap
             .bind(to: viewModel.didTapRegister)
             .disposed(by: disposeBag)
+        
+        viewModel.isFormValid
+            .drive(onNext: { [weak self] isValid in
+                self?.workRegisterView.getRegisterButton.isEnabled = isValid
+            })
+            .disposed(by: disposeBag)
 
         viewModel.didCompleteRegister
             .observe(on: MainScheduler.instance)

@@ -136,33 +136,9 @@ private extension WorkRegisterViewModel {
             )
             .subscribe(onNext: { [weak self]
                 (workplace, date, clockIn, clockOut, breakMin, memo, repeatInfo, routines) in
-
                 guard let self else { return }
 
-                let dateStr = DateFormatter.dataSourceDateFormatter.string(from: date)
-                let clockInStr = DateFormatter.ko12hTimeFormatter.string(from: clockIn)
-                let clockOutStr = DateFormatter.ko12hTimeFormatter.string(from: clockOut)
-                
                 let routineIDs = routines.map { $0.routineId }
-
-                print("--------------------------------------------------")
-                print("근무 등록 요청")
-                print("근무지: \(workplace.id) - \(workplace.name)")
-                print("근무 날짜: \(dateStr)")
-                print("출근 시간: \(clockInStr)")
-                print("퇴근 시간: \(clockOutStr)")
-                print("휴게 시간: \(breakMin)분")
-                print("메모: \(memo)")
-
-                if let r = repeatInfo {
-                    print("반복 종료 날짜: \(r.endDate)")
-                    print("반복 요일(EN): \(r.daysEN)")
-                } else {
-                    print("반복 없음")
-                }
-                print("선택된 루틴 IDs: \(routineIDs)")
-                print("--------------------------------------------------")
-                
                 
                 let requestDTO: MyWorkCreateRequestDTO
                 if let repeatEndDate = repeatInfo?.endDate {
@@ -171,6 +147,7 @@ private extension WorkRegisterViewModel {
                 } else {
                     requestDTO = MyWorkCreateRequestDTO(routineIdList: routineIDs, startTime: clockIn, actualStartTime: nil, endTime: clockOut, actualEndTime: nil, restTimeMinutes: breakMin, memo: memo, repeatDays: repeatInfo?.daysEN ?? [], repeatEndDate: nil)
                 }
+                dump(requestDTO)
                 
                 createTask = Task {
                     do {
