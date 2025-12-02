@@ -5,7 +5,8 @@
 //  Created by 양원식 on 11/11/25.
 //
 
-import Foundation
+import OSLog
+
 import RxSwift
 import RxRelay
 import RxCocoa
@@ -26,6 +27,7 @@ protocol WorkRegisterViewModelInput {
 protocol WorkRegisterViewModelOutput {
     var isFormValid: Driver<Bool> { get }
     var didCompleteRegister: PublishRelay<Void> { get }
+    var errorMessage: PublishRelay<(title: String, message: String)> { get }
 }
 
 final class WorkRegisterViewModel:
@@ -62,8 +64,13 @@ final class WorkRegisterViewModel:
             .map { $0 && $1 && $2 && $3 }
             .asDriver(onErrorJustReturn: false)
     }()
+    
+    private lazy var logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: self))
+    
+    private var createTask: Task<Void, Never>?
 
     let didCompleteRegister = PublishRelay<Void>()
+    let errorMessage = PublishRelay<(title: String, message: String)>()
 
     // MARK: - Dependencies
     private let workUseCase: WorkUseCaseProtocol
@@ -155,7 +162,35 @@ private extension WorkRegisterViewModel {
                 }
                 print("선택된 루틴 IDs: \(routineIDs)")
                 print("--------------------------------------------------")
-
+                
+                
+                let requestDTO: MyWorkCreateRequestDTO
+                if let repeatEndDate = repeatInfo?.endDate {
+                    let repeatEndDateForDTO = DateFormatter.dataSourceDateFormatter.string(from: repeatEndDate)
+                    requestDTO = MyWorkCreateRequestDTO(routineIdList: routineIDs, startTime: clockIn, actualStartTime: nil, endTime: clockOut, actualEndTime: nil, restTimeMinutes: breakMin, memo: memo, repeatDays: repeatInfo?.daysEN ?? [], repeatEndDate: repeatEndDateForDTO)
+                } else {
+                    requestDTO = MyWorkCreateRequestDTO(routineIdList: routineIDs, startTime: clockIn, actualStartTime: nil, endTime: clockOut, actualEndTime: nil, restTimeMinutes: breakMin, memo: memo, repeatDays: repeatInfo?.daysEN ?? [], repeatEndDate: nil)
+                }
+                
+                createTask = Task {
+                    do {
+                        let createdWorkIdList = try await self.workUseCase.createMyWork(workplaceId: workplace.id, requestDTO: requestDTO)
+                        try Task.checkCancellation()
+                        
+                        self.logger.debug("생성된 근무 ID 배열: \(createdWorkIdList)")
+                    } catch is CancellationError {
+                        self.logger.info("근무 생성 Task가 취소되었습니다.")
+                    } catch let error as LocalizedError {
+                        await MainActor.run {
+                            self.errorMessage.accept((title: "근무 등록 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        }
+                    } catch {
+                        await MainActor.run {
+                            self.errorMessage.accept((title: "근무 등록 실패", message: "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        }
+                    }
+                }
+                
                 
                 self.didCompleteRegister.accept(())
             })
