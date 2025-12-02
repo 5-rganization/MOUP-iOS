@@ -18,7 +18,7 @@ final class WorkBreakPickerViewController: UIViewController {
     private let disposeBag = DisposeBag()
     
     // Picker data (30분 단위, 최대 5시간 예시)
-    private var breakMinutes: [Int] = Array(stride(from: 30, through: 300, by: 30))
+    private var breakMinutes: [Int] = Array(stride(from: 0, through: 300, by: 30))
     
     // local state
     private var curIndex = 0
@@ -107,8 +107,10 @@ extension WorkBreakPickerViewController: UIPickerViewDataSource, UIPickerViewDel
             return "\(hours)시간 \(mins)분"
         } else if hours > 0 {
             return "\(hours)시간"
-        } else {
+        } else if mins > 0 {
             return "\(mins)분"
+        } else {
+            return "없음"
         }
     }
 

@@ -243,8 +243,10 @@ private extension WorkRegisterViewController {
                             return "\(hours)시간 \(mins)분"
                         } else if hours > 0 {
                             return "\(hours)시간"
-                        } else {
+                        } else if mins > 0 {
                             return "\(mins)분"
+                        } else {
+                            return "없음"
                         }
                     }
                     .observe(on: MainScheduler.instance)
