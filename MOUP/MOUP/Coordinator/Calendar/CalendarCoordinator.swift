@@ -123,24 +123,24 @@ extension CalendarCoordinator {
     // TODO: 근무 엔티티를 직접 전달 or 근무 ID만 전달
     /// 근무 등록 화면 표시
     func showWorkerWorkRegister(selectedDate: Date? = nil, workToEdit: WorkSummary?) {
-        // TODO: - 근무 수정 화면 연결
         if let workToEdit {
-            logger.debug("WorkRegisterVC 표시 - 근무 수정")
-            dump(workToEdit)
+            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate, mode: .edit(workId: workToEdit.id))
+            childCoordinators.append(coordinator)
+            coordinator.start()
         } else {
-            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate, mode: .edit(workId: 1))
+            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate, mode: .create)
             childCoordinators.append(coordinator)
             coordinator.start()
         }
     }
     
     func showOwnerWorkRegister(selectedDate: Date? = nil, workToEdit: WorkSummary?) {
-        // TODO: - 근무 수정 화면 연결
         if let workToEdit {
-            logger.debug("WorkRegisterVC 표시 - 근무 수정")
-            dump(workToEdit)
+            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate, mode: .edit(workId: workToEdit.id))
+            childCoordinators.append(coordinator)
+            coordinator.start()
         } else {
-            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: true, selectedDate: selectedDate, mode: .edit(workId: 1))
+            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: true, selectedDate: selectedDate, mode: .create)
             childCoordinators.append(coordinator)
             coordinator.start()
         }
