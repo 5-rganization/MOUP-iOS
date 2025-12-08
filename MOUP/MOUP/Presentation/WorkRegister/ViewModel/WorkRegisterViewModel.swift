@@ -199,7 +199,6 @@ private extension WorkRegisterViewModel {
     func bindViewWillDisappear() {
         viewWillDisappear
             .subscribe(with: self) { owner, _ in
-                owner.createTask?.cancel()
                 owner.createTask = nil
             }.disposed(by: disposeBag)
     }
