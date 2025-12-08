@@ -60,4 +60,13 @@ final class WorkplaceRepository: WorkplaceRepositoryProtocol {
     func deleteWorkplace(workplaceId: Int) async throws {
         try await workplaceService.deleteWorkplace(workplaceId: workplaceId)
     }
+    
+    func fetchWorkplaceDetail(workplaceId: Int) async throws -> WorkplaceDetailResponseDTO {
+        try await workplaceService.fetchWorkplaceDetail(workplaceId: workplaceId)
+    }
+    
+    func updateWorkplace(workplaceId: Int, request: UpdateWorkplaceRequestDTO) async throws {
+        try await workplaceService.updateWorkplace(workplaceId: workplaceId, request: request)
+    }
+
 }

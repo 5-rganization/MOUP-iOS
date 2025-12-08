@@ -309,8 +309,8 @@ private extension WorkRegisterViewController {
 
         viewModel.didCompleteRegister
             .observe(on: MainScheduler.instance)
-            .bind(onNext: { [weak self] in
-                print("근무 등록 완료")
+            .bind(onNext: { [weak self] workIdList in
+                print("근무 등록 완료: \(workIdList)")
                 self?.navigationController?.popViewController(animated: true)
             })
             .disposed(by: disposeBag)

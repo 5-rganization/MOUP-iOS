@@ -15,19 +15,6 @@ enum OwnerWorkplaceMode {
     case edit(workplaceId: Int)      // 수정 모드
 }
 
-/*
- 
- 수정모드 예시
- 
- let vm = OwnerWorkplaceRegisterViewModel(
-     mode: .edit(workplaceId: workplace.id),
-     workplaceVM: WorkplaceContainerViewModel(),
-     colorLabelVM: ColorLabelContainerViewModel(),
-     workplaceUseCase: workplaceUseCase
- )
- 
- */
-
 // MARK: - Input / Output
 protocol OwnerWorkplaceRegisterViewModelInput {
     var didTapCompleteButton: PublishRelay<Void> { get }
@@ -74,12 +61,30 @@ final class OwnerWorkplaceRegisterViewModel:
 
         // MARK: - TODO: 수정모드에서 초기값 설정
         if case let .edit(workplaceId) = mode {
-            print("[TODO] 수정모드 - workplaceId: \(workplaceId) 데이터 fetch 후 UI 세팅 필요")
-            // 추후:
-            // workplaceVM.nameTextInput.accept(fetched.name)
-            // workplaceVM.categoryTextInput.accept(fetched.category)
-            // colorLabelVM.selectedColorLabel.accept(fetched.color)
+            Task {
+                do {
+                    let detail = try await workplaceUseCase.fetchWorkplaceDetail(workplaceId: workplaceId)
+
+                    // 이름 초기값
+                    workplaceVM.inputNameViewModel.confirmedNameRelay.accept(detail.workplaceName)
+
+                    // 카테고리 초기값
+                    workplaceVM.selectCategoryViewModel.confirmedCategorySubject.accept(detail.categoryName)
+
+                    // 색상 초기값
+                    if let color = detail.ownerBasedLabelColor {
+                        if let mapped = LabelColor(serverStr: color)?.displayStr {
+                            colorLabelVM.selectColorLabelViewModel.confirmedColorRelay.accept(mapped)
+                        }
+                    }
+
+                } catch {
+                    print("상세 조회 실패: \(error)")
+                }
+            }
         }
+
+
 
         // MARK: - Validation Combine
         let combinedInputs = Observable

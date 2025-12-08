@@ -67,8 +67,10 @@ private extension OwnerWorkplaceRegisterViewController {
         // 버튼 텍스트 모드에 따라 변경
         switch viewModel.mode {
         case .create:
+            ownerView.getNavigationBar.configureTitle(title: "새 근무지 등록")
             ownerView.getRegisterButton.setTitle("등록하기", for: .normal)
         case .edit:
+            ownerView.getNavigationBar.configureTitle(title: "근무지 수정")
             ownerView.getRegisterButton.setTitle("수정하기", for: .normal)
         }
     }

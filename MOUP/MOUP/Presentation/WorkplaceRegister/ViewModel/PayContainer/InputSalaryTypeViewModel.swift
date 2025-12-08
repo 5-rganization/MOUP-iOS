@@ -54,7 +54,12 @@ final class InputSalaryTypeViewModel: InputSalaryTypeViewModelInput, InputSalary
     func currentFormattedSalaryText() -> String {
         return salaryTextRelay.value
     }
-
+    
+    func setInitialSalary(_ value: Int) {
+        let text = "\(value)"
+        salaryTextRelay.accept(text)
+        confirmedSalaryRelay.accept(text)
+    }
 
     // MARK: - Output
     let salaryTypeTitleOutput: Driver<String>

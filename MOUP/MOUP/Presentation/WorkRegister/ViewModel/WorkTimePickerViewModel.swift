@@ -52,6 +52,22 @@ final class WorkTimePickerViewModel: WorkTimePickerViewModelInput, WorkTimePicke
     var selectedAMPM: AnyObserver<Int> { selectedAMPMSubject.asObserver() }
     var selectedHour: AnyObserver<Int> { selectedHourSubject.asObserver() }
     var selectedMinute: AnyObserver<Int> { selectedMinuteSubject.asObserver() }
+    
+    var currentTime: Observable<Date> {
+        Observable
+            .combineLatest(ampmRelay, hourRelay, minuteRelay)
+            .map { ampm, hour12, minute in
+                var hour24 = hour12 % 12 + (ampm == 1 ? 12 : 0)
+                if hour24 == 24 { hour24 = 12 }
+
+                var comp = Calendar.current.dateComponents([.year,.month,.day], from: self.anchorDate)
+                comp.hour = hour24
+                comp.minute = minute
+                comp.second = 0
+                return Calendar.current.date(from: comp) ?? self.anchorDate
+            }
+    }
+
 
     func resetToConfirmedTime() {
         ampmRelay.accept(confirmedAMPMRelay.value)

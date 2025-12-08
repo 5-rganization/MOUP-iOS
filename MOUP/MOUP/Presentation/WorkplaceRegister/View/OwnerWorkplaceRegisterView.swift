@@ -35,6 +35,7 @@ final class OwnerWorkplaceRegisterView: UIView {
     }
     
     // MARK: - Getter
+    var getNavigationBar: BaseNavigationBar { navigationBar }
     var getOwnerWorkplaceContainerView: OwnerWorkplaceContainerView { ownerWorkplaceContainerView }
     var getColorLabelContainerView: ColorLabelContainerView { colorLabelContainerView }
     var getRegisterButton: BaseButton { registerButton }

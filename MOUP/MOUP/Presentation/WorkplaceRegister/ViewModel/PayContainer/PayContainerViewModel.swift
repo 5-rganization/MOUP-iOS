@@ -23,6 +23,11 @@ protocol PayContainerViewModelOutput {
 }
 
 final class PayContainerViewModel: PayContainerViewModelInput, PayContainerViewModelOutput {
+    
+    let selectPayTypeViewModel: SelectPayTypeViewModel
+    let selectPayCalculationViewModel: SelectPayCalculationViewModel
+    let inputSalaryTypeViewModel: InputSalaryTypeViewModel
+    let payDayPickerViewModel: PayDayPickerViewModel
 
     // Input
     private let didTapPayTypeSubject = PublishSubject<Void>()
@@ -74,8 +79,15 @@ final class PayContainerViewModel: PayContainerViewModelInput, PayContainerViewM
                 value.replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression)
             }
             .asDriver(onErrorJustReturn: "")
-        self.payDayOutput = payDayPickerViewModel.confirmSelectedDay
+        self.payDayOutput = payDayPickerViewModel.currentDay
             .map { "\($0)일" }
             .asDriver(onErrorJustReturn: "")
+        
+        self.selectPayTypeViewModel = selectPayTypeViewModel
+        self.selectPayCalculationViewModel = selectPayCalculationViewModel
+        self.inputSalaryTypeViewModel = inputSalaryTypeViewModel
+        self.payDayPickerViewModel = payDayPickerViewModel
     }
+    
+    
 }

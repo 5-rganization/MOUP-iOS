@@ -60,6 +60,11 @@ final class PayDayPickerViewModel: PayDayPickerViewModelInput, PayDayPickerViewM
     // MARK: - Private
     private var confirmedDay: Int
 
+    func setInitialDay(_ day: Int) {
+        selectedDayRelay.accept(day)
+        confirmedDay = day
+    }
+    
     // MARK: - Init
     init(initialDay: Int? = nil) {
         let startDay = initialDay ?? Calendar.current.component(.day, from: Date())

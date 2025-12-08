@@ -23,7 +23,7 @@ final class InputNameViewModel: InputNameViewModelInput, InputNameViewModelOutpu
 
     // MARK: - Input Relays
     private let nameTextRelay = BehaviorRelay<String>(value: "")
-    private let confirmedNameRelay = BehaviorRelay<String>(value: "입력")
+    let confirmedNameRelay = BehaviorRelay<String>(value: "입력")
     
     // MARK: - Input
     var nameText: AnyObserver<String> {

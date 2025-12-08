@@ -16,4 +16,6 @@ protocol WorkplaceUseCaseProtocol: AnyObject {
     func createOwnerWorkplace(request: OwnerWorkplaceCreateRequestDTO) async throws -> WorkplaceCreate
     func joinWorkplace(request: WorkplaceJoinRequestDTO) async throws -> WorkplaceJoinResponseDTO
     func deleteWorkplace(workplaceId: Int) async throws
+    func fetchWorkplaceDetail(workplaceId: Int) async throws -> WorkplaceDetailResponseDTO
+    func updateWorkplace(workplaceId: Int, request: UpdateWorkplaceRequestDTO) async throws
 }
