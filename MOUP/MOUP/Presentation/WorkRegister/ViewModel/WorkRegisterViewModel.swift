@@ -18,6 +18,11 @@ struct RepeatInfo {
     let daysIndex: [Int]      // ex: [1, 5]   ← UI 표시용
 }
 
+enum WorkRegisterMode {
+    case create
+    case edit(workId: Int)
+}
+
 // MARK: - Input / Output
 protocol WorkRegisterViewModelInput {
     var didTapRegister: PublishRelay<Void> { get }
@@ -38,6 +43,8 @@ final class WorkRegisterViewModel:
     WorkRegisterViewModelOutput {
 
     // MARK: - Sub ViewModels
+    let mode: WorkRegisterMode
+    
     let selectedWorkplaceVM: SelectedWorkplaceViewModel
     let datePickerVM: WorkDatePickerViewModel
     let clockInVM: WorkTimePickerViewModel
@@ -95,6 +102,7 @@ final class WorkRegisterViewModel:
 
     // MARK: - Init
     init(
+        mode: WorkRegisterMode,
         selectedWorkplaceVM: SelectedWorkplaceViewModel,
         datePickerVM: WorkDatePickerViewModel,
         clockInVM: WorkTimePickerViewModel,
@@ -104,6 +112,8 @@ final class WorkRegisterViewModel:
         workUseCase: WorkUseCaseProtocol,
         selectedDate: Date?
     ) {
+        self.mode = mode
+        
         self.selectedWorkplaceVM = selectedWorkplaceVM
         self.datePickerVM = datePickerVM
         self.clockInVM = clockInVM

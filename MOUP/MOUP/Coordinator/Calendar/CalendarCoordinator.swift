@@ -128,7 +128,7 @@ extension CalendarCoordinator {
             logger.debug("WorkRegisterVC 표시 - 근무 수정")
             dump(workToEdit)
         } else {
-            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate)
+            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate, mode: .edit(workId: 1))
             childCoordinators.append(coordinator)
             coordinator.start()
         }
@@ -140,7 +140,7 @@ extension CalendarCoordinator {
             logger.debug("WorkRegisterVC 표시 - 근무 수정")
             dump(workToEdit)
         } else {
-            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: true, selectedDate: selectedDate)
+            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: true, selectedDate: selectedDate, mode: .edit(workId: 1))
             childCoordinators.append(coordinator)
             coordinator.start()
         }

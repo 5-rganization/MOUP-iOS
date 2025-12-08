@@ -10,6 +10,8 @@ import UIKit
 final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
     // MARK: - Properties
     var childCoordinators = [Coordinator]()
+    
+    private let registerMode: WorkRegisterMode
     private let navigationController: UINavigationController
     private var workRegisterViewModel: WorkRegisterViewModel?
     
@@ -33,15 +35,17 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
     private lazy var repeatSettingViewModel = RepeatSettingViewModel()
 
     // MARK: - Init
-    init(navigationController: UINavigationController, isOwnerInjected: Bool, selectedDate: Date?) {
+    init(navigationController: UINavigationController, isOwnerInjected: Bool, selectedDate: Date?, mode: WorkRegisterMode) {
         self.navigationController = navigationController
         self.isOwnerInjected = isOwnerInjected
         self.selectedDate = selectedDate
+        self.registerMode = mode
     }
 
     // MARK: - Start
     func start() {
         let viewModel = WorkRegisterViewModel(
+            mode: registerMode,
             selectedWorkplaceVM: selectedWorkplaceViewModel,
             datePickerVM: workDatePickerViewModel,
             clockInVM: clockInViewModel,

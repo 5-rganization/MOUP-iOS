@@ -63,8 +63,21 @@ private extension WorkRegisterViewController {
         setConstraints()
         setActions()
         setBinding()
+        applyModeUI()
     }
 
+    func applyModeUI() {
+        switch viewModel.mode {
+        case .create:
+            workRegisterView.getNavigationBar.configureTitle(title: "새 근무 등록")
+            workRegisterView.getRegisterButton.setTitle("등록하기", for: .normal)
+
+        case .edit:
+            workRegisterView.getNavigationBar.configureTitle(title: "근무 수정")
+            workRegisterView.getRegisterButton.setTitle("수정하기", for: .normal)
+        }
+    }
+    
     func setHierarchy() { }
 
     func setStyles() { }

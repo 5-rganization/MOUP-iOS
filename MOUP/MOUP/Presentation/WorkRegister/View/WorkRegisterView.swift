@@ -48,6 +48,7 @@ final class WorkRegisterView: UIView {
         $0.isEnabled = false
     }
     
+    var getNavigationBar: BaseNavigationBar { navigationBar }
     var getRegisterButton: BaseButton { registerButton }
     var getMemoContainerView: MemoContainerView { memoContainerView }
     var getSelectWorkplace: InfoRowView { selectWorkplace }
