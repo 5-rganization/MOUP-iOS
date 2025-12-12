@@ -43,6 +43,8 @@ final class WorkRegisterViewModel:
     WorkRegisterViewModelOutput {
 
     // MARK: - Sub ViewModels
+    let userRole: UserRole
+    
     let mode: WorkRegisterMode
     
     let selectedWorkplaceVM: SelectedWorkplaceViewModel
@@ -111,7 +113,8 @@ final class WorkRegisterViewModel:
         breakPickerVM: WorkBreakPickerViewModel,
         repeatSettingVM: RepeatSettingViewModel,
         workUseCase: WorkUseCaseProtocol,
-        selectedDate: Date?
+        selectedDate: Date?,
+        userRole: UserRole
     ) {
         self.mode = mode
         
@@ -122,6 +125,7 @@ final class WorkRegisterViewModel:
         self.breakPickerVM = breakPickerVM
         self.repeatSettingVM = repeatSettingVM
         self.workUseCase = workUseCase
+        self.userRole = userRole 
         self.selectedDate.accept(selectedDate ?? .now)
         
         bindRepeatSetting()

@@ -334,8 +334,12 @@ private extension OwnerWorkRegisterViewController {
         
         // MARK: - 인원 선택
         workRegisterView.rx.workerTap
-            .bind(onNext: { [weak self] in
-                self?.coordinator?.showWorkerSelection()
+            .withLatestFrom(viewModel.selectedWorkplaceVM.confirmSelectedWorkplace)
+            .bind(onNext: { [weak self] workplace in
+                guard let self else { return }
+                
+                let workplaceId = workplace.id
+                self.coordinator?.showWorkerSelection(workplaceId: workplaceId)
             })
             .disposed(by: disposeBag)
     }

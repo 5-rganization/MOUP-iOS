@@ -8,6 +8,7 @@
 import UIKit
 
 final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
+    
     // MARK: - Properties
     var childCoordinators = [Coordinator]()
     
@@ -27,6 +28,13 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
             )
         )
     )
+    
+    private lazy var attendanceUseCase = AttendanceUseCase(
+        attendanceRepository: AttendanceRepository(
+            attendanceService: AttendanceService()
+        )
+    )
+    
     private lazy var workDatePickerViewModel = WorkDatePickerViewModel(initialDate: selectedDate ?? .now)
     private lazy var clockInViewModel = WorkTimePickerViewModel()
     private lazy var clockOutViewModel = WorkTimePickerViewModel()
@@ -44,6 +52,9 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
 
     // MARK: - Start
     func start() {
+        
+        let userRole: UserRole = isOwnerInjected ? .owner : .worker
+        
         let viewModel = WorkRegisterViewModel(
             mode: registerMode,
             selectedWorkplaceVM: selectedWorkplaceViewModel,
@@ -53,7 +64,8 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
             breakPickerVM: breakPickerViewModel,
             repeatSettingVM: repeatSettingViewModel,
             workUseCase: WorkUseCase(workRepository: WorkRepository(workService: WorkService())),
-            selectedDate: selectedDate
+            selectedDate: selectedDate,
+            userRole: userRole
             )
             
         let vc: UIViewController
@@ -84,16 +96,35 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
         navigationController.pushViewController(vc, animated: true)
     }
     
-    func showWorkerSelection() {
-        
-        // TODO: UI 테스트 용 추후 API 연동 
-        let vc = SelectedWorkerViewController(workers: [
-            (id: 1, name: "테스트 유저1"),
-            (id: 2, name: "테스트 유저2"),
-            (id: 3, name: "테스트 유저3"),
-        ])
-        navigationController.pushViewController(vc, animated: true)
+    func showWorkerSelection(workplaceId: Int) {
+        Task {
+            do {
+                let workers = try await attendanceUseCase.fetchWorkplaceWorkers(
+                    workplaceId: workplaceId,
+                    isActiveOnly: true
+                )
+
+                // SelectedWorkerViewController 는 (id, name) 형태로 받으니까 맵핑 필요
+                let mapped = workers.map { worker in
+                    (id: worker.id, name: worker.nickname)
+                }
+
+                let vc = SelectedWorkerViewController(workers: mapped)
+
+                vc.onWorkersSelected = { selectedIds in
+                    print("선택된 알바 ID:", selectedIds)
+                    // → ViewModel 등에 전달하면 됨
+                }
+
+                navigationController.pushViewController(vc, animated: true)
+
+            } catch {
+                print("근무자 불러오기 실패:", error)
+            }
+        }
     }
+
+
 
     
     func showRoutineSelection() {

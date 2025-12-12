@@ -21,7 +21,6 @@ protocol WorkplaceServiceProtocol: AnyObject {
     func deleteWorkplace(workplaceId: Int) async throws
     func fetchWorkplaceDetail(workplaceId: Int) async throws -> WorkplaceDetailResponseDTO
     func updateWorkplace(workplaceId: Int, request: UpdateWorkplaceRequestDTO) async throws -> Void
-
 }
 
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: String(describing: "WorkplaceService"))
@@ -289,5 +288,4 @@ final class WorkplaceService: WorkplaceServiceProtocol {
             throw NetworkError.serverError
         }
     }
-
 }
