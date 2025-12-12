@@ -59,3 +59,10 @@ final class WorkBreakPickerViewModel: WorkBreakPickerViewModelInput, WorkBreakPi
         selectedIndexSubject.bind(to: indexRelay).disposed(by: disposeBag)
     }
 }
+extension WorkBreakPickerViewModel {
+    func setInitialBreak(_ minutes: Int) {
+        let index = minutes / 30
+        indexRelay.accept(index)
+        confirmedIndexRelay.accept(index)
+    }
+}

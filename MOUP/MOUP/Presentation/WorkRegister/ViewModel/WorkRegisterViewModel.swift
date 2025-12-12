@@ -62,7 +62,8 @@ final class WorkRegisterViewModel:
     let viewWillDisappear = PublishRelay<Void>()
     let didTapRegister = PublishRelay<Void>()
     let memoText = BehaviorRelay<String>(value: "")
-
+    let editPrefilledData = PublishRelay<WorkerWorkData>()
+    
     // MARK: - Output (lazy 로 변경 → 초기화 순서 문제 해결)
     lazy var isFormValidForWorker: Driver<Bool> = {
         return Observable
@@ -169,47 +170,156 @@ private extension WorkRegisterViewModel {
                 guard let self else { return }
 
                 let routineIDs = routines.map { $0.routineId }
-                
-                // TODO: 알바생/사장님 역할, 생성/수정 기능에 따라 API 호출 변경 필요
-                // 아래는 알바생/사장님 자신의 근무 등록 기준 API 호출
-                let requestDTO: MyWorkCreateRequestDTO
-                if let repeatEndDate = repeatInfo?.endDate {
-                    let repeatEndDateForDTO = DateFormatter.dataSourceDateFormatter.string(from: repeatEndDate)
-                    requestDTO = MyWorkCreateRequestDTO(routineIdList: routineIDs, startTime: clockIn, actualStartTime: nil, endTime: clockOut, actualEndTime: nil, restTimeMinutes: breakMin, memo: memo, repeatDays: repeatInfo?.daysEN ?? [], repeatEndDate: repeatEndDateForDTO)
-                } else {
-                    requestDTO = MyWorkCreateRequestDTO(routineIdList: routineIDs, startTime: clockIn, actualStartTime: nil, endTime: clockOut, actualEndTime: nil, restTimeMinutes: breakMin, memo: memo, repeatDays: repeatInfo?.daysEN ?? [], repeatEndDate: nil)
+
+                // 반복 종료일 문자열 변환
+                let repeatEndDateString: String? = repeatInfo.map { info in
+                    DateFormatter.dataSourceDateFormatter.string(from: info.endDate)
                 }
-                dump(requestDTO)
-                
+
+                // 공통 필드 — updateDTO (수정 시 사용)
+                let updateDTO = MyWorkUpdateRequestDTO(
+                    routineIdList: routineIDs,
+                    startTime: clockIn,
+                    actualStartTime: nil,
+                    endTime: clockOut,
+                    actualEndTime: nil,
+                    restTimeMinutes: breakMin,
+                    memo: memo,
+                    repeatDays: repeatInfo?.daysEN ?? [],
+                    repeatEndDate: repeatEndDateString
+                )
+
+                // createDTO (등록 시 사용)
+                let createDTO = MyWorkCreateRequestDTO(
+                    routineIdList: routineIDs,
+                    startTime: clockIn,
+                    actualStartTime: nil,
+                    endTime: clockOut,
+                    actualEndTime: nil,
+                    restTimeMinutes: breakMin,
+                    memo: memo,
+                    repeatDays: repeatInfo?.daysEN ?? [],
+                    repeatEndDate: repeatEndDateString
+                )
+
                 self.createTask?.cancel()
-                createTask = Task {
+                self.createTask = Task {
                     do {
-                        let createdWorkIdList = try await self.workUseCase.createMyWork(workplaceId: workplace.id, requestDTO: requestDTO)
-                        try Task.checkCancellation()
-                        
-                        self.logger.debug("생성된 근무 ID 배열: \(createdWorkIdList)")
-                    } catch is CancellationError {
-                        self.logger.info("근무 생성 Task가 취소되었습니다.")
-                    } catch let error as LocalizedError {
-                        await MainActor.run {
-                            self.errorMessage.accept((title: "근무 등록 실패", message: error.errorDescription ?? "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                        switch self.mode {
+
+                        // 신규 등록
+                        case .create:
+                            _ = try await self.workUseCase.createMyWork(
+                                workplaceId: workplace.id,
+                                requestDTO: createDTO
+                            )
+
+                        // 단일 근무 수정
+                        case .edit(let workId):
+                            try await self.workUseCase.updateMySingleWork(
+                                workId: workId,
+                                requestDTO: updateDTO
+                            )
                         }
+
+                        try Task.checkCancellation()
+
+                        await MainActor.run {
+                            self.didCompleteRegister.accept(())
+                        }
+
                     } catch {
                         await MainActor.run {
-                            self.errorMessage.accept((title: "근무 등록 실패", message: "오류가 발생하였습니다. 잠시 후 다시 시도해주세요."))
+                            self.errorMessage.accept((
+                                title: "근무 저장 실패",
+                                message: "근무 저장 중 오류가 발생했습니다. 다시 시도해주세요."
+                            ))
                         }
                     }
                 }
-                
-                self.didCompleteRegister.accept(())
             })
             .disposed(by: disposeBag)
     }
+
+
     
     func bindViewWillDisappear() {
         viewWillDisappear
             .subscribe(with: self) { owner, _ in
                 owner.createTask = nil
             }.disposed(by: disposeBag)
+    }
+    
+    
+}
+extension WorkRegisterViewModel {
+
+    func loadEditData(workId: Int) {
+        Task {
+            do {
+                // 조회 API 호출
+                let detail = try await workUseCase.fetchWorkerWorkDetail(workId: workId)
+
+                await MainActor.run {
+
+                    // MARK: 1) 근무지 선택값 반영
+                    let wp = detail.workplaceSummary
+                    selectedWorkplaceVM.confirmSelectedWorkplace
+                        .accept((id: wp.id, name: wp.name))
+
+                    // MARK: 2) 날짜
+                    if let date = DateFormatter.dataSourceDateFormatter.date(from: detail.workDate) {
+                        selectedDate.accept(date)
+                        datePickerVM.forceConfirmCurrentDate()
+                    }
+
+                    // MARK: 3) 출근/퇴근 시간
+                    let start = detail.startTime
+                    clockInVM.reconfigure(anchorDate: start, confirmedDate: start)
+                    clockInVM.applyInitialConfirmedDate(start)
+
+                    if let end = detail.endTime {
+                        clockOutVM.reconfigure(anchorDate: end, confirmedDate: end)
+                        clockOutVM.applyInitialConfirmedDate(end)
+                    }
+                    // MARK: 4) 휴게 시간
+                    breakPickerVM.confirmSelectedBreak
+                    breakPickerVM.setInitialBreak(detail.restTimeMinutes)
+
+                    // MARK: 5) 루틴 목록
+                    selectedRoutines.accept(detail.routineSummaryInfoList)
+
+                    // MARK: 6) 메모
+                    memoText.accept(detail.memo ?? "")
+
+                    // MARK: 7) 반복 설정
+                    if !detail.repeatDays.isEmpty,
+                       let endRepeat = DateFormatter.dataSourceDateFormatter.date(from: detail.repeatEndDate ?? "") {
+
+                        let daysIndex = detail.repeatDays.compactMap { dayEN in
+                            ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"]
+                                .firstIndex(of: dayEN)
+                        }
+
+                        repeatInfo.accept(
+                            RepeatInfo(
+                                endDate: endRepeat,
+                                daysEN: detail.repeatDays,
+                                daysIndex: daysIndex
+                            )
+                        )
+                    }
+                    self.editPrefilledData.accept(detail)
+                }
+
+            } catch {
+                await MainActor.run {
+                    self.errorMessage.accept((
+                        title: "데이터 불러오기 실패",
+                        message: "근무 정보를 불러오지 못했습니다. 다시 시도해주세요."
+                    ))
+                }
+            }
+        }
     }
 }

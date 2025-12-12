@@ -64,6 +64,10 @@ private extension WorkRegisterViewController {
         setActions()
         setBinding()
         applyModeUI()
+        
+        if case .edit(let workId) = viewModel.mode {
+            viewModel.loadEditData(workId: workId)
+        }
     }
 
     func applyModeUI() {
@@ -332,6 +336,43 @@ private extension WorkRegisterViewController {
             .drive(with: self) { owner, errorMessage in
                 owner.presentNoticeModal(title: errorMessage.title, comment: errorMessage.message)
             }.disposed(by: disposeBag)
+        
+        // MARK: - EDIT MODE: 서버에서 불러온 데이터 UI에 반영
+        viewModel.editPrefilledData
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, detail in
+
+                // 1) 날짜
+                if let date = DateFormatter.dataSourceDateFormatter.date(from: detail.workDate) {
+                    self.selectedWorkDate = date
+                    self.workRegisterView.rx.selectedWorkDateText
+                        .onNext(DateFormatter.dataSourceDateFormatter.string(from: date))
+                }
+
+                // 2) 출근 시간
+                let start = detail.startTime
+                self.clockInDate = start
+                let startText = DateFormatter.ko12hTimeFormatter.string(from: start)
+                owner.workRegisterView.rx.selectedClockInTimeText.onNext(startText)
+
+                // 3) 퇴근 시간
+                if let end = detail.endTime {
+                    owner.clockOutDate = end
+                    let endText = DateFormatter.ko12hTimeFormatter.string(from: end)
+                    owner.workRegisterView.rx.selectedClockOutTimeText.onNext(endText)
+                }
+
+                // 4) 휴게 시간
+                let breakText = detail.restTimeMinutes > 0
+                    ? detail.restTimeMinutes.timeString
+                    : "없음"
+                self.workRegisterView.rx.selectedLunchBreakTimeText.onNext(breakText)
+
+                // 5) 메모
+                self.workRegisterView.getMemoContainerView.rx.text.onNext(detail.memo ?? "")
+            }
+            .disposed(by: disposeBag)
+
     }
 }
 

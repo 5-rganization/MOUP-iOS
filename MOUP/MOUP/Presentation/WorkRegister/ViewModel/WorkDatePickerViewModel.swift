@@ -111,4 +111,22 @@ final class WorkDatePickerViewModel: WorkDatePickerViewModelInput, WorkDatePicke
         selectedMonthSubject.bind(to: monthRelay).disposed(by: disposeBag)
         selectedDaySubject.bind(to: dayRelay).disposed(by: disposeBag)
     }
+    
+    func forceConfirmCurrentDate() {
+        var comp = DateComponents()
+        comp.year = yearRelay.value
+        comp.month = monthRelay.value
+        comp.day = dayRelay.value
+
+        let date = calendar.date(from: comp) ?? Date()
+
+        // confirmed 값 갱신
+        confirmedYearRelay.accept(yearRelay.value)
+        confirmedMonthRelay.accept(monthRelay.value)
+        confirmedDayRelay.accept(dayRelay.value)
+
+        // 실제 confirm 이벤트 발생
+        didTapConfirmSubject.onNext(())
+    }
+
 }

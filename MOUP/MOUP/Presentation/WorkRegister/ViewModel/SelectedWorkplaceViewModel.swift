@@ -91,3 +91,8 @@ private extension SelectedWorkplaceViewModel {
             .disposed(by: disposeBag)
     }
 }
+extension SelectedWorkplaceViewModel {
+    func applyInitial(workplaceId: Int, name: String) {
+        confirmSelectedWorkplace.accept((id: workplaceId, name: name))
+    }
+}

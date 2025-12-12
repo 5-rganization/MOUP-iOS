@@ -53,21 +53,6 @@ final class WorkTimePickerViewModel: WorkTimePickerViewModelInput, WorkTimePicke
     var selectedHour: AnyObserver<Int> { selectedHourSubject.asObserver() }
     var selectedMinute: AnyObserver<Int> { selectedMinuteSubject.asObserver() }
     
-    var currentTime: Observable<Date> {
-        Observable
-            .combineLatest(ampmRelay, hourRelay, minuteRelay)
-            .map { ampm, hour12, minute in
-                var hour24 = hour12 % 12 + (ampm == 1 ? 12 : 0)
-                if hour24 == 24 { hour24 = 12 }
-
-                var comp = Calendar.current.dateComponents([.year,.month,.day], from: self.anchorDate)
-                comp.hour = hour24
-                comp.minute = minute
-                comp.second = 0
-                return Calendar.current.date(from: comp) ?? self.anchorDate
-            }
-    }
-
 
     func resetToConfirmedTime() {
         ampmRelay.accept(confirmedAMPMRelay.value)
@@ -168,5 +153,31 @@ final class WorkTimePickerViewModel: WorkTimePickerViewModelInput, WorkTimePicke
         confirmedAMPMRelay.accept(ampm)
         confirmedHourRelay.accept(h12)
         confirmedMinuteRelay.accept(m)
+        
+        didTapConfirmSubject.onNext(())
     }
+    
+    /// 외부에서 초기 확정 값을 강제로 emit할 때 사용
+    func applyInitialConfirmedDate(_ date: Date) {
+        let comp = calendar.dateComponents([.hour, .minute], from: date)
+        let h24 = comp.hour ?? 0
+        let m = comp.minute ?? 0
+        let ampm = h24 >= 12 ? 1 : 0
+        var h12 = h24 % 12; if h12 == 0 { h12 = 12 }
+
+        // UI 바퀴값 업데이트
+        ampmRelay.accept(ampm)
+        hourRelay.accept(h12)
+        minuteRelay.accept(m)
+
+        // 확정 값도 업데이트
+        confirmedAMPMRelay.accept(ampm)
+        confirmedHourRelay.accept(h12)
+        confirmedMinuteRelay.accept(m)
+
+        // confirmSelectedTime 이 emit 되도록 subject 트리거
+        didTapConfirmSubject.onNext(())
+    }
+
+    
 }
