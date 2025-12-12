@@ -104,14 +104,8 @@ private extension InviteCodeWorkplaceRegisterViewController {
         viewModel.didCompleteRegister
             .observe(on: MainScheduler.instance)
             .bind(onNext: { [weak self] in
-                guard let coordinator = self?.coordinator?.homeCoordinator else { return }
-
-                // 전체 스택을 홈 화면만 남기고 리셋
-                self?.navigationController?.setViewControllers(
-                    [UIViewController()], animated: false
-                )
-
-                coordinator.start()
+                print("초대코드 근무지 등록 완료 → 홈 이동")
+                self?.coordinator?.moveToHomeAfterJoin()
             })
             .disposed(by: disposeBag)
     }

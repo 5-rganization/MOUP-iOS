@@ -10,5 +10,5 @@ protocol WorkRegisterCoordinatorProtocol: Coordinator {
     func showSelectWorkplace()
     func showRepeatSetting()
     func showRoutineSelection()
-    func showWorkerSelection(workplaceId: Int)
+    func showWorkerSelection(workplaceId: Int, completion: @escaping ([Int]) -> Void)
 }

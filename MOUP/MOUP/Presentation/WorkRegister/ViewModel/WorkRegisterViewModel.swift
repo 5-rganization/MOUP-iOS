@@ -65,6 +65,8 @@ final class WorkRegisterViewModel:
     let didTapRegister = PublishRelay<Void>()
     let memoText = BehaviorRelay<String>(value: "")
     let editPrefilledData = PublishRelay<WorkerWorkData>()
+    // 사장님 전용 선택된 근무자 ID 목록
+    let selectedWorkerIds = BehaviorRelay<[Int]>(value: [])
     
     // MARK: - Output (lazy 로 변경 → 초기화 순서 문제 해결)
     lazy var isFormValidForWorker: Driver<Bool> = {
@@ -156,31 +158,47 @@ private extension WorkRegisterViewModel {
 
     /// 등록 버튼 처리
     func bindRegisterAction() {
+
+        let baseCombined = Observable.combineLatest(
+            selectedWorkplaceVM.confirmSelectedWorkplace,   // 1
+            datePickerVM.confirmSelectedDate,               // 2
+            clockInVM.confirmSelectedTime,                  // 3
+            clockOutVM.confirmSelectedTime,                 // 4
+            breakPickerVM.confirmSelectedBreak.startWith(0),// 5
+            memoText.asObservable(),                        // 6
+            repeatInfo.asObservable(),                      // 7
+            selectedRoutines.asObservable()                 // 8
+        )
+
         didTapRegister
             .withLatestFrom(
                 Observable.combineLatest(
-                    selectedWorkplaceVM.confirmSelectedWorkplace,
-                    datePickerVM.confirmSelectedDate,
-                    clockInVM.confirmSelectedTime,
-                    clockOutVM.confirmSelectedTime,
-                    breakPickerVM.confirmSelectedBreak.startWith(0),
-                    memoText.asObservable(),
-                    repeatInfo.asObservable(),
-                    selectedRoutines.asObservable()
+                    baseCombined,
+                    selectedWorkerIds.asObservable()
                 )
             )
-            .subscribe(onNext: { [weak self]
-                (workplace, date, clockIn, clockOut, breakMin, memo, repeatInfo, routines) in
+            .subscribe(onNext: { [weak self] base, workerIds in
                 guard let self else { return }
+
+                // base 튜플 풀기
+                let (
+                    workplace,
+                    date,
+                    clockIn,
+                    clockOut,
+                    breakMin,
+                    memo,
+                    repeatInfo,
+                    routines
+                ) = base
 
                 let routineIDs = routines.map { $0.routineId }
 
-                // 반복 종료일 문자열 변환
-                let repeatEndDateString: String? = repeatInfo.map { info in
-                    DateFormatter.dataSourceDateFormatter.string(from: info.endDate)
+                let repeatEndDateString: String? = repeatInfo.map {
+                    DateFormatter.dataSourceDateFormatter.string(from: $0.endDate)
                 }
 
-                // 공통 필드 — updateDTO (수정 시 사용)
+                // DTO 생성
                 let updateDTO = MyWorkUpdateRequestDTO(
                     routineIdList: routineIDs,
                     startTime: clockIn,
@@ -193,7 +211,6 @@ private extension WorkRegisterViewModel {
                     repeatEndDate: repeatEndDateString
                 )
 
-                // createDTO (등록 시 사용)
                 let createDTO = MyWorkCreateRequestDTO(
                     routineIdList: routineIDs,
                     startTime: clockIn,
@@ -211,22 +228,48 @@ private extension WorkRegisterViewModel {
                     do {
                         switch self.mode {
 
-                        // 신규 등록
                         case .create:
-                            _ = try await self.workUseCase.createMyWork(
-                                workplaceId: workplace.id,
-                                requestDTO: createDTO
-                            )
 
-                        // 단일 근무 수정
+                            // ① 알바 본인 등록
+                            if self.userRole == .worker {
+                                _ = try await self.workUseCase.createMyWork(
+                                    workplaceId: workplace.id,
+                                    requestDTO: createDTO
+                                )
+                            }
+                            // ② 사장 본인 등록
+                            else if self.userRole == .owner && workerIds.isEmpty {
+                                _ = try await self.workUseCase.createMyWork(
+                                    workplaceId: workplace.id,
+                                    requestDTO: createDTO
+                                )
+                            }
+                            // ③ 사장이 알바 등록
+                            else if self.userRole == .owner && !workerIds.isEmpty {
+                                let request = WorkersWorkCreateRequestDTO(
+                                    workerIdList: workerIds,
+                                    startTime: clockIn,
+                                    actualStartTime: nil,
+                                    endTime: clockOut,
+                                    actualEndTime: nil,
+                                    restTimeMinutes: breakMin,
+                                    memo: memo,
+                                    repeatDays: repeatInfo?.daysEN ?? [],
+                                    repeatEndDate: repeatEndDateString
+                                )
+
+                                _ = try await self.workUseCase.createWorkersWork(
+                                    workplaceId: workplace.id,
+                                    requestDTO: request
+                                )
+                            }
+
                         case .edit(let workId):
                             try await self.workUseCase.updateMySingleWork(
                                 workId: workId,
                                 requestDTO: updateDTO
                             )
                         }
-
-                        try Task.checkCancellation()
 
                         await MainActor.run {
                             self.didCompleteRegister.accept(())
@@ -244,6 +287,7 @@ private extension WorkRegisterViewModel {
             })
             .disposed(by: disposeBag)
     }
+
 
 
     

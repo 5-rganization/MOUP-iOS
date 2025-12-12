@@ -96,7 +96,7 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
         navigationController.pushViewController(vc, animated: true)
     }
     
-    func showWorkerSelection(workplaceId: Int) {
+    func showWorkerSelection(workplaceId: Int, completion: @escaping ([Int]) -> Void) {
         Task {
             do {
                 let workers = try await attendanceUseCase.fetchWorkplaceWorkers(
@@ -104,7 +104,6 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
                     isActiveOnly: true
                 )
 
-                // SelectedWorkerViewController 는 (id, name) 형태로 받으니까 맵핑 필요
                 let mapped = workers.map { worker in
                     (id: worker.id, name: worker.nickname)
                 }
@@ -113,7 +112,7 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
 
                 vc.onWorkersSelected = { selectedIds in
                     print("선택된 알바 ID:", selectedIds)
-                    // → ViewModel 등에 전달하면 됨
+                    completion(selectedIds)
                 }
 
                 navigationController.pushViewController(vc, animated: true)
@@ -123,9 +122,6 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
             }
         }
     }
-
-
-
     
     func showRoutineSelection() {
         let coordinator = RoutineSelectionCoordinator(navigationController: navigationController)

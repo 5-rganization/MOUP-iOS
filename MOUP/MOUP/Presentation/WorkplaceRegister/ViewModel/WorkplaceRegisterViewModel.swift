@@ -84,6 +84,8 @@ final class WorkplaceRegisterViewModel: WorkplaceRegisterViewModelInput, Workpla
                                     )
                                 )
 
+                                print("UPDATE 요청 =", updateDTO)
+                                
                                 try await self.workplaceUseCase.updateWorkplace(
                                     workplaceId: workplaceId,
                                     request: updateDTO
@@ -142,6 +144,7 @@ final class WorkplaceRegisterViewModel: WorkplaceRegisterViewModelInput, Workpla
                     }
 
                     if let salary = detail.salaryDetailInfo {
+                        print("조회 데이터 =", detail.salaryDetailInfo)
 
                         // 급여 타입
                         if let display = SalaryType(serverValue: salary.salaryType)?.displayText {

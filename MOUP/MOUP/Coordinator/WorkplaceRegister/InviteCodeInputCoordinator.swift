@@ -43,6 +43,7 @@ final class InviteCodeInputCoordinator: Coordinator, WorkplaceRegisterCoordinato
     ) {
         self.navigationController = navigationController
         self.workplaceUseCase = workplaceUseCase
+        self.homeCoordinator = homeCoordinator
     }
     
     func start() {
@@ -113,6 +114,19 @@ extension InviteCodeInputCoordinator {
     func showSelectColorLabel() {
         let vc = SelectColorLabelViewController(viewModel: selectColorLabelVM)
         navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func moveToHomeAfterJoin() {
+        guard let homeCoordinator else {
+            print("homeCoordinator is nil — 홈 이동 불가")
+            return
+        }
+
+        // 기존 스택 제거하고 home root 로 교체
+        navigationController.setViewControllers([], animated: false)
+
+        // 홈 화면 다시 시작
+        homeCoordinator.start()
     }
 }
 

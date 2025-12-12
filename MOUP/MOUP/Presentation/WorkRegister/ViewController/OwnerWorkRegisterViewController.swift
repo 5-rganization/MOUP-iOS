@@ -324,24 +324,34 @@ private extension OwnerWorkRegisterViewController {
             .bind(onNext: { [weak self] index in
                 guard let self else { return }
 
-                // index 기준: 0 = 사장, 1 = 알바
                 let isWorker = (index == 1)
 
-                // 알바일 때만 "근무자*" + "인원 선택" 보이게 함
+                // UI 반영
                 self.workRegisterView.showWorkerSection(isWorker)
+
+                // ★★★ 역할 변경 시 기존 선택 근무자 초기화
+                if isWorker {
+                    self.viewModel.selectedWorkerIds.accept([])
+                }
             })
             .disposed(by: disposeBag)
+
         
         // MARK: - 인원 선택
         workRegisterView.rx.workerTap
             .withLatestFrom(viewModel.selectedWorkplaceVM.confirmSelectedWorkplace)
             .bind(onNext: { [weak self] workplace in
                 guard let self else { return }
-                
+
                 let workplaceId = workplace.id
-                self.coordinator?.showWorkerSelection(workplaceId: workplaceId)
+                self.coordinator?.showWorkerSelection(workplaceId: workplaceId) { selectedIds in
+                    self.viewModel.selectedWorkerIds.accept(selectedIds)
+                }
             })
             .disposed(by: disposeBag)
+
+        
+        
     }
 }
 
