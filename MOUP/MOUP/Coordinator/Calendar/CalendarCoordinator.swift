@@ -82,8 +82,11 @@ final class CalendarCoordinator: Coordinator {
         navigationController.dismiss(animated: true)
     }
     
+    func calendarWorkListDismissedByUser() {
+        calendarVC.deselectCell()
+    }
+    
     func disappeared(_ coordinator: Coordinator) {
-        if coordinator is CalendarWorkListCoordinator { calendarVC.deselectCell() }
         removeChildCoordinator(coordinator)
     }
 }
