@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		3358E2BCBB25C3FF60F4E1E7 /* libPods-MOUP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E985550E85203EB5EFE5D142 /* libPods-MOUP.a */; };
-		5B3753CF2E24FBC900B13805 /* ReactorKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5B3753CE2E24FBC900B13805 /* ReactorKit */; };
 		5B3754642E2540C200B13805 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 5B3754632E2540C200B13805 /* GoogleSignIn */; };
 		5B5304D22E2251610083F7CA /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304D12E2251610083F7CA /* Then */; };
 		5B5304D52E22516A0083F7CA /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304D42E22516A0083F7CA /* SnapKit */; };
@@ -65,7 +64,6 @@
 				5B5304E62E2251DD0083F7CA /* RxCocoa in Frameworks */,
 				95C6BC852EA6291900803C04 /* FirebaseMessaging in Frameworks */,
 				5B95F7042E22525900C29F0D /* Alamofire in Frameworks */,
-				5B3753CF2E24FBC900B13805 /* ReactorKit in Frameworks */,
 				95C6BC832EA6291900803C04 /* FirebaseCore in Frameworks */,
 				3358E2BCBB25C3FF60F4E1E7 /* libPods-MOUP.a in Frameworks */,
 			);
@@ -138,7 +136,6 @@
 				5B5304EC2E2251FD0083F7CA /* Differentiator */,
 				5B5304EE2E2251FD0083F7CA /* RxDataSources */,
 				5B95F7032E22525900C29F0D /* Alamofire */,
-				5B3753CE2E24FBC900B13805 /* ReactorKit */,
 				5B3754632E2540C200B13805 /* GoogleSignIn */,
 				95C6BC822EA6291900803C04 /* FirebaseCore */,
 				95C6BC842EA6291900803C04 /* FirebaseMessaging */,
@@ -177,7 +174,6 @@
 				5B5304E42E2251DD0083F7CA /* XCRemoteSwiftPackageReference "RxSwift" */,
 				5B5304EB2E2251FD0083F7CA /* XCRemoteSwiftPackageReference "RxDataSources" */,
 				5B95F7022E22525900C29F0D /* XCRemoteSwiftPackageReference "Alamofire" */,
-				5B3753CD2E24FBC900B13805 /* XCRemoteSwiftPackageReference "ReactorKit" */,
 				5B3754622E2540C200B13805 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				95C6BC812EA6291900803C04 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
@@ -252,7 +248,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = NCJMGH8Z64;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MOUP/Resources/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -293,7 +289,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = NCJMGH8Z64;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MOUP/Resources/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -468,14 +464,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		5B3753CD2E24FBC900B13805 /* XCRemoteSwiftPackageReference "ReactorKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ReactorKit/ReactorKit";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.2.0;
-			};
-		};
 		5B3754622E2540C200B13805 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
@@ -535,11 +523,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		5B3753CE2E24FBC900B13805 /* ReactorKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 5B3753CD2E24FBC900B13805 /* XCRemoteSwiftPackageReference "ReactorKit" */;
-			productName = ReactorKit;
-		};
 		5B3754632E2540C200B13805 /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5B3754622E2540C200B13805 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
