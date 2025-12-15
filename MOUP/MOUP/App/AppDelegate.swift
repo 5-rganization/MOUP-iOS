@@ -8,17 +8,21 @@
 import os
 import UIKit
 import FirebaseCore
+import FirebaseCrashlytics
 import FirebaseMessaging
 import UserNotifications
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
-    let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "AppDelegate")
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "AppDelegate")
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         FirebaseApp.configure()
+        
+        let idfv = UIDevice.current.identifierForVendor?.uuidString
+        Crashlytics.crashlytics().setUserID(idfv)
         
         Messaging.messaging().delegate = self
         

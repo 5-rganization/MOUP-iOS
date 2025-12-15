@@ -166,7 +166,7 @@ extension CalendarWorkListModalViewController: CalendarWorkListViewDelegate {
 
 // MARK: - UIAdaptivePresentationControllerDelegate
 extension CalendarWorkListModalViewController: UIAdaptivePresentationControllerDelegate {
-    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+    func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
         coordinator?.dismissedByUser()
     }
 }

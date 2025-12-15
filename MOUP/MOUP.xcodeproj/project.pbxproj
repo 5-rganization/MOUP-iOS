@@ -17,6 +17,7 @@
 		5B5304ED2E2251FD0083F7CA /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304EC2E2251FD0083F7CA /* Differentiator */; };
 		5B5304EF2E2251FD0083F7CA /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5304EE2E2251FD0083F7CA /* RxDataSources */; };
 		5B95F7042E22525900C29F0D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 5B95F7032E22525900C29F0D /* Alamofire */; };
+		5BF10B6D2EF0B27700EF4C32 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 5BF10B6C2EF0B27700EF4C32 /* FirebaseCrashlytics */; };
 		95C6BC832EA6291900803C04 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 95C6BC822EA6291900803C04 /* FirebaseCore */; };
 		95C6BC852EA6291900803C04 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 95C6BC842EA6291900803C04 /* FirebaseMessaging */; };
 /* End PBXBuildFile section */
@@ -63,6 +64,7 @@
 				5B5304EF2E2251FD0083F7CA /* RxDataSources in Frameworks */,
 				5B5304E62E2251DD0083F7CA /* RxCocoa in Frameworks */,
 				95C6BC852EA6291900803C04 /* FirebaseMessaging in Frameworks */,
+				5BF10B6D2EF0B27700EF4C32 /* FirebaseCrashlytics in Frameworks */,
 				5B95F7042E22525900C29F0D /* Alamofire in Frameworks */,
 				95C6BC832EA6291900803C04 /* FirebaseCore in Frameworks */,
 				3358E2BCBB25C3FF60F4E1E7 /* libPods-MOUP.a in Frameworks */,
@@ -118,6 +120,7 @@
 				5B53045B2E224D210083F7CA /* Sources */,
 				5B53045C2E224D210083F7CA /* Frameworks */,
 				5B53045D2E224D210083F7CA /* Resources */,
+				5BF10CCF2EF0B3A300EF4C32 /* Crashlytics Settings */,
 			);
 			buildRules = (
 			);
@@ -139,6 +142,7 @@
 				5B3754632E2540C200B13805 /* GoogleSignIn */,
 				95C6BC822EA6291900803C04 /* FirebaseCore */,
 				95C6BC842EA6291900803C04 /* FirebaseMessaging */,
+				5BF10B6C2EF0B27700EF4C32 /* FirebaseCrashlytics */,
 			);
 			productName = MOUP;
 			productReference = 5B53045F2E224D210083F7CA /* MOUP.app */;
@@ -198,6 +202,31 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		5BF10CCF2EF0B3A300EF4C32 /* Crashlytics Settings */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}.debug.dylib",
+			);
+			name = "Crashlytics Settings";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
 		D19A9AD43362D613D2689361 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -244,6 +273,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = "$(BUILD_NUMBER)";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = NCJMGH8Z64;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -567,6 +597,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B95F7022E22525900C29F0D /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		5BF10B6C2EF0B27700EF4C32 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 95C6BC812EA6291900803C04 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
 		};
 		95C6BC822EA6291900803C04 /* FirebaseCore */ = {
 			isa = XCSwiftPackageProductDependency;
