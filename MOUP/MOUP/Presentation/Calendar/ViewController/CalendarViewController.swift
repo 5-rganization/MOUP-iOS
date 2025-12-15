@@ -205,7 +205,9 @@ private extension CalendarViewController {
 // MARK: - Internal Calendar Methods
 extension CalendarViewController {
     func updateDataSource() {
-        lastBaseFetchDateRelay.accept(visibleMonthStartDate)
+        DispatchQueue.main.async {
+            self.lastBaseFetchDateRelay.accept(self.visibleMonthStartDate)
+        }
     }
     
     func selectCell(date: Date) {
