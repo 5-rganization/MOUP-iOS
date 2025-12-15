@@ -184,7 +184,8 @@ private extension CalendarViewController {
         output.calendarWorkDict.asDriver(onErrorJustReturn: [:])
             .drive(with: self) { owner, calendarWorkDict in
                 owner.calendarWorkDataSourceRelay.accept(calendarWorkDict)
-                owner.calendarView.getMonthCalendarView.reloadData()
+                let dates = Array(calendarWorkDict.keys)
+                owner.calendarView.getMonthCalendarView.reloadDates(dates)
             }.disposed(by: disposeBag)
         
         output.errorMessage.asDriver(onErrorJustReturn: (title: "오류 발생", message: "잠시 후 다시 시도해주세요."))
@@ -208,7 +209,6 @@ extension CalendarViewController {
     }
     
     func selectCell(date: Date) {
-        calendarView.getMonthCalendarView.scrollToDate(date, animateScroll: false)
         calendarView.getMonthCalendarView.selectDates([date])
     }
     
@@ -221,7 +221,10 @@ extension CalendarViewController {
 private extension CalendarViewController {
     func setCalendarView() {
         if let selectedDate {
-            selectCell(date: selectedDate)
+            scrollToDate(selectedDate, animateScroll: false) {
+                self.selectCell(date: selectedDate)
+                self.updateDataSource()
+            }
         } else {
             scrollToDate(visibleMonthStartDate, animateScroll: false, completionHandler: { self.updateDataSource() })
         }

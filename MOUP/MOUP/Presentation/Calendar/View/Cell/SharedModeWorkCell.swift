@@ -17,7 +17,7 @@ final class SharedModeWorkCell: BaseWorkCell {
     override func update(work: WorkSummary) {
         switch UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) {
         case .worker:
-            if (work.isMyWork) {
+            if work.isMyWork {
                 let labelColorStr = work.workerSummary.workerBasedLabelColorStr ?? LabelColor._default.serverStr
                 setGivenLabelColor(labelColorStr)
                 menuButton.isHidden = false
@@ -28,7 +28,7 @@ final class SharedModeWorkCell: BaseWorkCell {
                 dailyIncomeLabel.isHidden = true
             }
         case .owner:
-            if (work.isMyWork) {
+            if work.isMyWork {
                 setDefaultLabelColor()
             } else {
                 let labelColorStr = work.workerSummary.ownerBasedLabelColorStr ?? LabelColor._default.serverStr
