@@ -184,8 +184,7 @@ private extension CalendarViewController {
         output.calendarWorkDict.asDriver(onErrorJustReturn: [:])
             .drive(with: self) { owner, calendarWorkDict in
                 owner.calendarWorkDataSourceRelay.accept(calendarWorkDict)
-                let dates = Array(calendarWorkDict.keys)
-                owner.calendarView.getMonthCalendarView.reloadDates(dates)
+                owner.calendarView.getMonthCalendarView.reloadData(withAnchor: owner.visibleMonthStartDate)
             }.disposed(by: disposeBag)
         
         output.errorMessage.asDriver(onErrorJustReturn: (title: "오류 발생", message: "잠시 후 다시 시도해주세요."))
@@ -205,9 +204,7 @@ private extension CalendarViewController {
 // MARK: - Internal Calendar Methods
 extension CalendarViewController {
     func updateDataSource() {
-        DispatchQueue.main.async {
-            self.lastBaseFetchDateRelay.accept(self.visibleMonthStartDate)
-        }
+        lastBaseFetchDateRelay.accept(visibleMonthStartDate)
     }
     
     func selectCell(date: Date) {
@@ -222,13 +219,9 @@ extension CalendarViewController {
 // MARK: - Private Calendar Methods
 private extension CalendarViewController {
     func setCalendarView() {
-        if let selectedDate {
-            scrollToDate(selectedDate, animateScroll: false) {
-                self.selectCell(date: selectedDate)
-                self.updateDataSource()
-            }
-        } else {
-            scrollToDate(visibleMonthStartDate, animateScroll: false, completionHandler: { self.updateDataSource() })
+        if let selectedDate { visibleMonthStartDate = selectedDate.startOfMonth }
+        scrollToDate(visibleMonthStartDate, animateScroll: false) {
+            self.updateDataSource()
         }
     }
     
@@ -290,11 +283,8 @@ private extension CalendarViewController {
 // MARK: - JTACMonthViewDataSource
 extension CalendarViewController: JTACMonthViewDataSource {
     func configureCalendar(_ calendar: JTACMonthView) -> ConfigurationParameters {
-        let startDate = DateFormatter.dataSourceDateFormatter.date(from: "\(CalendarRange.startYear).01.01")
-        let endDate = DateFormatter.dataSourceDateFormatter.date(from: "\(CalendarRange.endYear).12.31")
-        
-        return ConfigurationParameters(startDate: startDate ?? .distantPast,
-                                       endDate: endDate ?? .distantFuture,
+        return ConfigurationParameters(startDate: CalendarRange.startReferDate,
+                                       endDate: CalendarRange.endReferDate,
                                        generateInDates: .forAllMonths,
                                        generateOutDates: .tillEndOfRow)
     }

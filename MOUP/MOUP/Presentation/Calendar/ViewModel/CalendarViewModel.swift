@@ -130,7 +130,7 @@ final class CalendarViewModel {
                 owner.fetchTask = nil
             }.disposed(by: disposeBag)
         
-        return Output(calendarWorkDict: calendarWorkDictRelay.asObservable(),
+        return Output(calendarWorkDict: calendarWorkDictRelay.asObservable().skip(1),
                       errorMessage: errorMessageRelay.asObservable())
     }
 }
