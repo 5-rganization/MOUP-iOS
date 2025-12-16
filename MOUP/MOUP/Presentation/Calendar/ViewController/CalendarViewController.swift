@@ -85,6 +85,13 @@ final class CalendarViewController: UIViewController {
         setCalendarView()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if let selectedDate {
+            selectCell(date: selectedDate)
+        }
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         viewWillDisappearRelay.accept(())
@@ -184,7 +191,7 @@ private extension CalendarViewController {
         output.calendarWorkDict.asDriver(onErrorJustReturn: [:])
             .drive(with: self) { owner, calendarWorkDict in
                 owner.calendarWorkDataSourceRelay.accept(calendarWorkDict)
-                owner.calendarView.getMonthCalendarView.reloadData(withAnchor: owner.visibleMonthStartDate)
+                owner.calendarView.getMonthCalendarView.reloadData()
             }.disposed(by: disposeBag)
         
         output.errorMessage.asDriver(onErrorJustReturn: (title: "오류 발생", message: "잠시 후 다시 시도해주세요."))
@@ -219,15 +226,8 @@ extension CalendarViewController {
 // MARK: - Private Calendar Methods
 private extension CalendarViewController {
     func setCalendarView() {
-        if let selectedDate {
-            scrollToDate(selectedDate, animateScroll: false) {
-                self.selectCell(date: selectedDate)
-                self.updateDataSource()
-            }
-        } else {
-            scrollToDate(visibleMonthStartDate, animateScroll: false) {
-                self.updateDataSource()
-            }
+        scrollToDate(selectedDate ?? visibleMonthStartDate, animateScroll: false) {
+            self.updateDataSource()
         }
     }
     
