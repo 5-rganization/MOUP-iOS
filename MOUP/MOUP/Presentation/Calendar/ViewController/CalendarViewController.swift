@@ -219,9 +219,15 @@ extension CalendarViewController {
 // MARK: - Private Calendar Methods
 private extension CalendarViewController {
     func setCalendarView() {
-        if let selectedDate { visibleMonthStartDate = selectedDate.startOfMonth }
-        scrollToDate(visibleMonthStartDate, animateScroll: false) {
-            self.updateDataSource()
+        if let selectedDate {
+            scrollToDate(selectedDate, animateScroll: false) {
+                self.selectCell(date: selectedDate)
+                self.updateDataSource()
+            }
+        } else {
+            scrollToDate(visibleMonthStartDate, animateScroll: false) {
+                self.updateDataSource()
+            }
         }
     }
     
