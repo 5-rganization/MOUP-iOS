@@ -6,6 +6,9 @@
 //
 
 import UIKit
+
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 
@@ -13,20 +16,45 @@ final class SelectColorLabelView: UIView {
     // MARK: - Properties
     
     // MARK: - UI Components
+    fileprivate let navigationBar = BaseNavigationBar(title: "라벨 색상")
+    
     private let title = UILabel().then {
         $0.text = "라벨 색상을 선택해주세요."
         $0.textColor = .gray900
         $0.font = .headBold(18)
     }
     
-    private let registerButton = BaseButton(title: "완료", isSecondary: true)
-    private let redRadioButton = RadioButtonView(title: "빨강색", type: .colorDot(.labelRed, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let orangeRadioButton = RadioButtonView(title: "주황색", type: .colorDot(.labelOrange, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let yellowRadioButton = RadioButtonView(title: "노란색", type: .colorDot(.labelYellow, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let greenRadioButton = RadioButtonView(title: "초록색", type: .colorDot(.labelGreen, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let blueRadioButton = RadioButtonView(title: "파란색", type: .colorDot(.labelBlue, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let purpleRadioButton = RadioButtonView(title: "보라색", type: .colorDot(.labelPurple, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
-    private let indigoRadioButton = RadioButtonView(title: "남색", type: .colorDot(.indigoText, selectedRadioButton: UIImage(named: "selectedRadioButton")!, unselectedRadioButton: UIImage(named: "unselectedRadioButton")!))
+    private let confirmButton = BaseButton(title: "완료").then {
+        $0.isEnabled = false
+    }
+    private let redRadioButton = RadioButtonView(title: LabelColor.red.displayStr,
+                                                 type: .colorDot(LabelColor.red.labelColor,
+                                                                 selectedRadioButton: .selectedRadioButton,
+                                                                 unselectedRadioButton: .unselectedRadioButton))
+    private let orangeRadioButton = RadioButtonView(title: LabelColor.orange.displayStr,
+                                                    type: .colorDot(LabelColor.orange.labelColor,
+                                                                    selectedRadioButton: .selectedRadioButton,
+                                                                    unselectedRadioButton: .unselectedRadioButton))
+    private let yellowRadioButton = RadioButtonView(title: LabelColor.yellow.displayStr,
+                                                    type: .colorDot(LabelColor.yellow.labelColor,
+                                                                    selectedRadioButton: .selectedRadioButton,
+                                                                    unselectedRadioButton: .unselectedRadioButton))
+    private let greenRadioButton = RadioButtonView(title: LabelColor.green.displayStr,
+                                                   type: .colorDot(LabelColor.green.labelColor,
+                                                                   selectedRadioButton: .selectedRadioButton,
+                                                                   unselectedRadioButton: .unselectedRadioButton))
+    private let blueRadioButton = RadioButtonView(title: LabelColor.blue.displayStr,
+                                                  type: .colorDot(LabelColor.blue.labelColor,
+                                                                  selectedRadioButton: .selectedRadioButton,
+                                                                  unselectedRadioButton: .unselectedRadioButton))
+    private let purpleRadioButton = RadioButtonView(title: LabelColor.purple.displayStr,
+                                                    type: .colorDot(LabelColor.purple.labelColor,
+                                                                    selectedRadioButton: .selectedRadioButton,
+                                                                    unselectedRadioButton: .unselectedRadioButton))
+    private let indigoRadioButton = RadioButtonView(title: LabelColor.indigo.displayStr,
+                                                    type: .colorDot(LabelColor.indigo.labelColor,
+                                                                    selectedRadioButton: .selectedRadioButton,
+                                                                    unselectedRadioButton: .unselectedRadioButton))
     
     // MARK: - Getter
     var getRedRadioButton: RadioButtonView { redRadioButton }
@@ -36,7 +64,7 @@ final class SelectColorLabelView: UIView {
     var getBlueRadioButton: RadioButtonView { blueRadioButton }
     var getPurpleRadioButton: RadioButtonView { purpleRadioButton }
     var getIndigoRadioButton: RadioButtonView { indigoRadioButton }
-    var getRegisterButton: BaseButton { registerButton }
+    var getConfirmButton: BaseButton { confirmButton }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -64,6 +92,7 @@ private extension SelectColorLabelView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             title,
             redRadioButton,
             orangeRadioButton,
@@ -72,7 +101,7 @@ private extension SelectColorLabelView {
             blueRadioButton,
             purpleRadioButton,
             indigoRadioButton,
-            registerButton
+            confirmButton
         )
     }
     
@@ -83,8 +112,13 @@ private extension SelectColorLabelView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
+        }
+        
         title.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(32)
+            $0.top.equalTo(navigationBar.snp.bottom).offset(32)
             $0.leading.equalToSuperview().offset(16)
         }
         
@@ -123,10 +157,16 @@ private extension SelectColorLabelView {
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
-        registerButton.snp.makeConstraints {
+        confirmButton.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(45)
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(12)
         }
+    }
+}
+
+extension Reactive where Base: SelectColorLabelView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
     }
 }

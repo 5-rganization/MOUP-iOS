@@ -25,8 +25,8 @@ final class SelectPayTypeViewModel: SelectPayTypeViewModelInput, SelectPayTypeVi
     private let didSelectPayTypeSubject = PublishSubject<String>()
     private let didTapConfirmSubject = PublishSubject<Void>()
 
-    private let selectedPayTypeRelay = BehaviorRelay<String?>(value: nil)
-    private let confirmedPayTypeSubject = BehaviorRelay<String?>(value: nil)
+    let selectedPayTypeRelay = BehaviorRelay<String?>(value: nil)
+    let confirmedPayTypeSubject = BehaviorRelay<String?>(value: nil)
 
     // Input
     var didSelectPayType: AnyObserver<String> { didSelectPayTypeSubject.asObserver() }

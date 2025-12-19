@@ -12,6 +12,7 @@ struct WorkerWorkData {
     let id: Int
     let workplaceSummary: WorkplaceSummary
     let workerSummary: WorkerSummary
+    let routineSummaryInfoList: [RoutineSummary]
     let workDate: String
     let repeatDays: [String]
     let repeatEndDate: String?

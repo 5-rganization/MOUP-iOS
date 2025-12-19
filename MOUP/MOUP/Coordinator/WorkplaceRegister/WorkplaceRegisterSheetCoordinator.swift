@@ -36,9 +36,12 @@ final class WorkplaceRegisterSheetCoordinator: Coordinator {
     }
     
     func moveToInviteCodeInput() { // 초대 코드 등록
+        guard let coordinator else { return }
+        
         let inviteCodeInputCoordinator = InviteCodeInputCoordinator(
             navigationController: navigationController,
-            workplaceUseCase: workplaceUseCase
+            workplaceUseCase: workplaceUseCase,
+            homeCoordinator: coordinator
         )
         inviteCodeInputCoordinator.coordinator = self
         childCoordinators.append(inviteCodeInputCoordinator)
@@ -47,12 +50,17 @@ final class WorkplaceRegisterSheetCoordinator: Coordinator {
 
     func moveToDirectRegistration() {
         print("moveToDirectRegistration")
-
-        sheetNav?.dismiss(animated: true) { [weak self] in
-            guard let self = self else { return }
-
-            let coordinator = WorkplaceRegisterCoordinator(navigationController: self.navigationController)
-            self.childCoordinators.append(coordinator)
+        
+        let isOwner = (UserDefaultsManager.shared.userRole == "OWNER")
+        
+        let coordinator = WorkplaceRegisterCoordinator(
+            navigationController: navigationController,
+            isOwner: isOwner,
+            mode: .create
+        )
+        
+        childCoordinators.append(coordinator)
+        DispatchQueue.main.async {
             coordinator.start()
         }
     }

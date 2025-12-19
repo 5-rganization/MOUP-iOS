@@ -26,7 +26,7 @@ final class SelectColorLabelViewModel: SelectColorLabelViewModelInput, SelectCol
     private let didTapConfirmSubject = PublishSubject<Void>()
 
     private let selectedColorRelay = BehaviorRelay<String?>(value: nil)
-    private let confirmedColorRelay = BehaviorRelay<String?>(value: nil)
+    let confirmedColorRelay = BehaviorRelay<String?>(value: nil)
 
     private let disposeBag = DisposeBag()
 

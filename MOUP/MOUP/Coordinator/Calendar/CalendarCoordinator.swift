@@ -67,11 +67,11 @@ final class CalendarCoordinator: Coordinator {
         childCoordinators.append(filterCoordinator)
     }
     
-    func showCalendarWorkList(selectedDay: Int, calendarWorkList: Observable<[WorkSummary]>, calendarMode: CalendarMode) {
+    func showCalendarWorkList(selectedDate: Date, calendarWorkList: Observable<[WorkSummary]>, calendarMode: CalendarMode) {
         let calendarWorkListCoordinator = CalendarWorkListCoordinator(parentCoordinator: self,
                                                                       navigationController: navigationController,
                                                                       workUseCase: workUseCase,
-                                                                      selectedDay: selectedDay,
+                                                                      selectedDate: selectedDate,
                                                                       calendarWorkList: calendarWorkList,
                                                                       calendarMode: calendarMode)
         calendarWorkListCoordinator.start()
@@ -79,23 +79,22 @@ final class CalendarCoordinator: Coordinator {
     }
     
     func dismissCalendarWorkList() {
-        guard let coordinator = childCoordinators.first(where: { $0 is CalendarWorkListCoordinator }) else {
-            fatalError("\(#function) 실행 실패 - childCoordinators에 CalendarWorkListCoordinator가 존재하지 않습니다.")
-        }
-        removeChildCoordinator(coordinator, needToDismiss: true)
+        navigationController.dismiss(animated: true)
     }
     
-    func dismissed(_ coordinator: Coordinator) {
-        if coordinator is CalendarWorkListCoordinator { calendarVC.deselectCell() }
-        removeChildCoordinator(coordinator, needToDismiss: false)
+    func calendarWorkListDismissedByUser() {
+        calendarVC.deselectCell()
+    }
+    
+    func disappeared(_ coordinator: Coordinator) {
+        removeChildCoordinator(coordinator)
     }
 }
 
 // MARK: - Private Methods
 private extension CalendarCoordinator {
-    func removeChildCoordinator(_ coordinator: Coordinator, needToDismiss: Bool) {
+    func removeChildCoordinator(_ coordinator: Coordinator) {
         childCoordinators = childCoordinators.filter { $0 !== coordinator }
-        if needToDismiss { navigationController.dismiss(animated: true) }
     }
 }
 
@@ -103,13 +102,13 @@ private extension CalendarCoordinator {
 extension CalendarCoordinator {
     /// 연/월 이동 취소
     func cancelled(_ coordinator: YearMonthPickerCoordinator) {
-        removeChildCoordinator(coordinator, needToDismiss: true)
+        navigationController.dismiss(animated: true)
     }
     
     /// 선택한 연/월로 이동
     func changeYearMonth(_ coordinator: YearMonthPickerCoordinator, focusedYear: Int, focusedMonth: Int) {
         calendarVC.updateYearMonth(focusedYear: focusedYear, focusedMonth: focusedMonth)
-        removeChildCoordinator(coordinator, needToDismiss: true)
+        navigationController.dismiss(animated: true)
     }
 }
 
@@ -118,7 +117,7 @@ extension CalendarCoordinator {
     /// 선택한 필터 적용
     func applyFilter(_ coordinator: FilterCoordinator, filterWorkplace: WorkplaceSummary?) {
         calendarVC.updateFilter(filterWorkplace: filterWorkplace)
-        removeChildCoordinator(coordinator, needToDismiss: true)
+        navigationController.dismiss(animated: true)
     }
 }
 
@@ -126,13 +125,27 @@ extension CalendarCoordinator {
 extension CalendarCoordinator {
     // TODO: 근무 엔티티를 직접 전달 or 근무 ID만 전달
     /// 근무 등록 화면 표시
-    func showWorkRegister(work: WorkSummary?) {
-        // TODO: - 근무 수정 화면 연결
-        if let work {
-            logger.debug("WorkRegisterVC 표시 - 근무 수정")
-            dump(work)
+    func showWorkerWorkRegister(selectedDate: Date? = nil, workToEdit: WorkSummary?) {
+        if let workToEdit {
+            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate, mode: .edit(workId: workToEdit.id))
+            childCoordinators.append(coordinator)
+            coordinator.start()
         } else {
-            logger.debug("WorkRegisterVC 표시 - 근무 등록")
+            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate, mode: .create)
+            childCoordinators.append(coordinator)
+            coordinator.start()
+        }
+    }
+    
+    func showOwnerWorkRegister(selectedDate: Date? = nil, workToEdit: WorkSummary?) {
+        if let workToEdit {
+            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate, mode: .edit(workId: workToEdit.id))
+            childCoordinators.append(coordinator)
+            coordinator.start()
+        } else {
+            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: true, selectedDate: selectedDate, mode: .create)
+            childCoordinators.append(coordinator)
+            coordinator.start()
         }
     }
     

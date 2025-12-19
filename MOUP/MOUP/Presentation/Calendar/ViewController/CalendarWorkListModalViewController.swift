@@ -34,7 +34,7 @@ final class CalendarWorkListModalViewController: UIViewController {
     // Initializer Injections
     weak var coordinator: CalendarWorkListCoordinator?
     private let viewModel: CalendarWorkListViewModel
-    private let selectedDay: Int
+    private let selectedDate: Date
     private let calendarMode: CalendarMode
     
     // Input Relays
@@ -47,10 +47,10 @@ final class CalendarWorkListModalViewController: UIViewController {
     }
     
     // MARK: - Initializer
-    init(coordinator: CalendarWorkListCoordinator, viewModel: CalendarWorkListViewModel, selectedDay: Int, calendarMode: CalendarMode) {
+    init(coordinator: CalendarWorkListCoordinator, viewModel: CalendarWorkListViewModel, selectedDate: Date, calendarMode: CalendarMode) {
         self.coordinator = coordinator
         self.viewModel = viewModel
-        self.selectedDay = selectedDay
+        self.selectedDate = selectedDate
         self.calendarMode = calendarMode
         super.init(nibName: nil, bundle: nil)
     }
@@ -68,7 +68,14 @@ final class CalendarWorkListModalViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
-        calendarWorkListView.update(day: selectedDay)
+        calendarWorkListView.update(day: selectedDate.day)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if isBeingDismissed || isMovingFromParent {
+            coordinator?.disappeared()
+        }
     }
 }
 
@@ -92,12 +99,20 @@ private extension CalendarWorkListModalViewController {
         // View 바인딩
         calendarWorkListView.rx.workTableViewModelSelected.asDriver()
             .drive(with: self) { owner, work in
-                owner.coordinator?.workCellTapped(work: work)
+                if UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) == .worker {
+                    owner.coordinator?.workerWorkCellTapped(work: work)
+                } else {
+                    owner.coordinator?.ownerWorkCellTapped(work: work)
+                }
             }.disposed(by: disposeBag)
         
         calendarWorkListView.rx.registerButtonTap.asDriver()
             .drive(with: self) { owner, _ in
-                owner.coordinator?.registerButtonTapped()
+                if UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) == .worker {
+                    owner.coordinator?.workerWorkregisterButtonTapped(selectedDate: owner.selectedDate)
+                } else {
+                    owner.coordinator?.ownerWorkregisterButtonTapped()
+                }
             }.disposed(by: disposeBag)
         
         // ViewModel 바인딩
@@ -132,8 +147,12 @@ private extension CalendarWorkListModalViewController {
 
 // MARK: - CalendarWorkListViewDelegate
 extension CalendarWorkListModalViewController: CalendarWorkListViewDelegate {
-    func editWork(work: WorkSummary) {
-        coordinator?.editButtonTapped(work: work)
+    func workerEditWork(work: WorkSummary) {
+        coordinator?.workerEditButtonTapped(work: work)
+    }
+    
+    func ownerEditWork(work: WorkSummary) {
+        coordinator?.ownerEditButtonTapped(work: work)
     }
     
     func deleteSingleWork(workId: Int) {
@@ -147,7 +166,7 @@ extension CalendarWorkListModalViewController: CalendarWorkListViewDelegate {
 
 // MARK: - UIAdaptivePresentationControllerDelegate
 extension CalendarWorkListModalViewController: UIAdaptivePresentationControllerDelegate {
-    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        coordinator?.dismissReceived()
+    func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
+        coordinator?.dismissedByUser()
     }
 }

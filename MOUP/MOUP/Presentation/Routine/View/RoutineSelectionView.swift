@@ -32,7 +32,7 @@ final class RoutineSelectionView: UIView {
         $0.backgroundColor = .clear
     }
     
-    private let applyButton = BaseButton(title: "적용하기")
+    fileprivate let applyButton = BaseButton(title: "적용하기")
     
     // MARK: - Getter
     
@@ -118,5 +118,9 @@ extension Reactive where Base: RoutineSelectionView {
         Binder(base) { view, indexPath in
             view.tableView.deselectRow(at: indexPath, animated: true)
         }
+    }
+    
+    var applyButtonDidTap: ControlEvent<Void> {
+        return base.applyButton.rx.tap
     }
 }

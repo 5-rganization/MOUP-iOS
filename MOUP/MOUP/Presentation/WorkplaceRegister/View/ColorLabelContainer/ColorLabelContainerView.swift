@@ -21,7 +21,7 @@ final class ColorLabelContainerView: UIView {
     }
     
     // MARK: - UI Components
-    private let colorLabelInfoRow = InfoRowView(title: "", type: .colorWithChevron(color: .labelRed, title: "빨간색"), frame: .zero)
+    private let colorLabelInfoRow = InfoRowView(title: "", type: .colorWithChevron(color: LabelColor.red.labelColor, title: LabelColor.red.displayStr), frame: .zero)
     
     // MARK: - 라벨 타이틀
     private let colorLabelTitle = UILabel().then {
@@ -30,11 +30,6 @@ final class ColorLabelContainerView: UIView {
 
         attributed.addAttribute(.font, value: UIFont.headBold(18), range: NSRange(location: 0, length: fullText.count))
         attributed.addAttribute(.foregroundColor, value: UIColor.gray900, range: NSRange(location: 0, length: fullText.count))
-
-        if let starRange = fullText.range(of: "*") {
-            let nsRange = NSRange(starRange, in: fullText)
-            attributed.addAttribute(.foregroundColor, value: UIColor.accent, range: nsRange)
-        }
 
         $0.attributedText = attributed
     }

@@ -61,13 +61,13 @@ final class WorkingConditionsContainerViewModel: WorkingConditionsContainerViewM
     let isWeeklyHolidayAllowanceInsuranceChecked: Observable<Bool>
     let isNightShiftAllowanceInsuranceChecked: Observable<Bool>
 
-    private let nationalPensionRelay = BehaviorRelay<Bool>(value: false)
-    private let healthInsuranceRelay = BehaviorRelay<Bool>(value: false)
-    private let employmentInsuranceRelay = BehaviorRelay<Bool>(value: false)
-    private let industrialAccidentInsuranceRelay = BehaviorRelay<Bool>(value: false)
-    private let incomeTaxInsuranceRelay = BehaviorRelay<Bool>(value: false)
-    private let weeklyHolidayAllowanceInsuranceRelay = BehaviorRelay<Bool>(value: false)
-    private let nightShiftAllowanceInsuranceRelay = BehaviorRelay<Bool>(value: false)
+    let nationalPensionRelay = BehaviorRelay<Bool>(value: false)
+    let healthInsuranceRelay = BehaviorRelay<Bool>(value: false)
+    let employmentInsuranceRelay = BehaviorRelay<Bool>(value: false)
+    let industrialAccidentInsuranceRelay = BehaviorRelay<Bool>(value: false)
+    let incomeTaxInsuranceRelay = BehaviorRelay<Bool>(value: false)
+    let weeklyHolidayAllowanceInsuranceRelay = BehaviorRelay<Bool>(value: false)
+    let nightShiftAllowanceInsuranceRelay = BehaviorRelay<Bool>(value: false)
 
     private let disposeBag = DisposeBag()
 

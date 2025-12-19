@@ -6,6 +6,7 @@
 //
 
 import UIKit
+
 import RxSwift
 
 final class TabBarViewController: UITabBarController {
@@ -15,30 +16,6 @@ final class TabBarViewController: UITabBarController {
     // TODO: 추후 뷰 모델 넣기
     private let viewModel: TabBarViewModel
     private let disposeBag = DisposeBag()
-
-    // MARK: - Lifecycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        configure()
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        let defaultHeight: CGFloat = self.tabBar.frame.height
-        let customHeight: CGFloat = 64 + self.view.safeAreaInsets.bottom
-        var tabBarFrame = self.tabBar.frame
-        tabBarFrame.size.height = customHeight
-        tabBarFrame.origin.y = self.view.frame.height - customHeight
-        self.tabBar.frame = tabBarFrame
-        
-        // 변경된 탭바 높이 safeAreaLayoutGuide에 반영
-        let adjustment = customHeight - defaultHeight
-        for vc in self.viewControllers ?? [] {
-            vc.additionalSafeAreaInsets.bottom = adjustment
-        }
-    }
     
     // MARK: - Initializer
     init(viewModel: TabBarViewModel) {
@@ -50,7 +27,13 @@ final class TabBarViewController: UITabBarController {
     required init?(coder: NSCoder) {
         fatalError()
     }
+
+    // MARK: - Lifecycle
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configure()
+    }
 }
 
 // MARK: - UI Methods
@@ -65,6 +48,9 @@ private extension TabBarViewController {
     }
     
     func setStyles() {
+        let customTabBar = CustomHeightTabBar()
+        self.setValue(customTabBar, forKey: "tabBar")
+        
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         

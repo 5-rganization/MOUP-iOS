@@ -20,9 +20,9 @@ final class WorkRegisterView: UIView {
     fileprivate let clockOutTapSubject = PublishSubject<Void>()
     fileprivate let lunchBreakTapSubject = PublishSubject<Void>()
     fileprivate let routinTapSubject = PublishSubject<Void>()
-//    fileprivate let colorTapSubject = PublishSubject<Void>()
     
     // MARK: - UI Components
+    fileprivate let navigationBar = BaseNavigationBar(title: "새 근무 등록")
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     private let stackView = UIStackView().then {
@@ -42,12 +42,16 @@ final class WorkRegisterView: UIView {
     private let workDateContainerView = WorkDateContainerView()
     private let workTimeContainerView = WorkTimeContainerView()
     private let workRoutinContainerView = WorkRoutinContainerView()
-//    private let colorLabelContainerView = ColorLabelContainerView()
     private let memoContainerView = MemoContainerView()
     
-    private let registerButton = BaseButton(title: "등록하기", isSecondary: true)
+    private let registerButton = BaseButton(title: "등록하기").then {
+        $0.isEnabled = false
+    }
     
-    
+    var getNavigationBar: BaseNavigationBar { navigationBar }
+    var getRegisterButton: BaseButton { registerButton }
+    var getMemoContainerView: MemoContainerView { memoContainerView }
+    var getSelectWorkplace: InfoRowView { selectWorkplace }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -76,6 +80,13 @@ final class WorkRegisterView: UIView {
         workTimeContainerView.setLunchBreakText(text)
     }
     
+    func setRepetitionText(_ text: String) {
+        workDateContainerView.setRepetitionText(text)
+    }
+    
+    func updateRoutines(_ routines: [RoutineSummary]) {
+        workRoutinContainerView.updateRoutines(routines)
+    }
 }
 
 private extension WorkRegisterView {
@@ -90,6 +101,7 @@ private extension WorkRegisterView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             scrollView
         )
         
@@ -108,7 +120,6 @@ private extension WorkRegisterView {
             workDateContainerView,
             workTimeContainerView,
             workRoutinContainerView,
-//            colorLabelContainerView,
             memoContainerView
         )
     }
@@ -120,8 +131,15 @@ private extension WorkRegisterView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
+        }
+        
         scrollView.snp.makeConstraints {
-            $0.edges.equalTo(safeAreaLayoutGuide)
+            $0.top.equalTo(navigationBar.snp.bottom)
+            $0.trailing.leading.equalTo(safeAreaLayoutGuide)
+            $0.bottom.equalToSuperview()
         }
         
         contentView.snp.makeConstraints {
@@ -135,6 +153,7 @@ private extension WorkRegisterView {
         }
         
         divider.snp.makeConstraints {
+            $0.top.equalTo(selectWorkplace.snp.bottom)
             $0.height.equalTo(1)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
@@ -176,15 +195,14 @@ private extension WorkRegisterView {
         workRoutinContainerView.rx.routinTap
             .bind(to: routinTapSubject)
             .disposed(by: disposeBag)
-        
-//        colorLabelContainerView.rx.colorLabelInfoRowTap
-//            .bind(to: colorTapSubject)
-//            .disposed(by: disposeBag)
-        
     }
 }
 
 extension Reactive where Base: WorkRegisterView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
+    }
+    
     var selectWorkplaceTap: ControlEvent<Void> {
         return ControlEvent(events: base.selectWorkplaceSubject.asObservable())
     }
@@ -212,11 +230,7 @@ extension Reactive where Base: WorkRegisterView {
     var routinTap: ControlEvent<Void> {
         return ControlEvent(events: base.routinTapSubject.asObservable())
     }
-    
-//    var colorTap: ControlEvent<Void> {
-//        return ControlEvent(events: base.colorTapSubject.asObservable())
-//    }
-    
+
     var selectedWorkDateText: Binder<String> {
         Binder(base) { view, text in
             view.setWorkDateText(text)
@@ -236,6 +250,12 @@ extension Reactive where Base: WorkRegisterView {
     var selectedLunchBreakTimeText: Binder<String> {
         Binder(base) { view, text in
             view.setLunchBreakText(text)
+        }
+    }
+    
+    var selectedRoutines: Binder<[RoutineSummary]> {
+        Binder(base) { view, routines in
+            view.updateRoutines(routines)
         }
     }
 }

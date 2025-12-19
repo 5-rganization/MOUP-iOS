@@ -70,21 +70,20 @@ final class CalendarDayCell: JTACDayCell {
             
             // 근무 컨테이너 UI와 캘린더 셀 하단 사이 여백이 4 미만일 때
             if workContainerMaxY >= possibleMaxY {
-                let workContainerMinY = self.workContainerVStackView.frame.minY
+                let workContainerMinY = workContainerVStackView.frame.minY
                 let possibleMaxHeight = possibleMaxY - workContainerMinY
                 
-                let reducedCount = Int(possibleMaxHeight / (WorkRowSize.baseComponentHeight + self.workContainerVStackView.spacing))
+                let reducedCount = Int(possibleMaxHeight / (WorkRowSize.baseComponentHeight + workContainerVStackView.spacing))
                 
-                self.workContainerVStackView.reduceHeight(displayCount: reducedCount)
-                
-                if self.workContainerVStackView.alpha.isEqual(to: 0.0) {
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.1, delay: 0) {
-                        self.workContainerVStackView.alpha = 1.0
-                    }
-                }
-            } else {
-                self.workContainerVStackView.alpha = 1.0
+                workContainerVStackView.reduceHeight(displayCount: reducedCount)
             }
+            
+            if workContainerVStackView.alpha.isEqual(to: 0.0) {
+                UIView.animate(withDuration: 0.1) {
+                    self.workContainerVStackView.alpha = 1.0
+                }
+            }
+            
         }
     }
     
@@ -111,7 +110,9 @@ final class CalendarDayCell: JTACDayCell {
         dayLabel.isHidden = !dateBelongsToThisMonth
         workContainerVStackView.isHidden = !dateBelongsToThisMonth
         
-        workContainerVStackView.alpha = 0.0
+        if workList.count > 1 {
+            workContainerVStackView.alpha = 0.0
+        }
         
         switch calendarMode {
         case .personal:

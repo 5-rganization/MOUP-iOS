@@ -90,13 +90,12 @@ final class CalendarViewModel {
                         
                         // 근무 데이터 보존용 코드 (UI 깜빡임 방지)
                         let dateRange: ClosedRange<Date>? = {
-                            guard let minDate = Calendar.current.date(byAdding: .month, value: -6, to: baseFetchDate),
-                                  let maxDate = Calendar.current.date(byAdding: .month, value: 6, to: baseFetchDate),
-                                  let startOfMonth = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: minDate)) else { return nil }
+                            guard let minDate = Calendar.current.date(byAdding: .month, value: -6, to: baseFetchDate) else { return nil }
+                            let startOfMonth = minDate.startOfMonth
                             
-                            let endOfMonthStart = Calendar.current.dateComponents([.year, .month], from: maxDate)
-                            guard let endOfMonthStartDate = Calendar.current.date(from: endOfMonthStart),
-                                  let endOfMonth = Calendar.current.date(byAdding: DateComponents(month: 1, day: -1), to: endOfMonthStartDate) else { return nil }
+                            guard let maxDate = Calendar.current.date(byAdding: .month, value: 6, to: baseFetchDate) else { return nil }
+                            let endOfMonthStartDate = maxDate.startOfMonth
+                            guard let endOfMonth = Calendar.current.date(byAdding: DateComponents(month: 1, day: -1), to: endOfMonthStartDate) else { return nil }
                             return startOfMonth...endOfMonth
                         }()
                         
@@ -131,7 +130,7 @@ final class CalendarViewModel {
                 owner.fetchTask = nil
             }.disposed(by: disposeBag)
         
-        return Output(calendarWorkDict: calendarWorkDictRelay.asObservable(),
+        return Output(calendarWorkDict: calendarWorkDictRelay.asObservable().skip(1),
                       errorMessage: errorMessageRelay.asObservable())
     }
 }

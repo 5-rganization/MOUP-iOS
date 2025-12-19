@@ -69,12 +69,6 @@ final class WorkplaceRegisterViewController: UIViewController {
         add(child: colorLabelContainerVC, to: workplaceRegisterView.getColorLabelContainerView)
         configure()
     }
-
-    @objc
-    private func didTapBack() {
-        navigationController?.popViewController(animated: true)
-    }
-
 }
 
 // MARK: - UI Methods
@@ -86,25 +80,36 @@ private extension WorkplaceRegisterViewController {
         setConstraints()
         setActions()
         setBinding()
+        applyEditModeUIIfNeeded()
     }
 
     func setHierarchy() { }
-    func setStyles() {
-        setNavigationBar(
-            title: "새 근무지 등록",
-            backAction: #selector(didTapBack)
-        )
-    }
+    func setStyles() { }
 
     func setConstraints() { }
     func setActions() { }
+    
+    func applyEditModeUIIfNeeded() {
+        switch viewModel.mode {
+        case .create:
+            workplaceRegisterView.getNavigationBar.configureTitle(title: "새 근무지 등록")
+            workplaceRegisterView.getRegisterButton.setTitle("등록하기", for: .normal)
+
+        case .edit(_):
+            workplaceRegisterView.getNavigationBar.configureTitle(title: "근무지 수정")
+            workplaceRegisterView.getRegisterButton.setTitle("수정하기", for: .normal)
+        }
+    }
 
     func setBinding() {
+        workplaceRegisterView.rx.navBackBtnTapped.asDriver()
+            .drive(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposeBag)
         
         viewModel.isFormValid
             .drive(onNext: { [weak self] isValid in
                 self?.workplaceRegisterView.getRegisterButton.isEnabled = isValid
-                self?.workplaceRegisterView.getRegisterButton.update(title: "완료", isSecondary: false)
             })
             .disposed(by: disposeBag)
         

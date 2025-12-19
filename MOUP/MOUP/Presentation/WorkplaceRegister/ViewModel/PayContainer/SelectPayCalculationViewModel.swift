@@ -25,7 +25,7 @@ final class SelectPayCalculationViewModel: SelectPayCalculationViewModelInput, S
     private let didTapConfirmSubject = PublishSubject<Void>()
 
     private let selectedPayCalculationRelay = BehaviorRelay<String?>(value: nil)
-    private let confirmedPayCalculationSubject = BehaviorRelay<String?>(value: nil)
+    let confirmedPayCalculationSubject = BehaviorRelay<String?>(value: nil)
     
     // Input
     var didSelectPayCalculation: AnyObserver<String> { didSelectPayCalculationSubject.asObserver() }

@@ -44,17 +44,21 @@ extension WorkData {
     }
     
     func toWorkerWorkData() -> WorkerWorkData {
-        WorkerWorkData(id: id,
-                       workplaceSummary: workplaceSummary,
-                       workerSummary: workerSummary,
-                       workDate: workDate,
-                       repeatDays: repeatDays,
-                       repeatEndDate: repeatEndDate,
-                       startTime: startTime,
-                       actualStartTime: actualStartTime,
-                       endTime: endTime,
-                       actualEndTime: actualEndTime,
-                       restTimeMinutes: restTimeMinutes,
-                       memo: memo)
+        WorkerWorkData(
+            id: id,
+            workplaceSummary: workplaceSummary,
+            workerSummary: workerSummary,
+            routineSummaryInfoList: routineSummaryList,
+            workDate: workDate,
+            repeatDays: repeatDays,
+            repeatEndDate: repeatEndDate,
+            startTime: startTime,
+            actualStartTime: actualStartTime,
+            endTime: endTime,
+            actualEndTime: actualEndTime,
+            restTimeMinutes: restTimeMinutes,
+            memo: memo
+        )
     }
+
 }

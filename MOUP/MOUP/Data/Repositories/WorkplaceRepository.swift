@@ -43,4 +43,30 @@ final class WorkplaceRepository: WorkplaceRepositoryProtocol {
         let response = try await workplaceService.createWorkplace(request: request)
         return WorkplaceCreate(workplaceId: response.workplaceId)
     }
+    
+    func createOwnerWorkplace(request: OwnerWorkplaceCreateRequestDTO) async throws -> WorkplaceCreate {
+        let response = try await workplaceService.createOwnerWorkplace(request: request)
+        return WorkplaceCreate(workplaceId: response.workplaceId)
+    }
+    
+    func joinWorkplace(request: WorkplaceJoinRequestDTO) async throws -> WorkplaceJoinResponseDTO {
+        let response = try await workplaceService.joinWorkplace(request: request)
+        return WorkplaceJoinResponseDTO(
+            workplaceId: response.workplaceId,
+            workerId: response.workerId
+        )
+    }
+    
+    func deleteWorkplace(workplaceId: Int) async throws {
+        try await workplaceService.deleteWorkplace(workplaceId: workplaceId)
+    }
+    
+    func fetchWorkplaceDetail(workplaceId: Int) async throws -> WorkplaceDetailResponseDTO {
+        try await workplaceService.fetchWorkplaceDetail(workplaceId: workplaceId)
+    }
+    
+    func updateWorkplace(workplaceId: Int, request: UpdateWorkplaceRequestDTO) async throws {
+        try await workplaceService.updateWorkplace(workplaceId: workplaceId, request: request)
+    }
+
 }

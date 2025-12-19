@@ -52,6 +52,7 @@ final class WorkTimePickerViewModel: WorkTimePickerViewModelInput, WorkTimePicke
     var selectedAMPM: AnyObserver<Int> { selectedAMPMSubject.asObserver() }
     var selectedHour: AnyObserver<Int> { selectedHourSubject.asObserver() }
     var selectedMinute: AnyObserver<Int> { selectedMinuteSubject.asObserver() }
+    
 
     func resetToConfirmedTime() {
         ampmRelay.accept(confirmedAMPMRelay.value)
@@ -152,5 +153,31 @@ final class WorkTimePickerViewModel: WorkTimePickerViewModelInput, WorkTimePicke
         confirmedAMPMRelay.accept(ampm)
         confirmedHourRelay.accept(h12)
         confirmedMinuteRelay.accept(m)
+        
+        didTapConfirmSubject.onNext(())
     }
+    
+    /// 외부에서 초기 확정 값을 강제로 emit할 때 사용
+    func applyInitialConfirmedDate(_ date: Date) {
+        let comp = calendar.dateComponents([.hour, .minute], from: date)
+        let h24 = comp.hour ?? 0
+        let m = comp.minute ?? 0
+        let ampm = h24 >= 12 ? 1 : 0
+        var h12 = h24 % 12; if h12 == 0 { h12 = 12 }
+
+        // UI 바퀴값 업데이트
+        ampmRelay.accept(ampm)
+        hourRelay.accept(h12)
+        minuteRelay.accept(m)
+
+        // 확정 값도 업데이트
+        confirmedAMPMRelay.accept(ampm)
+        confirmedHourRelay.accept(h12)
+        confirmedMinuteRelay.accept(m)
+
+        // confirmSelectedTime 이 emit 되도록 subject 트리거
+        didTapConfirmSubject.onNext(())
+    }
+
+    
 }

@@ -25,7 +25,7 @@ final class SelectCategoryViewModel: SelectCategoryViewModelInput, SelectCategor
     private let didTapConfirmSubject = PublishSubject<Void>()
 
     private let selectedCategoryRelay = BehaviorRelay<String?>(value: nil)
-    private let confirmedCategorySubject = BehaviorRelay<String?>(value: nil)
+    let confirmedCategorySubject = BehaviorRelay<String?>(value: nil)
 
     // Input
     var didSelectCategory: AnyObserver<String> { didSelectCategorySubject.asObserver() }

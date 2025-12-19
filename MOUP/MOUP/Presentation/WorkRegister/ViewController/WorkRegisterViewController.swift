@@ -15,36 +15,30 @@ final class WorkRegisterViewController: UIViewController {
     private let workRegisterView = WorkRegisterView()
 
     // MARK: - DI
-    weak var coordinator: WorkRegisterCoordinatorProtocol?
-    private let workDatePickerViewModel: WorkDatePickerViewModel
-    private let clockInVM: WorkTimePickerViewModel
-    private let clockOutVM: WorkTimePickerViewModel
+    private let viewModel: WorkRegisterViewModel
+    private weak var coordinator: WorkRegisterCoordinatorProtocol?
 
-    // MARK: - State (단일 소스)
+    // MARK: - State
     private var selectedWorkDate: Date = Date()
     private var clockInDate: Date?
     private var clockOutDate: Date?
 
     // MARK: - Etc
     private let disposeBag = DisposeBag()
-    private let calendar = Calendar(identifier: .gregorian)
+    private let calendar = Calendar.current
 
     // MARK: - Init
     init(
-        coordinator: WorkRegisterCoordinatorProtocol,
-        workDatePickerViewModel: WorkDatePickerViewModel,
-        clockInVM: WorkTimePickerViewModel,
-        clockOutVM: WorkTimePickerViewModel
+        viewModel: WorkRegisterViewModel,
+        coordinator: WorkRegisterCoordinatorProtocol
     ) {
+        self.viewModel = viewModel
         self.coordinator = coordinator
-        self.workDatePickerViewModel = workDatePickerViewModel
-        self.clockInVM = clockInVM
-        self.clockOutVM = clockOutVM
         super.init(nibName: nil, bundle: nil)
     }
 
-    @available(*, unavailable, message: "compile error")
-    required init?(coder: NSCoder) { fatalError() }
+    @available(*, unavailable, message: "Storyboard is not supported.")
+    required init?(coder: NSCoder) { fatalError("Storyboard is not supported.") }
 
     // MARK: - Life Cycle
     override func loadView() { self.view = workRegisterView }
@@ -53,9 +47,10 @@ final class WorkRegisterViewController: UIViewController {
         super.viewDidLoad()
         configure()
     }
-
-    @objc private func didTapBack() {
-        navigationController?.popViewController(animated: true)
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        viewModel.viewWillDisappear.accept(())
     }
 }
 
@@ -68,21 +63,33 @@ private extension WorkRegisterViewController {
         setConstraints()
         setActions()
         setBinding()
+        applyModeUI()
+        
+        if case .edit(let workId) = viewModel.mode {
+            viewModel.loadEditData(workId: workId)
+        }
     }
 
+    func applyModeUI() {
+        switch viewModel.mode {
+        case .create:
+            workRegisterView.getNavigationBar.configureTitle(title: "새 근무 등록")
+            workRegisterView.getRegisterButton.setTitle("등록하기", for: .normal)
+
+        case .edit:
+            workRegisterView.getNavigationBar.configureTitle(title: "근무 수정")
+            workRegisterView.getRegisterButton.setTitle("수정하기", for: .normal)
+        }
+    }
+    
     func setHierarchy() { }
 
-    func setStyles() {
-        setNavigationBar(
-            title: "새 근무 등록",
-            backAction: #selector(didTapBack)
-        )
-    }
+    func setStyles() { }
 
     func setConstraints() { }
     func setActions() { }
 
-    // workDate(연월일) + time(시/분)을 합쳐 anchor 생성
+    /// workDate(연월일) + time(시/분)을 합쳐 anchor 생성
     func anchorDate(workDate: Date, time: Date?) -> Date {
         let base = time ?? Date()
         var d = calendar.dateComponents([.year, .month, .day], from: workDate)
@@ -91,155 +98,281 @@ private extension WorkRegisterViewController {
         return calendar.date(from: d) ?? workDate
     }
 
+    // MARK: - Binding
     func setBinding() {
-
-        // 근무지
+        workRegisterView.rx.navBackBtnTapped.asDriver()
+            .drive(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
+            }.disposed(by: disposeBag)
+        
+        // MARK: - 근무지
         workRegisterView.rx.selectWorkplaceTap
-            .bind(onNext: { print("근무지 선택 버튼 클릭") })
+            .bind(onNext: { [weak self] in
+                self?.coordinator?.showSelectWorkplace()
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.selectedWorkplaceVM.confirmSelectedWorkplace
+            .map { $0.name } // 선택된 근무지의 이름만 추출
+            .observe(on: MainScheduler.instance)
+            .bind(onNext: { [weak self] name in
+                self?.workRegisterView.getSelectWorkplace.updateAttributedTitle(to: name)
+            })
             .disposed(by: disposeBag)
 
-        // 날짜 피커
+        // MARK: - 날짜 선택
+        viewModel.selectedDate.asDriver()
+            .drive(with: self, onNext: { owner, date in
+                let dateStr = DateFormatter.dataSourceDateFormatter.string(from: date)
+                owner.workRegisterView.rx.selectedWorkDateText.onNext(dateStr)
+            }).disposed(by: disposeBag)
+        
         workRegisterView.rx.workDateTap
             .bind(onNext: { [weak self] in
                 guard let self else { return }
-                let vc = WorkDatePickerViewController(viewModel: self.workDatePickerViewModel)
 
-                self.workDatePickerViewModel.confirmSelectedDate
-                    .do(onNext: { [weak self] d in self?.selectedWorkDate = d }) // 상태 저장
+                let vc = WorkDatePickerViewController(viewModel: viewModel.datePickerVM)
+
+                viewModel.datePickerVM.confirmSelectedDate
+                    .do(onNext: { [weak self] d in self?.selectedWorkDate = d })
                     .map { DateFormatter.dataSourceDateFormatter.string(from: $0) }
                     .observe(on: MainScheduler.instance)
-                    .take(until: vc.rx.deallocated) // 구독 누적 방지
-                    .bind(to: self.workRegisterView.rx.selectedWorkDateText)
-                    .disposed(by: self.disposeBag)
+                    .take(until: vc.rx.deallocated)
+                    .bind(to: workRegisterView.rx.selectedWorkDateText)
+                    .disposed(by: disposeBag)
 
-                self.present(vc, animated: true)
+                present(vc, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        // MARK: - 반복 선택
+        workRegisterView.rx.repetitionTap
+            .bind(onNext: { [weak self] in
+                guard let self else { return }
+
+                let vm = self.viewModel.repeatSettingVM
+                let info = self.viewModel.repeatInfo.value
+
+                // 기존 반복값을 RepeatViewModel 에 전달
+                vm.configureInitial(
+                    endDate: info?.endDate,
+                    daysIndex: info?.daysIndex
+                )
+
+                self.coordinator?.showRepeatSetting()
             })
             .disposed(by: disposeBag)
 
-        // 반복
-        workRegisterView.rx.repetitionTap
-            .bind(onNext: { print("반복 버튼 클릭") })
+        
+        // 반복 설정 완료 값 구독
+        viewModel.repeatInfo
+            .observe(on: MainScheduler.instance)
+            .bind(onNext: { [weak self] repeatInfo in
+                guard let self else { return }
+
+                // repeatInfo == nil → "없음" 처리
+                guard let info = repeatInfo else {
+                    self.workRegisterView.setRepetitionText("없음")
+                    return
+                }
+
+                let days = info.daysIndex
+                let weekKR = ["일", "월", "화", "수", "목", "금", "토"]
+
+                let krText = days.map { weekKR[$0] }.joined(separator: " / ")
+
+                self.workRegisterView.setRepetitionText(krText)
+            })
             .disposed(by: disposeBag)
 
-        // 출근 시간
+
+
+        // MARK: - 출근 시간
         workRegisterView.rx.clockInTap
             .bind(onNext: { [weak self] in
                 guard let self else { return }
-                let anchor = self.anchorDate(workDate: self.selectedWorkDate, time: self.clockInDate)
-                self.clockInVM.reconfigure(anchorDate: anchor, confirmedDate: self.clockInDate)
 
-                let vc = WorkTimePickerViewController(viewModel: self.clockInVM)
+                let vm = viewModel.clockInVM
+                let anchor = anchorDate(workDate: selectedWorkDate, time: clockInDate)
+                vm.reconfigure(anchorDate: anchor, confirmedDate: clockInDate)
 
-                self.clockInVM.confirmSelectedTime
-                    .do(onNext: { [weak self] d in self?.clockInDate = d }) // 상태 저장
+                let vc = WorkTimePickerViewController(viewModel: vm)
+
+                vm.confirmSelectedTime
+                    .do(onNext: { [weak self] d in self?.clockInDate = d })
                     .map { DateFormatter.ko12hTimeFormatter.string(from: $0) }
                     .observe(on: MainScheduler.instance)
                     .take(until: vc.rx.deallocated)
-                    .bind(to: self.workRegisterView.rx.selectedClockInTimeText)
-                    .disposed(by: self.disposeBag)
+                    .bind(to: workRegisterView.rx.selectedClockInTimeText)
+                    .disposed(by: disposeBag)
 
-                self.clockInVM.confirmSelectedTime
+                vm.confirmSelectedTime
                     .take(1)
                     .take(until: vc.rx.deallocated)
                     .bind(onNext: { [weak vc] _ in vc?.dismiss(animated: true) })
-                    .disposed(by: self.disposeBag)
+                    .disposed(by: disposeBag)
 
-                self.clockInVM.dismiss
+                vm.dismiss
                     .take(until: vc.rx.deallocated)
                     .bind(onNext: { [weak vc] in vc?.dismiss(animated: true) })
-                    .disposed(by: self.disposeBag)
+                    .disposed(by: disposeBag)
 
-                self.present(vc, animated: true)
+                present(vc, animated: true)
             })
             .disposed(by: disposeBag)
 
-        // 퇴근 시간
+        // MARK: - 퇴근 시간
         workRegisterView.rx.clockOutTap
             .bind(onNext: { [weak self] in
                 guard let self else { return }
-                let anchor = self.anchorDate(workDate: self.selectedWorkDate, time: self.clockOutDate)
-                self.clockOutVM.reconfigure(anchorDate: anchor, confirmedDate: self.clockOutDate)
 
-                let vc = WorkTimePickerViewController(viewModel: self.clockOutVM)
+                let vm = viewModel.clockOutVM
+                let anchor = anchorDate(workDate: selectedWorkDate, time: clockOutDate)
+                vm.reconfigure(anchorDate: anchor, confirmedDate: clockOutDate)
 
-                self.clockOutVM.confirmSelectedTime
+                let vc = WorkTimePickerViewController(viewModel: vm)
+
+                vm.confirmSelectedTime
                     .do(onNext: { [weak self] d in self?.clockOutDate = d })
                     .map { DateFormatter.ko12hTimeFormatter.string(from: $0) }
                     .observe(on: MainScheduler.instance)
                     .take(until: vc.rx.deallocated)
-                    .bind(to: self.workRegisterView.rx.selectedClockOutTimeText)
-                    .disposed(by: self.disposeBag)
+                    .bind(to: workRegisterView.rx.selectedClockOutTimeText)
+                    .disposed(by: disposeBag)
 
-                self.clockOutVM.confirmSelectedTime
+                vm.confirmSelectedTime
                     .take(1)
                     .take(until: vc.rx.deallocated)
                     .bind(onNext: { [weak vc] _ in vc?.dismiss(animated: true) })
-                    .disposed(by: self.disposeBag)
+                    .disposed(by: disposeBag)
 
-                self.clockOutVM.dismiss
+                vm.dismiss
                     .take(until: vc.rx.deallocated)
                     .bind(onNext: { [weak vc] in vc?.dismiss(animated: true) })
-                    .disposed(by: self.disposeBag)
+                    .disposed(by: disposeBag)
 
-                self.present(vc, animated: true)
+                present(vc, animated: true)
             })
             .disposed(by: disposeBag)
 
-        // 휴게 시간
+        // MARK: - 휴게 시간
         workRegisterView.rx.lunchBreakTap
             .bind(onNext: { [weak self] in
                 guard let self else { return }
 
-                // 휴게 전용 VM + VC
-                let breakVM = WorkBreakPickerViewModel(initialIndex: 0)
-                let vc = WorkBreakPickerViewController(viewModel: breakVM)
+                let vm = viewModel.breakPickerVM
+                let vc = WorkBreakPickerViewController(viewModel: vm)
 
-                // confirm 시 → UI 업데이트
-                breakVM.confirmSelectedBreak
+                vm.confirmSelectedBreak
                     .map { minutes -> String in
                         let hours = minutes / 60
                         let mins = minutes % 60
-
                         if hours > 0 && mins > 0 {
                             return "\(hours)시간 \(mins)분"
                         } else if hours > 0 {
                             return "\(hours)시간"
-                        } else {
+                        } else if mins > 0 {
                             return "\(mins)분"
+                        } else {
+                            return "없음"
                         }
                     }
                     .observe(on: MainScheduler.instance)
                     .take(until: vc.rx.deallocated)
-                    .bind(to: self.workRegisterView.rx.selectedLunchBreakTimeText)
-                    .disposed(by: self.disposeBag)
+                    .bind(to: workRegisterView.rx.selectedLunchBreakTimeText)
+                    .disposed(by: disposeBag)
 
-                // confirm → dismiss
-                breakVM.confirmSelectedBreak
+                vm.confirmSelectedBreak
                     .take(1)
                     .take(until: vc.rx.deallocated)
                     .bind(onNext: { [weak vc] _ in vc?.dismiss(animated: true) })
-                    .disposed(by: self.disposeBag)
+                    .disposed(by: disposeBag)
 
-                // cancel → dismiss
-                breakVM.dismiss
+                vm.dismiss
                     .take(until: vc.rx.deallocated)
                     .bind(onNext: { [weak vc] in vc?.dismiss(animated: true) })
-                    .disposed(by: self.disposeBag)
+                    .disposed(by: disposeBag)
 
-                self.present(vc, animated: true)
+                present(vc, animated: true)
             })
             .disposed(by: disposeBag)
 
-        // 루틴/컬러
+        // MARK: - 루틴
         workRegisterView.rx.routinTap
-            .bind(onNext: { print("루틴 추가 버튼 클릭") })
+            .bind(onNext: { [weak self] in
+                self?.coordinator?.showRoutineSelection()
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.selectedRoutines
+            .observe(on: MainScheduler.instance)
+            .bind(to: workRegisterView.rx.selectedRoutines)
             .disposed(by: disposeBag)
 
-//        workRegisterView.rx.colorTap
-//            .bind(onNext: { [weak self] in
-//                print("컬러 선택 버튼 클릭")
-//                self?.coordinator?.showSelectColorLabel()
-//            })
-//            .disposed(by: disposeBag)
+        // MARK: - 메모
+        workRegisterView.getMemoContainerView.rx.text
+            .bind(to: viewModel.memoText)
+            .disposed(by: disposeBag)
+
+        // MARK: - 등록 버튼
+        viewModel.isFormValidForWorker
+            .drive(with: self, onNext: { owner, isValid in
+                owner.workRegisterView.getRegisterButton.isEnabled = isValid
+            }).disposed(by: disposeBag)
+        
+        workRegisterView.getRegisterButton.rx.tap
+            .bind(to: viewModel.didTapRegister)
+            .disposed(by: disposeBag)
+
+        viewModel.didCompleteRegister
+            .observe(on: MainScheduler.instance)
+            .bind(onNext: { [weak self] workIdList in
+                print("근무 등록 완료: \(workIdList)")
+                self?.navigationController?.popViewController(animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.errorMessage.asDriver(onErrorJustReturn: (title: "오류 발생", message: "잠시 후 다시 시도해주세요."))
+            .drive(with: self) { owner, errorMessage in
+                owner.presentNoticeModal(title: errorMessage.title, comment: errorMessage.message)
+            }.disposed(by: disposeBag)
+        
+        // MARK: - EDIT MODE: 서버에서 불러온 데이터 UI에 반영
+        viewModel.editPrefilledData
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, detail in
+
+                // 1) 날짜
+                if let date = DateFormatter.dataSourceDateFormatter.date(from: detail.workDate) {
+                    self.selectedWorkDate = date
+                    self.workRegisterView.rx.selectedWorkDateText
+                        .onNext(DateFormatter.dataSourceDateFormatter.string(from: date))
+                }
+
+                // 2) 출근 시간
+                let start = detail.startTime
+                self.clockInDate = start
+                let startText = DateFormatter.ko12hTimeFormatter.string(from: start)
+                owner.workRegisterView.rx.selectedClockInTimeText.onNext(startText)
+
+                // 3) 퇴근 시간
+                if let end = detail.endTime {
+                    owner.clockOutDate = end
+                    let endText = DateFormatter.ko12hTimeFormatter.string(from: end)
+                    owner.workRegisterView.rx.selectedClockOutTimeText.onNext(endText)
+                }
+
+                // 4) 휴게 시간
+                let breakText = detail.restTimeMinutes > 0
+                    ? detail.restTimeMinutes.timeString
+                    : "없음"
+                self.workRegisterView.rx.selectedLunchBreakTimeText.onNext(breakText)
+
+                // 5) 메모
+                self.workRegisterView.getMemoContainerView.rx.text.onNext(detail.memo ?? "")
+            }
+            .disposed(by: disposeBag)
+
     }
 }
+

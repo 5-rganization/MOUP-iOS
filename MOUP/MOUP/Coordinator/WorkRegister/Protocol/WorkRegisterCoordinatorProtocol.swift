@@ -7,4 +7,8 @@
 
 protocol WorkRegisterCoordinatorProtocol: Coordinator {
     func showSelectColorLabel()
+    func showSelectWorkplace()
+    func showRepeatSetting()
+    func showRoutineSelection()
+    func showWorkerSelection(workplaceId: Int, completion: @escaping ([Int]) -> Void)
 }

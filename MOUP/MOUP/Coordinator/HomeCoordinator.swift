@@ -53,7 +53,8 @@ final class HomeCoordinator: Coordinator {
             userRole: userRole,
             homeUseCase: homeUseCase,
             attendanceUseCase: attendanceUseCase,
-            notificationUseCase: notificationUseCase
+            notificationUseCase: notificationUseCase,
+            workplaceUseCase: workplaceUseCase
         )
         let homeVC = HomeViewController(
             coordinator: self,
@@ -75,8 +76,36 @@ final class HomeCoordinator: Coordinator {
     
     func moveToDirectRegistration() { // 직접 등록
         print("moveToDirectRegistration")
-        let coordinator = WorkplaceRegisterCoordinator(navigationController: navigationController)
+        let role = UserDefaultsManager.shared.userRole
+        let isOwner = (role == "ROLE_OWNER")
+
+        print("UserRole: \(role ?? "nil"), isOwner: \(isOwner)")
+
+        let coordinator = WorkplaceRegisterCoordinator(
+            navigationController: navigationController,
+            isOwner: isOwner,
+            mode: .create
+        )
+        
         childCoordinators.append(coordinator)
+
+        DispatchQueue.main.async {
+            coordinator.start()
+        }
+    }
+
+    func moveToEditWorkplace(id: Int) {
+        let role = UserDefaultsManager.shared.userRole
+        let isOwner = (role == "ROLE_OWNER")
+        
+        let coordinator = WorkplaceRegisterCoordinator(
+            navigationController: navigationController,
+            isOwner: isOwner,
+            mode: .edit(workplaceId: id)
+        )
+        
+        childCoordinators.append(coordinator)
+        
         DispatchQueue.main.async {
             coordinator.start()
         }

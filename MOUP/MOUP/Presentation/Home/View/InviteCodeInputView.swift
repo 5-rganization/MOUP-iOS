@@ -58,6 +58,10 @@ final class InviteCodeInputView: UIView {
     func setTextFieldDelegate(_ delegate: UITextFieldDelegate) {
         self.codeInputTextField.delegate = delegate
     }
+    
+    func getInviteCode() -> String? {
+        return self.codeInputTextField.text
+    }
 }
 
 private extension InviteCodeInputView {
@@ -88,6 +92,7 @@ private extension InviteCodeInputView {
                 .foregroundColor: UIColor.gray400
             ]
         )
+        backgroundColor = .white
     }
     
     // MARK: - setConstraints

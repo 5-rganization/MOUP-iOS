@@ -46,7 +46,7 @@ final class WorkBreakPickerViewModel: WorkBreakPickerViewModelInput, WorkBreakPi
         return didTapConfirmSubject
             .withLatestFrom(indexRelay)
             .do(onNext: { [weak self] idx in self?.confirmedIndexRelay.accept(idx) })
-            .map { ($0 + 1) * 30 } // 30분 단위
+            .map { $0 * 30 } // 30분 단위
             .share()
     }()
     
@@ -57,5 +57,12 @@ final class WorkBreakPickerViewModel: WorkBreakPickerViewModelInput, WorkBreakPi
         confirmedIndexRelay = BehaviorRelay(value: initialIndex)
         
         selectedIndexSubject.bind(to: indexRelay).disposed(by: disposeBag)
+    }
+}
+extension WorkBreakPickerViewModel {
+    func setInitialBreak(_ minutes: Int) {
+        let index = minutes / 30
+        indexRelay.accept(index)
+        confirmedIndexRelay.accept(index)
     }
 }

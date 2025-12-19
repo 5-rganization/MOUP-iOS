@@ -19,20 +19,20 @@ protocol ColorLabelContainerViewModelOutput {
 
 final class ColorLabelContainerViewModel: ColorLabelContainerViewModelInput, ColorLabelContainerViewModelOutput {
 
-    // MARK: - Input
+    let selectColorLabelViewModel: SelectColorLabelViewModel
+    
     private let didTapColorLabelSubject = PublishSubject<Void>()
     var didTapColorLabel: AnyObserver<Void> { didTapColorLabelSubject.asObserver() }
 
-    // MARK: - Output
     let showColorLabel: Observable<Void>
     let selectedColorLabel: Driver<String>
 
-    // MARK: - Init
     init(selectColorLabelViewModel: SelectColorLabelViewModel) {
+
+        self.selectColorLabelViewModel = selectColorLabelViewModel
         self.showColorLabel = didTapColorLabelSubject.asObservable()
 
         self.selectedColorLabel = selectColorLabelViewModel.confirmedColor
             .asDriver(onErrorJustReturn: "")
     }
 }
-

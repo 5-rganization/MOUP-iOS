@@ -19,6 +19,7 @@ final class HomeViewModel {
     private let homeUseCase: HomeUseCaseProtocol
     private let attendanceUseCase: AttendanceUseCaseProtocol
     private let notificationUseCase: NotificationUseCaseProtocol
+    private let workplaceUseCase: WorkplaceUseCaseProtocol
     
     private let homeHeaderDataRelay = BehaviorRelay<HomeHeaderData>(
         value: HomeHeaderData(
@@ -35,16 +36,19 @@ final class HomeViewModel {
     private let errorMessageRelay = PublishRelay<(title: String, message: String)>()
     private let unreadCountRelay = BehaviorRelay<Int>(value: 0)
     
+    
     init(
         userRole: UserRole,
         homeUseCase: HomeUseCaseProtocol,
         attendanceUseCase: AttendanceUseCaseProtocol,
-        notificationUseCase: NotificationUseCaseProtocol
+        notificationUseCase: NotificationUseCaseProtocol,
+        workplaceUseCase: WorkplaceUseCaseProtocol
     ) {
         self.userRole = userRole
         self.homeUseCase = homeUseCase
         self.attendanceUseCase = attendanceUseCase
         self.notificationUseCase = notificationUseCase
+        self.workplaceUseCase = workplaceUseCase
     }
 
     // MARK: - Input, Output
@@ -54,6 +58,7 @@ final class HomeViewModel {
         let startWorkTapped: Observable<Int>
         let endWorkTapped: Observable<Int>
         let viewWillAppear: Observable<Void>
+        let deleteWorkplace: Observable<Int>
     }
 
     struct Output {
@@ -115,6 +120,13 @@ final class HomeViewModel {
                 }
             }
             .bind(to: unreadCountRelay)
+            .disposed(by: disposeBag)
+        
+        input.deleteWorkplace
+            .withUnretained(self)
+            .subscribe(onNext: { owner, id in
+                owner.deleteWorkplace(workplaceId: id)
+            })
             .disposed(by: disposeBag)
         
         return Output(
@@ -296,5 +308,21 @@ private extension HomeViewModel {
     
     func handleAttendanceSuccess() async {
         await MainActor.run { fetchHomeData() }
+    }
+    
+    func deleteWorkplace(workplaceId: Int) {
+        Task {
+            do {
+                try await workplaceUseCase.deleteWorkplace(workplaceId: workplaceId)
+                fetchHomeData()
+            } catch {
+                errorMessageRelay.accept(
+                    (
+                        title: "근무지 삭제 실패",
+                        message: "근무지 삭제에 실패했습니다.\n잠시 후 다시 시도해주세요."
+                    )
+                )
+            }
+        }
     }
 }

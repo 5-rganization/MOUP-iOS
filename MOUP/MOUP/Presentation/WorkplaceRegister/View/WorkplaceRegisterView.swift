@@ -6,6 +6,9 @@
 //
 
 import UIKit
+
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 
@@ -28,9 +31,16 @@ final class WorkplaceRegisterView: UIView {
     private let colorLabelContainerView = ColorLabelContainerView()
     
     // MARK: - UI Components
-    private let registerButton = BaseButton(title: "등록하기", isSecondary: true)
+    fileprivate let navigationBar = BaseNavigationBar(title: "새 근무지 등록")
+    private let registerButton = BaseButton(title: "등록하기").then {
+        $0.isEnabled = false
+    }
     
     // MARK: - Getter
+    var getNavigationBar: BaseNavigationBar {
+        navigationBar
+    }
+    
     var getWorkplaceContainerView: WorkplaceContainerView {
         workplaceContainerView
     }
@@ -73,6 +83,7 @@ private extension WorkplaceRegisterView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             scrollView
         )
         
@@ -81,15 +92,15 @@ private extension WorkplaceRegisterView {
         )
         
         contentView.addSubviews(
-            stackView
+            stackView,
+            registerButton
         )
         
         stackView.addArrangedSubviews(
             workplaceContainerView,
             payContainerView,
             workingConditionsContainerView,
-            colorLabelContainerView,
-            registerButton
+            colorLabelContainerView
         )
     }
     
@@ -100,8 +111,15 @@ private extension WorkplaceRegisterView {
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
+        }
+        
         scrollView.snp.makeConstraints {
-            $0.edges.equalTo(safeAreaLayoutGuide)
+            $0.top.equalTo(navigationBar.snp.bottom)
+            $0.trailing.leading.equalTo(safeAreaLayoutGuide)
+            $0.bottom.equalToSuperview()
         }
         
         contentView.snp.makeConstraints {
@@ -112,13 +130,19 @@ private extension WorkplaceRegisterView {
         stackView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(32)
             $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(12)
         }
         
         registerButton.snp.makeConstraints {
+            $0.top.equalTo(stackView.snp.bottom).offset(71)
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(45)
+            $0.bottom.equalToSuperview().inset(12)
         }
     }
 }
 
+extension Reactive where Base: WorkplaceRegisterView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
+    }
+}

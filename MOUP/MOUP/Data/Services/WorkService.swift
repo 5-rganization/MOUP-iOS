@@ -41,6 +41,8 @@ final class WorkService: WorkServiceProtocol {
     func createMyWork(workplaceId: Int, requestDTO: MyWorkCreateRequestDTO) async throws -> WorkCreateResponseDTO {
         let request = session.request(WorkRouter.createMyWork(workplaceId: workplaceId, dto: requestDTO))
         let response = await request.serializingDecodable(WorkCreateResponseDTO.self).response
+        
+        try checkCancellation(response)
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -57,6 +59,8 @@ final class WorkService: WorkServiceProtocol {
     func createWorkersWork(workplaceId: Int, requestDTO: WorkersWorkCreateRequestDTO) async throws -> WorkersWorkCreateResponseDTO {
         let request = session.request(WorkRouter.createWorkersWork(workplaceId: workplaceId, dto: requestDTO))
         let response = await request.serializingDecodable(WorkersWorkCreateResponseDTO.self).response
+        
+        try checkCancellation(response)
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -73,6 +77,8 @@ final class WorkService: WorkServiceProtocol {
     func fetchWorkDetail(workId: Int) async throws -> WorkDetailResponseDTO {
         let request = session.request(WorkRouter.fetchWork(workId: workId, viewQueryType: .detail))
         let response = await request.serializingDecodable(WorkDetailResponseDTO.self, decoder: isoDecoder).response
+        
+        try checkCancellation(response)
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -89,6 +95,8 @@ final class WorkService: WorkServiceProtocol {
     func fetchWorkSummary(workId: Int) async throws -> WorkSummaryResponseDTO {
         let request = session.request(WorkRouter.fetchWork(workId: workId, viewQueryType: .summary))
         let response = await request.serializingDecodable(WorkSummaryResponseDTO.self, decoder: isoDecoder).response
+        
+        try checkCancellation(response)
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -105,6 +113,8 @@ final class WorkService: WorkServiceProtocol {
     func fetchAllMyWorkList(baseYearMonth: String) async throws -> WorkCalendarListResponseDTO {
         let request = session.request(WorkRouter.fetchAllMyWorkList(baseYearMonth: baseYearMonth))
         let response = await request.serializingDecodable(WorkCalendarListResponseDTO.self, decoder: isoDecoder).response
+        
+        try checkCancellation(response)
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -121,6 +131,8 @@ final class WorkService: WorkServiceProtocol {
     func fetchWorkplaceMyWorkList(workplaceId: Int, baseYearMonth: String) async throws -> WorkCalendarListResponseDTO {
         let request = session.request(WorkRouter.fetchWorkplaceMyWorkList(workplaceId: workplaceId, baseYearMonth: baseYearMonth))
         let response = await request.serializingDecodable(WorkCalendarListResponseDTO.self, decoder: isoDecoder).response
+        
+        try checkCancellation(response)
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -137,6 +149,8 @@ final class WorkService: WorkServiceProtocol {
     func fetchWorkplaceAllWorkList(workplaceId: Int, baseYearMonth: String) async throws -> WorkCalendarListResponseDTO {
         let request = session.request(WorkRouter.fetchWorkplaceAllWorkList(workplaceId: workplaceId, baseYearMonth: baseYearMonth))
         let response = await request.serializingDecodable(WorkCalendarListResponseDTO.self, decoder: isoDecoder).response
+        
+        try checkCancellation(response)
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -153,6 +167,8 @@ final class WorkService: WorkServiceProtocol {
     func updateMySingleWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws {
         let request = session.request(WorkRouter.updateMySingleWork(workId: workId, dto: requestDTO))
         let response = await request.serializingData().response
+        
+        try checkCancellation(response)
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -168,6 +184,8 @@ final class WorkService: WorkServiceProtocol {
     func updateMyRecurringWork(workId: Int, requestDTO: MyWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO {
         let request = session.request(WorkRouter.updateMyRecurringWork(workId: workId, dto: requestDTO))
         let response = await request.serializingDecodable(WorkCreateResponseDTO.self, decoder: isoDecoder).response
+        
+        try checkCancellation(response)
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -185,6 +203,9 @@ final class WorkService: WorkServiceProtocol {
         let request = session.request(WorkRouter.updateWorkerSingleWork(workplaceId: workplaceId, workerId: workerId, workId: workId, dto: requestDTO))
         let response = await request.serializingData().response
         
+        try checkCancellation(response)
+        logResponse(response)
+        
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
         
         switch statusCode {
@@ -198,6 +219,8 @@ final class WorkService: WorkServiceProtocol {
     func updateWorkerRecurringWork(workplaceId: Int, workerId: Int, workId: Int, requestDTO: WorkerWorkUpdateRequestDTO) async throws -> WorkCreateResponseDTO {
         let request = session.request(WorkRouter.updateWorkerRecurringWork(workplaceId: workplaceId, workerId: workerId, workId: workId, dto: requestDTO))
         let response = await request.serializingDecodable(WorkCreateResponseDTO.self, decoder: isoDecoder).response
+        
+        try checkCancellation(response)
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -214,6 +237,8 @@ final class WorkService: WorkServiceProtocol {
     func deleteWork(workId: Int) async throws {
         let request = session.request(WorkRouter.deleteWork(workId: workId))
         let response = await request.serializingData().response
+        
+        try checkCancellation(response)
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -229,6 +254,8 @@ final class WorkService: WorkServiceProtocol {
     func deleteRecurringWork(workId: Int) async throws {
         let request = session.request(WorkRouter.deleteRecurringWork(workId: workId))
         let response = await request.serializingData().response
+        
+        try checkCancellation(response)
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -244,6 +271,8 @@ final class WorkService: WorkServiceProtocol {
     func startWork(workplaceId: Int) async throws -> WorkCreateResponseDTO? {
         let request = session.request(WorkRouter.startWork(workplaceId: workplaceId))
         let response = await request.serializingDecodable(WorkCreateResponseDTO.self).response
+        
+        try checkCancellation(response)
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -266,6 +295,8 @@ final class WorkService: WorkServiceProtocol {
     func endWork(workplaceId: Int) async throws {
         let request = session.request(WorkRouter.endWork(workplaceId: workplaceId))
         let response = await request.serializingData().response
+        
+        try checkCancellation(response)
         logResponse(response)
         
         guard let statusCode = response.response?.statusCode else { throw NetworkError.noResponse }
@@ -320,6 +351,20 @@ private extension WorkService {
                case .responseSerializationFailed(let reason) = afError,
                case .decodingFailed(let underlyingError) = reason {
                 logger.error("[\(functionName)] 에러 내용: \(String(describing: underlyingError))")
+            }
+        }
+    }
+    
+    /// Alamofire 응답 중 취소 에러가 있는지 확인하고, 있다면 `CancellationError`를 던집니다.
+    func checkCancellation<T>(_ response: DataResponse<T, AFError>) throws {
+        if let error = response.error {
+            // Alamofire 자체 취소 에러 (.explicitlyCancelled)
+            if case .explicitlyCancelled = error {
+                throw CancellationError()
+            }
+            // 내부 URLSession 취소 에러 (URLError.cancelled)
+            if let urlError = error.underlyingError as? URLError, urlError.code == .cancelled {
+                throw CancellationError()
             }
         }
     }

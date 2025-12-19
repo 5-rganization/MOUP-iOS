@@ -48,7 +48,7 @@ final class WorkTimeContainerView: UIView {
     
     private let clockIn = InfoRowView(title: "출근", type: .labelWithButton(title: "선택"), frame: .zero)
     private let clockOut = InfoRowView(title: "퇴근", type: .labelWithButton(title: "선택"), frame: .zero)
-    private let lunchBreak = InfoRowView(title: "휴게", type: .labelWithButton(title: "선택"), frame: .zero)
+    private let lunchBreak = InfoRowView(title: "휴게", type: .labelWithButton(title: "없음"), frame: .zero)
     
     private let container = ContainerView()
     private let divider = UIView().then {

@@ -61,6 +61,13 @@ final class YearMonthPickerModalViewController: UIViewController {
         configure()
         setYearMonthPickerView(currYear: focusedYear, currMonth: focusedMonth)
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if isBeingDismissed || isMovingFromParent {
+            coordinator?.disappeared()
+        }
+    }
 }
 
 private extension YearMonthPickerModalViewController {
@@ -78,8 +85,6 @@ private extension YearMonthPickerModalViewController {
     
     // MARK: - setDelegates
     func setDelegates() {
-        self.presentationController?.delegate = self
-        
         yearMonthPickerView.getPickerView.dataSource = self
         yearMonthPickerView.getPickerView.delegate = self
     }
@@ -149,12 +154,5 @@ extension YearMonthPickerModalViewController: UIPickerViewDelegate {
         default:
             break
         }
-    }
-}
-
-// MARK: - UIAdaptivePresentationControllerDelegate
-extension YearMonthPickerModalViewController: UIAdaptivePresentationControllerDelegate {
-    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        coordinator?.dismissReceived()
     }
 }

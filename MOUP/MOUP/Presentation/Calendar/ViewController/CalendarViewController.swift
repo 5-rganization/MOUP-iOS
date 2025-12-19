@@ -51,10 +51,6 @@ final class CalendarViewController: UIViewController {
     private let fetchThresholdInDays = 110
     
     // MARK: - UI Components
-    private let todayButton = UIBarButtonItem(title: "오늘").then {
-        $0.setTitleTextAttributes([.font: UIFont.headBold(14), .foregroundColor: UIColor.gray900], for: .normal)
-        $0.setTitleTextAttributes([.font: UIFont.headBold(14), .foregroundColor: UIColor.gray900], for: .selected)
-    }
     private let calendarView = CalendarView()
     /// `CalendarWorkListModalViewController` 이외 영역의 터치를 제한
     private lazy var calendarViewTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(didCalendarViewTap(_:))).then {
@@ -87,6 +83,13 @@ final class CalendarViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setCalendarView()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if let selectedDate {
+            selectCell(date: selectedDate)
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -122,9 +125,7 @@ private extension CalendarViewController {
     
     // MARK: - setStyles
     func setStyles() {
-        // TODO: BaseNavigationBar로 교체
-        self.setNavigationBar(title: "캘린더")
-        self.navigationItem.rightBarButtonItem = todayButton
+        self.navigationController?.navigationBar.isHidden = true
         
         self.view.backgroundColor = .primaryBackground
     }
@@ -143,7 +144,7 @@ private extension CalendarViewController {
     // MARK: - setBindings
     func setBindings() {
         // View 바인딩
-        todayButton.rx.tap
+        calendarView.getNavigationBar.rx.rightBtnTapped
             .subscribe(with: self) { owner, _ in
                 owner.deselectCell()
                 owner.scrollToDate(.now)
@@ -214,7 +215,6 @@ extension CalendarViewController {
     }
     
     func selectCell(date: Date) {
-        calendarView.getMonthCalendarView.scrollToDate(date, animateScroll: true)
         calendarView.getMonthCalendarView.selectDates([date])
     }
     
@@ -226,9 +226,9 @@ extension CalendarViewController {
 // MARK: - Private Calendar Methods
 private extension CalendarViewController {
     func setCalendarView() {
-        calendarView.getMonthCalendarView.scrollToDate(visibleMonthStartDate, animateScroll: false)
-        updateYearMonthLabel()
-        updateDataSource()
+        scrollToDate(selectedDate ?? visibleMonthStartDate, animateScroll: false) {
+            self.updateDataSource()
+        }
     }
     
     func updateYearMonthLabel() {
@@ -236,18 +236,18 @@ private extension CalendarViewController {
         calendarView.getCalendarHeaderView.update(dateStr: dateStr)
     }
     
-    func scrollToDate(_ date: Date) {
-        calendarView.getMonthCalendarView.scrollToDate(date, animateScroll: true)
+    func scrollToDate(_ date: Date, animateScroll: Bool = true, completionHandler: (() -> Void)? = nil) {
+        calendarView.getMonthCalendarView.scrollToDate(date,
+                                                       animateScroll: animateScroll,
+                                                       completionHandler: completionHandler)
         visibleMonthStartDate = date
         updateYearMonthLabel()
-        updateDataSource()
     }
     
     func configureCell(cell: JTACDayCell?, cellState: CellState, calendarMode: CalendarMode, workSet: Set<WorkSummary>) {
         guard let cell = cell as? CalendarDayCell else { return }
         
         let dateBelongsToThisMonth = (cellState.dateBelongsTo == .thisMonth)
-        let isSelected = cellState.isSelected
         let isToday = Calendar.current.isDateInToday(cellState.date)
         
         let workList = Array(workSet).sorted(by: sortCalendarWorkList)
@@ -261,12 +261,11 @@ private extension CalendarViewController {
     }
     
     func didSelectCell(selectedDate: Date) {
-        let selectedDay = Calendar.current.component(.day, from: selectedDate)
         let calendarWorkList: Observable<[WorkSummary]> = calendarWorkDataSourceRelay.map { [weak self] dict in
             guard let self else { return [] }
             return Array(dict[selectedDate] ?? []).sorted(by: self.sortCalendarWorkList)
         }
-        coordinator?.showCalendarWorkList(selectedDay: selectedDay,
+        coordinator?.showCalendarWorkList(selectedDate: selectedDate,
                                           calendarWorkList: calendarWorkList,
                                           calendarMode: calendarModeRelay.value)
         calendarViewTapRecognizer.isEnabled = true
@@ -290,11 +289,8 @@ private extension CalendarViewController {
 // MARK: - JTACMonthViewDataSource
 extension CalendarViewController: JTACMonthViewDataSource {
     func configureCalendar(_ calendar: JTACMonthView) -> ConfigurationParameters {
-        let startDate = DateFormatter.dataSourceDateFormatter.date(from: "\(CalendarRange.startYear).01.01")
-        let endDate = DateFormatter.dataSourceDateFormatter.date(from: "\(CalendarRange.endYear).12.31")
-        
-        return ConfigurationParameters(startDate: startDate ?? .distantPast,
-                                       endDate: endDate ?? .distantFuture,
+        return ConfigurationParameters(startDate: CalendarRange.startReferDate,
+                                       endDate: CalendarRange.endReferDate,
                                        generateInDates: .forAllMonths,
                                        generateOutDates: .tillEndOfRow)
     }
@@ -303,15 +299,39 @@ extension CalendarViewController: JTACMonthViewDataSource {
 // MARK: - JTACMonthViewDelegate
 extension CalendarViewController: JTACMonthViewDelegate {
     func calendar(_ calendar: JTACMonthView, willDisplay cell: JTACDayCell, forItemAt date: Date, cellState: CellState, indexPath: IndexPath) {
-        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workSet: calendarWorkDataSourceRelay.value[date] ?? [])
+        configureCell(cell: cell,
+                      cellState: cellState,
+                      calendarMode: calendarModeRelay.value,
+                      workSet: calendarWorkDataSourceRelay.value[date] ?? [])
     }
     
     func calendar(_ calendar: JTACMonthView, cellForItemAt date: Date, cellState: CellState, indexPath: IndexPath) -> JTACDayCell {
         guard let cell = calendar.dequeueReusableJTAppleCell(withReuseIdentifier: CalendarDayCell.identifier, for: indexPath) as? CalendarDayCell else {
             return JTACDayCell()
         }
-        configureCell(cell: cell, cellState: cellState, calendarMode: calendarModeRelay.value, workSet: calendarWorkDataSourceRelay.value[date] ?? [])
+        configureCell(cell: cell,
+                      cellState: cellState,
+                      calendarMode: calendarModeRelay.value,
+                      workSet: calendarWorkDataSourceRelay.value[date] ?? [])
         return cell
+    }
+    
+    // 사용자의 터치에 의해서만 호출됨, programmatic한 스크롤의 경우 호출 X
+    func calendar(_ calendar: JTACMonthView, willScrollToDateSegmentWith visibleDates: DateSegmentInfo) {
+        guard let date = visibleDates.monthDates.first?.date else { return }
+        visibleMonthStartDate = date
+        
+        // 셀 선택 해제
+        deselectCell()
+        
+        // 연/월 라벨 변경
+        updateYearMonthLabel()
+        
+        // 근무 데이터 로딩
+        if checkPrefetchCondition(date: date) {
+            logger.info("[\(#function)] 캘린더 근무 데이터 Prefetch")
+            updateDataSource()
+        }
     }
     
     // 사용자의 터치, programmatic한 스크롤 모두 호출
@@ -325,30 +345,21 @@ extension CalendarViewController: JTACMonthViewDelegate {
         }
     }
     
-    // 사용자의 터치에 의해서만 호출됨, programmatic한 스크롤의 경우 호출 X
-    func calendar(_ calendar: JTACMonthView, willScrollToDateSegmentWith visibleDates: DateSegmentInfo) {
-        guard let date = visibleDates.monthDates.first?.date else { return }
-        visibleMonthStartDate = date
-        
-        // 연/월 라벨 변경
-        updateYearMonthLabel()
-        
-        // 근무 데이터 로딩
-        if checkPrefetchCondition(date: date) {
-            logger.info("[\(#function)] 캘린더 근무 데이터 Prefetch")
-            updateDataSource()
-        }
-    }
-    
     func calendar(_ calendar: JTACMonthView, didSelectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
         selectedDate = date
-        cell?.isSelected = true
+        configureCell(cell: cell,
+                      cellState: cellState,
+                      calendarMode: calendarModeRelay.value,
+                      workSet: calendarWorkDataSourceRelay.value[date] ?? [])
         didSelectCell(selectedDate: date)
     }
     
     func calendar(_ calendar: JTACMonthView, didDeselectDate date: Date, cell: JTACDayCell?, cellState: CellState, indexPath: IndexPath) {
         selectedDate = nil
-        cell?.isSelected = false
+        configureCell(cell: cell,
+                      cellState: cellState,
+                      calendarMode: calendarModeRelay.value,
+                      workSet: calendarWorkDataSourceRelay.value[date] ?? [])
         didDeselectCell()
     }
 }

@@ -148,8 +148,8 @@ private extension BaseWorkCell {
 // MARK: - Internal Methods
 extension BaseWorkCell {
     /// 설정된 라벨 컬러를 적용하는 메서드
-    func setGivenLabelColor(_ labelColorStr: String) {
-        guard let labelColor = LabelColorString(rawValue: labelColorStr) else {
+    func setGivenLabelColor(_ labelColorServerStr: String) {
+        guard let labelColor = LabelColor(serverStr: labelColorServerStr) else {
             assertionFailure("\(#function) 실행 실패 - labelColorStr 값이 올바르지 않습니다.")
             return
         }

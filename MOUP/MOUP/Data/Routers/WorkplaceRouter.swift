@@ -13,6 +13,11 @@ enum WorkplaceRouter {
     case fetchWorkplaceByInviteCode(inviteCode: String)
     case fetchInviteCode(workplaceId: Int, requestDTO: InviteCodeRequestDTO)
     case createWorkplace(request: WorkplaceCreateRequestDTO)
+    case createOwnerWorkplace(request: OwnerWorkplaceCreateRequestDTO)
+    case joinWorkplace(request: WorkplaceJoinRequestDTO)
+    case deleteWorkplace(workplaceId: Int)
+    case fetchWorkplaceDetail(id: Int)
+    case updateWorkplace(workplaceId: Int, request: UpdateWorkplaceRequestDTO)
 }
 
 extension WorkplaceRouter: URLRequestConvertible {
@@ -33,17 +38,31 @@ extension WorkplaceRouter: URLRequestConvertible {
             return "/workplaces/\(workplaceId)/invite-code"
         case .createWorkplace:
             return "/workplaces"
+        case .createOwnerWorkplace:
+            return "/workplaces"
+        case .joinWorkplace:
+            return "/workplaces/join"
+        case .deleteWorkplace(let workplaceId):
+            return "/workplaces/\(workplaceId)"
+        case .fetchWorkplaceDetail(let id):
+            return "/workplaces/\(id)"
+        case .updateWorkplace(let workplaceId, _):
+            return "/workplaces/\(workplaceId)"
         }
     }
 
     var method: HTTPMethod {
         switch self {
-        case .fetchWorkplaceList, .fetchWorkplaceByInviteCode:
+        case .fetchWorkplaceList, .fetchWorkplaceByInviteCode, .fetchWorkplaceDetail:
             return .get
         case .fetchInviteCode:
             return .put
-        case .createWorkplace:
+        case .createWorkplace, .createOwnerWorkplace, .joinWorkplace:
             return .post
+        case .updateWorkplace:
+            return .patch
+        case .deleteWorkplace:
+            return .delete
         }
     }
     
@@ -51,27 +70,35 @@ extension WorkplaceRouter: URLRequestConvertible {
         switch self {
         case .fetchWorkplaceList(let isSharedOnly):
             return ["isSharedOnly": isSharedOnly]
-        case .createWorkplace, .fetchWorkplaceByInviteCode, .fetchInviteCode:
+        case .fetchWorkplaceDetail:
+            return ["view": "detail"]
+        case .createWorkplace, .createOwnerWorkplace, .fetchWorkplaceByInviteCode, .fetchInviteCode, .joinWorkplace, .deleteWorkplace, .updateWorkplace:
             return nil
         }
     }
 
     var requestBody: Encodable? {
         switch self {
-        case .fetchWorkplaceList, .fetchWorkplaceByInviteCode:
+        case .fetchWorkplaceList, .fetchWorkplaceByInviteCode, .deleteWorkplace, .fetchWorkplaceDetail:
             return nil
         case .fetchInviteCode(_, let requestDTO):
             return requestDTO
         case .createWorkplace(let request):
+            return request
+        case .createOwnerWorkplace(let request):
+            return request
+        case .joinWorkplace(let request):
+            return request
+        case .updateWorkplace(_, let request):
             return request
         }
     }
 
     var encoding: ParameterEncoding {
         switch self {
-        case .fetchWorkplaceList, .fetchWorkplaceByInviteCode:
+        case .fetchWorkplaceList, .fetchWorkplaceByInviteCode, .deleteWorkplace, .fetchWorkplaceDetail:
             return URLEncoding.default
-        case .createWorkplace, .fetchInviteCode:
+        case .createWorkplace, .createOwnerWorkplace, .fetchInviteCode, .joinWorkplace, .updateWorkplace:
             return JSONEncoding.default
         }
     }

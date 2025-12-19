@@ -5,6 +5,9 @@
 //  Created by 양원식 on 7/24/25.
 //
 import UIKit
+
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 
@@ -12,37 +15,61 @@ final class SelectCategoryView: UIView {
     // MARK: - Properties
     
     // MARK: - UI Components
+    fileprivate let navigationBar = BaseNavigationBar(title: "카테고리")
+    
     private let title = UILabel().then {
         $0.text = "근무지 카테고리를 선택해주세요."
         $0.textColor = .gray900
         $0.font = .headBold(18)
     }
-    private let restaurantRadioButton = RadioButtonView(title: "음식점", type: .icon(selectedIcon: UIImage(named:"RestaurantSelected")!, unselectedIcon: UIImage(named:"RestaurantUnselected")!, selectedRadioButton: UIImage(named:"selectedRadioButton")!, unselectedRadioButton: UIImage(named:"unselectedRadioButton")!))
+    private let restaurantRadioButton = RadioButtonView(title: WorkplaceCategory.restaurant.displayStr,
+                                                        type: .icon(selectedIcon: WorkplaceCategory.restaurant.selectedImage,
+                                                                    unselectedIcon: WorkplaceCategory.restaurant.unselectedImage,
+                                                                    selectedRadioButton: .selectedRadioButton,
+                                                                    unselectedRadioButton: .unselectedRadioButton))
     
-    private let cafeRadioButton = RadioButtonView(title: "카페", type: .icon(selectedIcon: UIImage(named:"CafeSelected")!, unselectedIcon: UIImage(named:"CafeUnselected")!, selectedRadioButton: UIImage(named:"selectedRadioButton")!, unselectedRadioButton: UIImage(named:"unselectedRadioButton")!))
+    private let cafeRadioButton = RadioButtonView(title: WorkplaceCategory.cafe.displayStr,
+                                                  type: .icon(selectedIcon: WorkplaceCategory.cafe.selectedImage,
+                                                              unselectedIcon: WorkplaceCategory.cafe.unselectedImage,
+                                                              selectedRadioButton: .selectedRadioButton,
+                                                              unselectedRadioButton: .unselectedRadioButton))
     
-    private let cvsRadioButton = RadioButtonView(title: "편의점", type: .icon(selectedIcon: UIImage(named:"CVSSelected")!, unselectedIcon: UIImage(named:"CVSUnselected")!, selectedRadioButton: UIImage(named:"selectedRadioButton")!, unselectedRadioButton: UIImage(named:"unselectedRadioButton")!))
+    private let cvsRadioButton = RadioButtonView(title: WorkplaceCategory.cvs.displayStr,
+                                                 type: .icon(selectedIcon: WorkplaceCategory.cvs.selectedImage,
+                                                             unselectedIcon: WorkplaceCategory.cvs.unselectedImage,
+                                                             selectedRadioButton: .selectedRadioButton,
+                                                             unselectedRadioButton: .unselectedRadioButton))
     
-    private let theaterRadioButton = RadioButtonView(title: "영화관", type: .icon(selectedIcon: UIImage(named:"TheaterSelected")!, unselectedIcon: UIImage(named:"TheaterUnselected")!, selectedRadioButton: UIImage(named:"selectedRadioButton")!, unselectedRadioButton: UIImage(named:"unselectedRadioButton")!))
+    private let movieTheaterRadioButton = RadioButtonView(title: WorkplaceCategory.movieTheater.displayStr,
+                                                          type: .icon(selectedIcon: WorkplaceCategory.movieTheater.selectedImage,
+                                                                      unselectedIcon: WorkplaceCategory.movieTheater.unselectedImage,
+                                                                      selectedRadioButton: .selectedRadioButton,
+                                                                      unselectedRadioButton: .unselectedRadioButton))
     
-    private let etcRadioButton = RadioButtonView(title: "기타", type: .icon(selectedIcon: UIImage(named:"EtcSelected")!, unselectedIcon: UIImage(named:"EtcUnselected")!, selectedRadioButton: UIImage(named:"selectedRadioButton")!, unselectedRadioButton: UIImage(named:"unselectedRadioButton")!))
+    private let othersRadioButton = RadioButtonView(title: WorkplaceCategory.others.displayStr,
+                                                    type: .icon(selectedIcon: WorkplaceCategory.others.selectedImage,
+                                                                unselectedIcon: WorkplaceCategory.others.unselectedImage,
+                                                                selectedRadioButton: .selectedRadioButton,
+                                                                unselectedRadioButton: .unselectedRadioButton))
     
     
-    private let registerButton = BaseButton(title: "완료", isSecondary: true)
+    private let confirmButton = BaseButton(title: "완료").then {
+        $0.isEnabled = false
+    }
     
     // MARK: - Getter
     
     var getRestaurantRadioButton: RadioButtonView { restaurantRadioButton }
     var getCafeRadioButton: RadioButtonView { cafeRadioButton }
     var getCvsRadioButton: RadioButtonView { cvsRadioButton }
-    var getTheaterRadioButton: RadioButtonView { theaterRadioButton }
-    var getEtcRadioButton: RadioButtonView { etcRadioButton }
-    var getRegisterButton: BaseButton { registerButton }
+    var getMovieTheaterRadioButton: RadioButtonView { movieTheaterRadioButton }
+    var getOthersRadioButton: RadioButtonView { othersRadioButton }
+    var getConfirmButton: BaseButton { confirmButton }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+        setupRoleTitle()
         configure()
     }
     
@@ -52,6 +79,15 @@ final class SelectCategoryView: UIView {
     }
     
     // MARK: - Public Methods
+    func setupRoleTitle() {
+        let role = UserDefaultsManager.shared.userRole
+        
+        if role == "OWNER" {
+            title.text = "매장 카테고리를 선택해주세요."
+        } else {
+            title.text = "근무지 카테고리를 선택해주세요."
+        }
+    }
 }
 
 private extension SelectCategoryView {
@@ -65,25 +101,31 @@ private extension SelectCategoryView {
     // MARK: - setHierarchy
     func setHierarchy() {
         addSubviews(
+            navigationBar,
             title,
             restaurantRadioButton,
             cafeRadioButton,
             cvsRadioButton,
-            theaterRadioButton,
-            etcRadioButton,
-            registerButton
+            movieTheaterRadioButton,
+            othersRadioButton,
+            confirmButton
         )
     }
     
     // MARK: - setStyles
     func setStyles() {
-        backgroundColor = .white
+        backgroundColor = .primaryBackground
     }
     
     // MARK: - setConstraints
     func setConstraints() {
+        navigationBar.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide)
+            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
+        }
+        
         title.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(32)
+            $0.top.equalTo(navigationBar.snp.bottom).offset(32)
             $0.leading.equalToSuperview().offset(16)
         }
         restaurantRadioButton.snp.makeConstraints {
@@ -101,17 +143,17 @@ private extension SelectCategoryView {
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
-        theaterRadioButton.snp.makeConstraints {
+        movieTheaterRadioButton.snp.makeConstraints {
             $0.top.equalTo(cvsRadioButton.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
-        etcRadioButton.snp.makeConstraints {
-            $0.top.equalTo(theaterRadioButton.snp.bottom).offset(12)
+        othersRadioButton.snp.makeConstraints {
+            $0.top.equalTo(movieTheaterRadioButton.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
-        registerButton.snp.makeConstraints {
+        confirmButton.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(45)
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(12)
@@ -119,3 +161,8 @@ private extension SelectCategoryView {
     }
 }
 
+extension Reactive where Base: SelectCategoryView {
+    var navBackBtnTapped: ControlEvent<Void> {
+        return base.navigationBar.rx.backBtnTapped
+    }
+}

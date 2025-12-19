@@ -17,13 +17,13 @@ final class PersonalModeWorkRowVStackView: BaseWorkRowVStackView {
     override func update(work: WorkSummary) {
         switch UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) {
         case .worker:
-            setGivenLabelColor(work.workerSummary.workerBasedLabelColorStr ?? LabelColorString._default.rawValue)
+            setGivenLabelColor(work.workerSummary.workerBasedLabelColorStr ?? LabelColor._default.serverStr)
             dailyIncomeLabel.isHidden = false
         case .owner:
-            setGivenLabelColor(work.workerSummary.ownerBasedLabelColorStr ?? LabelColorString._default.rawValue)
+            setGivenLabelColor(work.workerSummary.ownerBasedLabelColorStr ?? LabelColor._default.serverStr)
             dailyIncomeLabel.isHidden = true
         default:
-            setGivenLabelColor(LabelColorString._default.rawValue)
+            setGivenLabelColor(LabelColor._default.serverStr)
             dailyIncomeLabel.isHidden = true
         }
         
