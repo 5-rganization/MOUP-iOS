@@ -31,14 +31,18 @@ final class BaseButton: UIButton {
     
     /// API 호출 전 로딩 상태를 시작합니다. (인디케이터 표시, 터치 비활성화)
     func startLoading() {
-        isLoading = true
-        self.isEnabled = false
+        DispatchQueue.main.async {
+            self.isLoading = true
+            self.isEnabled = false
+        }
     }
     
     /// API 응답 후 로딩 상태를 종료합니다. (인디케이터 숨김, 터치 활성화)
     func stopLoading() {
-        isLoading = false
-        self.isEnabled = true
+        DispatchQueue.main.async {
+            self.isLoading = false
+            self.isEnabled = true
+        }
     }
 }
 
@@ -68,7 +72,7 @@ private extension BaseButton {
         config.attributedTitle = AttributedString(title, attributes: normalAttribute)
         config.imagePadding = 8
         config.baseBackgroundColor = baseBackgroundColor
-        config.background.cornerRadius = 12
+        config.background.cornerRadius = 12  // iOS 26에서 UIButton.Configuration의 cornerRadius가 적용되지 않는 문제에 대한 workaround
         
         let handler: UIButton.ConfigurationUpdateHandler = { [weak self] button in
             guard let self else { return }
