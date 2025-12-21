@@ -330,7 +330,6 @@ flowchart TB
 }%%
 classDiagram
 direction LR
-
     AttendanceService ..|> AttendanceServiceProtocol
     AttendanceServiceProtocol <.. AttendanceRepository
     AttendanceRepository ..|> AttendanceRepositoryProtocol
@@ -422,13 +421,13 @@ direction LR
     WorkUseCaseProtocol <.. CalendarWorkListViewModel
     WorkUseCaseProtocol <.. WorkRegisterViewModel
 
-	  class AttendanceServiceProtocol:::MOUP_primary100 { <<protocol>> }
-	  class AttendanceRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
-	  class AttendanceUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
-
-	  class AuthServiceProtocol:::MOUP_primary100 { <<protocol>> }
-	  class AuthRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
-	  class AuthUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+    class AttendanceServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class AttendanceRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class AttendanceUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
+	
+    class AuthServiceProtocol:::MOUP_primary100 { <<protocol>> }
+    class AuthRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
+    class AuthUseCaseProtocol:::MOUP_primary100 { <<protocol>> }
 
     class HomeServiceProtocol:::MOUP_primary100 { <<protocol>> }
     class HomeRepositoryProtocol:::MOUP_primary100 { <<protocol>> }
