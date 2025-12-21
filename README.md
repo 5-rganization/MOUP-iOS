@@ -274,7 +274,7 @@ flowchart TB
     Check -- No Token --> SignIn["SignInCoordinator"]
     SignIn --> SignUp["SignUpCoordinator"]
     Check -- Has Token --> TabBar["TabBarCoordinator"]
-    SignIn -. Login Success .-> TabBar
+    SignIn -. SignUp Success .-> TabBar
     TabBar --> Home["HomeCoordinator"] & Calendar["CalendarCoordinator"] & MyPage["MyPageCoordinator"]
     Home --> WP_Sheet["WorkplaceRegisterSheetCoordinator"] & WP_Register["WorkplaceRegisterCoordinator"]
     WP_Sheet --> Invite["InviteCodeInputCoordinator"] & WP_Register
