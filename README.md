@@ -16,8 +16,7 @@
 > *알바생에게는 복잡할 수 있는 근무 시간 • 급여 계산을 돕고, 사장님의 인건비 • 근무 일정의 효율적인 관리를 지원합니다 !*
 >
 > 개발 기간(Cloud Firestore): 2025.05.29 ~ 2025.07.07  
-> 리팩토링 기간([Spring Boot](https://github.com/5-rganization/MOUP-Server)): 2025.07.12 ~ 2025.11.23  
-> 유비보수 기간: 2025.11.24 ~
+> 리팩토링 기간([Spring Boot](https://github.com/5-rganization/MOUP-Server)): 2025.07.12 ~ 2025.12.16  
 
 <br>
 
@@ -45,7 +44,7 @@
 |:---------:|:----------:|:----------|
 | 서동환 | `리더` | 프로젝트 초기 세팅, Apple 로그인, 캘린더 |
 | 양원식 | `부리더` | 근무지 등록/수정, 근무 등록/수정 |
-| 김신영 | `팀원` | 마이페이지, 루틴 등록/수정 |
+| 김신영 | `팀원` | 마이페이지, 루틴 등록/수정, 푸시 알림 |
 | 송규섭 | `팀원` | 홈, 근무지 등록 모달, 초대 코드 |
 | 권대현 | `팀원` | 백엔드 구현 |
 | 조유빈 | `디자이너` | 와이어프레임, UI/UX 디자인 |
@@ -248,6 +247,70 @@ erDiagram
 ---
 
 ### 리팩토링 과정([Spring Boot](https://github.com/5-rganization/MOUP-Server))
+#### Coordinator 다이어그램
+``` mermaid
+%%{
+  init: {
+    "theme": "default",
+    "fontFamily": "monospace",
+    "elk": {
+        "mergeEdges": false,
+        "nodePlacementStrategy": "BRANDES_KOEPF",
+        "forceNodeModelOrder": false,
+        "considerModelOrder": "NODES_AND_EDGES"
+    }
+  }
+}%%
+flowchart TB
+ subgraph Legend["Legend"]
+    direction LR
+        L1["Root/App"]
+        L2["Decision"]
+        L3["Tab Parent"]
+        L4["Feature Flow"]
+        L5["Modal/Sheet"]
+  end
+    App["AppCoordinator"] --> Check{"Login Check"}
+    Check -- No Token --> SignIn["SignInCoordinator"]
+    SignIn --> SignUp["SignUpCoordinator"]
+    Check -- Has Token --> TabBar["TabBarCoordinator"]
+    SignIn -. Login Success .-> TabBar
+    TabBar --> Home["HomeCoordinator"] & Calendar["CalendarCoordinator"] & MyPage["MyPageCoordinator"]
+    Home --> WP_Sheet["WorkplaceRegisterSheetCoordinator"] & WP_Register["WorkplaceRegisterCoordinator"]
+    WP_Sheet --> Invite["InviteCodeInputCoordinator"] & WP_Register
+    Calendar --> Filter["FilterCoordinator"] & YearPicker["YearMonthPickerCoordinator"] & WorkList["CalendarWorkListCoordinator"] & WorkReg["WorkRegisterCoordinator"]
+    WorkList -.-> WorkReg
+    WorkReg --> RoutineSel["RoutineSelectionCoordinator"]
+
+     App:::root
+     Check:::decision
+     SignIn:::root
+     SignUp:::flow
+     TabBar:::root
+     Home:::tab
+     Calendar:::tab
+     MyPage:::tab
+     WP_Sheet:::modal
+     WP_Register:::flow
+     Invite:::flow
+     Filter:::modal
+     YearPicker:::modal
+     WorkList:::modal
+     WorkReg:::flow
+     RoutineSel:::flow
+     L1:::root
+     L2:::decision
+     L3:::tab
+     L4:::flow
+     L5:::modal
+    classDef root fill:#f9f,stroke:#333,stroke-width:2px,color:black
+    classDef tab fill:#bbf,stroke:#333,stroke-width:2px,color:black
+    classDef flow fill:#dfd,stroke:#333,stroke-width:1px,color:black
+    classDef modal fill:#fff,stroke:#333,stroke-width:1px,stroke-dasharray: 5 5,color:black
+    classDef decision fill:#ff9,stroke:#333,stroke-width:2px,shape:rhombus,color:black
+```
+
+
 #### 의존성 다이어그램
 ``` mermaid
 %%{
@@ -633,7 +696,7 @@ if !hasLaunchedBefore {
 | 의존성 관리 도구 | `SPM`, `CocoaPods` |
 | 형상 관리 도구 | `Git`, `GitHub` |
 | 아키텍처 | `Clean Architecture`, `MVVM` |
-| 디자인 패턴 | `Delegate`, `Singleton` |
+| 디자인 패턴 | `Coordinator`, `Delegate`, `Singleton` |
 | 인터페이스 | `UIKit` |
 | 네트워크 | `Swift Concurrency`, `Alamofire` |
 | 비동기 처리 | `RxSwift`, `RxCocoa`, `RxDataSources` |
@@ -642,6 +705,7 @@ if !hasLaunchedBefore {
 | 내부 저장소 | `UserDefaults` |
 | 외부 저장소 | `Cloud Firestore` ➡️ [`Spring Boot`](https://github.com/5-rganization/MOUP-Server) |
 | 외부 인증 | `Sign in with Apple`, `Google Sign in`, `Firebase Auth` ➡️ [`Spring Boot`](https://github.com/5-rganization/MOUP-Server) |
+| 활용 API | `Firebase Cloud Message`, `Firebase Crashlytics` |
 | 코드 컨벤션 | `StyleShare - Swift Style Guide` |
 | 커밋 컨벤션 | `Udacity Git Commit Message Style Guide` |
 
@@ -717,9 +781,9 @@ if !hasLaunchedBefore {
 
 
 ## 🔨 개발 환경
-
-![Static Badge](https://img.shields.io/badge/Xcode%2016.3-147EFB?logo=xcode&logoColor=white&logoSize=auto)
-![Static Badge](https://img.shields.io/badge/16.0-000000?logo=ios&logoColor=white&logoSize=auto)
+![Static Badge](https://img.shields.io/badge/Swift%205-%23F05138?logo=swift&logoColor=white)
+![Static Badge](https://img.shields.io/badge/Xcode%2016%20~-%23147EFB?logo=xcode&logoColor=white)
+![Static Badge](https://img.shields.io/badge/16%20~%20-%23000000?logo=ios&logoColor=white)
 
 
 <br><br>
