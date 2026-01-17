@@ -67,6 +67,7 @@ extension WorkplaceRouter: URLRequestConvertible {
         case .updateWorkplace:
             return .patch
         case .deleteWorkplace:
+            return .delete
         case .approveJoinRequest:
             return .patch
         case .rejectJoinRequest:
@@ -81,6 +82,7 @@ extension WorkplaceRouter: URLRequestConvertible {
         case .fetchWorkplaceDetail:
             return ["view": "detail"]
         case .createWorkplace, .createOwnerWorkplace, .fetchWorkplaceByInviteCode, .fetchInviteCode, .joinWorkplace, .deleteWorkplace, .updateWorkplace:
+            return nil
         case .approveJoinRequest,
              .rejectJoinRequest:
             return nil
@@ -90,6 +92,7 @@ extension WorkplaceRouter: URLRequestConvertible {
     var requestBody: Encodable? {
         switch self {
         case .fetchWorkplaceList, .fetchWorkplaceByInviteCode, .deleteWorkplace, .fetchWorkplaceDetail:
+            return nil
         case .approveJoinRequest,
              .rejectJoinRequest:
             return nil
@@ -111,6 +114,7 @@ extension WorkplaceRouter: URLRequestConvertible {
         case .fetchWorkplaceList, .fetchWorkplaceByInviteCode, .deleteWorkplace, .fetchWorkplaceDetail:
             return URLEncoding.default
         case .createWorkplace, .createOwnerWorkplace, .fetchInviteCode, .joinWorkplace, .updateWorkplace:
+            return JSONEncoding.default
         case .approveJoinRequest,
              .rejectJoinRequest:
             return JSONEncoding.default
