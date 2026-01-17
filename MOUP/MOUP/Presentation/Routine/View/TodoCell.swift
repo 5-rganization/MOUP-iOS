@@ -8,10 +8,13 @@
 import UIKit
 import Then
 import SnapKit
+import RxSwift
 
 final class TodoCell: UITableViewCell {
     
     static let id = "TodoCell"
+    
+    var disposeBag = DisposeBag()
 
     // MARK: - UI Components
     
@@ -48,6 +51,11 @@ final class TodoCell: UITableViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        disposeBag = DisposeBag()
     }
 }
 

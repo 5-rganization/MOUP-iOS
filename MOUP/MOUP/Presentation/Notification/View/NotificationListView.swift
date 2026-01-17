@@ -10,6 +10,7 @@ import Then
 import SnapKit
 import RxSwift
 import RxCocoa
+import OSLog
 
 final class NotificationListView: UIView {
     
@@ -19,6 +20,16 @@ final class NotificationListView: UIView {
     fileprivate let markAllAsReadSubject = PublishSubject<Void>()
     fileprivate let deleteAllSubject = PublishSubject<Void>()
     fileprivate let deleteSubject = PublishSubject<UserNotification>()
+    fileprivate let approveSubject = PublishSubject<(
+        notificationId: Int,
+        workplaceId: Int,
+        workerId: Int
+    )>()
+    fileprivate let rejectSubject = PublishSubject<(
+        notificationId: Int,
+        workplaceId: Int,
+        workerId: Int
+    )>()
     private var notifications: [UserNotification] = []
     
     // MARK: - UI Components
@@ -182,6 +193,24 @@ extension NotificationListView: UITableViewDataSource {
         let notification = notifications[indexPath.row]
         cell.configure(with: notification)
         
+        if notification.type == .inviteRequest,
+           let metadata = notification.metadata,
+           let workplaceId = metadata.workplaceId,
+           let workerId = metadata.workerId {
+
+            cell.onApprove = { [weak self] notificationId in
+                self?.approveSubject.onNext(
+                    (notificationId, workplaceId, workerId)
+                )
+            }
+
+            cell.onReject = { [weak self] notificationId in
+                self?.rejectSubject.onNext(
+                    (notificationId, workplaceId, workerId)
+                )
+            }
+        }
+        
         return cell
     }
 }
@@ -193,7 +222,9 @@ extension NotificationListView: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let deleteAction = UIContextualAction(style: .destructive, title: "삭제") { [weak self] _, _, completion in
+        let deleteAction = UIContextualAction(
+            style: .destructive, title: "삭제"
+        ) { [weak self] _, _, completion in
             guard let self else {
                 completion(false)
                 return
@@ -227,5 +258,17 @@ extension Reactive where Base: NotificationListView {
     
     var deleteTapped: ControlEvent<UserNotification> {
         ControlEvent(events: base.deleteSubject)
+    }
+    
+    var approveTapped: Observable<(
+        notificationId: Int, workplaceId: Int, workerId: Int
+    )> {
+        return base.approveSubject.asObservable()
+    }
+
+    var rejectTapped: Observable<(
+        notificationId: Int, workplaceId: Int, workerId: Int
+    )> {
+        return base.rejectSubject.asObservable()
     }
 }

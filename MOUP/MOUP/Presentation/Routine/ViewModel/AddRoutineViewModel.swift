@@ -219,7 +219,7 @@ final class AddRoutineViewModel {
                     validationFocusRelay.accept(.alarmTime)
                     return .empty()
                 }
-                let alarmTimeString = String(format: "%d:%02d", hour, minute)
+                let alarmTimeString = String(format: "%02d:%02d", hour, minute)
                 
                 let tasks = validItems.map { item in
                     (content: item.content, orderIndex: item.orderIndex)

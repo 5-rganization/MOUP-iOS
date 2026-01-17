@@ -18,17 +18,32 @@ final class AddRoutineView: UIView {
     enum Section { case main }
     fileprivate lazy var dataSource = UITableViewDiffableDataSource<Section, RoutineTaskItem>(
         tableView: tableView
-    ) { tableView, indexPath, item in
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: TodoCell.id, for: indexPath) as? TodoCell else {
-            fatalError("TodoCell을 생성할 수 없습니다.")
+    ) { [weak self] tableView, indexPath, item in
+        guard let self,
+              let cell = tableView.dequeueReusableCell(
+                withIdentifier: TodoCell.id,
+                for: indexPath
+              ) as? TodoCell else {
+            assertionFailure("TodoCell 생성 실패 - 셀이 등록되지 않았거나 타입이 잘못됨")
+            return UITableViewCell()
         }
+        cell.disposeBag = DisposeBag()
+        
         cell.textField.text = item.content
+        
+        cell.textField.rx.text.orEmpty
+            .skip(1)
+            .map { text in
+                return (index: indexPath.row, text: text)
+            }
+            .bind(to: self.itemTextChangeRelay)
+            .disposed(by: cell.disposeBag)
+        
         return cell
     }
     fileprivate let itemTextChangeRelay = PublishRelay<(index: Int, text: String)>()
     fileprivate let itemMovedRelay = PublishRelay<(source: Int, destination: Int)>()
     fileprivate let itemDeleteRelay = PublishRelay<Int>()
-    fileprivate var isHandlingDragDrop = false
 
     // MARK: - UI Components
     
@@ -264,17 +279,6 @@ private extension AddRoutineView {
 }
 
 extension AddRoutineView: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let cell = cell as? TodoCell else { return }
-        cell.textField.tag = indexPath.row
-        cell.textField.removeTarget(nil, action: nil, for: .editingChanged)
-        cell.textField.addTarget(self, action: #selector(textChanged(_:)), for: .editingChanged)
-    }
-    
-    @objc private func textChanged(_ tf: UITextField) {
-        itemTextChangeRelay.accept((index: tf.tag, text: tf.text ?? ""))
-    }
-    
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let deleteAction = UIContextualAction(style: .destructive, title: "삭제") { [weak self] _, _, completion in
             self?.itemDeleteRelay.accept(indexPath.row)
@@ -335,22 +339,10 @@ extension AddRoutineView: UITableViewDropDelegate {
         _ tableView: UITableView,
         performDropWith coordinator: UITableViewDropCoordinator
     ) {
-        let destinationIndexPath: IndexPath
-        if let indexPath = coordinator.destinationIndexPath {
-            destinationIndexPath = indexPath
-        } else {
-            let section = tableView.numberOfSections - 1
-            let row = tableView.numberOfRows(inSection: section)
-            destinationIndexPath = IndexPath(row: row, section: section)
-        }
-
-        guard let item = coordinator.items.first,
+        guard let destinationIndexPath = coordinator.destinationIndexPath,
+              let item = coordinator.items.first,
               let sourceIndexPath = item.sourceIndexPath else { return }
-
-        coordinator.drop(item.dragItem, toRowAt: destinationIndexPath)
-
-        self.isHandlingDragDrop = true
-
+        
         self.itemMovedRelay.accept(
             (source: sourceIndexPath.row, destination: destinationIndexPath.row)
         )
@@ -380,10 +372,7 @@ extension Reactive where Base: AddRoutineView {
             snapshot.appendSections([.main])
             snapshot.appendItems(items, toSection: .main)
 
-            let shouldAnimate = !view.isHandlingDragDrop
-            view.dataSource.apply(snapshot, animatingDifferences: shouldAnimate)
-
-            view.isHandlingDragDrop = false
+            view.dataSource.apply(snapshot, animatingDifferences: false)
         }
     }
     

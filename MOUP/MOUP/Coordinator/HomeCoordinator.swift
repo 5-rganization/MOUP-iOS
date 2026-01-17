@@ -26,6 +26,12 @@ final class HomeCoordinator: Coordinator {
     private let notificationRepository: NotificationRepositoryProtocol
     private let notificationUseCase: NotificationUseCaseProtocol
     private let draftRoutineStorage: DraftRoutineStorageProtocol
+    private lazy var notificationListViewModel: NotificationListViewModel = {
+        return NotificationListViewModel(
+            notificationUseCase: notificationUseCase,
+            workplaceUseCase: workplaceUseCase
+        )
+    }()
     
     init(navigationController: UINavigationController, userRole: UserRole) {
         self.navigationController = navigationController
@@ -193,9 +199,17 @@ final class HomeCoordinator: Coordinator {
         childCoordinators.removeAll { $0 === coordinator }
     }
     
-    func showNotificationList() {
-        let viewModel = NotificationListViewModel(notificationUseCase: notificationUseCase)
-        let notificationListVC = NotificationListViewController(viewModel: viewModel)
+    func showNotificationList(
+        pushType: String? = nil,
+        pushWorkerId: Int? = nil,
+        pushWorkplaceId: Int? = nil
+    ) {
+        let notificationListVC = NotificationListViewController(
+            viewModel: notificationListViewModel,
+            pushType: pushType,
+            pushWorkerId: pushWorkerId,
+            pushWorkplaceId: pushWorkplaceId
+        )
         navigationController.pushViewController(notificationListVC, animated: true)
     }
     

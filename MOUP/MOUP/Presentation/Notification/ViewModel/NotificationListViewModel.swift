@@ -20,6 +20,12 @@ final class NotificationListViewModel {
         let deleteAllTapped: Observable<Void>
         let refreshTrigger: Observable<Void>
         let deleteTapped: Observable<UserNotification>
+        let approveTapped: Observable<(
+            notificationId: Int, workplaceId: Int, workerId: Int
+        )>
+        let rejectTapped: Observable<(
+            notificationId: Int, workplaceId: Int, workerId: Int
+        )>
     }
     
     // MARK: - Output
@@ -29,17 +35,59 @@ final class NotificationListViewModel {
         let isLoading: Driver<Bool>
         let error: Signal<String>
         let unreadCount: Driver<Int>
+        let approveSuccess: Signal<Void>
+        let rejectSuccess: Signal<Void>
     }
     
     // MARK: - Properties
     
     private let notificationUseCase: NotificationUseCaseProtocol
+    private let workplaceUseCase: WorkplaceUseCaseProtocol
     private let disposeBag = DisposeBag()
+    private var approvedNotificationIds: Set<Int> = []
+    private var rejectedNotificationIds: Set<Int> = []
     
     // MARK: - Initializer
     
-    init(notificationUseCase: NotificationUseCaseProtocol) {
+    init(
+        notificationUseCase: NotificationUseCaseProtocol,
+        workplaceUseCase: WorkplaceUseCaseProtocol
+    ) {
         self.notificationUseCase = notificationUseCase
+        self.workplaceUseCase = workplaceUseCase
+    }
+
+    // MARK: - Helper Methods
+
+    private func applyLocalState(to notifications: [UserNotification]) -> [UserNotification] {
+        return notifications.map { notification in
+            if approvedNotificationIds.contains(notification.id) {
+                return UserNotification(
+                    id: notification.id,
+                    senderId: notification.senderId,
+                    receiverId: notification.receiverId,
+                    title: notification.title,
+                    content: notification.content,
+                    sentAt: notification.sentAt,
+                    readAt: notification.readAt,
+                    type: .inviteApproved,
+                    metadata: notification.metadata
+                )
+            } else if rejectedNotificationIds.contains(notification.id) {
+                return UserNotification(
+                    id: notification.id,
+                    senderId: notification.senderId,
+                    receiverId: notification.receiverId,
+                    title: notification.title,
+                    content: notification.content,
+                    sentAt: notification.sentAt,
+                    readAt: notification.readAt,
+                    type: .inviteRejected,
+                    metadata: notification.metadata
+                )
+            }
+            return notification
+        }
     }
     
     // MARK: - Transform
@@ -48,7 +96,8 @@ final class NotificationListViewModel {
         let loadingRelay = BehaviorRelay<Bool>(value: false)
         let notificationsRelay = BehaviorRelay<[UserNotification]>(value: [])
         let errorRelay = PublishRelay<String>()
-        
+        let approveSuccessRelay = PublishRelay<Void>()
+        let rejectSuccessRelay = PublishRelay<Void>()
         let fetchTrigger = Observable.merge(
             input.viewDidLoad,
             input.refreshTrigger
@@ -64,9 +113,9 @@ final class NotificationListViewModel {
                 return Observable.create { observer in
                     Task {
                         do {
-                            let notifications = try await self.notificationUseCase.fetchNotifications()
-                            
-                            let sortedNotification = notifications.sorted { $0.sentAt > $1.sentAt }
+                            let fetchedNotifications = try await self.notificationUseCase.fetchNotifications()
+
+                            let sortedNotification = fetchedNotifications.sorted { $0.sentAt > $1.sentAt }
                             
                             observer.onNext(sortedNotification)
                             observer.onCompleted()
@@ -79,6 +128,10 @@ final class NotificationListViewModel {
                     }
                     return Disposables.create()
                 }
+            }
+            .map { [weak self] notifications -> [UserNotification] in
+                guard let self else { return notifications }
+                return self.applyLocalState(to: notifications)
             }
             .bind(to: notificationsRelay)
             .disposed(by: disposeBag)
@@ -104,8 +157,9 @@ final class NotificationListViewModel {
                 }
             }
             .withLatestFrom(notificationsRelay) { tappedNotificationId, notifications -> [UserNotification] in
-                return notifications.map { notification in
-                    if notification.id == tappedNotificationId && !notification.isRead {
+
+                let updatedNotifications = notifications.map { notification in
+                    if notification.id == tappedNotificationId {
                         return UserNotification(
                             id: notification.id,
                             senderId: notification.senderId,
@@ -113,11 +167,15 @@ final class NotificationListViewModel {
                             title: notification.title,
                             content: notification.content,
                             sentAt: notification.sentAt,
-                            readAt: Date()
+                            readAt: Date(),
+                            type: notification.type,
+                            metadata: notification.metadata
                         )
                     }
                     return notification
                 }
+
+                return updatedNotifications
             }
             .bind(to: notificationsRelay)
             .disposed(by: disposeBag)
@@ -149,7 +207,9 @@ final class NotificationListViewModel {
                         title: notification.title,
                         content: notification.content,
                         sentAt: notification.sentAt,
-                        readAt: notification.readAt ?? Date()
+                        readAt: notification.readAt ?? Date(),
+                        type: notification.type,
+                        metadata: notification.metadata
                     )
                 }
             }
@@ -207,11 +267,139 @@ final class NotificationListViewModel {
             .bind(to: notificationsRelay)
             .disposed(by: disposeBag)
         
+        input.approveTapped
+            .do(onNext: { [weak self] (notificationId, _, _) in
+                self?.approvedNotificationIds.insert(notificationId)
+            })
+            .flatMapLatest { [weak self] (_, workplaceId, workerId) -> Observable<Void> in
+                guard let self else { return .empty() }
+                
+                return Observable.create { observer in
+                    Task {
+                        do {
+                            try await self.workplaceUseCase.approveJoinRequest(
+                                workplaceId: workplaceId,
+                                workerId: workerId
+                            )
+                            observer.onNext(())
+                            observer.onCompleted()
+                        } catch {
+                            errorRelay.accept("승인에 실패했습니다.")
+                            observer.onCompleted()
+                        }
+                    }
+                    return Disposables.create()
+                }
+            }
+            .do(onNext: { [weak self] _ in
+                guard let self else { return }
+                Task {
+                    do {
+                        let currentNotifications = notificationsRelay.value
+                        let fetchedNotifications = try await self.notificationUseCase.fetchNotifications()
+                        let mergedNotifications = fetchedNotifications.map { fetched -> UserNotification in
+                            if let current = currentNotifications.first(
+                                where: { $0.id == fetched.id }
+                            ),
+                               current.isRead {
+                                return UserNotification(
+                                    id: fetched.id,
+                                    senderId: fetched.senderId,
+                                    receiverId: fetched.receiverId,
+                                    title: fetched.title,
+                                    content: fetched.content,
+                                    sentAt: fetched.sentAt,
+                                    readAt: current.readAt,
+                                    type: fetched.type,
+                                    metadata: fetched.metadata
+                                )
+                            }
+                            return fetched
+                        }
+
+                        let sortedNotification = mergedNotifications.sorted { $0.sentAt > $1.sentAt }
+                        let notificationsWithLocalState = self.applyLocalState(to: sortedNotification)
+
+                        notificationsRelay.accept(notificationsWithLocalState)
+                    } catch {
+                        // 에러
+                    }
+                }
+            })
+            .bind(to: approveSuccessRelay)
+            .disposed(by: disposeBag)
+        
+        input.rejectTapped
+            .do(onNext: { [weak self] (notificationId, _, _) in
+                self?.rejectedNotificationIds.insert(notificationId)
+            })
+            .flatMapLatest { [weak self] (_, workplaceId, workerId) -> Observable<Void> in
+                guard let self else { return .empty() }
+                
+                return Observable.create { observer in
+                    Task {
+                        do {
+                            try await self.workplaceUseCase.rejectJoinRequest(
+                                workplaceId: workplaceId,
+                                workerId: workerId
+                            )
+                            observer.onNext(())
+                            observer.onCompleted()
+                        } catch {
+                            errorRelay.accept("거절에 실패했습니다.")
+                            observer.onCompleted()
+                        }
+                    }
+                    return Disposables.create()
+                }
+            }
+            .do(onNext: { [weak self] _ in
+                guard let self else { return }
+                Task {
+                    do {
+                        let currentNotifications = notificationsRelay.value
+
+                        let fetchedNotifications = try await self.notificationUseCase.fetchNotifications()
+
+                        let mergedNotifications = fetchedNotifications.map { fetched -> UserNotification in
+                            if let current = currentNotifications.first(
+                                where: { $0.id == fetched.id }
+                            ),
+                               current.isRead {
+                                return UserNotification(
+                                    id: fetched.id,
+                                    senderId: fetched.senderId,
+                                    receiverId: fetched.receiverId,
+                                    title: fetched.title,
+                                    content: fetched.content,
+                                    sentAt: fetched.sentAt,
+                                    readAt: current.readAt,
+                                    type: fetched.type,
+                                    metadata: fetched.metadata
+                                )
+                            }
+                            return fetched
+                        }
+
+                        let sortedNotification = mergedNotifications.sorted { $0.sentAt > $1.sentAt }
+                        let notificationsWithLocalState = self.applyLocalState(to: sortedNotification)
+
+                        notificationsRelay.accept(notificationsWithLocalState)
+                    } catch {
+                        // 에러
+                    }
+                }
+            })
+            .bind(to: rejectSuccessRelay)
+            .disposed(by: disposeBag)
+        
         return Output(
             notifications: notificationsRelay.asDriver(),
             isLoading: loadingRelay.asDriver(),
             error: errorRelay.asSignal(),
-            unreadCount: unreadCount.asDriver(onErrorJustReturn: 0)
+            unreadCount: unreadCount.asDriver(onErrorJustReturn: 0),
+            approveSuccess: approveSuccessRelay.asSignal(),
+            rejectSuccess: rejectSuccessRelay.asSignal()
         )
     }
 }

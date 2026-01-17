@@ -31,6 +31,8 @@ final class AuthRepository: AuthRepositoryProtocol {
         
         UserDefaultsManager.shared.userRole = role
         UserDefaultsManager.shared.hasSignIn = true
+        
+        FCMTokenManager.shared.syncTokenToServer()
     }
     
     func signUp(requestDTO: RegisterRequestDTO) async throws -> UserRole {

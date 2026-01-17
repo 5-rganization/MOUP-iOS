@@ -20,9 +20,19 @@ final class EditRoutineView: UIView {
         tableView: tableView
     ) { tableView, indexPath, item in
         guard let cell = tableView.dequeueReusableCell(withIdentifier: TodoCell.id, for: indexPath) as? TodoCell else {
-            fatalError("TodoCell을 생성할 수 없습니다.")
+            assertionFailure("TodoCell 생성 실패 - 셀이 등록되지 않았거나 타입이 잘못됨")
+            return UITableViewCell()
         }
+        cell.disposeBag = DisposeBag()
+        
         cell.textField.text = item.content
+        
+        cell.textField.rx.text.orEmpty
+            .skip(1)
+            .map { text in (index: indexPath.row, text: text) }
+            .bind(to: self.itemTextChangeRelay)
+            .disposed(by: cell.disposeBag)
+        
         return cell
     }
     fileprivate let itemTextChangeRelay = PublishRelay<(index: Int, text: String)>()
@@ -249,17 +259,6 @@ private extension EditRoutineView {
 }
 
 extension EditRoutineView: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let cell = cell as? TodoCell else { return }
-        cell.textField.tag = indexPath.row
-        cell.textField.removeTarget(nil, action: nil, for: .editingChanged)
-        cell.textField.addTarget(self, action: #selector(textChanged(_:)), for: .editingChanged)
-    }
-    
-    @objc private func textChanged(_ tf: UITextField) {
-        itemTextChangeRelay.accept((index: tf.tag, text: tf.text ?? ""))
-    }
-    
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let deleteAction = UIContextualAction(style: .destructive, title: "삭제") { [weak self] _, _, completion in
             self?.itemDeleteRelay.accept(indexPath.row)
@@ -280,7 +279,6 @@ extension EditRoutineView: UITableViewDelegate {
 }
 
 extension EditRoutineView: UITableViewDragDelegate {
-
     func tableView(_ tableView: UITableView,
                    itemsForBeginning session: UIDragSession,
                    at indexPath: IndexPath) -> [UIDragItem] {

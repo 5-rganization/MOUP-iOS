@@ -155,6 +155,7 @@ private extension EditRoutineViewController {
                     comment: message
                 )
                 alert.modalTransitionStyle = .crossDissolve
+                alert.modalPresentationStyle = .overFullScreen
 
                 owner.present(alert, animated: true)
             }
@@ -179,6 +180,7 @@ private extension EditRoutineViewController {
                     comment: message
                 )
                 alert.modalTransitionStyle = .crossDissolve
+                alert.modalPresentationStyle = .overFullScreen
                 
                 owner.present(alert, animated: true) {
                     owner.navigationController?.popViewController(animated: true)

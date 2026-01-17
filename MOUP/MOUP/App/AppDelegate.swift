@@ -103,19 +103,20 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     
     private func handleNotificationTap(_ userInfo: [AnyHashable: Any]) {
         let notificationTypeString = userInfo[PushNotificationKey.type] as? String
-        let notificationType = PushNotificationType(from: notificationTypeString)
+        let destination = determineDestination(
+            for: PushNotificationType(from: notificationTypeString)
+        )
         
-        if let notificationType = notificationType {
-            self.logger.debug("알림 타입: \(notificationType.rawValue)")
-        } else {
-            self.logger.warning("알림 타입이 없거나 알 수 없는 타입입니다: \(notificationTypeString ?? "nil")")
-        }
-        
-        let destination = determineDestination(for: notificationType)
-        
+        let workerIdString = userInfo[PushNotificationKey.workerId] as? String
+        let workplaceIdString = userInfo[PushNotificationKey.workplaceId] as? String
+        let notificationIdString = userInfo[PushNotificationKey.notificationId] as? String
+
         postNotificationTappedEvent(
             destination: destination,
-            type: notificationTypeString
+            type: notificationTypeString,
+            workerId: workerIdString.flatMap { Int($0) },
+            workplaceId: workplaceIdString.flatMap { Int($0) },
+            notificationId: notificationIdString.flatMap { Int($0) }
         )
     }
     
@@ -134,16 +135,31 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     
     private func postNotificationTappedEvent(
         destination: PushNotificationDestination,
-        type: String?
+        type: String?,
+        workerId: Int?,
+        workplaceId: Int?,
+        notificationId: Int?
     ) {
         var userInfo: [String: Any] = [
             PushNotificationKey.destination: destination.rawValue
         ]
         
-        if let type = type {
+        if let type {
             userInfo[PushNotificationKey.type] = type
         }
         
+        if let workerId {
+            userInfo[PushNotificationKey.workerId] = workerId
+        }
+
+        if let workplaceId {
+            userInfo[PushNotificationKey.workplaceId] = workplaceId
+        }
+        
+        if let notificationId {
+            userInfo[PushNotificationKey.notificationId] = notificationId
+        }
+
         NotificationCenter.default.post(
             name: .pushNotificationTapped,
             object: nil,

@@ -69,4 +69,17 @@ final class WorkplaceRepository: WorkplaceRepositoryProtocol {
         try await workplaceService.updateWorkplace(workplaceId: workplaceId, request: request)
     }
 
+    func approveJoinRequest(workplaceId: Int, workerId: Int) async throws {
+        try await workplaceService.approveJoinRequest(
+            workplaceId: workplaceId,
+            workerId: workerId
+        )
+    }
+    
+    func rejectJoinRequest(workplaceId: Int, workerId: Int) async throws {
+        try await workplaceService.rejectJoinRequest(
+            workplaceId: workplaceId,
+            workerId: workerId
+        )
+    }
 }

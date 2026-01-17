@@ -150,6 +150,7 @@ private extension AddRoutineViewController {
                     comment: message
                 )
                 alert.modalTransitionStyle = .crossDissolve
+                alert.modalPresentationStyle = .overFullScreen
                 
                 owner.present(alert, animated: true)
             }

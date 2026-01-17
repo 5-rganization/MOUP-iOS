@@ -21,7 +21,7 @@ enum PushNotificationDestination: String {
 enum PushNotificationType: String {
     case inviteApproved = "INVITE_APPROVED"
     case inviteRejected = "INVITE_REJECTED"
-    case inviteRequest = "INVITE_REQUEST"
+    case inviteRequest = "WORKPLACE_JOIN_REQUEST"
     case paydayReminder = "PAYDAY_REMINDER"
     
     init?(from string: String?) {
@@ -33,4 +33,7 @@ enum PushNotificationType: String {
 enum PushNotificationKey {
     static let type = "type"
     static let destination = "destination"
+    static let workerId = "workerId"
+    static let workplaceId = "workplaceId"
+    static let notificationId = "notificationId"
 }
