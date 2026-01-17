@@ -116,8 +116,7 @@ final class NotificationListViewModel {
                             let fetchedNotifications = try await self.notificationUseCase.fetchNotifications()
 
                             let sortedNotification = fetchedNotifications.sorted { $0.sentAt > $1.sentAt }
-                            _ = sortedNotification.filter { $0.isRead }.count
-
+                            
                             observer.onNext(sortedNotification)
                             observer.onCompleted()
                         } catch {
@@ -175,8 +174,6 @@ final class NotificationListViewModel {
                     }
                     return notification
                 }
-
-                _ = updatedNotifications.filter { $0.isRead }.count
 
                 return updatedNotifications
             }

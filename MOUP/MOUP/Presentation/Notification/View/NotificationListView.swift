@@ -111,7 +111,6 @@ final class NotificationListView: UIView {
     }
     
     func updateNotifications(_ notifications: [UserNotification]) {
-        _ = notifications.filter { $0.isRead }.count
         self.notifications = notifications
         emptyLabel.isHidden = !notifications.isEmpty
         actionButtonStackView.isHidden = notifications.isEmpty
