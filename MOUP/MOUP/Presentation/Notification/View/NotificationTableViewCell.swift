@@ -171,6 +171,20 @@ final class NotificationTableViewCell: UITableViewCell {
         switch type {
         case .inviteRequest:
             currentState = .initial
+        case .inviteApproved:
+            currentState = .approved
+        case .inviteRejected:
+            currentState = .rejected
+        default:
+            break
+        }
+        
+        applyButtonState()
+    }
+    
+    private func applyButtonState() {
+        switch currentState {
+        case .initial:
             approveButton.isHidden = false
             rejectButton.isHidden = false
             approveButton.alpha = 1.0
@@ -178,27 +192,6 @@ final class NotificationTableViewCell: UITableViewCell {
             approveButton.isEnabled = true
             rejectButton.isEnabled = true
             actionButtonStackView.distribution = .fillEqually
-        case .inviteApproved:
-            currentState = .approved
-            approveButton.isHidden = false
-            rejectButton.isHidden = true
-            approveButton.alpha = 1.0
-            rejectButton.alpha = 0
-            approveButton.isEnabled = false
-            rejectButton.isEnabled = false
-            actionButtonStackView.distribution = .fill
-        case .inviteRejected:
-            currentState = .rejected
-            approveButton.isHidden = true
-            rejectButton.isHidden = false
-            approveButton.alpha = 0
-            rejectButton.alpha = 1.0
-            approveButton.isEnabled = false
-            rejectButton.isEnabled = false
-            actionButtonStackView.distribution = .fill
-        case nil:
-
-        switch currentState {
         case .approved:
             approveButton.isHidden = false
             rejectButton.isHidden = true
@@ -215,17 +208,6 @@ final class NotificationTableViewCell: UITableViewCell {
             approveButton.isEnabled = false
             rejectButton.isEnabled = false
             actionButtonStackView.distribution = .fill
-        case .initial:
-            approveButton.isHidden = false
-            rejectButton.isHidden = false
-            approveButton.alpha = 1.0
-            rejectButton.alpha = 1.0
-            approveButton.isEnabled = true
-            rejectButton.isEnabled = true
-            actionButtonStackView.distribution = .fillEqually
-        }
-        default:
-            break
         }
     }
 
