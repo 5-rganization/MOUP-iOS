@@ -39,6 +39,7 @@ final class SignUpCoordinator: Coordinator {
         let nicknameViewController = NicknameViewController(nicknameViewModel: nicknameViewModel)
         nicknameViewController.coordinator = self
         let nav = UINavigationController(rootViewController: nicknameViewController)
+        nav.setNavigationBarHidden(true, animated: false)
         self.navigationController = nav
         DispatchQueue.main.async {
             UIView.transition(with: self.window, duration: 0.3, options: [.transitionCrossDissolve]) {
