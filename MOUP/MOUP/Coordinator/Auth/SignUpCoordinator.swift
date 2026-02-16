@@ -8,7 +8,7 @@
 import UIKit
 import RxSwift
 
-final class SignUpCoordinator: Coordinator {
+final class SignUpCoordinator: NSObject, Coordinator {
     weak var signInCoordinator: SignInCoordinator?
     private var navigationController: UINavigationController?
     let window: UIWindow
@@ -40,6 +40,7 @@ final class SignUpCoordinator: Coordinator {
         nicknameViewController.coordinator = self
         let nav = UINavigationController(rootViewController: nicknameViewController)
         nav.setNavigationBarHidden(true, animated: false)
+        nav.interactivePopGestureRecognizer?.delegate = self
         self.navigationController = nav
         DispatchQueue.main.async {
             UIView.transition(with: self.window, duration: 0.3, options: [.transitionCrossDissolve]) {
@@ -84,5 +85,11 @@ final class SignUpCoordinator: Coordinator {
     func didFinishSignUp() {
         print("didFinishSignUp")
         signInCoordinator?.moveToTabBar()
+    }
+}
+
+extension SignUpCoordinator: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return (navigationController?.viewControllers.count ?? 0) > 1
     }
 }
