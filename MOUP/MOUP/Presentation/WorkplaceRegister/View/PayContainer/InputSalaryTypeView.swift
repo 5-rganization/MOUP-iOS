@@ -24,7 +24,7 @@ final class InputSalaryTypeView: UIView {
         $0.font = .headBold(18)
     }
     
-    private let textField = CustomTextField().then {
+    private let textField = OLDCustomTextField().then {
         $0.placeholder = "10,030원"
         $0.returnKeyType = .done
     }
@@ -35,7 +35,7 @@ final class InputSalaryTypeView: UIView {
     
     // MARK: - Getter
     var getTitle: UILabel { title }
-    var getTextField: CustomTextField { textField }
+    var getTextField: OLDCustomTextField { textField }
     var getRegisterButton: BaseButton { registerButton }
     
     // MARK: - Initializer

@@ -27,9 +27,9 @@ final class WorkRoutinContainerView: UIView {
         $0.font = .headBold(18)
     }
     
-    private let routin = InfoRowView(title: "루틴 추가", type: .labelWithChevron(value: ""), frame: .zero)
+    private let routin = OLDInfoRowView(title: "루틴 추가", type: .labelWithChevron(value: ""), frame: .zero)
     
-    private let container = ContainerView()
+    private let container = OLDContainerView()
     
     private let additionalRoutineLabel = UILabel().then {
         $0.text = ""

@@ -10,27 +10,27 @@ import Then
 
 final class WorkingConditionsContainerView: UIView {
     // MARK: - Properties
-    private let fourMajorSocialInsuranceContainer = ContainerView()
+    private let fourMajorSocialInsuranceContainer = OLDContainerView()
     
     // MARK: - 4대보험
-    private let fourMajorSocialInsurancesInfoRow = InfoRowView(title: "4대 보험", type: .checkBox(isChecked: false), frame: .zero)
+    private let fourMajorSocialInsurancesInfoRow = OLDInfoRowView(title: "4대 보험", type: .checkBox(isChecked: false), frame: .zero)
     // MARK: - 국민연금
-    private let nationalPensionInfoRow = InfoRowView(title: "국민연금", type: .checkBox(isChecked: false), frame: .zero)
+    private let nationalPensionInfoRow = OLDInfoRowView(title: "국민연금", type: .checkBox(isChecked: false), frame: .zero)
     // MARK: - 건강보험
-    private let nationalHealthInsuranceInfoRow = InfoRowView(title: "건강보험", type: .checkBox(isChecked: false), frame: .zero)
+    private let nationalHealthInsuranceInfoRow = OLDInfoRowView(title: "건강보험", type: .checkBox(isChecked: false), frame: .zero)
     // MARK: - 고용보험
-    private let employmentInsuranceInfoRow = InfoRowView(title: "고용보험", type: .checkBox(isChecked: false), frame: .zero)
+    private let employmentInsuranceInfoRow = OLDInfoRowView(title: "고용보험", type: .checkBox(isChecked: false), frame: .zero)
     // MARK: - 산재보험
-    private let industrialAccidentCompensationInsuranceInfoRow = InfoRowView(title: "산재보험", type: .checkBox(isChecked: false), frame: .zero)
+    private let industrialAccidentCompensationInsuranceInfoRow = OLDInfoRowView(title: "산재보험", type: .checkBox(isChecked: false), frame: .zero)
     // MARK: - 소득세
-    private let incomeTaxInfoRow = InfoRowView(title: "소득세", type: .checkBox(isChecked: false), frame: .zero)
+    private let incomeTaxInfoRow = OLDInfoRowView(title: "소득세", type: .checkBox(isChecked: false), frame: .zero)
     
-    private let AllowanceOptionsContainer = ContainerView()
+    private let AllowanceOptionsContainer = OLDContainerView()
     
     // MARK: - 주휴수당
-    private let weeklyHolidayAllowanceInfoRow = InfoRowView(title: "주휴수당", type: .checkBox(isChecked: false), frame: .zero)
+    private let weeklyHolidayAllowanceInfoRow = OLDInfoRowView(title: "주휴수당", type: .checkBox(isChecked: false), frame: .zero)
     // MARK: - 야간수당
-    private let nightShiftAllowanceInfoRow = InfoRowView(title: "야간수당", type: .checkBox(isChecked: false), frame: .zero)
+    private let nightShiftAllowanceInfoRow = OLDInfoRowView(title: "야간수당", type: .checkBox(isChecked: false), frame: .zero)
     
     // MARK: - UI Components
     // 디바이더
@@ -70,14 +70,14 @@ final class WorkingConditionsContainerView: UIView {
     }
     
     // MARK: - Getter
-    var getFourMajorSocialInsurancesInfoRow: InfoRowView { fourMajorSocialInsurancesInfoRow }
-    var getNationalPensionInfoRow: InfoRowView { nationalPensionInfoRow }
-    var getNationalHealthInsuranceInfoRow: InfoRowView { nationalHealthInsuranceInfoRow }
-    var getEmploymentInsuranceInfoRow: InfoRowView { employmentInsuranceInfoRow }
-    var getIndustrialAccidentCompensationInsuranceInfoRow: InfoRowView { industrialAccidentCompensationInsuranceInfoRow }
-    var getIncomeTaxInfoRow: InfoRowView { incomeTaxInfoRow }
-    var getWeeklyHolidayAllowanceInfoRow: InfoRowView { weeklyHolidayAllowanceInfoRow }
-    var getNightShiftAllowanceInfoRow: InfoRowView { nightShiftAllowanceInfoRow }
+    var getFourMajorSocialInsurancesInfoRow: OLDInfoRowView { fourMajorSocialInsurancesInfoRow }
+    var getNationalPensionInfoRow: OLDInfoRowView { nationalPensionInfoRow }
+    var getNationalHealthInsuranceInfoRow: OLDInfoRowView { nationalHealthInsuranceInfoRow }
+    var getEmploymentInsuranceInfoRow: OLDInfoRowView { employmentInsuranceInfoRow }
+    var getIndustrialAccidentCompensationInsuranceInfoRow: OLDInfoRowView { industrialAccidentCompensationInsuranceInfoRow }
+    var getIncomeTaxInfoRow: OLDInfoRowView { incomeTaxInfoRow }
+    var getWeeklyHolidayAllowanceInfoRow: OLDInfoRowView { weeklyHolidayAllowanceInfoRow }
+    var getNightShiftAllowanceInfoRow: OLDInfoRowView { nightShiftAllowanceInfoRow }
     
     // MARK: - Initializer
     override init(frame: CGRect) {

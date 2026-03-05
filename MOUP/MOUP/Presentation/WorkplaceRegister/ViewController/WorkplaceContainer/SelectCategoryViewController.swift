@@ -63,7 +63,7 @@ private extension SelectCategoryViewController {
     func setStyles() { }
     func setConstraints() { }
     func setActions() {
-        let radioButtons: [(RadioButtonView, String)] = [
+        let radioButtons: [(OLDRadioButtonView, String)] = [
             (selectCategoryView.getRestaurantRadioButton, "음식점"),
             (selectCategoryView.getCafeRadioButton, "카페"),
             (selectCategoryView.getCvsRadioButton, "편의점"),
@@ -81,7 +81,7 @@ private extension SelectCategoryViewController {
     }
     
     func setBinding() {
-        let radioButtons: [(RadioButtonView, String)] = [
+        let radioButtons: [(OLDRadioButtonView, String)] = [
             (selectCategoryView.getRestaurantRadioButton, "음식점"),
             (selectCategoryView.getCafeRadioButton, "카페"),
             (selectCategoryView.getCvsRadioButton, "편의점"),

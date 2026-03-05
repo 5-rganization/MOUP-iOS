@@ -12,7 +12,7 @@ import RxCocoa
 
 final class ColorLabelContainerView: UIView {
     // MARK: - Properties
-    private let container = ContainerView()
+    private let container = OLDContainerView()
     private let disposeBag = DisposeBag()
     fileprivate let colorLabelInfoRowSubject = PublishSubject<Void>()
     
@@ -21,7 +21,7 @@ final class ColorLabelContainerView: UIView {
     }
     
     // MARK: - UI Components
-    private let colorLabelInfoRow = InfoRowView(title: "", type: .colorWithChevron(color: LabelColor.red.labelColor, title: LabelColor.red.displayStr), frame: .zero)
+    private let colorLabelInfoRow = OLDInfoRowView(title: "", type: .colorWithChevron(color: LabelColor.red.labelColor, title: LabelColor.red.displayStr), frame: .zero)
     
     // MARK: - 라벨 타이틀
     private let colorLabelTitle = UILabel().then {
@@ -35,7 +35,7 @@ final class ColorLabelContainerView: UIView {
     }
     
     // MARK: - Getter
-    var getColorLabelInfoRow: InfoRowView { colorLabelInfoRow }
+    var getColorLabelInfoRow: OLDInfoRowView { colorLabelInfoRow }
     
     // MARK: - Initializer
     override init(frame: CGRect) {

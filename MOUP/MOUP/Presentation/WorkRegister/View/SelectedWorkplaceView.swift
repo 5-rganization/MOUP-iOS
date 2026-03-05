@@ -118,7 +118,7 @@ extension SelectedWorkplaceView {
         
         // 새로운 라디오 버튼 추가
         for workplace in workplaces {
-            let radioButton = RadioButtonView(
+            let radioButton = OLDRadioButtonView(
                 title: workplace.name,
                 type: .none(
                     selectedRadioButton: .check,
@@ -138,7 +138,7 @@ extension SelectedWorkplaceView {
 
                     // 모든 버튼 상태 리셋 후 클릭된 버튼만 선택
                     self.radioStackView.arrangedSubviews
-                        .compactMap { $0 as? RadioButtonView }
+                        .compactMap { $0 as? OLDRadioButtonView }
                         .forEach { $0.setSelected($0 === radioButton) }
                     
                     self.registerButton.isEnabled = true

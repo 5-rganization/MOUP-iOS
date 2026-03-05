@@ -1,5 +1,5 @@
 //
-//  CustomTextField.swift
+//  OLDCustomTextField.swift
 //  MOUP
 //
 //  Created by 양원식 on 7/28/25.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CustomTextField: UITextField {
+class OLDCustomTextField: UITextField {
     let padding = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 0)
 
     override func textRect(forBounds bounds: CGRect) -> CGRect {

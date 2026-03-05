@@ -35,7 +35,7 @@ final class OwnerWorkRegisterView: UIView {
         $0.distribution = .fill
     }
     
-    private let selectWorkplace = InfoRowView(title: "근무지 선택 *", type: .labelWithChevron(value: ""), frame: .zero).then {
+    private let selectWorkplace = OLDInfoRowView(title: "근무지 선택 *", type: .labelWithChevron(value: ""), frame: .zero).then {
         $0.updateAttributedTitle(to: "근무지 선택 *")
     }
     private let divider = UIView().then {
@@ -57,13 +57,13 @@ final class OwnerWorkRegisterView: UIView {
         $0.attributedText = attributed
     }
     
-    private let selectWorker = InfoRowView(title: "인원 선택", type: .labelWithChevron(value: ""), frame: .zero)
-    private let container = ContainerView()
+    private let selectWorker = OLDInfoRowView(title: "인원 선택", type: .labelWithChevron(value: ""), frame: .zero)
+    private let container = OLDContainerView()
 
     private let workDateContainerView = WorkDateContainerView()
     private let workTimeContainerView = WorkTimeContainerView()
     private let workRoutinContainerView = WorkRoutinContainerView()
-    private let memoContainerView = MemoContainerView()
+    private let memoContainerView = OLDMemoContainerView()
     
     private let registerButton = BaseButton(title: "등록하기").then {
         $0.isEnabled = false
@@ -71,9 +71,9 @@ final class OwnerWorkRegisterView: UIView {
     
     var getRoleSegmentedControl: RoleSegmentedControl { toggleSegment }
     var getRegisterButton: BaseButton { registerButton }
-    var getMemoContainerView: MemoContainerView { memoContainerView }
-    var getSelectWorkplace: InfoRowView { selectWorkplace }
-    var getSelectWorker: InfoRowView { selectWorker }
+    var getMemoContainerView: OLDMemoContainerView { memoContainerView }
+    var getSelectWorkplace: OLDInfoRowView { selectWorkplace }
+    var getSelectWorker: OLDInfoRowView { selectWorker }
     
     // MARK: - Initializer
     override init(frame: CGRect) {

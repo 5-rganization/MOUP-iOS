@@ -27,43 +27,43 @@ final class SelectColorLabelView: UIView {
     private let confirmButton = BaseButton(title: "완료").then {
         $0.isEnabled = false
     }
-    private let redRadioButton = RadioButtonView(title: LabelColor.red.displayStr,
+    private let redRadioButton = OLDRadioButtonView(title: LabelColor.red.displayStr,
                                                  type: .colorDot(LabelColor.red.labelColor,
                                                                  selectedRadioButton: .selectedRadioButton,
                                                                  unselectedRadioButton: .unselectedRadioButton))
-    private let orangeRadioButton = RadioButtonView(title: LabelColor.orange.displayStr,
+    private let orangeRadioButton = OLDRadioButtonView(title: LabelColor.orange.displayStr,
                                                     type: .colorDot(LabelColor.orange.labelColor,
                                                                     selectedRadioButton: .selectedRadioButton,
                                                                     unselectedRadioButton: .unselectedRadioButton))
-    private let yellowRadioButton = RadioButtonView(title: LabelColor.yellow.displayStr,
+    private let yellowRadioButton = OLDRadioButtonView(title: LabelColor.yellow.displayStr,
                                                     type: .colorDot(LabelColor.yellow.labelColor,
                                                                     selectedRadioButton: .selectedRadioButton,
                                                                     unselectedRadioButton: .unselectedRadioButton))
-    private let greenRadioButton = RadioButtonView(title: LabelColor.green.displayStr,
+    private let greenRadioButton = OLDRadioButtonView(title: LabelColor.green.displayStr,
                                                    type: .colorDot(LabelColor.green.labelColor,
                                                                    selectedRadioButton: .selectedRadioButton,
                                                                    unselectedRadioButton: .unselectedRadioButton))
-    private let blueRadioButton = RadioButtonView(title: LabelColor.blue.displayStr,
+    private let blueRadioButton = OLDRadioButtonView(title: LabelColor.blue.displayStr,
                                                   type: .colorDot(LabelColor.blue.labelColor,
                                                                   selectedRadioButton: .selectedRadioButton,
                                                                   unselectedRadioButton: .unselectedRadioButton))
-    private let purpleRadioButton = RadioButtonView(title: LabelColor.purple.displayStr,
+    private let purpleRadioButton = OLDRadioButtonView(title: LabelColor.purple.displayStr,
                                                     type: .colorDot(LabelColor.purple.labelColor,
                                                                     selectedRadioButton: .selectedRadioButton,
                                                                     unselectedRadioButton: .unselectedRadioButton))
-    private let indigoRadioButton = RadioButtonView(title: LabelColor.indigo.displayStr,
+    private let indigoRadioButton = OLDRadioButtonView(title: LabelColor.indigo.displayStr,
                                                     type: .colorDot(LabelColor.indigo.labelColor,
                                                                     selectedRadioButton: .selectedRadioButton,
                                                                     unselectedRadioButton: .unselectedRadioButton))
     
     // MARK: - Getter
-    var getRedRadioButton: RadioButtonView { redRadioButton }
-    var getOrangeRadioButton: RadioButtonView { orangeRadioButton }
-    var getYellowRadioButton: RadioButtonView { yellowRadioButton }
-    var getGreenRadioButton: RadioButtonView { greenRadioButton }
-    var getBlueRadioButton: RadioButtonView { blueRadioButton }
-    var getPurpleRadioButton: RadioButtonView { purpleRadioButton }
-    var getIndigoRadioButton: RadioButtonView { indigoRadioButton }
+    var getRedRadioButton: OLDRadioButtonView { redRadioButton }
+    var getOrangeRadioButton: OLDRadioButtonView { orangeRadioButton }
+    var getYellowRadioButton: OLDRadioButtonView { yellowRadioButton }
+    var getGreenRadioButton: OLDRadioButtonView { greenRadioButton }
+    var getBlueRadioButton: OLDRadioButtonView { blueRadioButton }
+    var getPurpleRadioButton: OLDRadioButtonView { purpleRadioButton }
+    var getIndigoRadioButton: OLDRadioButtonView { indigoRadioButton }
     var getConfirmButton: BaseButton { confirmButton }
     
     // MARK: - Initializer

@@ -63,7 +63,7 @@ private extension SelectPayCalculationViewController {
     func setStyles() {}
     func setConstraints() { }
     func setActions() {
-        let radioButtons: [(RadioButtonView, String)] = [
+        let radioButtons: [(OLDRadioButtonView, String)] = [
             (selectPayCalculationView.getHourlyRadioButton, SalaryCalculation.hourly.displayStr),
             (selectPayCalculationView.getFixedRadioButton, SalaryCalculation.fixed.displayStr),
         ]
@@ -90,7 +90,7 @@ private extension SelectPayCalculationViewController {
                 owner.navigationController?.popViewController(animated: true)
             }.disposed(by: disposeBag)
         
-        let radioButtons: [(RadioButtonView, String)] = [
+        let radioButtons: [(OLDRadioButtonView, String)] = [
             (selectPayCalculationView.getHourlyRadioButton, SalaryCalculation.hourly.displayStr),
             (selectPayCalculationView.getFixedRadioButton, SalaryCalculation.fixed.displayStr),
         ]

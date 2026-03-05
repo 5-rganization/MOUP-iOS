@@ -63,7 +63,7 @@ private extension SelectPayTypeViewController {
     func setStyles() {}
     func setConstraints() { }
     func setActions() {
-        let radioButtons: [(RadioButtonView, String)] = [
+        let radioButtons: [(OLDRadioButtonView, String)] = [
             (selectPayTypeView.getMonthlyRadioButton, SalaryType.monthly.displayText),
             (selectPayTypeView.getWeeklyRadioButton, SalaryType.weekly.displayText),
             (selectPayTypeView.getDailyRadioButton, SalaryType.daily.displayText)
@@ -91,7 +91,7 @@ private extension SelectPayTypeViewController {
                 owner.navigationController?.popViewController(animated: true)
             }.disposed(by: disposeBag)
         
-        let radioButtons: [(RadioButtonView, String)] = [
+        let radioButtons: [(OLDRadioButtonView, String)] = [
             (selectPayTypeView.getMonthlyRadioButton, SalaryType.monthly.displayText),
             (selectPayTypeView.getWeeklyRadioButton, SalaryType.weekly.displayText),
             (selectPayTypeView.getDailyRadioButton, SalaryType.daily.displayText)

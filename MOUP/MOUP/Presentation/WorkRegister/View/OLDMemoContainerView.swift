@@ -1,5 +1,5 @@
 //
-//  memoContainerView.swift
+//  OLDMemoContainerView.swift
 //  MOUP
 //
 //  Created by 양원식 on 8/11/25.
@@ -10,7 +10,7 @@ import Then
 import RxSwift
 import RxCocoa
 
-final class MemoContainerView: UIView {
+final class OLDMemoContainerView: UIView {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     fileprivate let maxLength = 150
@@ -22,7 +22,7 @@ final class MemoContainerView: UIView {
         $0.font = .headBold(18)
     }
     
-    private let container = ContainerView()
+    private let container = OLDContainerView()
     fileprivate let memoTextView = UITextView().then {
         $0.font = .systemFont(ofSize: 16)
         $0.textColor = .label
@@ -62,7 +62,7 @@ final class MemoContainerView: UIView {
     // MARK: - Public Methods
 }
 
-private extension MemoContainerView {
+private extension OLDMemoContainerView {
     // MARK: - configure
     func configure() {
         setHierarchy()
@@ -142,7 +142,7 @@ private extension MemoContainerView {
             .disposed(by: disposeBag)
     }
 }
-extension Reactive where Base: MemoContainerView {
+extension Reactive where Base: OLDMemoContainerView {
     var text: ControlProperty<String> {
         let source = base.memoTextView.rx.text.orEmpty
 

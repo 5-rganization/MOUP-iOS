@@ -63,7 +63,7 @@ private extension SelectColorLabelViewController {
     func setStyles() {}
     func setConstraints() { }
     func setActions() {
-        let radioButtons: [(RadioButtonView, String)] = [
+        let radioButtons: [(OLDRadioButtonView, String)] = [
             (selectColorLabelView.getRedRadioButton, LabelColor.red.displayStr),
             (selectColorLabelView.getOrangeRadioButton, LabelColor.orange.displayStr),
             (selectColorLabelView.getYellowRadioButton, LabelColor.yellow.displayStr),
@@ -96,7 +96,7 @@ private extension SelectColorLabelViewController {
                 owner.navigationController?.popViewController(animated: true)
             }.disposed(by: disposeBag)
         
-        let radioButtons: [(RadioButtonView, String)] = [
+        let radioButtons: [(OLDRadioButtonView, String)] = [
             (selectColorLabelView.getRedRadioButton, LabelColor.red.displayStr),
             (selectColorLabelView.getOrangeRadioButton, LabelColor.orange.displayStr),
             (selectColorLabelView.getYellowRadioButton, LabelColor.yellow.displayStr),

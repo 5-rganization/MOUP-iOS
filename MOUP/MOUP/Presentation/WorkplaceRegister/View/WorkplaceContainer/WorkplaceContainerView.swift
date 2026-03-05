@@ -11,13 +11,13 @@ import Then
 
 final class WorkplaceContainerView: UIView {
     // MARK: - Properties
-    private let container = ContainerView()
+    private let container = OLDContainerView()
     
     // MARK: - 이름 레이블
-    private let nameRow = InfoRowView(title: "이름", type: .labelWithChevron(value: "입력"), frame: .zero)
+    private let nameRow = OLDInfoRowView(title: "이름", type: .labelWithChevron(value: "입력"), frame: .zero)
     
     // MARK: - 카테고리 레이블
-    private let categoryRow = InfoRowView(title: "카테고리", type: .labelWithChevron(value: "선택"), frame: .zero)
+    private let categoryRow = OLDInfoRowView(title: "카테고리", type: .labelWithChevron(value: "선택"), frame: .zero)
     
     // MARK: - UI Components
     // 디바이더
@@ -42,8 +42,8 @@ final class WorkplaceContainerView: UIView {
     }
     
     // MARK: - Getter
-    var getNameRow: InfoRowView { nameRow }
-    var getCategoryRow: InfoRowView { categoryRow }
+    var getNameRow: OLDInfoRowView { nameRow }
+    var getCategoryRow: OLDInfoRowView { categoryRow }
     
     // MARK: - Initializer
     override init(frame: CGRect) {

@@ -22,31 +22,31 @@ final class SelectCategoryView: UIView {
         $0.textColor = .gray900
         $0.font = .headBold(18)
     }
-    private let restaurantRadioButton = RadioButtonView(title: WorkplaceCategory.restaurant.displayStr,
+    private let restaurantRadioButton = OLDRadioButtonView(title: WorkplaceCategory.restaurant.displayStr,
                                                         type: .icon(selectedIcon: WorkplaceCategory.restaurant.selectedImage,
                                                                     unselectedIcon: WorkplaceCategory.restaurant.unselectedImage,
                                                                     selectedRadioButton: .selectedRadioButton,
                                                                     unselectedRadioButton: .unselectedRadioButton))
     
-    private let cafeRadioButton = RadioButtonView(title: WorkplaceCategory.cafe.displayStr,
+    private let cafeRadioButton = OLDRadioButtonView(title: WorkplaceCategory.cafe.displayStr,
                                                   type: .icon(selectedIcon: WorkplaceCategory.cafe.selectedImage,
                                                               unselectedIcon: WorkplaceCategory.cafe.unselectedImage,
                                                               selectedRadioButton: .selectedRadioButton,
                                                               unselectedRadioButton: .unselectedRadioButton))
     
-    private let cvsRadioButton = RadioButtonView(title: WorkplaceCategory.cvs.displayStr,
+    private let cvsRadioButton = OLDRadioButtonView(title: WorkplaceCategory.cvs.displayStr,
                                                  type: .icon(selectedIcon: WorkplaceCategory.cvs.selectedImage,
                                                              unselectedIcon: WorkplaceCategory.cvs.unselectedImage,
                                                              selectedRadioButton: .selectedRadioButton,
                                                              unselectedRadioButton: .unselectedRadioButton))
     
-    private let movieTheaterRadioButton = RadioButtonView(title: WorkplaceCategory.movieTheater.displayStr,
+    private let movieTheaterRadioButton = OLDRadioButtonView(title: WorkplaceCategory.movieTheater.displayStr,
                                                           type: .icon(selectedIcon: WorkplaceCategory.movieTheater.selectedImage,
                                                                       unselectedIcon: WorkplaceCategory.movieTheater.unselectedImage,
                                                                       selectedRadioButton: .selectedRadioButton,
                                                                       unselectedRadioButton: .unselectedRadioButton))
     
-    private let othersRadioButton = RadioButtonView(title: WorkplaceCategory.others.displayStr,
+    private let othersRadioButton = OLDRadioButtonView(title: WorkplaceCategory.others.displayStr,
                                                     type: .icon(selectedIcon: WorkplaceCategory.others.selectedImage,
                                                                 unselectedIcon: WorkplaceCategory.others.unselectedImage,
                                                                 selectedRadioButton: .selectedRadioButton,
@@ -59,11 +59,11 @@ final class SelectCategoryView: UIView {
     
     // MARK: - Getter
     
-    var getRestaurantRadioButton: RadioButtonView { restaurantRadioButton }
-    var getCafeRadioButton: RadioButtonView { cafeRadioButton }
-    var getCvsRadioButton: RadioButtonView { cvsRadioButton }
-    var getMovieTheaterRadioButton: RadioButtonView { movieTheaterRadioButton }
-    var getOthersRadioButton: RadioButtonView { othersRadioButton }
+    var getRestaurantRadioButton: OLDRadioButtonView { restaurantRadioButton }
+    var getCafeRadioButton: OLDRadioButtonView { cafeRadioButton }
+    var getCvsRadioButton: OLDRadioButtonView { cvsRadioButton }
+    var getMovieTheaterRadioButton: OLDRadioButtonView { movieTheaterRadioButton }
+    var getOthersRadioButton: OLDRadioButtonView { othersRadioButton }
     var getConfirmButton: BaseButton { confirmButton }
     
     // MARK: - Initializer

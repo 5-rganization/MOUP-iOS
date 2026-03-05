@@ -22,7 +22,7 @@ final class EditModal: UIView {
         $0.textColor = .gray900
     }
     
-    fileprivate let textField = CustomTextField().then {
+    fileprivate let textField = OLDCustomTextField().then {
         $0.placeholder = "닉네임을 입력해주세요"
     }
     

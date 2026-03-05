@@ -11,19 +11,19 @@ import Then
 
 final class PayContainerView: UIView {
     // MARK: - Properties
-    private let container = ContainerView()
+    private let container = OLDContainerView()
     
     // MARK: - 급여 유형 레이블
-    private let payTypeInfoRow = InfoRowView(title: "급여 유형", type: .labelWithChevron(value: "선택"), frame: .zero)
+    private let payTypeInfoRow = OLDInfoRowView(title: "급여 유형", type: .labelWithChevron(value: "선택"), frame: .zero)
     
     // MARK: - 급여 계산 레이블
-    private let payCalculationInfoRow = InfoRowView(title: "급여 계산", type: .labelWithChevron(value: "선택"), frame: .zero)
+    private let payCalculationInfoRow = OLDInfoRowView(title: "급여 계산", type: .labelWithChevron(value: "선택"), frame: .zero)
     
     // MARK: - 급여 형태 레이블
-    private let salaryTypeInfoRow = InfoRowView(title: "급여 형태", type: .labelWithChevron(value: "선택"), frame: .zero)
+    private let salaryTypeInfoRow = OLDInfoRowView(title: "급여 형태", type: .labelWithChevron(value: "선택"), frame: .zero)
     
     // MARK: - 급여일 레이블
-    private let payDayInfoRow = InfoRowView(title: "급여일", type: .labelWithButton(title: "선택"), frame: .zero)
+    private let payDayInfoRow = OLDInfoRowView(title: "급여일", type: .labelWithButton(title: "선택"), frame: .zero)
     
     // MARK: - UI Components
     
@@ -58,10 +58,10 @@ final class PayContainerView: UIView {
     
     // MARK: - Getter
     
-    var getPayTypeInfoRow: InfoRowView { payTypeInfoRow }
-    var getPayCalculationInfoRow: InfoRowView { payCalculationInfoRow }
-    var getSalaryTypeInfoRow: InfoRowView { salaryTypeInfoRow }
-    var getPayDayInfoRow: InfoRowView { payDayInfoRow }
+    var getPayTypeInfoRow: OLDInfoRowView { payTypeInfoRow }
+    var getPayCalculationInfoRow: OLDInfoRowView { payCalculationInfoRow }
+    var getSalaryTypeInfoRow: OLDInfoRowView { salaryTypeInfoRow }
+    var getPayDayInfoRow: OLDInfoRowView { payDayInfoRow }
     
     // MARK: - Initializer
     override init(frame: CGRect) {

@@ -1,5 +1,5 @@
 //
-//  RadioButtonView.swift
+//  OLDRadioButtonView.swift
 //  MOUP
 //
 //  Created by 양원식 on 7/29/25.
@@ -29,7 +29,7 @@ enum RadioButtonType {
     )
 }
 
-final class RadioButtonView: UIView {
+final class OLDRadioButtonView: UIView {
     // MARK: - Properties
     private let tapRelay = PublishRelay<Void>()
     private let containerView = UIView()
@@ -77,7 +77,7 @@ final class RadioButtonView: UIView {
 }
 
 // MARK: - Private Methods
-private extension RadioButtonView {
+private extension OLDRadioButtonView {
     func configure(type: RadioButtonType) {
         setHierarchy(type: type)
         setStyles(type: type)
@@ -188,7 +188,7 @@ private extension RadioButtonView {
 }
 
 // MARK: - Rx Extension
-extension Reactive where Base: RadioButtonView {
+extension Reactive where Base: OLDRadioButtonView {
     var tap: ControlEvent<Void> {
         ControlEvent(events: base.tap)
     }

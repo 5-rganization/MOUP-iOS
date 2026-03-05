@@ -41,10 +41,10 @@ final class WorkDateContainerView: UIView {
         $0.attributedText = attributed
     }
     
-    private let date = InfoRowView(title: "날짜", type: .labelWithButton(title: "선택"), frame: .zero)
-    private let repetition = InfoRowView(title: "반복", type: .labelWithChevron(value: "없음"), frame: .zero)
+    private let date = OLDInfoRowView(title: "날짜", type: .labelWithButton(title: "선택"), frame: .zero)
+    private let repetition = OLDInfoRowView(title: "반복", type: .labelWithChevron(value: "없음"), frame: .zero)
     
-    private let container = ContainerView()
+    private let container = OLDContainerView()
     private let divider = UIView().then {
         $0.backgroundColor = .gray400
     }

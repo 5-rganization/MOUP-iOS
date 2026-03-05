@@ -30,14 +30,14 @@ final class RepeatSettingView: UIView {
         $0.distribution = .fillEqually
     }
     
-    private lazy var dayButtons: [RadioButtonView] = [
-        RadioButtonView(title: "일요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
-        RadioButtonView(title: "월요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
-        RadioButtonView(title: "화요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
-        RadioButtonView(title: "수요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
-        RadioButtonView(title: "목요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
-        RadioButtonView(title: "금요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
-        RadioButtonView(title: "토요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil))
+    private lazy var dayButtons: [OLDRadioButtonView] = [
+        OLDRadioButtonView(title: "일요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
+        OLDRadioButtonView(title: "월요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
+        OLDRadioButtonView(title: "화요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
+        OLDRadioButtonView(title: "수요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
+        OLDRadioButtonView(title: "목요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
+        OLDRadioButtonView(title: "금요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil)),
+        OLDRadioButtonView(title: "토요일마다", type: .none(selectedRadioButton: .check, unselectedRadioButton: nil))
     ]
     
     private let dateTitleLabel = UILabel().then {
@@ -46,8 +46,8 @@ final class RepeatSettingView: UIView {
         $0.textColor = .gray900
     }
     
-    private let container = ContainerView()
-    private let dateRow = InfoRowView(title: "날짜", type: .labelWithButton(title: "선택"), frame: .zero)
+    private let container = OLDContainerView()
+    private let dateRow = OLDInfoRowView(title: "날짜", type: .labelWithButton(title: "선택"), frame: .zero)
     
     let registerButton = BaseButton(title: "등록하기")
 

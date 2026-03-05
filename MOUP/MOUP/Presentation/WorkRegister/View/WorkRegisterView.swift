@@ -32,7 +32,7 @@ final class WorkRegisterView: UIView {
         $0.distribution = .fill
     }
     
-    private let selectWorkplace = InfoRowView(title: "근무지 선택 *", type: .labelWithChevron(value: ""), frame: .zero).then {
+    private let selectWorkplace = OLDInfoRowView(title: "근무지 선택 *", type: .labelWithChevron(value: ""), frame: .zero).then {
         $0.updateAttributedTitle(to: "근무지 선택 *")
     }
     private let divider = UIView().then {
@@ -42,7 +42,7 @@ final class WorkRegisterView: UIView {
     private let workDateContainerView = WorkDateContainerView()
     private let workTimeContainerView = WorkTimeContainerView()
     private let workRoutinContainerView = WorkRoutinContainerView()
-    private let memoContainerView = MemoContainerView()
+    private let memoContainerView = OLDMemoContainerView()
     
     private let registerButton = BaseButton(title: "등록하기").then {
         $0.isEnabled = false
@@ -50,8 +50,8 @@ final class WorkRegisterView: UIView {
     
     var getNavigationBar: BaseNavigationBar { navigationBar }
     var getRegisterButton: BaseButton { registerButton }
-    var getMemoContainerView: MemoContainerView { memoContainerView }
-    var getSelectWorkplace: InfoRowView { selectWorkplace }
+    var getMemoContainerView: OLDMemoContainerView { memoContainerView }
+    var getSelectWorkplace: OLDInfoRowView { selectWorkplace }
     
     // MARK: - Initializer
     override init(frame: CGRect) {

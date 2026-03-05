@@ -1,5 +1,5 @@
 //
-//  InfoRowView.swift
+//  OLDInfoRowView.swift
 //  MOUP
 //
 //  Created by 양원식 on 7/18/25.
@@ -18,7 +18,7 @@ enum InfoRowType {
 }
 
 
-final class InfoRowView: UIView {
+final class OLDInfoRowView: UIView {
     // MARK: - Properties
     private let tapRelay = PublishRelay<Void>()
     
@@ -145,7 +145,7 @@ final class InfoRowView: UIView {
     }
 }
 
-private extension InfoRowView {
+private extension OLDInfoRowView {
     // MARK: - configure
     func configure(type: InfoRowType) {
         setHierarchy(type: type)
@@ -257,7 +257,7 @@ private extension InfoRowView {
         }
     }
 }
-extension Reactive where Base: InfoRowView {
+extension Reactive where Base: OLDInfoRowView {
     /// 버튼 탭 이벤트
     var tap: ControlEvent<Void> {
         return ControlEvent(events: base.tap)

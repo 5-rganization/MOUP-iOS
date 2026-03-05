@@ -1,5 +1,5 @@
 //
-//  containerView.swift
+//  OLDContainerView.swift
 //  MOUP
 //
 //  Created by 양원식 on 7/16/25.
@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-final class ContainerView: UIView {
+final class OLDContainerView: UIView {
     // MARK: - Properties
     
     // MARK: - UI Components
@@ -28,7 +28,7 @@ final class ContainerView: UIView {
     // MARK: - Public Methods
 }
 
-private extension ContainerView {
+private extension OLDContainerView {
     // MARK: - configure
     func configure() {
         setHierarchy()

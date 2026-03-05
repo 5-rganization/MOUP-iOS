@@ -53,7 +53,7 @@ final class EditRoutineView: UIView {
         $0.setLineSpacing(.headBold)
     }
     
-    fileprivate let textfield = CustomTextField().then {
+    fileprivate let textfield = OLDCustomTextField().then {
         let placeholderText = "제목을 입력해 주세요"
         $0.attributedPlaceholder = NSAttributedString(
             string: placeholderText,

@@ -23,7 +23,7 @@ final class InputNameView: UIView {
         $0.font = .headBold(18)
     }
     
-    private let textField = CustomTextField().then {
+    private let textField = OLDCustomTextField().then {
         $0.placeholder = "근무지 명"
         $0.returnKeyType = .done
     }
@@ -33,7 +33,7 @@ final class InputNameView: UIView {
     }
     
     // MARK: - Getter
-    var getTextField: CustomTextField { textField }
+    var getTextField: OLDCustomTextField { textField }
     var getRegisterButton: BaseButton { registerButton }
     
     // MARK: - Initializer
