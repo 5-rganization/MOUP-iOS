@@ -10,7 +10,7 @@ import SwiftUI
 /// 라디오버튼 (라벨only, 이미지-라벨)
 ///
 /// 이 뷰는 내부적으로 상태를 가지지 않으며(`@State` 없음), 외부에서 주입받은 `isSelected` 값에 따라
-/// 폰트 굵기, 좌측 아이콘(선택/미선택), 우측 라디오 아이콘, 테두리 색상 등의 UI를 자동으로 업데이트합니다.
+/// 폰트 굵기, 좌측 아이콘(선택/미선택), 우측 라디오 아이콘, 테두리 색상 등의 UI를 업데이트합니다.
 ///
 /// **사용 예시:**
 /// ```swift
@@ -19,14 +19,14 @@ import SwiftUI
 ///
 ///     var body: some View {
 ///         RadioButtonView(
-///             unselectedImage: .restaurantUnselected,
-///             selectedImage: .restaurantSelected,
+///             unselectedLeftImage: .restaurantUnselected,
+///             selectedLeftImage: .restaurantSelected,
 ///             label: "음식점",
 ///             isSelected: selectedOption == "음식점",
-///             onTapAction: {
+///             action: {
 ///                 // 탭 되었을 때 부모 뷰의 상태를 업데이트합니다.
 ///                 selectedOption = "음식점"
-///                 print("음식점 버튼이 눌렸습니다!")
+///                 print("음식점 버튼 탭")
 ///             }
 ///         )
 ///     }
@@ -35,48 +35,48 @@ import SwiftUI
 struct RadioButtonView: View {
     
     // MARK: - Properties
-    private let unselectedImage: UIImage?
-    private let selectedImage: UIImage?
+    private let unselectedLeftImage: UIImage?
+    private let selectedLeftImage: UIImage?
     private let label: String
     private let isSelected: Bool
-    private let onTapAction: () -> Void
+    private let action: () -> Void
     
     // MARK: - Initializer
     
     /// 새로운 `RadioButtonView`를 생성합니다.
     /// - Parameters:
-    ///   - unselectedImage: 버튼이 선택되지 않았을 때 좌측에 표시될 옵셔널 이미지입니다. (기본값 `nil`)
-    ///   - selectedImage: 버튼이 선택되었을 때 좌측에 표시될 옵셔널 이미지입니다. (기본값 `nil`)
+    ///   - unselectedLeftImage: 버튼이 선택되지 않았을 때 좌측에 표시될 옵셔널 이미지입니다. (기본값 `nil`)
+    ///   - selectedLeftImage: 버튼이 선택되었을 때 좌측에 표시될 옵셔널 이미지입니다. (기본값 `nil`)
     ///   - label: 라디오 버튼에 표시될 텍스트입니다.
     ///   - isSelected: 버튼의 선택 여부를 결정하는 불리언 값입니다. `true`일 경우 선택 상태 UI가 표시됩니다. 기본값은 `false`입니다.
-    ///   - onTapAction: 버튼이 탭 되었을 때 실행될 클로저입니다. 이 클로저 내부에서 부모 뷰의 상태 값을 변경해야 합니다.
+    ///   - action: 버튼이 탭 되었을 때 실행될 클로저입니다. 이 클로저 내부에서 부모 뷰의 상태 값을 변경해야 합니다.
     init(
-        unselectedImage: UIImage? = nil,
-        selectedImage: UIImage? = nil,
+        unselectedLeftImage: UIImage? = nil,
+        selectedLeftImage: UIImage? = nil,
         label: String,
         isSelected: Bool = false,
-        onTapAction: @escaping () -> Void = {}
+        action: @escaping () -> Void = {}
     ) {
-        self.unselectedImage = unselectedImage
-        self.selectedImage = selectedImage
+        self.unselectedLeftImage = unselectedLeftImage
+        self.selectedLeftImage = selectedLeftImage
         self.label = label
         self.isSelected = isSelected
-        self.onTapAction = onTapAction
+        self.action = action
     }
     
     // MARK: - Content
     var body: some View {
-        Button(action: onTapAction) {
+        Button(action: action) {
             HStack(spacing: 12) {
                 if isSelected {
-                    if let selectedImage {
-                        Image(uiImage: selectedImage)
+                    if let selectedLeftImage {
+                        Image(uiImage: selectedLeftImage)
                             .resizable()
                             .frame(width: 24, height: 24)
                     }
                 } else {
-                    if let unselectedImage {
-                        Image(uiImage: unselectedImage)
+                    if let unselectedLeftImage {
+                        Image(uiImage: unselectedLeftImage)
                             .resizable()
                             .frame(width: 24, height: 24)
                     }
@@ -101,7 +101,7 @@ struct RadioButtonView: View {
         .overlay(
             RoundedRectangle(cornerRadius: 12)
                 .stroke(isSelected ? .accent : .gray400,
-                        lineWidth: isSelected ? 2.0 : 1.0)
+                        lineWidth: isSelected ? 2 : 1)
         )
         .frame(height: 48)
     }
@@ -112,16 +112,16 @@ struct RadioButtonView: View {
     VStack(spacing: 12) {
         // 미선택 상태
         RadioButtonView(
-            unselectedImage: .restaurantUnselected,
-            selectedImage: .restaurantSelected,
+            unselectedLeftImage: .restaurantUnselected,
+            selectedLeftImage: .restaurantSelected,
             label: "음식점",
             isSelected: false,
         )
         
         // 선택 상태
         RadioButtonView(
-            unselectedImage: .cafeUnselected,
-            selectedImage: .cafeSelected,
+            unselectedLeftImage: .cafeUnselected,
+            selectedLeftImage: .cafeSelected,
             label: "카페",
             isSelected: true,
         )
