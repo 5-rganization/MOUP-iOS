@@ -40,7 +40,7 @@ struct CheckBoxRow: View {
     }
 
     private var titleArea: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 8) {
             Text(title)
                 .font(Font.bodyMedium(16))
                 .foregroundColor(Color("Gray900"))
