@@ -70,7 +70,7 @@ final class HomeHeaderContainerView: UIView {
         $0.text = "오늘의 루틴"
     }
     private let todayRoutineRightImageView = UIImageView().then {
-        $0.image = .chevronRightForCard
+        $0.image = .chevronRight
         $0.tintColor = .gray700
     }
     private let todayRoutineCommentLabel = UILabel().then {
@@ -90,7 +90,7 @@ final class HomeHeaderContainerView: UIView {
         $0.text = "전체 루틴"
     }
     private let allRoutineRightImageView = UIImageView().then {
-        $0.image = .chevronRightForCard
+        $0.image = .chevronRight
         $0.tintColor = .gray700
     }
     private let allRoutineCommentLabel = UILabel().then {

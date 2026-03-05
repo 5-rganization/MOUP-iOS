@@ -31,7 +31,7 @@ class TodayRoutineCell: UITableViewCell {
     }
     
     private let rightIcon = UIImageView().then {
-        $0.image = .chevronRightForCard
+        $0.image = .chevronRight
         $0.tintColor = .gray700
     }
 
