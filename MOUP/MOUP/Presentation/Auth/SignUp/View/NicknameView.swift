@@ -130,7 +130,7 @@ private extension NicknameView {
         }
         
         nicknameTitleLabel.snp.makeConstraints {
-            $0.top.equalTo(navigationBar.snp.bottom).inset(32)
+            $0.top.equalTo(navigationBar.snp.bottom).offset(32)
             $0.directionalHorizontalEdges.equalToSuperview().inset(16)
         }
         
