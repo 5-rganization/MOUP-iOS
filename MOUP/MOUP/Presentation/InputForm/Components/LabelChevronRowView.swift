@@ -78,8 +78,8 @@ struct LabelChevronRowView: View {
                 }
                 Image(.chevronRight)
             }
-            .padding(.horizontal, 16)
             .padding(.vertical, 12)
+            .padding(.horizontal, 16)
             .contentShape(Rectangle())
         }
         .frame(height: 48)

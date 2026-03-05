@@ -60,7 +60,7 @@ struct WizardTextFieldView: View {
     // MARK: - Properties
     private let placeholder: String
     private let keyboardType: UIKeyboardType
-    private let regex: String?
+    private let regex: Regex<AnyRegexOutput>?
     
     @Binding private var text: String
     @FocusState private var isFocused: Bool
@@ -79,12 +79,19 @@ struct WizardTextFieldView: View {
         placeholder: String,
         text: Binding<String>,
         keyboardType: UIKeyboardType = .default,
-        regex: String? = nil
+        regexStr: String? = nil
     ) {
         self.placeholder = placeholder
         self._text = text
         self.keyboardType = keyboardType
-        self.regex = regex
+        if let regexStr {
+            self.regex = try? Regex(regexStr)
+            assert(self.regex != nil, "올바르지 않은 정규표현식: \(regexStr)")
+        } else {
+            self.regex = nil
+        }
+        
+        self._lastValidText = State(initialValue: text.wrappedValue)
     }
     
     // MARK: - Content
@@ -110,14 +117,9 @@ struct WizardTextFieldView: View {
                 
                 // 정규표현식 검사
                 if let regex {
-                    do {
-                        let swiftRegex = try Regex(regex)
-                        guard newValue.wholeMatch(of: swiftRegex) != nil else {
-                            text = lastValidText
-                            return
-                        }
-                    } catch {
-                        assertionFailure("올바르지 않은 정규표현식입니다: \(regex)")
+                    guard newValue.wholeMatch(of: regex) != nil else {
+                        text = lastValidText
+                        return
                     }
                 }
                 
@@ -163,7 +165,7 @@ private struct WizardTextFieldPreviewWrapper: View {
                     }
                 ),
                 keyboardType: .numberPad,
-                regex: "^[0-9,원]*$"
+                regexStr: "^[0-9,원]*$"
             )
             
             Text("부모 뷰가 가진 원본 데이터: \(salary)")

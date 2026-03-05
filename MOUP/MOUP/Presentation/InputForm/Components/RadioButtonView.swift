@@ -68,18 +68,10 @@ struct RadioButtonView: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
-                if isSelected {
-                    if let selectedLeftImage {
-                        Image(uiImage: selectedLeftImage)
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                    }
-                } else {
-                    if let unselectedLeftImage {
-                        Image(uiImage: unselectedLeftImage)
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                    }
+                if let image = isSelected ? selectedLeftImage : unselectedLeftImage {
+                    Image(uiImage: image)
+                        .resizable()
+                        .frame(width: 24, height: 24)
                 }
                 Text(label)
                     .font(isSelected ? .headBold(16) : .bodyMedium(16))
@@ -93,8 +85,8 @@ struct RadioButtonView: View {
                     Image(.radioUnselected)
                 }
             }
-            .padding(.horizontal, 16)
             .padding(.vertical, 12)
+            .padding(.horizontal, 16)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
