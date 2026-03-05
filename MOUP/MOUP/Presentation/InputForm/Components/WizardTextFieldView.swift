@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// 입력 폼의 내부 네비게이션에서 사용되는 텍스트 입력 필드
+/// 텍스트 입력 필드 (내부 네비게이션에서 사용)
 ///
 /// 내부적으로 `@Binding`을 사용하여 부모 뷰와 텍스트 상태를 양방향으로 공유하며,
 /// 지정된 정규표현식(Regex)을 활용하여 허용되지 않은 문자(예: 문자, 기호) 입력을 차단합니다.
@@ -90,38 +90,45 @@ struct WizardTextFieldView: View {
     // MARK: - Content
     var body: some View {
         HStack {
-            TextField(placeholder, text: $text)
-                .font(.fieldsRegular(16))
-                .focused($isFocused)
-                .lineLimit(1)
-                .keyboardType(keyboardType)
-                .onChange(of: text) { newValue in
-                    guard !newValue.isEmpty else {
-                        lastValidText = newValue
-                        return
-                    }
-                    
-                    // 정규표현식 검사
-                    if let regex {
-                        do {
-                            let swiftRegex = try Regex(regex)
-                            guard newValue.wholeMatch(of: swiftRegex) != nil else {
-                                text = lastValidText
-                                return
-                            }
-                        } catch {
-                            assertionFailure("올바르지 않은 정규표현식입니다: \(regex)")
-                        }
-                    }
-                    
+            TextField(
+                "",
+                text: $text,
+                prompt: Text(placeholder)
+                    .font(.fieldsRegular(16))
+                    .foregroundColor(.gray400) // Deprecated 예정, iOS 17부터 foregroundStyle로 변경
+            )
+            .font(.fieldsRegular(16))
+            .foregroundStyle(.gray900)
+            .focused($isFocused)
+            .lineLimit(1)
+            .keyboardType(keyboardType)
+            .onChange(of: text) { newValue in // Deprecated 예정, iOS 17부터 onChange(of:initial:_:)로 변경
+                guard !newValue.isEmpty else {
                     lastValidText = newValue
+                    return
                 }
-                .onAppear {
-                    lastValidText = text
+                
+                // 정규표현식 검사
+                if let regex {
+                    do {
+                        let swiftRegex = try Regex(regex)
+                        guard newValue.wholeMatch(of: swiftRegex) != nil else {
+                            text = lastValidText
+                            return
+                        }
+                    } catch {
+                        assertionFailure("올바르지 않은 정규표현식입니다: \(regex)")
+                    }
                 }
+                
+                lastValidText = newValue
+            }
+            .onAppear {
+                lastValidText = text
+            }
         }
-        .padding(.horizontal, 16)
         .padding(.vertical, 12)
+        .padding(.horizontal, 16)
         .frame(height: 48)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
