@@ -99,7 +99,7 @@ struct RadioButtonView: View {
         }
         .buttonStyle(.plain)
         .overlay(
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 12)
                 .stroke(isSelected ? .accent : .gray400,
                         lineWidth: isSelected ? 2.0 : 1.0)
         )
