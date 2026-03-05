@@ -50,7 +50,7 @@ import SwiftUI
 ///             ),
 ///             keyboardType: .numberPad,
 ///             // 숫자, 콤마(,), '원' 글자만 입력 가능하도록 정규식 제한
-///             regex: "^[0-9,원]*$"
+///             regexStr: "^[0-9,원]*$"
 ///         )
 ///     }
 /// }
@@ -124,9 +124,6 @@ struct WizardTextFieldView: View {
                 }
                 
                 lastValidText = newValue
-            }
-            .onAppear {
-                lastValidText = text
             }
         }
         .padding(.vertical, 12)
