@@ -53,10 +53,10 @@ struct MemoView: View {
         .foregroundStyle(.gray900)
         .setLineSpacing(.fieldsRegular, fontSize: 16)
         .focused($isFocused)
-        .frame(minHeight: 156, alignment: .topLeading)
         .padding(.top, 16)
         .padding(.horizontal, 16)
         .padding(.bottom, 40)
+        .frame(minHeight: 156, alignment: .topLeading)
         .onChange(of: text) { newValue in // Deprecated 예정, iOS 17부터 onChange(of:initial:_:)로 변경
             guard newValue.count > maxCount else { return }
             text = String(newValue.prefix(maxCount))
