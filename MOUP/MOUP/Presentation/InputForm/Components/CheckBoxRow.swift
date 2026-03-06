@@ -43,12 +43,12 @@ struct CheckBoxRow: View {
         HStack(spacing: 8) {
             Text(title)
                 .font(Font.bodyMedium(16))
-                .foregroundColor(Color("Gray900"))
+                .foregroundColor(.gray900)
             if showInfo {
                 Button {
                     onInfoTap?()
                 } label: {
-                    Image("info")
+                    Image(.info)
                 }
             }
         }

@@ -25,17 +25,17 @@ struct PickerRow: View {
     private var titleLabel: some View {
         Text(title)
             .font(Font.bodyMedium(16))
-            .foregroundColor(Color("Gray900"))
+            .foregroundColor(.gray900)
     }
 
     private var actionButton: some View {
         Button(action: onTap) {
             Text(buttonTitle)
                 .font(Font.bodyMedium(16))
-                .foregroundColor(Color("Gray700"))
+                .foregroundColor(.gray700)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 4)
-                .background(Color("Primary100"))
+                .background(.primary100)
                 .cornerRadius(8)
         }
     }

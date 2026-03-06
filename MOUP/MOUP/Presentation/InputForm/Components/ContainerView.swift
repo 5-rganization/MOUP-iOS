@@ -39,7 +39,7 @@ struct ContainerView: View {
             }
         }
         .font(Font.headBold(18))
-        .foregroundColor(Color("Gray900"))
+        .foregroundColor(.gray900)
     }
 
     private var containerBox: some View {
@@ -49,13 +49,13 @@ struct ContainerView: View {
                 if index < rows.count - 1 {
                     Divider()
                         .frame(height: 1)
-                        .overlay(Color("Gray400"))
+                        .overlay(.gray400)
                 }
             }
         }
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color("Gray400"), lineWidth: 1)
+                .stroke(.gray400, lineWidth: 1)
         )
     }
 }
@@ -96,5 +96,5 @@ struct SectionRowBuilder {
         }
         .padding(.vertical, 32)
     }
-    .background(Color.white)
+    .background(.white)
 }
