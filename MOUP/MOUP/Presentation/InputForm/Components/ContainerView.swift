@@ -35,10 +35,10 @@ struct ContainerView: View {
             Text(title)
             if isRequired {
                 Text(" *")
-                    .foregroundColor(Color.accentColor)
+                    .foregroundColor(.accentColor)
             }
         }
-        .font(Font.headBold(18))
+        .font(.headBold(18))
         .foregroundColor(.gray900)
     }
 

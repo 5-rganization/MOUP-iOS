@@ -42,7 +42,7 @@ struct CheckBoxRow: View {
     private var titleArea: some View {
         HStack(spacing: 8) {
             Text(title)
-                .font(Font.bodyMedium(16))
+                .font(.bodyMedium(16))
                 .foregroundColor(.gray900)
             if showInfo {
                 Button {

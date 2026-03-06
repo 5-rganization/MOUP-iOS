@@ -24,14 +24,14 @@ struct PickerRow: View {
 
     private var titleLabel: some View {
         Text(title)
-            .font(Font.bodyMedium(16))
+            .font(.bodyMedium(16))
             .foregroundColor(.gray900)
     }
 
     private var actionButton: some View {
         Button(action: onTap) {
             Text(buttonTitle)
-                .font(Font.bodyMedium(16))
+                .font(.bodyMedium(16))
                 .foregroundColor(.gray700)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 4)
