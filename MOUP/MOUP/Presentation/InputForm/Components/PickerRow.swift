@@ -13,30 +13,24 @@ struct PickerRow: View {
     let onTap: () -> Void
 
     var body: some View {
-        HStack(spacing: 0) {
-            titleLabel
-            Spacer()
-            actionButton
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-    }
-
-    private var titleLabel: some View {
-        Text(title)
-            .font(.bodyMedium(16))
-            .foregroundColor(.gray900)
-    }
-
-    private var actionButton: some View {
         Button(action: onTap) {
-            Text(buttonTitle)
-                .font(.bodyMedium(16))
-                .foregroundColor(.gray700)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 4)
-                .background(.primary100)
-                .cornerRadius(8)
+            HStack(spacing: 0) {
+                Text(title)
+                    .font(.bodyMedium(16))
+                    .foregroundStyle(.gray900)
+                Spacer()
+                Text(buttonTitle)
+                    .font(.bodyMedium(16))
+                    .foregroundStyle(.gray700)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 4)
+                    .background(.primary100)
+                    .cornerRadius(8)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
     }
 }

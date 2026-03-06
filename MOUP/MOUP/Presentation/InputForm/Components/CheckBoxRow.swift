@@ -26,17 +26,19 @@ struct CheckBoxRow: View {
     }
 
     var body: some View {
-        HStack(spacing: 0) {
-            titleArea
-            Spacer()
-            checkBoxImage
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .contentShape(Rectangle())
-        .onTapGesture {
+        Button {
             isChecked.toggle()
+        } label: {
+            HStack(spacing: 0) {
+                titleArea
+                Spacer()
+                checkBoxImage
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
     }
 
     private var titleArea: some View {
@@ -55,6 +57,6 @@ struct CheckBoxRow: View {
     }
 
     private var checkBoxImage: some View {
-        Image(isChecked ? "CheckboxSelected" : "CheckboxUnselected")
+        Image(isChecked ? .checkboxSelected : .checkboxUnselected)
     }
 }
