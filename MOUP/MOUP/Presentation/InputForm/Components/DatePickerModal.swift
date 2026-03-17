@@ -55,8 +55,10 @@ struct DatePickerModal: View {
                 selectedMonth: $selectedMonth,
                 selectedDay: $selectedDay
             )
-            .frame(height: 180)
+            .frame(height: 210)
             .padding(.top, 12)
+            
+            Spacer()
             
             HStack(spacing: 12) {
                 BaseButtonSU(title: "취소", isSecondary: true) {
@@ -78,6 +80,7 @@ struct DatePickerModal: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(.primaryBackground)
         .presentationDetents([.height(320)])
         .presentationDragIndicator(.hidden)

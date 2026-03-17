@@ -42,8 +42,10 @@ struct TimePickerModal: View {
                 hour24: $tempHour24,
                 minute: $tempMinute
             )
-            .frame(height: 180)
+            .frame(height: 210)
             .padding(.top, 12)
+            
+            Spacer()
             
             HStack(spacing: 12) {
                 BaseButtonSU(title: "취소", isSecondary: true) {
@@ -67,6 +69,7 @@ struct TimePickerModal: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(.primaryBackground)
         .presentationDetents([.height(320)])
         .presentationDragIndicator(.hidden)
