@@ -11,7 +11,7 @@ import RxCocoa
 import SnapKit
 import Then
 
-class NoticeModalViewController: UIViewController {
+final class NoticeModalViewController: UIViewController {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     private let noticeTitle: String
@@ -53,7 +53,7 @@ class NoticeModalViewController: UIViewController {
         self.onConfirm = onConfirm
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     @available(*, unavailable, message: "storyboard is not supported.")
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented.")
@@ -61,10 +61,10 @@ class NoticeModalViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         configure()
     }
-
+    
 }
 
 private extension NoticeModalViewController {
@@ -131,4 +131,43 @@ private extension NoticeModalViewController {
             })
             .disposed(by: disposeBag)
     }
+}
+
+// MARK: - SwiftUI Convert
+
+import SwiftUI
+
+/// `NoticeModalViewController`의 SwiftUI 래퍼
+///
+/// **사용 예시**
+/// ```swift
+/// @State private var showNotice = false
+///
+/// var body: some View {
+///     Button("알림 표시") {
+///         showNotice = true
+///     }
+///     .fullScreenCover(isPresented: $showNotice) {
+///         NoticeModalViewControllerSU(
+///             title: "알림",
+///             comment: "작업이 완료되었습니다."
+///         ) {
+///             showNotice = false
+///         }
+///     }
+/// }
+/// ```
+struct NoticeModalViewControllerSU: UIViewControllerRepresentable {
+    let title: String
+    let comment: String
+    var onConfirm: (() -> Void)?
+    
+    func makeUIViewController(context: Context) -> NoticeModalViewController {
+        let vc = NoticeModalViewController(title: title, comment: comment, onConfirm: onConfirm)
+        vc.modalPresentationStyle = .overFullScreen
+        vc.modalTransitionStyle = .crossDissolve
+        return vc
+    }
+    
+    func updateUIViewController(_ uiViewController: NoticeModalViewController, context: Context) {}
 }
