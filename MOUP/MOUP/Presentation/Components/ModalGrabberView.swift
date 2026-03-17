@@ -44,6 +44,19 @@ private extension ModalGrabberView {
 
 import SwiftUI
 
+/// `ModalGrabberView`의 SwiftUI 래퍼
+///
+/// `intrinsicContentSize`(45×4)가 설정되어 있어 별도 `.frame` 지정 없이 사용 가능
+///
+/// **사용 예시**
+/// ```swift
+/// VStack {
+///     ModalGrabberViewSU()
+///         .padding(.top, 8)
+///
+///     // 모달 컨텐츠 ...
+/// }
+/// ```
 struct ModalGrabberViewSU: UIViewRepresentable {
     func makeUIView(context: Context) -> ModalGrabberView {
         let view = ModalGrabberView()

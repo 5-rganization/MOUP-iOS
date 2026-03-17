@@ -109,6 +109,22 @@ private extension BaseButton {
 
 import SwiftUI
 
+/// `BaseButton`의 SwiftUI 래퍼
+///
+/// **사용 예시**
+/// ```swift
+/// HStack(spacing: 12) {
+///     BaseButtonSU(title: "취소", isSecondary: true) {
+///         // 취소 액션
+///     }
+///     .frame(height: 48)
+///
+///     BaseButtonSU(title: "선택") {
+///         // 확인 액션
+///     }
+///     .frame(height: 48)
+/// }
+/// ```
 struct BaseButtonSU: UIViewRepresentable {
     let title: String
     var isSecondary: Bool = false
