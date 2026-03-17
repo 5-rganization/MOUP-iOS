@@ -1,5 +1,5 @@
 //
-//  SelectedWorkerViewController.swift
+//  OLDSelectedWorkerViewController.swift
 //  MOUP
 //
 //  Created by 양원식 on 12/1/25.
@@ -9,10 +9,10 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class SelectedWorkerViewController: UIViewController {
+final class OLDSelectedWorkerViewController: UIViewController {
     
     // MARK: - UI
-    private let selectedWorkerView = SelectedWorkerView()
+    private let selectedWorkerView = OLDSelectedWorkerView()
     
     // MARK: - State
     private let disposeBag = DisposeBag()
@@ -52,7 +52,7 @@ final class SelectedWorkerViewController: UIViewController {
 
 
 // MARK: - UI Methods
-private extension SelectedWorkerViewController {
+private extension OLDSelectedWorkerViewController {
     
     func configure() {
         setHierarchy()
@@ -103,7 +103,7 @@ private extension SelectedWorkerViewController {
         Observable.just(workers)
             .bind(to: selectedWorkerView.getTableView.rx.items(
                 cellIdentifier: "WorkerCell",
-                cellType: WorkerCell.self
+                cellType: OLDWorkerCell.self
             )) { [weak self] row, worker, cell in
                 
                 guard let self else { return }

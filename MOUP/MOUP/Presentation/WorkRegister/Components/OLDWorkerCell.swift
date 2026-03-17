@@ -1,5 +1,5 @@
 //
-//  WorkerCell.swift
+//  OLDWorkerCell.swift
 //  MOUP
 //
 //  Created by 양원식 on 12/1/25.
@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Then
 
-final class WorkerCell: UITableViewCell {
+final class OLDWorkerCell: UITableViewCell {
 
     var onToggle: (() -> Void)?   // 컨트롤러에게 상태 변경 알림
     

@@ -1,5 +1,5 @@
 //
-//  WorkRoutinContainerView.swift
+//  OLDWorkRoutinContainerView.swift
 //  MOUP
 //
 //  Created by 양원식 on 8/11/25.
@@ -11,7 +11,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-final class WorkRoutinContainerView: UIView {
+final class OLDWorkRoutinContainerView: UIView {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     fileprivate let routinSubject = PublishSubject<Void>()
@@ -74,7 +74,7 @@ final class WorkRoutinContainerView: UIView {
     }
 }
 
-private extension WorkRoutinContainerView {
+private extension OLDWorkRoutinContainerView {
     // MARK: - configure
     func configure() {
         setHierarchy()
@@ -137,7 +137,7 @@ private extension WorkRoutinContainerView {
     }
 }
 
-extension Reactive where Base: WorkRoutinContainerView {
+extension Reactive where Base: OLDWorkRoutinContainerView {
     var routinTap: ControlEvent<Void> {
         return ControlEvent(events: base.routinSubject.asObservable())
     }

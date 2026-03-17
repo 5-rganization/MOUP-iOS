@@ -1,5 +1,5 @@
 //
-//  SelectedWorkplaceView.swift
+//  OLDSelectedWorkplaceView.swift
 //  MOUP
 //
 //  Created by 양원식 on 11/9/25.
@@ -12,7 +12,7 @@ import RxRelay
 import RxSwift
 import RxCocoa
 
-final class SelectedWorkplaceView: UIView {
+final class OLDSelectedWorkplaceView: UIView {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     
@@ -58,7 +58,7 @@ final class SelectedWorkplaceView: UIView {
 }
 
 // MARK: - Configure
-private extension SelectedWorkplaceView {
+private extension OLDSelectedWorkplaceView {
     func configure() {
         setHierarchy()
         setStyles()
@@ -111,7 +111,7 @@ private extension SelectedWorkplaceView {
 }
 
 // MARK: - Public Methods
-extension SelectedWorkplaceView {
+extension OLDSelectedWorkplaceView {
     func updateWorkplaceList(with workplaces: [WorkplaceSummary]) {
         // 기존 라디오 버튼 제거
         radioStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
@@ -153,7 +153,7 @@ extension SelectedWorkplaceView {
     }
 }
 
-extension Reactive where Base: SelectedWorkplaceView {
+extension Reactive where Base: OLDSelectedWorkplaceView {
     var navBackBtnTapped: ControlEvent<Void> {
         return base.navigationBar.rx.backBtnTapped
     }

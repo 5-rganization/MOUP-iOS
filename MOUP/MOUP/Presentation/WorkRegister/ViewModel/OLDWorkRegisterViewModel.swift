@@ -1,5 +1,5 @@
 //
-//  WorkRegisterViewModel.swift
+//  OLDWorkRegisterViewModel.swift
 //  MOUP
 //
 //  Created by 양원식 on 11/11/25.
@@ -12,25 +12,25 @@ import RxRelay
 import RxCocoa
 
 // MARK: - Repeat Info Model
-struct RepeatInfo {
+struct OLDRepeatInfo {
     let endDate: Date
     let daysEN: [String]      // ex: ["MONDAY", "FRIDAY"]
     let daysIndex: [Int]      // ex: [1, 5]   ← UI 표시용
 }
 
-enum WorkRegisterMode {
+enum OLDWorkRegisterMode {
     case create
     case edit(workId: Int)
 }
 
 // MARK: - Input / Output
-protocol WorkRegisterViewModelInput {
+protocol OLDWorkRegisterViewModelInput {
     var didTapRegister: PublishRelay<Void> { get }
     var memoText: BehaviorRelay<String> { get }
     var viewWillDisappear: PublishRelay<Void> { get }
 }
 
-protocol WorkRegisterViewModelOutput {
+protocol OLDWorkRegisterViewModelOutput {
     var isFormValidForWorker: Driver<Bool> { get }
     var isFormValidForOwner: Driver<Bool> { get }
     var selectedDate: BehaviorRelay<Date> { get }
@@ -38,24 +38,24 @@ protocol WorkRegisterViewModelOutput {
     var errorMessage: PublishRelay<(title: String, message: String)> { get }
 }
 
-final class WorkRegisterViewModel:
-    WorkRegisterViewModelInput,
-    WorkRegisterViewModelOutput {
+final class OLDWorkRegisterViewModel:
+    OLDWorkRegisterViewModelInput,
+    OLDWorkRegisterViewModelOutput {
 
     // MARK: - Sub ViewModels
     let userRole: UserRole
     
-    let mode: WorkRegisterMode
+    let mode: OLDWorkRegisterMode
     
-    let selectedWorkplaceVM: SelectedWorkplaceViewModel
-    let datePickerVM: WorkDatePickerViewModel
-    let clockInVM: WorkTimePickerViewModel
-    let clockOutVM: WorkTimePickerViewModel
-    let breakPickerVM: WorkBreakPickerViewModel
-    let repeatSettingVM: RepeatSettingViewModel
+    let selectedWorkplaceVM: OLDSelectedWorkplaceViewModel
+    let datePickerVM: OLDWorkDatePickerViewModel
+    let clockInVM: OLDWorkTimePickerViewModel
+    let clockOutVM: OLDWorkTimePickerViewModel
+    let breakPickerVM: OLDWorkBreakPickerViewModel
+    let repeatSettingVM: OLDRepeatSettingViewModel
     
     // MARK: - Repeat Info (Optional)
-    let repeatInfo = BehaviorRelay<RepeatInfo?>(value: nil)
+    let repeatInfo = BehaviorRelay<OLDRepeatInfo?>(value: nil)
     
     // MARK: - Selected Routine IDs
     let selectedRoutines = BehaviorRelay<[RoutineSummary]>(value: [])
@@ -107,13 +107,13 @@ final class WorkRegisterViewModel:
 
     // MARK: - Init
     init(
-        mode: WorkRegisterMode,
-        selectedWorkplaceVM: SelectedWorkplaceViewModel,
-        datePickerVM: WorkDatePickerViewModel,
-        clockInVM: WorkTimePickerViewModel,
-        clockOutVM: WorkTimePickerViewModel,
-        breakPickerVM: WorkBreakPickerViewModel,
-        repeatSettingVM: RepeatSettingViewModel,
+        mode: OLDWorkRegisterMode,
+        selectedWorkplaceVM: OLDSelectedWorkplaceViewModel,
+        datePickerVM: OLDWorkDatePickerViewModel,
+        clockInVM: OLDWorkTimePickerViewModel,
+        clockOutVM: OLDWorkTimePickerViewModel,
+        breakPickerVM: OLDWorkBreakPickerViewModel,
+        repeatSettingVM: OLDRepeatSettingViewModel,
         workUseCase: WorkUseCaseProtocol,
         selectedDate: Date?,
         userRole: UserRole
@@ -137,19 +137,19 @@ final class WorkRegisterViewModel:
 }
 
 // MARK: - Bindings
-private extension WorkRegisterViewModel {
+private extension OLDWorkRegisterViewModel {
 
     /// 반복 설정 값 바인딩 (RepeatSettingVC → RegisterViewModel)
     func bindRepeatSetting() {
         // RepeatSetting 결과 받아서 repeatInfo 저장
         repeatSettingVM.didCompleteRepeatSetting
-            .map { endDate, daysIndex -> RepeatInfo in
+            .map { endDate, daysIndex -> OLDRepeatInfo in
                 let weekEN = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY",
                               "THURSDAY", "FRIDAY", "SATURDAY"]
 
                 let daysEN = daysIndex.map { weekEN[$0] }
 
-                return RepeatInfo(endDate: endDate, daysEN: daysEN, daysIndex: daysIndex)
+                return OLDRepeatInfo(endDate: endDate, daysEN: daysEN, daysIndex: daysIndex)
             }
             .bind(to: repeatInfo)
             .disposed(by: disposeBag)
@@ -300,7 +300,7 @@ private extension WorkRegisterViewModel {
     
     
 }
-extension WorkRegisterViewModel {
+extension OLDWorkRegisterViewModel {
 
     func loadEditData(workId: Int) {
         Task {
@@ -350,7 +350,7 @@ extension WorkRegisterViewModel {
                         }
 
                         repeatInfo.accept(
-                            RepeatInfo(
+                            OLDRepeatInfo(
                                 endDate: endRepeat,
                                 daysEN: detail.repeatDays,
                                 daysIndex: daysIndex

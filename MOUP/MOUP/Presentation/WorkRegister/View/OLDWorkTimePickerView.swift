@@ -1,5 +1,5 @@
 //
-//  WorkTimePickerView.swift
+//  OLDWorkTimePickerView.swift
 //  MOUP
 //
 //  Created by 양원식 on 8/13/25.
@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Then
 
-final class WorkTimePickerView: UIView {
+final class OLDWorkTimePickerView: UIView {
 
     // MARK: - UI
     private let indicatorBar = UIView().then {
@@ -44,7 +44,7 @@ final class WorkTimePickerView: UIView {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented.") }
 }
 
-private extension WorkTimePickerView {
+private extension OLDWorkTimePickerView {
     func configure() {
         setHierarchy()
         setStyles()

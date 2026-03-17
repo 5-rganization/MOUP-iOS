@@ -1,5 +1,5 @@
 //
-//  RepeatSettingView.swift
+//  OLDRepeatSettingView.swift
 //  MOUP
 //
 //  Created by 양원식 on 11/15/25.
@@ -11,7 +11,7 @@ import Then
 import RxSwift
 import RxCocoa
 
-final class RepeatSettingView: UIView {
+final class OLDRepeatSettingView: UIView {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     
@@ -87,7 +87,7 @@ final class RepeatSettingView: UIView {
 
 
 // MARK: - Configure UI
-private extension RepeatSettingView {
+private extension OLDRepeatSettingView {
     func configure() {
         setHierarchy()
         setStyles()
@@ -173,7 +173,7 @@ private extension RepeatSettingView {
             .disposed(by: disposeBag)
     }
 }
-extension Reactive where Base: RepeatSettingView {
+extension Reactive where Base: OLDRepeatSettingView {
     var navBackBtnTapped: ControlEvent<Void> {
         return base.navigationBar.rx.backBtnTapped
     }

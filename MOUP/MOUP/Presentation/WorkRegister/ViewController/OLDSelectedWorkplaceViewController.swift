@@ -1,5 +1,5 @@
 //
-//  SelectedWorkplaceViewController.swift
+//  OLDSelectedWorkplaceViewController.swift
 //  MOUP
 //
 //  Created by 양원식 on 11/9/25.
@@ -9,11 +9,11 @@ import UIKit
 import RxSwift
 import RxRelay
 
-final class SelectedWorkplaceViewController: UIViewController {
+final class OLDSelectedWorkplaceViewController: UIViewController {
     
     // MARK: - Properties
-    private let selectedWorkplaceView = SelectedWorkplaceView()
-    private let viewModel: SelectedWorkplaceViewModel
+    private let selectedWorkplaceView = OLDSelectedWorkplaceView()
+    private let viewModel: OLDSelectedWorkplaceViewModel
     private let disposeBag = DisposeBag()
     
     // MARK: - Lifecycle
@@ -33,7 +33,7 @@ final class SelectedWorkplaceViewController: UIViewController {
     }
     
     // MARK: - Initializer
-    init(viewModel: SelectedWorkplaceViewModel) {
+    init(viewModel: OLDSelectedWorkplaceViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -45,7 +45,7 @@ final class SelectedWorkplaceViewController: UIViewController {
 }
 
 // MARK: - UI Methods
-private extension SelectedWorkplaceViewController {
+private extension OLDSelectedWorkplaceViewController {
     func configure() {
         setHierarchy()
         setStyles()

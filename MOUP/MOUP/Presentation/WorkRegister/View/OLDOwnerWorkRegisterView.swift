@@ -1,5 +1,5 @@
 //
-//  WorkRegisterView.swift
+//  OLDOwnerWorkRegisterView.swift
 //  MOUP
 //
 //  Created by 양원식 on 8/8/25.
@@ -10,8 +10,10 @@ import Then
 import RxSwift
 import RxCocoa
 
-final class WorkRegisterView: UIView {
+final class OLDOwnerWorkRegisterView: UIView {
     // MARK: - Properties
+    private let toggleSegment = OLDRoleSegmentedControl(items: UserRole.allCases.map { $0.displayStr })
+    
     private let disposeBag = DisposeBag()
     fileprivate let selectWorkplaceSubject = PublishSubject<Void>()
     fileprivate let dateTapSubject = PublishSubject<Void>()
@@ -19,7 +21,8 @@ final class WorkRegisterView: UIView {
     fileprivate let clockInTapSubject = PublishSubject<Void>()
     fileprivate let clockOutTapSubject = PublishSubject<Void>()
     fileprivate let lunchBreakTapSubject = PublishSubject<Void>()
-    fileprivate let routinTapSubject = PublishSubject<Void>()
+    fileprivate let routineTapSubject = PublishSubject<Void>()
+    fileprivate let workerTapSubject = PublishSubject<Void>()
     
     // MARK: - UI Components
     fileprivate let navigationBar = BaseNavigationBar(title: "새 근무 등록")
@@ -38,20 +41,39 @@ final class WorkRegisterView: UIView {
     private let divider = UIView().then {
         $0.backgroundColor = .gray400
     }
+    
+    private let workerTitle = UILabel().then {
+        let fullText = "근무자 *"
+        let attributed = NSMutableAttributedString(string: fullText)
 
-    private let workDateContainerView = WorkDateContainerView()
-    private let workTimeContainerView = WorkTimeContainerView()
-    private let workRoutinContainerView = WorkRoutinContainerView()
+        attributed.addAttribute(.font, value: UIFont.headBold(18), range: NSRange(location: 0, length: fullText.count))
+        attributed.addAttribute(.foregroundColor, value: UIColor.gray900, range: NSRange(location: 0, length: fullText.count))
+
+        if let starRange = fullText.range(of: "*") {
+            let nsRange = NSRange(starRange, in: fullText)
+            attributed.addAttribute(.foregroundColor, value: UIColor.accent, range: nsRange)
+        }
+
+        $0.attributedText = attributed
+    }
+    
+    private let selectWorker = OLDInfoRowView(title: "인원 선택", type: .labelWithChevron(value: ""), frame: .zero)
+    private let container = OLDContainerView()
+
+    private let workDateContainerView = OLDWorkDateContainerView()
+    private let workTimeContainerView = OLDWorkTimeContainerView()
+    private let workRoutinContainerView = OLDWorkRoutinContainerView()
     private let memoContainerView = OLDMemoContainerView()
     
     private let registerButton = BaseButton(title: "등록하기").then {
         $0.isEnabled = false
     }
     
-    var getNavigationBar: BaseNavigationBar { navigationBar }
+    var getRoleSegmentedControl: OLDRoleSegmentedControl { toggleSegment }
     var getRegisterButton: BaseButton { registerButton }
     var getMemoContainerView: OLDMemoContainerView { memoContainerView }
     var getSelectWorkplace: OLDInfoRowView { selectWorkplace }
+    var getSelectWorker: OLDInfoRowView { selectWorker }
     
     // MARK: - Initializer
     override init(frame: CGRect) {
@@ -87,9 +109,15 @@ final class WorkRegisterView: UIView {
     func updateRoutines(_ routines: [RoutineSummary]) {
         workRoutinContainerView.updateRoutines(routines)
     }
+    
+    // MARK: - Show/Hide Worker UI
+    func showWorkerSection(_ show: Bool) {
+        workerTitle.isHidden = !show
+        container.isHidden = !show
+    }
 }
 
-private extension WorkRegisterView {
+private extension OLDOwnerWorkRegisterView {
     // MARK: - configure
     func configure() {
         setHierarchy()
@@ -102,6 +130,7 @@ private extension WorkRegisterView {
     func setHierarchy() {
         addSubviews(
             navigationBar,
+            toggleSegment,
             scrollView
         )
         
@@ -117,10 +146,16 @@ private extension WorkRegisterView {
         stackView.addArrangedSubviews(
             selectWorkplace,
             divider,
+            workerTitle,
+            container,
             workDateContainerView,
             workTimeContainerView,
             workRoutinContainerView,
             memoContainerView
+        )
+        
+        container.addSubviews(
+            selectWorker
         )
     }
     
@@ -136,19 +171,26 @@ private extension WorkRegisterView {
             $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
         }
         
+        toggleSegment.snp.makeConstraints {
+            $0.top.equalTo(navigationBar.snp.bottom).offset(32)
+            $0.leading.trailing.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.height.equalTo(48)
+        }
+        
         scrollView.snp.makeConstraints {
-            $0.top.equalTo(navigationBar.snp.bottom)
-            $0.trailing.leading.equalTo(safeAreaLayoutGuide)
+            $0.top.equalTo(toggleSegment.snp.bottom).offset(12)
+            $0.leading.trailing.equalTo(safeAreaLayoutGuide)
             $0.bottom.equalToSuperview()
         }
         
         contentView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.equalToSuperview().offset(12)
+            $0.leading.trailing.bottom.equalToSuperview()
             $0.width.equalToSuperview()
         }
         
         stackView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(20)
+            $0.top.equalToSuperview()
             $0.horizontalEdges.equalToSuperview()
         }
         
@@ -156,6 +198,15 @@ private extension WorkRegisterView {
             $0.top.equalTo(selectWorkplace.snp.bottom)
             $0.height.equalTo(1)
             $0.horizontalEdges.equalToSuperview().inset(16)
+        }
+        
+        container.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(48)
+        }
+        
+        selectWorker.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
         
         registerButton.snp.makeConstraints {
@@ -193,12 +244,16 @@ private extension WorkRegisterView {
             .disposed(by: disposeBag)
         
         workRoutinContainerView.rx.routinTap
-            .bind(to: routinTapSubject)
+            .bind(to: routineTapSubject)
+            .disposed(by: disposeBag)
+        
+        selectWorker.rx.tap
+            .bind(to: workerTapSubject)
             .disposed(by: disposeBag)
     }
 }
 
-extension Reactive where Base: WorkRegisterView {
+extension Reactive where Base: OLDOwnerWorkRegisterView {
     var navBackBtnTapped: ControlEvent<Void> {
         return base.navigationBar.rx.backBtnTapped
     }
@@ -228,7 +283,7 @@ extension Reactive where Base: WorkRegisterView {
     }
     
     var routinTap: ControlEvent<Void> {
-        return ControlEvent(events: base.routinTapSubject.asObservable())
+        return ControlEvent(events: base.routineTapSubject.asObservable())
     }
 
     var selectedWorkDateText: Binder<String> {
@@ -257,5 +312,9 @@ extension Reactive where Base: WorkRegisterView {
         Binder(base) { view, routines in
             view.updateRoutines(routines)
         }
+    }
+    
+    var workerTap: ControlEvent<Void> {
+        ControlEvent(events: base.workerTapSubject.asObservable())
     }
 }

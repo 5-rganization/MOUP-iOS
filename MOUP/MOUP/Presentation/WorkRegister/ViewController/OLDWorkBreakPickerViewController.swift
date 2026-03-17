@@ -1,5 +1,5 @@
 //
-//  WorkBreakPickerViewController.swift
+//  OLDWorkBreakPickerViewController.swift
 //  MOUP
 //
 //  Created by 양원식 on 9/16/25.
@@ -10,11 +10,11 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-final class WorkBreakPickerViewController: UIViewController {
+final class OLDWorkBreakPickerViewController: UIViewController {
     
     // MARK: - Properties
-    private let viewModel: WorkBreakPickerViewModel
-    private let contentView = WorkDatePickerView()
+    private let viewModel: OLDWorkBreakPickerViewModel
+    private let contentView = OLDWorkDatePickerView()
     private let disposeBag = DisposeBag()
     
     // Picker data (30분 단위, 최대 5시간 예시)
@@ -24,7 +24,7 @@ final class WorkBreakPickerViewController: UIViewController {
     private var curIndex = 0
     
     // MARK: - Init
-    init(viewModel: WorkBreakPickerViewModel) {
+    init(viewModel: OLDWorkBreakPickerViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .pageSheet
@@ -92,7 +92,7 @@ final class WorkBreakPickerViewController: UIViewController {
 }
 
 // MARK: - UIPickerView
-extension WorkBreakPickerViewController: UIPickerViewDataSource, UIPickerViewDelegate {
+extension OLDWorkBreakPickerViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     func numberOfComponents(in _: UIPickerView) -> Int { 1 }
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         breakMinutes.count

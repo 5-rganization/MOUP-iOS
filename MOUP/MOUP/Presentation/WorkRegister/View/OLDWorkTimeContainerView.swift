@@ -1,5 +1,5 @@
 //
-//  WorkTimeContainerView.swift
+//  OLDWorkTimeContainerView.swift
 //  MOUP
 //
 //  Created by 양원식 on 8/11/25.
@@ -11,7 +11,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-final class WorkTimeContainerView: UIView {
+final class OLDWorkTimeContainerView: UIView {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     fileprivate let clockInSubject = PublishSubject<Void>()
@@ -86,7 +86,7 @@ final class WorkTimeContainerView: UIView {
     }
 }
 
-private extension WorkTimeContainerView {
+private extension OLDWorkTimeContainerView {
     // MARK: - configure
     func configure() {
         setHierarchy()
@@ -177,7 +177,7 @@ private extension WorkTimeContainerView {
     }
 }
 
-extension Reactive where Base: WorkTimeContainerView {
+extension Reactive where Base: OLDWorkTimeContainerView {
     var clockInTap: ControlEvent<Void> {
         return ControlEvent(events: base.clockInSubject.asObservable())
     }

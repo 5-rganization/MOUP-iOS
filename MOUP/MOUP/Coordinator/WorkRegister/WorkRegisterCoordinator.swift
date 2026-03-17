@@ -12,16 +12,16 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
     // MARK: - Properties
     var childCoordinators = [Coordinator]()
     
-    private let registerMode: WorkRegisterMode
+    private let registerMode: OLDWorkRegisterMode
     private let navigationController: UINavigationController
-    private var workRegisterViewModel: WorkRegisterViewModel?
+    private var workRegisterViewModel: OLDWorkRegisterViewModel?
     
     private let isOwnerInjected: Bool
     
     private let selectedDate: Date?
 
     // MARK: - Sub ViewModels
-    private lazy var selectedWorkplaceViewModel = SelectedWorkplaceViewModel(
+    private lazy var selectedWorkplaceViewModel = OLDSelectedWorkplaceViewModel(
         useCase: WorkplaceUseCase(
             workplaceRepository: WorkplaceRepository(
                 workplaceService: WorkplaceService()
@@ -35,15 +35,15 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
         )
     )
     
-    private lazy var workDatePickerViewModel = WorkDatePickerViewModel(initialDate: selectedDate ?? .now)
-    private lazy var clockInViewModel = WorkTimePickerViewModel()
-    private lazy var clockOutViewModel = WorkTimePickerViewModel()
-    private lazy var breakPickerViewModel = WorkBreakPickerViewModel()
+    private lazy var workDatePickerViewModel = OLDWorkDatePickerViewModel(initialDate: selectedDate ?? .now)
+    private lazy var clockInViewModel = OLDWorkTimePickerViewModel()
+    private lazy var clockOutViewModel = OLDWorkTimePickerViewModel()
+    private lazy var breakPickerViewModel = OLDWorkBreakPickerViewModel()
     private lazy var selectColorLabelViewModel = SelectColorLabelViewModel()
-    private lazy var repeatSettingViewModel = RepeatSettingViewModel()
+    private lazy var repeatSettingViewModel = OLDRepeatSettingViewModel()
 
     // MARK: - Init
-    init(navigationController: UINavigationController, isOwnerInjected: Bool, selectedDate: Date?, mode: WorkRegisterMode) {
+    init(navigationController: UINavigationController, isOwnerInjected: Bool, selectedDate: Date?, mode: OLDWorkRegisterMode) {
         self.navigationController = navigationController
         self.isOwnerInjected = isOwnerInjected
         self.selectedDate = selectedDate
@@ -55,7 +55,7 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
         
         let userRole: UserRole = isOwnerInjected ? .owner : .worker
         
-        let viewModel = WorkRegisterViewModel(
+        let viewModel = OLDWorkRegisterViewModel(
             mode: registerMode,
             selectedWorkplaceVM: selectedWorkplaceViewModel,
             datePickerVM: workDatePickerViewModel,
@@ -70,9 +70,9 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
             
         let vc: UIViewController
         if isOwnerInjected {
-            vc = OwnerWorkRegisterViewController(viewModel: viewModel, coordinator: self)
+            vc = OLDOwnerWorkRegisterViewController(viewModel: viewModel, coordinator: self)
         } else {
-            vc = WorkRegisterViewController(viewModel: viewModel, coordinator: self)
+            vc = OLDWorkRegisterViewController(viewModel: viewModel, coordinator: self)
         }
         self.workRegisterViewModel = viewModel
 
@@ -82,7 +82,7 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
 
     // MARK: - Navigation
     func showSelectWorkplace() {
-        let vc = SelectedWorkplaceViewController(viewModel: selectedWorkplaceViewModel)
+        let vc = OLDSelectedWorkplaceViewController(viewModel: selectedWorkplaceViewModel)
         navigationController.pushViewController(vc, animated: true)
     }
 
@@ -92,7 +92,7 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
     }
     
     func showRepeatSetting() {
-        let vc = RepeatSettingViewController(viewModel: repeatSettingViewModel)
+        let vc = OLDRepeatSettingViewController(viewModel: repeatSettingViewModel)
         navigationController.pushViewController(vc, animated: true)
     }
     
@@ -108,7 +108,7 @@ final class WorkRegisterCoordinator: WorkRegisterCoordinatorProtocol {
                     (id: worker.id, name: worker.nickname)
                 }
 
-                let vc = SelectedWorkerViewController(workers: mapped)
+                let vc = OLDSelectedWorkerViewController(workers: mapped)
 
                 vc.onWorkersSelected = { selectedIds in
                     print("선택된 알바 ID:", selectedIds)

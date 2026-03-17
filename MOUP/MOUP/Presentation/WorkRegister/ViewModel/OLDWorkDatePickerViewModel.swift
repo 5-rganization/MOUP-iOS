@@ -1,5 +1,5 @@
 //
-//  WorkDatePickerViewModel.swift
+//  OLDWorkDatePickerViewModel.swift
 //  MOUP
 //
 //  Created by 양원식 on 8/12/25.
@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-protocol WorkDatePickerViewModelInput {
+protocol OLDWorkDatePickerViewModelInput {
     var didTapConfirm: AnyObserver<Void> { get }
     var didTapCancel: AnyObserver<Void> { get }
     var selectedYear: AnyObserver<Int> { get }
@@ -18,7 +18,7 @@ protocol WorkDatePickerViewModelInput {
     func resetToConfirmedDate()
 }
 
-protocol WorkDatePickerViewModelOutput {
+protocol OLDWorkDatePickerViewModelOutput {
     var currentYear: Driver<Int> { get }
     var currentMonth: Driver<Int> { get }
     var currentDay: Driver<Int> { get }
@@ -26,7 +26,7 @@ protocol WorkDatePickerViewModelOutput {
     var dismiss: Observable<Void> { get }
 }
 
-final class WorkDatePickerViewModel: WorkDatePickerViewModelInput, WorkDatePickerViewModelOutput {
+final class OLDWorkDatePickerViewModel: OLDWorkDatePickerViewModelInput, OLDWorkDatePickerViewModelOutput {
     
     // MARK: - State
     private let calendar = Calendar(identifier: .gregorian)

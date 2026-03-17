@@ -1,5 +1,5 @@
 //
-//  WorkTimePickerViewModel.swift
+//  OLDWorkTimePickerViewModel.swift
 //  MOUP
 //
 //  Created by 양원식 on 8/13/25.
@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-protocol WorkTimePickerViewModelInput {
+protocol OLDWorkTimePickerViewModelInput {
     var didTapConfirm: AnyObserver<Void> { get }
     var didTapCancel: AnyObserver<Void> { get }
     var selectedAMPM: AnyObserver<Int> { get }     // 0 = AM, 1 = PM
@@ -18,7 +18,7 @@ protocol WorkTimePickerViewModelInput {
     func resetToConfirmedTime()
 }
 
-protocol WorkTimePickerViewModelOutput {
+protocol OLDWorkTimePickerViewModelOutput {
     var currentAMPM: Driver<Int> { get }       // 0 or 1
     var currentHour: Driver<Int> { get }       // 1...12
     var currentMinute: Driver<Int> { get }     // 0...59
@@ -26,7 +26,7 @@ protocol WorkTimePickerViewModelOutput {
     var dismiss: Observable<Void> { get }
 }
 
-final class WorkTimePickerViewModel: WorkTimePickerViewModelInput, WorkTimePickerViewModelOutput {
+final class OLDWorkTimePickerViewModel: OLDWorkTimePickerViewModelInput, OLDWorkTimePickerViewModelOutput {
 
     // MARK: - State
     private let calendar = Calendar(identifier: .gregorian)

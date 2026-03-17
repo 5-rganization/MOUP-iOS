@@ -1,5 +1,5 @@
 //
-//  WorkTimePickerViewController.swift
+//  OLDWorkTimePickerViewController.swift
 //  MOUP
 //
 //  Created by 양원식 on 8/13/25.
@@ -9,10 +9,10 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class WorkTimePickerViewController: UIViewController {
+final class OLDWorkTimePickerViewController: UIViewController {
 
-    private let contentView = WorkTimePickerView()
-    private let viewModel: WorkTimePickerViewModel
+    private let contentView = OLDWorkTimePickerView()
+    private let viewModel: OLDWorkTimePickerViewModel
     private let disposeBag = DisposeBag()
 
     // Picker data
@@ -26,7 +26,7 @@ final class WorkTimePickerViewController: UIViewController {
     private let minutes: [Int] = Array(0...59)
 
     // MARK: - Init
-    init(viewModel: WorkTimePickerViewModel) {
+    init(viewModel: OLDWorkTimePickerViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .pageSheet
@@ -91,7 +91,7 @@ final class WorkTimePickerViewController: UIViewController {
     }
 }
 
-extension WorkTimePickerViewController: UIPickerViewDataSource, UIPickerViewDelegate {
+extension OLDWorkTimePickerViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     func numberOfComponents(in pickerView: UIPickerView) -> Int { 3 }
 
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {

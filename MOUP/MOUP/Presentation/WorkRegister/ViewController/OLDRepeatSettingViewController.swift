@@ -1,5 +1,5 @@
 //
-//  RepeatSettingViewController.swift
+//  OLDRepeatSettingViewController.swift
 //  MOUP
 //
 //  Created by 양원식 on 11/15/25.
@@ -9,11 +9,11 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class RepeatSettingViewController: UIViewController {
+final class OLDRepeatSettingViewController: UIViewController {
     
     // MARK: - UI
-    private let repeatSettingView = RepeatSettingView()
-    private let viewModel: RepeatSettingViewModel
+    private let repeatSettingView = OLDRepeatSettingView()
+    private let viewModel: OLDRepeatSettingViewModel
     // MARK: - Etc
     private let disposeBag = DisposeBag()
     
@@ -28,7 +28,7 @@ final class RepeatSettingViewController: UIViewController {
     }
     
     // MARK: - Initializer
-    init(viewModel: RepeatSettingViewModel) {
+    init(viewModel: OLDRepeatSettingViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -41,7 +41,7 @@ final class RepeatSettingViewController: UIViewController {
 
 
 // MARK: - UI Methods
-private extension RepeatSettingViewController {
+private extension OLDRepeatSettingViewController {
     func configure() {
         setHierarchy()
         setStyles()
@@ -62,8 +62,8 @@ private extension RepeatSettingViewController {
                 .bind { [weak self] in
                     guard let self else { return }
                     
-                    let dateVM = WorkDatePickerViewModel()
-                    let dateVC = WorkDatePickerViewController(viewModel: dateVM)
+                    let dateVM = OLDWorkDatePickerViewModel()
+                    let dateVC = OLDWorkDatePickerViewController(viewModel: dateVM)
                     
                     // 날짜 선택 완료
                     dateVM.confirmSelectedDate

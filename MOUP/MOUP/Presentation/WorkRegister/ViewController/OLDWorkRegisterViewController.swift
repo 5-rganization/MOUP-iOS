@@ -1,5 +1,5 @@
 //
-//  WorkRegisterViewController.swift
+//  OLDWorkRegisterViewController.swift
 //  MOUP
 //
 //  Created by 양원식 on 8/8/25.
@@ -9,13 +9,13 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class WorkRegisterViewController: UIViewController {
+final class OLDWorkRegisterViewController: UIViewController {
 
     // MARK: - UI
-    private let workRegisterView = WorkRegisterView()
+    private let workRegisterView = OLDWorkRegisterView()
 
     // MARK: - DI
-    private let viewModel: WorkRegisterViewModel
+    private let viewModel: OLDWorkRegisterViewModel
     private weak var coordinator: WorkRegisterCoordinatorProtocol?
 
     // MARK: - State
@@ -29,7 +29,7 @@ final class WorkRegisterViewController: UIViewController {
 
     // MARK: - Init
     init(
-        viewModel: WorkRegisterViewModel,
+        viewModel: OLDWorkRegisterViewModel,
         coordinator: WorkRegisterCoordinatorProtocol
     ) {
         self.viewModel = viewModel
@@ -55,7 +55,7 @@ final class WorkRegisterViewController: UIViewController {
 }
 
 // MARK: - Private
-private extension WorkRegisterViewController {
+private extension OLDWorkRegisterViewController {
 
     func configure() {
         setHierarchy()
@@ -131,7 +131,7 @@ private extension WorkRegisterViewController {
             .bind(onNext: { [weak self] in
                 guard let self else { return }
 
-                let vc = WorkDatePickerViewController(viewModel: viewModel.datePickerVM)
+                let vc = OLDWorkDatePickerViewController(viewModel: viewModel.datePickerVM)
 
                 viewModel.datePickerVM.confirmSelectedDate
                     .do(onNext: { [weak self] d in self?.selectedWorkDate = d })
@@ -196,7 +196,7 @@ private extension WorkRegisterViewController {
                 let anchor = anchorDate(workDate: selectedWorkDate, time: clockInDate)
                 vm.reconfigure(anchorDate: anchor, confirmedDate: clockInDate)
 
-                let vc = WorkTimePickerViewController(viewModel: vm)
+                let vc = OLDWorkTimePickerViewController(viewModel: vm)
 
                 vm.confirmSelectedTime
                     .do(onNext: { [weak self] d in self?.clockInDate = d })
@@ -230,7 +230,7 @@ private extension WorkRegisterViewController {
                 let anchor = anchorDate(workDate: selectedWorkDate, time: clockOutDate)
                 vm.reconfigure(anchorDate: anchor, confirmedDate: clockOutDate)
 
-                let vc = WorkTimePickerViewController(viewModel: vm)
+                let vc = OLDWorkTimePickerViewController(viewModel: vm)
 
                 vm.confirmSelectedTime
                     .do(onNext: { [weak self] d in self?.clockOutDate = d })
@@ -261,7 +261,7 @@ private extension WorkRegisterViewController {
                 guard let self else { return }
 
                 let vm = viewModel.breakPickerVM
-                let vc = WorkBreakPickerViewController(viewModel: vm)
+                let vc = OLDWorkBreakPickerViewController(viewModel: vm)
 
                 vm.confirmSelectedBreak
                     .map { minutes -> String in

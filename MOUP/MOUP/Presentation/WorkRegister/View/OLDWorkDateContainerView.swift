@@ -1,5 +1,5 @@
 //
-//  WorkDateContainerView.swift
+//  OLDWorkDateContainerView.swift
 //  MOUP
 //
 //  Created by 양원식 on 8/10/25.
@@ -11,7 +11,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-final class WorkDateContainerView: UIView {
+final class OLDWorkDateContainerView: UIView {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     fileprivate let dateSubject = PublishSubject<Void>()
@@ -73,7 +73,7 @@ final class WorkDateContainerView: UIView {
 
 }
 
-private extension WorkDateContainerView {
+private extension OLDWorkDateContainerView {
     // MARK: - configure
     func configure() {
         setHierarchy()
@@ -147,7 +147,7 @@ private extension WorkDateContainerView {
     }
 }
 
-extension Reactive where Base: WorkDateContainerView {
+extension Reactive where Base: OLDWorkDateContainerView {
     var dateTap: ControlEvent<Void> {
         return ControlEvent(events: base.dateSubject.asObservable())
     }

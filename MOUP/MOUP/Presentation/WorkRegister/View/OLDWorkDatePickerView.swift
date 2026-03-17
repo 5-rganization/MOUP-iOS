@@ -1,5 +1,5 @@
 //
-//  WorkDatePickerView.swift
+//  OLDWorkDatePickerView.swift
 //  MOUP
 //
 //  Created by 양원식 on 8/12/25.
@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Then
 
-final class WorkDatePickerView: UIView {
+final class OLDWorkDatePickerView: UIView {
 
     // MARK: - UI
     private let indicatorBar = UIView().then {
@@ -44,7 +44,7 @@ final class WorkDatePickerView: UIView {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented.") }
 }
 
-private extension WorkDatePickerView {
+private extension OLDWorkDatePickerView {
     func configure() {
         setHierarchy()
         setStyles()

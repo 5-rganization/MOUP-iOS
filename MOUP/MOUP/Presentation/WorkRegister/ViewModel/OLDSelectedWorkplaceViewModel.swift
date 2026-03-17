@@ -1,5 +1,5 @@
 //
-//  SelectedWorkplaceViewModel.swift
+//  OLDSelectedWorkplaceViewModel.swift
 //  MOUP
 //
 //  Created by 양원식 on 11/10/25.
@@ -10,23 +10,23 @@ import RxSwift
 import RxRelay
 
 // MARK: - Input / Output
-protocol SelectedWorkplaceViewModelInput {
+protocol OLDSelectedWorkplaceViewModelInput {
     var fetchTrigger: PublishRelay<Void> { get }
     var selectedWorkplace: PublishRelay<(id: Int, name: String)> { get }
     var didTapConfirm: PublishRelay<Void> { get }
     var didTapCancel: PublishRelay<Void> { get }
 }
 
-protocol SelectedWorkplaceViewModelOutput {
+protocol OLDSelectedWorkplaceViewModelOutput {
     var workplaces: BehaviorRelay<[WorkplaceSummary]> { get }
     var confirmSelectedWorkplace: PublishRelay<(id: Int, name: String)> { get }
     
 }
 
 // MARK: - ViewModel
-final class SelectedWorkplaceViewModel:
-    SelectedWorkplaceViewModelInput,
-    SelectedWorkplaceViewModelOutput {
+final class OLDSelectedWorkplaceViewModel:
+    OLDSelectedWorkplaceViewModelInput,
+    OLDSelectedWorkplaceViewModelOutput {
     
     // MARK: - Input
     let fetchTrigger = PublishRelay<Void>()
@@ -53,7 +53,7 @@ final class SelectedWorkplaceViewModel:
 }
 
 // MARK: - Bind
-private extension SelectedWorkplaceViewModel {
+private extension OLDSelectedWorkplaceViewModel {
     func bind() {
         // MARK: 근무지 목록 조회
         fetchTrigger
@@ -91,7 +91,7 @@ private extension SelectedWorkplaceViewModel {
             .disposed(by: disposeBag)
     }
 }
-extension SelectedWorkplaceViewModel {
+extension OLDSelectedWorkplaceViewModel {
     func applyInitial(workplaceId: Int, name: String) {
         confirmSelectedWorkplace.accept((id: workplaceId, name: name))
     }

@@ -1,5 +1,5 @@
 //
-//  SelectedWorkerView.swift
+//  OLDSelectedWorkerView.swift
 //  MOUP
 //
 //  Created by 양원식 on 12/1/25.
@@ -12,7 +12,7 @@ import RxRelay
 import RxSwift
 import RxCocoa
 
-final class SelectedWorkerView: UIView {
+final class OLDSelectedWorkerView: UIView {
 
     // MARK: - UI Components
     fileprivate let navigationBar = BaseNavigationBar(title: "인원 선택")
@@ -31,7 +31,7 @@ final class SelectedWorkerView: UIView {
         $0.rowHeight = 56
         $0.allowsMultipleSelection = true
         $0.showsVerticalScrollIndicator = false
-        $0.register(WorkerCell.self, forCellReuseIdentifier: "WorkerCell")
+        $0.register(OLDWorkerCell.self, forCellReuseIdentifier: "WorkerCell")
     }
     
     private let registerButton = BaseButton(title: "적용하기").then {
@@ -54,7 +54,7 @@ final class SelectedWorkerView: UIView {
     }
 }
 
-private extension SelectedWorkerView {
+private extension OLDSelectedWorkerView {
     // MARK: - configure
     func configure() {
         setHierarchy()

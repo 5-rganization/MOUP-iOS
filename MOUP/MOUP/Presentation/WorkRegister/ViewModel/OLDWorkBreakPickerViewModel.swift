@@ -1,5 +1,5 @@
 //
-//  WorkBreakPickerViewModel.swift
+//  OLDWorkBreakPickerViewModel.swift
 //  MOUP
 //
 //  Created by 양원식 on 9/16/25.
@@ -9,20 +9,20 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-protocol WorkBreakPickerViewModelInput {
+protocol OLDWorkBreakPickerViewModelInput {
     var didTapConfirm: AnyObserver<Void> { get }
     var didTapCancel: AnyObserver<Void> { get }
     var selectedIndex: AnyObserver<Int> { get }
     func resetToConfirmedIndex()
 }
 
-protocol WorkBreakPickerViewModelOutput {
+protocol OLDWorkBreakPickerViewModelOutput {
     var currentIndex: Driver<Int> { get }
     var confirmSelectedBreak: Observable<Int> { get } // 분 단위 결과
     var dismiss: Observable<Void> { get }
 }
 
-final class WorkBreakPickerViewModel: WorkBreakPickerViewModelInput, WorkBreakPickerViewModelOutput {
+final class OLDWorkBreakPickerViewModel: OLDWorkBreakPickerViewModelInput, OLDWorkBreakPickerViewModelOutput {
     
     private let indexRelay: BehaviorRelay<Int>
     private let confirmedIndexRelay: BehaviorRelay<Int>
@@ -59,7 +59,7 @@ final class WorkBreakPickerViewModel: WorkBreakPickerViewModelInput, WorkBreakPi
         selectedIndexSubject.bind(to: indexRelay).disposed(by: disposeBag)
     }
 }
-extension WorkBreakPickerViewModel {
+extension OLDWorkBreakPickerViewModel {
     func setInitialBreak(_ minutes: Int) {
         let index = minutes / 30
         indexRelay.accept(index)

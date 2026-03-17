@@ -1,5 +1,5 @@
 //
-//  RepeatSettingViewModel.swift
+//  OLDRepeatSettingViewModel.swift
 //  MOUP
 //
 //  Created by 양원식 on 11/15/25.
@@ -10,20 +10,20 @@ import RxSwift
 import RxRelay
 import RxCocoa
 
-protocol RepeatSettingViewModelInput {
+protocol OLDRepeatSettingViewModelInput {
     var dateSelected: PublishRelay<Date> { get }
     var didTapDay: PublishRelay<Int> { get }
     var didTapRegister: PublishRelay<Void> { get }
 }
 
-protocol RepeatSettingViewModelOutput {
+protocol OLDRepeatSettingViewModelOutput {
     var isFormValid: Driver<Bool> { get }
     var didCompleteRepeatSetting: PublishRelay<(endDate: Date, days: [Int])> { get }
 }
 
-final class RepeatSettingViewModel:
-    RepeatSettingViewModelInput,
-    RepeatSettingViewModelOutput {
+final class OLDRepeatSettingViewModel:
+    OLDRepeatSettingViewModelInput,
+    OLDRepeatSettingViewModelOutput {
 
     // MARK: - Input
     let dateSelected = PublishRelay<Date>()

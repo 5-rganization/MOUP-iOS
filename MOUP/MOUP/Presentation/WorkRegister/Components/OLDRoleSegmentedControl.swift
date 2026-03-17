@@ -1,5 +1,5 @@
 //
-//  RoleSegmentedControl.swift
+//  OLDRoleSegmentedControl.swift
 //  MOUP
 //
 //  Created by 서동환 on 11/28/25.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class RoleSegmentedControl: UISegmentedControl {
+final class OLDRoleSegmentedControl: UISegmentedControl {
     
     // MARK: - Initializer
     
@@ -27,7 +27,7 @@ final class RoleSegmentedControl: UISegmentedControl {
     }
 }
 
-private extension RoleSegmentedControl {
+private extension OLDRoleSegmentedControl {
     // MARK: - setStyles
     func setStyles() {
         // SegmentedControl 자체 스타일 설정
