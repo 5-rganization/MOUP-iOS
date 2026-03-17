@@ -50,7 +50,7 @@ struct DatePickerModal: View {
             ModalGrabberViewSU()
                 .padding(.top, 8)
             
-            YearMonthDayPickerViewSU(
+            DatePickerViewSU(
                 selectedYear: $selectedYear,
                 selectedMonth: $selectedMonth,
                 selectedDay: $selectedDay

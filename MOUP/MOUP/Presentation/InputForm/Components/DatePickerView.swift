@@ -180,7 +180,28 @@ extension DatePickerView: UIPickerViewDelegate {
 
 import SwiftUI
 
-struct YearMonthDayPickerViewSU: UIViewRepresentable {
+/// `DatePickerView`의 SwiftUI 래퍼
+///
+/// 연/월/일을 선택할 수 있는 `UIPickerView` 기반 피커입니다.
+/// 월 변경 시 해당 월의 최대 일수에 맞춰 자동으로 일(day)이 보정됩니다.
+/// 연도 범위는 `CalendarRange.startYear...CalendarRange.endYear`입니다.
+///
+/// **사용 예시**
+/// ```swift
+/// @State private var year: Int = 2026
+/// @State private var month: Int = 3
+/// @State private var day: Int = 17
+///
+/// var body: some View {
+///     DatePickerViewSU(
+///         selectedYear: $year,
+///         selectedMonth: $month,
+///         selectedDay: $day
+///     )
+///     .frame(height: 180)
+/// }
+/// ```
+struct DatePickerViewSU: UIViewRepresentable {
     @Binding var selectedYear: Int
     @Binding var selectedMonth: Int
     @Binding var selectedDay: Int
