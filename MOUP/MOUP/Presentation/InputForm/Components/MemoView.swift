@@ -80,19 +80,18 @@ struct MemoView: View {
 }
 
 // MARK: - Preview
-private struct MemoPreviewWrapper: View {
-    @State private var text1 = ""
-    @State private var text2 = "텍스트 입력 상황"
-    
-    var body: some View {
-        VStack(spacing: 12) {
-            MemoView(text: $text1)
-            MemoView(text: $text2)
-        }
-        .padding()
-    }
-}
-
 #Preview {
-    MemoPreviewWrapper()
+    struct Wrapper: View {
+        @State var text1 = ""
+        @State var text2 = "텍스트 입력 상황"
+        
+        var body: some View {
+            VStack(spacing: 12) {
+                MemoView(text: $text1)
+                MemoView(text: $text2)
+            }
+            .padding()
+        }
+    }
+    return Wrapper()
 }

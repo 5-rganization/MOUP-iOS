@@ -1,5 +1,5 @@
 //
-//  YearMonthDayPickerView.swift
+//  DatePickerView.swift
 //  MOUP
 //
 //  Created by 서동환 on 3/17/26.
@@ -9,7 +9,7 @@ import UIKit
 
 import SnapKit
 
-final class YearMonthDayPickerView: UIView {
+final class DatePickerView: UIView {
     
     // MARK: - Properties
     
@@ -54,8 +54,8 @@ final class YearMonthDayPickerView: UIView {
         selectedDay = day
         rebuildDays()
         
-        if let yearIdx = years.firstIndex(of: year) {
-            pickerView.selectRow(yearIdx, inComponent: 0, animated: false)
+        if let yearIndex = years.firstIndex(of: year) {
+            pickerView.selectRow(yearIndex, inComponent: 0, animated: false)
         }
         pickerView.selectRow(month - 1, inComponent: 1, animated: false)
         let dayRow = max(0, min(days.count - 1, day - 1))
@@ -65,7 +65,7 @@ final class YearMonthDayPickerView: UIView {
 
 // MARK: - UI Methods
 
-private extension YearMonthDayPickerView {
+private extension DatePickerView {
     func configure() {
         setStyles()
         setHierachy()
@@ -91,7 +91,7 @@ private extension YearMonthDayPickerView {
 
 // MARK: - Private Methods
 
-private extension YearMonthDayPickerView {
+private extension DatePickerView {
     func rebuildDays() {
         if let date = calendar.date(from: DateComponents(year: selectedYear, month: selectedMonth)),
            let range = calendar.range(of: .day, in: .month, for: date) {
@@ -113,7 +113,7 @@ private extension YearMonthDayPickerView {
 }
 
 // MARK: - UIPickerViewDataSource
-extension YearMonthDayPickerView: UIPickerViewDataSource {
+extension DatePickerView: UIPickerViewDataSource {
     func numberOfComponents(in pickerView: UIPickerView) -> Int { 3 }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
@@ -127,7 +127,7 @@ extension YearMonthDayPickerView: UIPickerViewDataSource {
 }
 
 // MARK: - UIPickerViewDelegate
-extension YearMonthDayPickerView: UIPickerViewDelegate {
+extension DatePickerView: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat { 44 }
     
     func pickerView(_ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
@@ -185,8 +185,8 @@ struct YearMonthDayPickerViewSU: UIViewRepresentable {
     @Binding var selectedMonth: Int
     @Binding var selectedDay: Int
     
-    func makeUIView(context: Context) -> YearMonthDayPickerView {
-        let picker = YearMonthDayPickerView(
+    func makeUIView(context: Context) -> DatePickerView {
+        let picker = DatePickerView(
             year: selectedYear,
             month: selectedMonth,
             day: selectedDay
@@ -199,7 +199,7 @@ struct YearMonthDayPickerViewSU: UIViewRepresentable {
         return picker
     }
     
-    func updateUIView(_ uiView: YearMonthDayPickerView, context: Context) {
+    func updateUIView(_ uiView: DatePickerView, context: Context) {
         uiView.updateSelection(year: selectedYear, month: selectedMonth, day: selectedDay)
     }
 }

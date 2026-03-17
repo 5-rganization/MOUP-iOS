@@ -137,40 +137,39 @@ struct WizardTextFieldView: View {
 }
 
 // MARK: - Preview
-private struct WizardTextFieldPreviewWrapper: View {
-    @State private var workplaceName = ""
-    @State private var salary = 15000
-    
-    var body: some View {
-        VStack(spacing: 12) {
-            WizardTextFieldView(
-                placeholder: "근무지 이름",
-                text: $workplaceName
-            )
-            
-            WizardTextFieldView(
-                placeholder: "10,320원",
-                text: Binding<String>(
-                    get: {
-                        NumberFormatter.formattedWon(from: salary)
-                    },
-                    set: { newValue in
-                        let numbersOnly = newValue.filter { $0.isNumber }
-                        if let intValue = Int(numbersOnly) {
-                            salary = intValue
-                        }
-                    }
-                ),
-                keyboardType: .numberPad,
-                regexStr: "^[0-9,원]*$"
-            )
-            
-            Text("부모 뷰가 가진 원본 데이터: \(salary)")
-        }
-        .padding()
-    }
-}
-
 #Preview {
-    WizardTextFieldPreviewWrapper()
+    struct Wrapper: View {
+        @State private var workplaceName = ""
+        @State private var salary = 15000
+        
+        var body: some View {
+            VStack(spacing: 12) {
+                WizardTextFieldView(
+                    placeholder: "근무지 이름",
+                    text: $workplaceName
+                )
+                
+                WizardTextFieldView(
+                    placeholder: "10,320원",
+                    text: Binding<String>(
+                        get: {
+                            NumberFormatter.formattedWon(from: salary)
+                        },
+                        set: { newValue in
+                            let numbersOnly = newValue.filter { $0.isNumber }
+                            if let intValue = Int(numbersOnly) {
+                                salary = intValue
+                            }
+                        }
+                    ),
+                    keyboardType: .numberPad,
+                    regexStr: "^[0-9,원]*$"
+                )
+                
+                Text("부모 뷰가 가진 원본 데이터: \(salary)")
+            }
+            .padding()
+        }
+    }
+    return Wrapper()
 }

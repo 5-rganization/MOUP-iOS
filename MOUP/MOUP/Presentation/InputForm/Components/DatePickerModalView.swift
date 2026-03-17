@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct DatePickerModal: View {
+struct DatePickerModalView: View {
     
     // MARK: - Properties
     
@@ -86,7 +86,7 @@ struct DatePickerModal: View {
 
 // MARK: - Private Methods
 
-private extension DatePickerModal {
+private extension DatePickerModalView {
     func clampDay() {
         let maxDay = days.last ?? 31
         if selectedDay > maxDay {
@@ -103,7 +103,7 @@ private extension DatePickerModal {
         @State var isPresented = true
         
         var body: some View {
-            DatePickerModal(selectedDate: $date, isPresented: $isPresented)
+            DatePickerModalView(selectedDate: $date, isPresented: $isPresented)
         }
     }
     return Wrapper()
