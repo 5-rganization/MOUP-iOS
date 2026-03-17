@@ -211,3 +211,50 @@ private extension DeleteAlertViewController {
         }
     }
 }
+
+// MARK: - SwiftUI Convert
+
+import SwiftUI
+
+/// `DeleteAlertViewController`의 SwiftUI 래퍼
+///
+/// **사용 예시**
+/// ```swift
+/// @State private var showDeleteAlert = false
+///
+/// var body: some View {
+///     Button("삭제") {
+///         showDeleteAlert = true
+///     }
+///     .fullScreenCover(isPresented: $showDeleteAlert) {
+///         DeleteAlertViewControllerSU(
+///             onDeleteConfirmed: {
+///                 showDeleteAlert = false
+///             },
+///             onCancelConfirmed: {
+///                 showDeleteAlert = false
+///             }
+///         )
+///     }
+/// }
+/// ```
+struct DeleteAlertViewControllerSU: UIViewControllerRepresentable {
+    var alertTitle: String = "정말 삭제하시겠어요?"
+    var alertMessage: String = "삭제된 정보는 되돌릴 수 없습니다."
+    var deleteButtonTitle: String = "삭제하기"
+    var onDeleteConfirmed: (() -> Void)?
+    var onCancelConfirmed: (() -> Void)?
+    
+    func makeUIViewController(context: Context) -> DeleteAlertViewController {
+        let vc = DeleteAlertViewController(
+            alertTitle: alertTitle,
+            alertMessage: alertMessage,
+            deleteButtonTitle: deleteButtonTitle
+        )
+        vc.onDeleteConfirmed = onDeleteConfirmed
+        vc.onCancelConfirmed = onCancelConfirmed
+        return vc
+    }
+    
+    func updateUIViewController(_ uiViewController: DeleteAlertViewController, context: Context) {}
+}
