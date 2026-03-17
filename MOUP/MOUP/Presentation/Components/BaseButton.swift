@@ -104,3 +104,24 @@ private extension BaseButton {
         self.configurationUpdateHandler = handler
     }
 }
+
+// MARK: - SwiftUI Convert
+
+import SwiftUI
+
+struct BaseButtonSU: UIViewRepresentable {
+    let title: String
+    var isSecondary: Bool = false
+    var fontSize: CGFloat = 18
+    var action: () -> Void
+    
+    func makeUIView(context: Context) -> BaseButton {
+        let button = BaseButton(title: title, isSecondary: isSecondary, fontSize: fontSize)
+        button.addAction(UIAction { _ in action() }, for: .touchUpInside)
+        return button
+    }
+    
+    func updateUIView(_ uiView: BaseButton, context: Context) {
+        uiView.update(title: title, isSecondary: isSecondary, fontSize: fontSize)
+    }
+}
