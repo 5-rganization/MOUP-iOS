@@ -39,3 +39,18 @@ private extension ModalGrabberView {
         self.layer.cornerRadius = 2
     }
 }
+
+// MARK: - SwiftUI Convert
+
+import SwiftUI
+
+struct ModalGrabberViewSU: UIViewRepresentable {
+    func makeUIView(context: Context) -> ModalGrabberView {
+        let view = ModalGrabberView()
+        view.setContentHuggingPriority(.required, for: .horizontal)
+        view.setContentHuggingPriority(.required, for: .vertical)
+        return view
+    }
+
+    func updateUIView(_ uiView: ModalGrabberView, context: Context) {}
+}
