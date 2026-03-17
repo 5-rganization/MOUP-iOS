@@ -1,5 +1,5 @@
 //
-//  DatePickerModalView.swift
+//  DatePickerModal.swift
 //  MOUP
 //
 //  Created by 서동환 on 3/17/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct DatePickerModalView: View {
+struct DatePickerModal: View {
     
     // MARK: - Properties
     
@@ -86,7 +86,7 @@ struct DatePickerModalView: View {
 
 // MARK: - Private Methods
 
-private extension DatePickerModalView {
+private extension DatePickerModal {
     func clampDay() {
         let maxDay = days.last ?? 31
         if selectedDay > maxDay {
@@ -103,7 +103,7 @@ private extension DatePickerModalView {
         @State var isPresented = true
         
         var body: some View {
-            DatePickerModalView(selectedDate: $date, isPresented: $isPresented)
+            DatePickerModal(selectedDate: $date, isPresented: $isPresented)
         }
     }
     return Wrapper()
