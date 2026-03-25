@@ -68,10 +68,6 @@ struct MemoView: View {
                 .padding(.bottom, 12)
                 .padding(.trailing, 16)
         }
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(.gray400, lineWidth: 1)
-        )
         .contentShape(Rectangle())
         .onTapGesture {
             isFocused = true
@@ -86,11 +82,15 @@ struct MemoView: View {
         @State var text2 = "텍스트 입력 상황"
         
         var body: some View {
-            VStack(spacing: 12) {
-                MemoView(text: $text1)
-                MemoView(text: $text2)
+            VStack(spacing: 24) {
+                ContainerView(title: "메모 1") {
+                    MemoView(text: $text1)
+                }
+                
+                ContainerView(title: "메모 2") {
+                    MemoView(text: $text2)
+                }
             }
-            .padding()
         }
     }
     return Wrapper()
