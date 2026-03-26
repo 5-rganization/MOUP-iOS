@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct ContainerView: View {
-    let title: String
-    let isRequired: Bool
+    let title: String?
+    let isRequired: Bool?
     let rows: [AnyView]
 
     init(
-        title: String,
-        isRequired: Bool = false,
+        title: String? = nil,
+        isRequired: Bool? = nil,
         @SectionRowBuilder content: () -> [AnyView]
     ) {
         self.title = title
@@ -32,10 +32,12 @@ struct ContainerView: View {
 
     private var titleView: some View {
         HStack(spacing: 0) {
-            Text(title)
-            if isRequired {
-                Text(" *")
-                    .foregroundColor(.accentColor)
+            if let title {
+                Text(title)
+                if let isRequired, isRequired == true {
+                    Text(" *")
+                        .foregroundColor(.accentColor)
+                }
             }
         }
         .font(.headBold(18))
