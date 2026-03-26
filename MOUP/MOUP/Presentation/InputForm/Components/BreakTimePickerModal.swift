@@ -48,8 +48,8 @@ struct BreakTimePickerModal: View {
                 }
             }
             .pickerStyle(.wheel)
-            .frame(height: 210)
             .padding(.top, 12)
+            .frame(height: 210)
             
             Spacer()
             
@@ -63,9 +63,8 @@ struct BreakTimePickerModal: View {
                     isPresented = false
                 }
             }
-            .padding(.top, 16)
+            .padding(.vertical, 12)
             .padding(.horizontal, 16)
-            .padding(.bottom, 16)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(.primaryBackground)

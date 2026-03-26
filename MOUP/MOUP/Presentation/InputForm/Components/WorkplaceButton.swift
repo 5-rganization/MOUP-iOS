@@ -48,9 +48,9 @@ struct WorkplaceButton: View {
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 16)
+            .frame(height: 48)
             .contentShape(Rectangle())
         }
-        .frame(height: 48)
         .buttonStyle(.plain)
         .overlay(alignment: .bottom) {
             Rectangle()

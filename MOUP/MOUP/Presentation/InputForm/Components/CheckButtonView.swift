@@ -88,7 +88,8 @@ struct CheckButtonView: View {
                 }
             }
             .padding(.horizontal, 16)
-            .background(.white)
+            .frame(height: 48)
+            .background(.primaryBackground)
             .cornerRadius(12)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
