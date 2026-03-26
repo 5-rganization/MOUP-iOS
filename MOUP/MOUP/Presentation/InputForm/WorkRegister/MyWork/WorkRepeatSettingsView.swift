@@ -79,8 +79,8 @@ struct WorkRepeatSettingsView: View {
                     }
                     dismiss()
                 }
+                .padding(.vertical, 12)
                 .padding(.horizontal, 16)
-                .padding(.bottom, 12)
                 .disabled(!tempDays.isEmpty && tempEndDate == nil)
             }
         }

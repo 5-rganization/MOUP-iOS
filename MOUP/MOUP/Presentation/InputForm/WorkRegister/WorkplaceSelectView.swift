@@ -45,6 +45,30 @@ struct WorkplaceSelectView: View {
         self._tempSelectedId = State(initialValue: selectedWorkplace.wrappedValue?.id)
     }
     
+    // MARK: - UI Components
+    
+    private var content: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            Text("등록할 근무지를 선택해 주세요")
+                .font(.headBold(18))
+                .foregroundColor(.gray900)
+                .padding(.top, 20)
+            
+            VStack(spacing: 12) {
+                ForEach(workplaces, id: \.id) { workplace in
+                    CheckButtonView(
+                        title: workplace.name,
+                        isSelected: binding(for: workplace.id)
+                    )
+                }
+            }
+            
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
     // MARK: - Content
     
     var body: some View {
@@ -53,26 +77,12 @@ struct WorkplaceSelectView: View {
                 dismiss()
             })
             
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    HStack(spacing: 0) {
-                        Text("등록할 근무지를 선택해 주세요")
-                    }
-                    .font(.headBold(18))
-                    .foregroundColor(.gray900)
-                    .padding(.top, 20)
-                    
-                    VStack(spacing: 12) {
-                        ForEach(workplaces, id: \.id) { workplace in
-                            CheckButtonView(
-                                title: workplace.name,
-                                isSelected: binding(for: workplace.id)
-                            )
-                        }
-                    }
+            ViewThatFits(in: .vertical) {
+                content
+                
+                ScrollView {
+                    content
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 16)
             }
             
             BaseButtonSU(title: "완료") {
@@ -82,7 +92,7 @@ struct WorkplaceSelectView: View {
                 }
                 dismiss()
             }
-            .frame(height: 45)
+            .padding(.vertical, 12)
             .padding(.horizontal, 16)
             .disabled(tempSelectedId == nil)
         }
@@ -121,6 +131,14 @@ private extension WorkplaceSelectView {
             WorkplaceSummary(id: 1, name: "맥도날드", isShared: false),
             WorkplaceSummary(id: 2, name: "스타벅스", isShared: true),
             WorkplaceSummary(id: 3, name: "서브웨이", isShared: false),
+            WorkplaceSummary(id: 4, name: "서브웨이", isShared: false),
+            WorkplaceSummary(id: 5, name: "서브웨이", isShared: false),
+            WorkplaceSummary(id: 6, name: "서브웨이", isShared: false),
+            WorkplaceSummary(id: 7, name: "서브웨이", isShared: false),
+            WorkplaceSummary(id: 8, name: "서브웨이", isShared: false),
+            WorkplaceSummary(id: 9, name: "서브웨이", isShared: false),
+            WorkplaceSummary(id: 10, name: "서브웨이", isShared: false),
+            WorkplaceSummary(id: 11, name: "서브웨이", isShared: false),
         ]
         
         var body: some View {
