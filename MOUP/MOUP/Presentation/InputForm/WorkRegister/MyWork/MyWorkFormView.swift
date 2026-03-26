@@ -1,5 +1,5 @@
 //
-//  MyWorkRegisterView.swift
+//  MyWorkFormView.swift
 //  MOUP
 //
 //  Created by 서동환 on 3/17/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MyWorkRegisterView: View {
+struct MyWorkFormView: View {
     
     // MARK: - Properties
     
@@ -100,7 +100,7 @@ struct MyWorkRegisterView: View {
 
 // MARK: - Private Methods
 
-private extension MyWorkRegisterView {
+private extension MyWorkFormView {
     func showRoutineSelection() {
         guard let nav = navigationController else { return }
         
@@ -121,5 +121,5 @@ private extension MyWorkRegisterView {
 // MARK: - Preview
 
 #Preview {
-    MyWorkRegisterView()
+    MyWorkFormView()
 }

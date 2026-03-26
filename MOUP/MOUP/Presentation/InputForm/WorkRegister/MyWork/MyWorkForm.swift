@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// `MyWorkRegisterView`의 폼 상태를 담는 값 타입
+/// `MyWorkFormView`의 폼 상태를 담는 값 타입
 ///
 /// UI 입력 상태와 도메인 엔티티(`MyWorkData`) 간 변환을 캡슐화합니다.
 /// View에서는 `@State private var form = MyWorkForm()`으로 선언하여 사용합니다.
