@@ -12,11 +12,14 @@ struct MyWorkRegisterView: View {
     // MARK: - Properties
     
     @State private var form: MyWorkForm
+    @State private var navigationController: UINavigationController?
     
     @State private var isDatePickerPresented = false
     @State private var isStartTimePickerPresented = false
     @State private var isEndTimePickerPresented = false
     @State private var isBreakTimePickerPresented = false
+    
+    @State private var routineCoordinator: RoutineSelectionCoordinator?
     
     // MARK: - Initializer
     
@@ -60,7 +63,9 @@ struct MyWorkRegisterView: View {
                 }
                 
                 ContainerView(title: "루틴") {
-                    LabelChevronRowView(titleLabel: "루틴 추가")
+                    LabelChevronRowView(titleLabel: "루틴 추가", rightLabel: form.formattedRoutineCount) {
+                        showRoutineSelection()
+                    }
                 }
                 
                 ContainerView(title: "메모") {
@@ -96,6 +101,18 @@ struct MyWorkRegisterView: View {
 // MARK: - Private Methods
 
 private extension MyWorkRegisterView {
+    func showRoutineSelection() {
+        guard let nav = navigationController else { return }
+        
+        let coordinator = RoutineSelectionCoordinator(navigationController: nav)
+        coordinator.onRoutinesSelected = { routines in
+            form.routines = routines
+        }
+        coordinator.start()
+        
+        routineCoordinator = coordinator
+    }
+    
     func handleRegister() {
         // TODO: form → API 요청 DTO 변환 후 등록
     }

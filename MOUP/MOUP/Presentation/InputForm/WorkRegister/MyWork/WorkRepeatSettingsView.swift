@@ -52,26 +52,6 @@ struct WorkRepeatSettingsView: View {
         self._tempEndDate = State(initialValue: repeatEndDate.wrappedValue)
     }
     
-    // MARK: - Private Methods
-    
-    private func dayBinding(_ key: String) -> Binding<Bool> {
-        Binding(
-            get: { tempDays.contains(key) },
-            set: { isOn in
-                if isOn {
-                    if !tempDays.contains(key) {
-                        tempDays.append(key)
-                    }
-                } else {
-                    tempDays.removeAll { $0 == key }
-                    if tempDays.isEmpty {
-                        tempEndDate = nil
-                    }
-                }
-            }
-        )
-    }
-    
     // MARK: - Content
     
     var body: some View {
@@ -118,7 +98,7 @@ struct WorkRepeatSettingsView: View {
                     }
                 }
                 
-                BaseButtonSU(title: "등록하기") {
+                BaseButtonSU(title: "적용하기") {
                     if tempDays.isEmpty {
                         // 아무것도 선택 안 했으면 "없음" 처리
                         repeatDays = []
@@ -143,6 +123,28 @@ struct WorkRepeatSettingsView: View {
                 isPresented: $isDatePickerPresented
             )
         }
+    }
+}
+
+// MARK: - Private Methods
+
+private extension WorkRepeatSettingsView {
+    func dayBinding(_ key: String) -> Binding<Bool> {
+        Binding(
+            get: { tempDays.contains(key) },
+            set: { isOn in
+                if isOn {
+                    if !tempDays.contains(key) {
+                        tempDays.append(key)
+                    }
+                } else {
+                    tempDays.removeAll { $0 == key }
+                    if tempDays.isEmpty {
+                        tempEndDate = nil
+                    }
+                }
+            }
+        )
     }
 }
 

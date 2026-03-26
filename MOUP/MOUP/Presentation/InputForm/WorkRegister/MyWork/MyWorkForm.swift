@@ -25,9 +25,12 @@ struct MyWorkForm {
     var selectedDate: Date
     var selectedStartTime: Date
     var selectedEndTime: Date
+    var actualStartTime: Date?
+    var actualEndTime: Date?
     var selectedBreakTime: Int
     var repeatDays: [String]
     var repeatEndDate: Date?
+    var routines: [RoutineSummary]
     var memo: String
     
     // MARK: - Initializer
@@ -53,9 +56,12 @@ struct MyWorkForm {
             self.selectedStartTime = calendar.date(byAdding: .hour, value: -6, to: endTime) ?? endTime
         }
         
+        self.actualStartTime = nil
+        self.actualEndTime = nil
         self.selectedBreakTime = selectedBreakTime
         self.repeatDays = []
         self.repeatEndDate = nil
+        self.routines = []
         self.memo = ""
     }
     
@@ -64,8 +70,11 @@ struct MyWorkForm {
         self.selectedWorkplace = data.workplaceSummary
         self.selectedStartTime = data.startTime
         self.selectedEndTime = data.endTime ?? data.startTime
+        self.actualStartTime = data.actualStartTime
+        self.actualEndTime = data.actualEndTime
         self.selectedBreakTime = data.restTimeMinutes
         self.repeatDays = data.repeatDays
+        self.routines = data.routineSummaryList
         self.memo = data.memo ?? ""
         
         if let dateString = data.repeatEndDate,
@@ -119,6 +128,10 @@ struct MyWorkForm {
             .sorted { (order.firstIndex(of: $0) ?? 0) < (order.firstIndex(of: $1) ?? 0) }
             .compactMap { dayMap[$0] }
             .joined(separator: " / ")
+    }
+    
+    var formattedRoutineCount: String {
+        routines.count == 0 ? "" : "+ \(routines.count)"
     }
     
     /// 필수 필드가 모두 채워졌는지 여부
