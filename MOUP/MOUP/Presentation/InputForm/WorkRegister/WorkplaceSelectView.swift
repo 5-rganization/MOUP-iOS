@@ -84,17 +84,19 @@ struct WorkplaceSelectView: View {
                     content
                 }
             }
-            
-            BaseButtonSU(title: "완료") {
-                if let id = tempSelectedId,
-                   let workplace = workplaces.first(where: { $0.id == id }) {
-                    selectedWorkplace = workplace
+            .safeAreaInset(edge: .bottom) {
+                BaseButtonSU(title: "적용하기") {
+                    if let id = tempSelectedId,
+                       let workplace = workplaces.first(where: { $0.id == id }) {
+                        selectedWorkplace = workplace
+                    }
+                    dismiss()
                 }
-                dismiss()
+                .padding(.vertical, 12)
+                .padding(.horizontal, 16)
+                .background(.primaryBackground)
+                .disabled(tempSelectedId == nil)
             }
-            .padding(.vertical, 12)
-            .padding(.horizontal, 16)
-            .disabled(tempSelectedId == nil)
         }
         .background(.primaryBackground)
         .navigationBarHidden(true)
