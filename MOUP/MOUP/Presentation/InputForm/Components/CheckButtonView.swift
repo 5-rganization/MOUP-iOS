@@ -88,7 +88,6 @@ struct CheckButtonView: View {
                 }
             }
             .padding(.horizontal, 16)
-            .frame(height: 48)
             .background(.white)
             .cornerRadius(12)
             .overlay(
