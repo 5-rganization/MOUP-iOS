@@ -8,6 +8,12 @@
 import SwiftUI
 
 extension UIApplication {
+    static var screenWidth: CGFloat {
+        shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first?.windows.first?.bounds.width ?? 375
+    }
+    
     static var safeAreaBottom: CGFloat {
         shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }

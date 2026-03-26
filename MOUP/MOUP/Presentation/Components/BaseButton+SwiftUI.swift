@@ -143,7 +143,7 @@ struct BaseButtonSU: UIViewRepresentable {
     }
     
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: BaseButton, context: Context) -> CGSize? {
-        let width = proposal.width ?? UIScreen.main.bounds.width
+        let width = proposal.width ?? UIApplication.screenWidth
         return CGSize(width: width, height: 45)
     }
 }
