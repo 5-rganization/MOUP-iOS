@@ -51,7 +51,6 @@ struct TimePickerModal: View {
                 BaseButtonSU(title: "취소", isSecondary: true) {
                     isPresented = false
                 }
-                .frame(height: 48)
                 
                 BaseButtonSU(title: "선택") {
                     var components = calendar.dateComponents([.year, .month, .day], from: selectedTime)
@@ -63,7 +62,6 @@ struct TimePickerModal: View {
                     }
                     isPresented = false
                 }
-                .frame(height: 48)
             }
             .padding(.top, 16)
             .padding(.horizontal, 16)

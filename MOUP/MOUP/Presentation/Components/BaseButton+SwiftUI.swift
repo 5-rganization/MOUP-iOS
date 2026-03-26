@@ -110,6 +110,7 @@ private extension BaseButton {
 import SwiftUI
 
 /// `BaseButton`의 SwiftUI 래퍼
+/// - 높이 45 지정되어있음
 ///
 /// **사용 예시**
 /// ```swift
@@ -117,12 +118,12 @@ import SwiftUI
 ///     BaseButtonSU(title: "취소", isSecondary: true) {
 ///         // 취소 액션
 ///     }
-///     .frame(height: 48)
+///     .frame(height: 45)
 ///
 ///     BaseButtonSU(title: "선택") {
 ///         // 확인 액션
 ///     }
-///     .frame(height: 48)
+///     .frame(height: 45)
 /// }
 /// ```
 struct BaseButtonSU: UIViewRepresentable {
@@ -139,5 +140,10 @@ struct BaseButtonSU: UIViewRepresentable {
     
     func updateUIView(_ uiView: BaseButton, context: Context) {
         uiView.update(title: title, isSecondary: isSecondary, fontSize: fontSize)
+    }
+    
+    func sizeThatFits(_ proposal: ProposedViewSize, uiView: BaseButton, context: Context) -> CGSize? {
+        let width = proposal.width ?? UIScreen.main.bounds.width
+        return CGSize(width: width, height: 45)
     }
 }

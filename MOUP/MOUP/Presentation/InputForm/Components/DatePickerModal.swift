@@ -64,7 +64,6 @@ struct DatePickerModal: View {
                 BaseButtonSU(title: "취소", isSecondary: true) {
                     isPresented = false
                 }
-                .frame(height: 48)
                 
                 BaseButtonSU(title: "선택") {
                     if let date = calendar.date(from: DateComponents(
@@ -74,7 +73,6 @@ struct DatePickerModal: View {
                     }
                     isPresented = false
                 }
-                .frame(height: 48)
             }
             .padding(.top, 16)
             .padding(.horizontal, 16)

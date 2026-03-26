@@ -143,6 +143,7 @@ extension Reactive where Base: BaseNavigationBar {
 import SwiftUI
 
 /// `BaseNavigationBar`의 SwiftUI 변환 버전
+/// - 높이 50 지정되어있음
 ///
 /// **사용 예시**
 /// ```swift
