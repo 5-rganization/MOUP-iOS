@@ -18,11 +18,14 @@ struct MyWorkFormView: View {
     @State private var form: MyWorkForm
     private let isEditing: Bool
     
+    @State private var workplaces: [WorkplaceSummary] = []
+    @State private var showWorkplaceSelect = false
+    @State private var showRepeatSettings = false
+    
     @State private var isDatePickerPresented = false
     @State private var isStartTimePickerPresented = false
     @State private var isEndTimePickerPresented = false
     @State private var isBreakTimePickerPresented = false
-    @State private var showRepeatSettings = false
     
     // MARK: - Initializer
     
@@ -44,7 +47,9 @@ struct MyWorkFormView: View {
         ScrollView {
             VStack(spacing: 24) {
                 WorkplaceButton(titleLabel: form.selectedWorkplace?.name ?? "근무지 선택",
-                                isRequired: form.selectedWorkplace == nil)
+                                isRequired: form.selectedWorkplace == nil) {
+                    fetchWorkplaces()
+                }
                 
                 ContainerView(title: "근무 날짜", isRequired: true) {
                     PickerRow(title: "날짜", buttonTitle: form.formattedDate) {
@@ -79,17 +84,29 @@ struct MyWorkFormView: View {
             }
             .disabled(!isEditing)
             
+            Spacer()
+                .frame(height: 60)
+            
             if isEditing {
                 BaseButtonSU(title: "등록하기") {
                     handleRegister()
                 }
-                .frame(height: 48)
                 .padding(.horizontal, 16)
+                .padding(.vertical, 12)
                 .disabled(!form.isValid)
+                
+                Spacer()
+                    .frame(height: UIApplication.safeAreaBottom + 12)
             }
         }
-        .padding(.bottom, 16)
         .scrollDismissesKeyboard(.interactively)
+        .ignoresSafeArea(edges: .bottom)
+        .navigationDestination(isPresented: $showWorkplaceSelect) {
+            WorkplaceSelectView(
+                workplaces: workplaces,
+                selectedWorkplace: $form.selectedWorkplace
+            )
+        }
         .navigationDestination(isPresented: $showRepeatSettings) {
             WorkRepeatSettingsView(
                 repeatDays: $form.repeatDays,
@@ -115,6 +132,13 @@ struct MyWorkFormView: View {
 // MARK: - Private Methods
 
 private extension MyWorkFormView {
+    func fetchWorkplaces() {
+        // TODO: API 호출
+        // 성공 시:
+        // workplaces = 응답 데이터
+        showWorkplaceSelect = true
+    }
+    
     func showRoutineSelection() {
         guard let nav = navigationController else { return }
         
