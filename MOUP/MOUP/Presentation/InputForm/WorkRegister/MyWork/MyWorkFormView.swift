@@ -6,31 +6,33 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct MyWorkFormView: View {
     
     // MARK: - Properties
     
+    private let navigationController: UINavigationController?
+    @State private var routineCoordinator: RoutineSelectionCoordinator?
+    
     @State private var form: MyWorkForm
-    @State private var navigationController: UINavigationController?
     
     @State private var isDatePickerPresented = false
     @State private var isStartTimePickerPresented = false
     @State private var isEndTimePickerPresented = false
     @State private var isBreakTimePickerPresented = false
-    
-    @State private var routineCoordinator: RoutineSelectionCoordinator?
+    @State private var showRepeatSettings = false
     
     // MARK: - Initializer
     
-    /// 등록 모드
-    init(selectedDate: Date = Date()) {
+    init(selectedDate: Date = Date(), navigationController: UINavigationController? = nil) {
         self._form = State(initialValue: MyWorkForm(selectedDate: selectedDate))
+        self.navigationController = navigationController
     }
     
-    /// 편집 모드
-    init(from data: MyWorkData) {
+    init(from data: MyWorkData, navigationController: UINavigationController? = nil) {
         self._form = State(initialValue: MyWorkForm(from: data))
+        self.navigationController = navigationController
     }
     
     // MARK: - Content
@@ -46,7 +48,7 @@ struct MyWorkFormView: View {
                         isDatePickerPresented = true
                     }
                     LabelChevronRowView(titleLabel: "반복", rightLabel: form.formattedRepeatDays) {
-                        // TODO: 반복 요일 설정 화면 연결
+                        showRepeatSettings = true
                     }
                 }
                 
@@ -82,6 +84,12 @@ struct MyWorkFormView: View {
             .padding(.bottom, 16)
         }
         .scrollDismissesKeyboard(.interactively)
+        .navigationDestination(isPresented: $showRepeatSettings) {
+            WorkRepeatSettingsView(
+                repeatDays: $form.repeatDays,
+                repeatEndDate: $form.repeatEndDate
+            )
+        }
         .sheet(isPresented: $isDatePickerPresented) {
             DatePickerModal(selectedDate: $form.selectedDate, isPresented: $isDatePickerPresented)
         }

@@ -14,23 +14,11 @@ struct WorkRepeatSettingsView: View {
     @Binding var repeatDays: [String]
     @Binding var repeatEndDate: Date?
     
-    /// 임시 편집 상태
     @State private var tempDays: [String]
     @State private var tempEndDate: Date?
     @State private var isDatePickerPresented = false
     
     @Environment(\.dismiss) private var dismiss
-    
-    /// 요일 목록 (API 키 + 표시 텍스트)
-    private let weekdays: [(key: String, label: String)] = [
-        ("SUNDAY", "일요일마다"),
-        ("MONDAY", "월요일마다"),
-        ("TUESDAY", "화요일마다"),
-        ("WEDNESDAY", "수요일마다"),
-        ("THURSDAY", "목요일마다"),
-        ("FRIDAY", "금요일마다"),
-        ("SATURDAY", "토요일마다")
-    ]
     
     private var hasSelection: Bool {
         !tempDays.isEmpty
@@ -55,65 +43,47 @@ struct WorkRepeatSettingsView: View {
     // MARK: - Content
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                VStack(spacing: 12) {
-                    ContainerView(title: "반복 요일을 선택해주세요") {
-                        CheckBoxRow(
-                            title: "일요일마다",
-                            isChecked: dayBinding("SUNDAY")
-                        )
-                        CheckBoxRow(
-                            title: "월요일마다",
-                            isChecked: dayBinding("MONDAY")
-                        )
-                        CheckBoxRow(
-                            title: "화요일마다",
-                            isChecked: dayBinding("TUESDAY")
-                        )
-                        CheckBoxRow(
-                            title: "수요일마다",
-                            isChecked: dayBinding("WEDNESDAY")
-                        )
-                        CheckBoxRow(
-                            title: "목요일마다",
-                            isChecked: dayBinding("THURSDAY")
-                        )
-                        CheckBoxRow(
-                            title: "금요일마다",
-                            isChecked: dayBinding("FRIDAY")
-                        )
-                        CheckBoxRow(
-                            title: "토요일마다",
-                            isChecked: dayBinding("SATURDAY")
-                        )
+        VStack(spacing: 0) {
+            BaseNavigationBarSU(title: "반복", onBackTap: {
+                dismiss()
+            })
+            
+            ScrollView {
+                VStack(spacing: 24) {
+                    ContainerView {
+                        CheckBoxRow(title: "일요일마다", isChecked: dayBinding("SUNDAY"))
+                        CheckBoxRow(title: "월요일마다", isChecked: dayBinding("MONDAY"))
+                        CheckBoxRow(title: "화요일마다", isChecked: dayBinding("TUESDAY"))
+                        CheckBoxRow(title: "수요일마다", isChecked: dayBinding("WEDNESDAY"))
+                        CheckBoxRow(title: "목요일마다", isChecked: dayBinding("THURSDAY"))
+                        CheckBoxRow(title: "금요일마다", isChecked: dayBinding("FRIDAY"))
+                        CheckBoxRow(title: "토요일마다", isChecked: dayBinding("SATURDAY"))
                     }
-                }
-                
-                if hasSelection {
+                    
                     ContainerView(title: "반복 종료 날짜를 입력해주세요") {
                         PickerRow(title: "날짜", buttonTitle: formattedRepeatEndDate) {
                             isDatePickerPresented = true
+                        }.disabled(!hasSelection)
+                    }
+                    
+                    BaseButtonSU(title: "적용하기") {
+                        if tempDays.isEmpty {
+                            repeatDays = []
+                            repeatEndDate = nil
+                        } else {
+                            repeatDays = tempDays
+                            repeatEndDate = tempEndDate
                         }
+                        dismiss()
                     }
+                    .frame(height: 48)
+                    .padding(.horizontal, 16)
+                    .disabled(!tempDays.isEmpty && tempEndDate == nil)
                 }
-                
-                BaseButtonSU(title: "적용하기") {
-                    if tempDays.isEmpty {
-                        // 아무것도 선택 안 했으면 "없음" 처리
-                        repeatDays = []
-                        repeatEndDate = nil
-                    } else {
-                        repeatDays = tempDays
-                        repeatEndDate = tempEndDate
-                    }
-                    dismiss()
-                }
-                .frame(height: 48)
-                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
             }
-            .padding(.bottom, 16)
         }
+        .navigationBarHidden(true)
         .sheet(isPresented: $isDatePickerPresented) {
             DatePickerModal(
                 selectedDate: Binding(
