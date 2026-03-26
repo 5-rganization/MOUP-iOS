@@ -48,39 +48,40 @@ struct WorkRepeatSettingsView: View {
                 dismiss()
             })
             
-            ScrollView {
-                VStack(spacing: 24) {
-                    ContainerView {
-                        CheckBoxRow(title: "일요일마다", isChecked: dayBinding("SUNDAY"))
-                        CheckBoxRow(title: "월요일마다", isChecked: dayBinding("MONDAY"))
-                        CheckBoxRow(title: "화요일마다", isChecked: dayBinding("TUESDAY"))
-                        CheckBoxRow(title: "수요일마다", isChecked: dayBinding("WEDNESDAY"))
-                        CheckBoxRow(title: "목요일마다", isChecked: dayBinding("THURSDAY"))
-                        CheckBoxRow(title: "금요일마다", isChecked: dayBinding("FRIDAY"))
-                        CheckBoxRow(title: "토요일마다", isChecked: dayBinding("SATURDAY"))
-                    }
-                    
+            VStack(spacing: 24) {
+                ContainerView {
+                    CheckBoxRow(title: "일요일마다", isChecked: dayBinding("SUNDAY"))
+                    CheckBoxRow(title: "월요일마다", isChecked: dayBinding("MONDAY"))
+                    CheckBoxRow(title: "화요일마다", isChecked: dayBinding("TUESDAY"))
+                    CheckBoxRow(title: "수요일마다", isChecked: dayBinding("WEDNESDAY"))
+                    CheckBoxRow(title: "목요일마다", isChecked: dayBinding("THURSDAY"))
+                    CheckBoxRow(title: "금요일마다", isChecked: dayBinding("FRIDAY"))
+                    CheckBoxRow(title: "토요일마다", isChecked: dayBinding("SATURDAY"))
+                }
+                
+                if hasSelection {
                     ContainerView(title: "반복 종료 날짜를 입력해주세요") {
                         PickerRow(title: "날짜", buttonTitle: formattedRepeatEndDate) {
                             isDatePickerPresented = true
-                        }.disabled(!hasSelection)
-                    }
-                    
-                    BaseButtonSU(title: "적용하기") {
-                        if tempDays.isEmpty {
-                            repeatDays = []
-                            repeatEndDate = nil
-                        } else {
-                            repeatDays = tempDays
-                            repeatEndDate = tempEndDate
                         }
-                        dismiss()
                     }
-                    .frame(height: 48)
-                    .padding(.horizontal, 16)
-                    .disabled(!tempDays.isEmpty && tempEndDate == nil)
                 }
-                .padding(.bottom, 16)
+                
+                Spacer()
+                
+                BaseButtonSU(title: "적용하기") {
+                    if tempDays.isEmpty {
+                        repeatDays = []
+                        repeatEndDate = nil
+                    } else {
+                        repeatDays = tempDays
+                        repeatEndDate = tempEndDate
+                    }
+                    dismiss()
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 12)
+                .disabled(!tempDays.isEmpty && tempEndDate == nil)
             }
         }
         .navigationBarHidden(true)
