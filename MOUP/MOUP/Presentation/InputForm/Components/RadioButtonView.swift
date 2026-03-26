@@ -87,6 +87,7 @@ struct RadioButtonView: View {
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 16)
+            .frame(height: 48)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -95,7 +96,6 @@ struct RadioButtonView: View {
                 .stroke(isSelected ? .accent : .gray400,
                         lineWidth: isSelected ? 2 : 1)
         )
-        .frame(height: 48)
     }
 }
 

@@ -74,9 +74,8 @@ struct DatePickerModal: View {
                     isPresented = false
                 }
             }
-            .padding(.top, 16)
+            .padding(.vertical, 12)
             .padding(.horizontal, 16)
-            .padding(.bottom, 12)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(.primaryBackground)
