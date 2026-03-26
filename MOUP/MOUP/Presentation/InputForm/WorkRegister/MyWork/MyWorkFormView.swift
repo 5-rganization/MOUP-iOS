@@ -16,6 +16,7 @@ struct MyWorkFormView: View {
     @State private var routineCoordinator: RoutineSelectionCoordinator?
     
     @State private var form: MyWorkForm
+    private let isEditing: Bool
     
     @State private var isDatePickerPresented = false
     @State private var isStartTimePickerPresented = false
@@ -25,14 +26,16 @@ struct MyWorkFormView: View {
     
     // MARK: - Initializer
     
-    init(selectedDate: Date = Date(), navigationController: UINavigationController? = nil) {
-        self._form = State(initialValue: MyWorkForm(selectedDate: selectedDate))
+    init(navigationController: UINavigationController? = nil, selectedDate: Date = Date(), isEditing: Bool = true) {
         self.navigationController = navigationController
+        self._form = State(initialValue: MyWorkForm(selectedDate: selectedDate))
+        self.isEditing = isEditing
     }
     
-    init(from data: MyWorkData, navigationController: UINavigationController? = nil) {
-        self._form = State(initialValue: MyWorkForm(from: data))
+    init(navigationController: UINavigationController? = nil, workData: MyWorkData, isEditing: Bool) {
         self.navigationController = navigationController
+        self._form = State(initialValue: MyWorkForm(workData: workData))
+        self.isEditing = isEditing
     }
     
     // MARK: - Content
@@ -73,7 +76,10 @@ struct MyWorkFormView: View {
                 ContainerView(title: "메모") {
                     MemoView(text: $form.memo)
                 }
-                
+            }
+            .disabled(!isEditing)
+            
+            if isEditing {
                 BaseButtonSU(title: "등록하기") {
                     handleRegister()
                 }
@@ -81,8 +87,8 @@ struct MyWorkFormView: View {
                 .padding(.horizontal, 16)
                 .disabled(!form.isValid)
             }
-            .padding(.bottom, 16)
         }
+        .padding(.bottom, 16)
         .scrollDismissesKeyboard(.interactively)
         .navigationDestination(isPresented: $showRepeatSettings) {
             WorkRepeatSettingsView(

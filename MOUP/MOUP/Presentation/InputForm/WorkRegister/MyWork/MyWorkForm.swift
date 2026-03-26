@@ -66,25 +66,25 @@ struct MyWorkForm {
     }
     
     /// 편집 모드: 기존 엔티티로부터 초기화
-    init(from data: MyWorkData) {
-        self.selectedWorkplace = data.workplaceSummary
-        self.selectedStartTime = data.startTime
-        self.selectedEndTime = data.endTime ?? data.startTime
-        self.actualStartTime = data.actualStartTime
-        self.actualEndTime = data.actualEndTime
-        self.selectedBreakTime = data.restTimeMinutes
-        self.repeatDays = data.repeatDays
-        self.routines = data.routineSummaryList
-        self.memo = data.memo ?? ""
+    init(workData: MyWorkData) {
+        self.selectedWorkplace = workData.workplaceSummary
+        self.selectedStartTime = workData.startTime
+        self.selectedEndTime = workData.endTime ?? workData.startTime
+        self.actualStartTime = workData.actualStartTime
+        self.actualEndTime = workData.actualEndTime
+        self.selectedBreakTime = workData.restTimeMinutes
+        self.repeatDays = workData.repeatDays
+        self.routines = workData.routineSummaryList
+        self.memo = workData.memo ?? ""
         
-        if let dateString = data.repeatEndDate,
+        if let dateString = workData.repeatEndDate,
            let endDate = DateFormatter.dataSourceDateFormatter.date(from: dateString) {
             self.repeatEndDate = endDate
         } else {
             self.repeatEndDate = nil
         }
         
-        if let date = DateFormatter.dataSourceDateFormatter.date(from: data.workDate) {
+        if let date = DateFormatter.dataSourceDateFormatter.date(from: workData.workDate) {
             self.selectedDate = date
         } else {
             self.selectedDate = Date()
