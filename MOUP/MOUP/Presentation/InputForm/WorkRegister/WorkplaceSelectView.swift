@@ -99,7 +99,7 @@ struct WorkplaceSelectView: View {
             }
         }
         .background(.primaryBackground)
-        .navigationBarHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 

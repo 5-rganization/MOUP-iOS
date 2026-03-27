@@ -84,7 +84,7 @@ struct WorkRepeatSettingsView: View {
                 .disabled(!tempDays.isEmpty && tempEndDate == nil)
             }
         }
-        .navigationBarHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
         .sheet(isPresented: $isDatePickerPresented) {
             DatePickerModal(
                 selectedDate: Binding(

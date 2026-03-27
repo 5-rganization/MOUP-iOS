@@ -65,7 +65,7 @@ struct WorkerWorkRegisterView: View {
                     }
                 }
             }
-            .navigationBarHidden(true)
+            .toolbar(.hidden, for: .navigationBar)
         }
         .background(
             NavigationControllerFinder { nav in
