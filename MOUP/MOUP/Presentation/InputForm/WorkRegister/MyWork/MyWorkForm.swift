@@ -116,7 +116,7 @@ struct MyWorkForm: Equatable {
     
     /// 반복 요일 표시 텍스트
     ///
-    /// 하루면 "목요일마다", 월~금이면 "평일", 토·일이면 "주말", 그 외에는 "월, 수, 금"으로 표시한다.
+    /// 하루면 "목요일마다", 전부면 "매일", 월~금이면 "평일", 토·일이면 "주말", 그 외에는 "월, 수, 금"으로 표시한다.
     var formattedRepeatDays: String {
         guard hasRepeat else { return "없음" }
 
@@ -124,6 +124,7 @@ struct MyWorkForm: Equatable {
         let weekend = ["SATURDAY", "SUNDAY"]
         let selected = Set(repeatDays)
 
+        if selected == Set(weekdays + weekend) { return "매일" }
         if selected == Set(weekdays) { return "평일" }
         if selected == Set(weekend) { return "주말" }
 
