@@ -106,12 +106,8 @@ struct WorkerWorkFormView: View {
             VStack(spacing: 24) {
                 // 수정 모드는 대상이 이미 정해져 있으므로 토글을 두지 않는다.
                 if !isEditMode {
-                    Picker("근무 대상", selection: $form.target) {
-                        Text(UserRole.owner.displayStr).tag(WorkerWorkForm.Target.owner)
-                        Text(UserRole.worker.displayStr).tag(WorkerWorkForm.Target.worker)
-                    }
-                    .pickerStyle(.segmented)
-                    .padding(.horizontal, 16)
+                    RoleSegmentedView(selection: $form.target)
+                        .padding(.horizontal, 16)
                 }
 
                 WorkplaceButton(titleLabel: form.selectedWorkplace?.name ?? "근무지 선택",

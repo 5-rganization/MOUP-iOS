@@ -14,7 +14,7 @@ import Foundation
 struct WorkerWorkForm: Equatable {
 
     /// 누구의 근무를 등록하는지
-    enum Target: Equatable {
+    enum Target: Hashable {
         /// 사장님 본인 근무
         case owner
         /// 근무자 근무
