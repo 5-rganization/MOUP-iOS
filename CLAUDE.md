@@ -72,7 +72,11 @@ Context7 MCP가 응답하지 않거나, 사용량 초과 등으로 사용할 수
 ### UIKit + SwiftUI 과도기
 RxSwift 사용 172파일 vs SwiftUI 27파일. 기존 화면은 전부 UIKit+Rx(`Input`/`Output` 구조체 + `transform()` + Relay 패턴)다.
 
-SwiftUI 화면을 UIKit 네비게이션 스택에 얹을 때 **`UIHostingController`를 쓰지 않고** `Presentation/InputForm/Utils/NavigationControllerFinder.swift`(`UIViewControllerRepresentable` 브릿지)로 상위 `UINavigationController`를 찾아 쓴다. `.toolbar(.hidden, for: .navigationBar)`로 죽는 스와이프 백 제스처도 여기서 복원한다.
+SwiftUI 화면을 UIKit 네비게이션 스택에 얹는 방식:
+
+- **루트 1회만 `UIHostingController`로 감싸 push**한다 (예: `CalendarCoordinator.showWorkerWorkRegister`).
+- 그 아래에서 UIKit 화면으로 전환할 때는 **Coordinator가 주입한 `UINavigationController`를 쓴다.** SwiftUI 안에서 `UINavigationController`를 탐색해 찾지 말 것 — `NavigationStack`이 내부적으로 만드는 nav를 잡으면 push/pop이 깨진다.
+- `Presentation/InputForm/Utils/NavigationControllerFinder.swift`는 **스와이프 백 제스처 복원 용도로만** 쓴다. `.toolbar(.hidden, for: .navigationBar)`를 쓰면 제스처가 죽는데, 이 브릿지를 `.background(...)`에 zero-size로 두면 복원된다. 콜백으로 넘어오는 nav는 무시한다.
 
 ### `SU` 접미사 = 기존 UIKit 컴포넌트의 SwiftUI 래퍼
 `BaseButtonSU`, `BaseNavigationBarSU`, `DatePickerViewSU`, `ModalGrabberViewSU` 등. 원본 UIKit 파일 옆에 `이름+SwiftUI.swift` 파일로 두고 `UIViewRepresentable` / `UIViewControllerRepresentable`로 감싼다. SwiftUI 화면에서 기존 컴포넌트가 필요하면 새로 만들지 말고 `SU` 래퍼가 있는지 먼저 확인할 것.

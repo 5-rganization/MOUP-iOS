@@ -5,8 +5,9 @@
 //  Created by 양원식 on 7/14/25.
 //
 
-import UIKit
 import OSLog
+import SwiftUI
+import UIKit
 
 import RxSwift
 
@@ -123,18 +124,22 @@ extension CalendarCoordinator {
 
 // MARK: - CalendarWorkListCoordinator Methods
 extension CalendarCoordinator {
-    // TODO: 근무 엔티티를 직접 전달 or 근무 ID만 전달
-    /// 근무 등록 화면 표시
+    /// 알바생 근무 등록/수정 화면 표시
+    ///
+    /// SwiftUI로 재구현한 화면이라 `UIHostingController`로 감싸 push 한다.
+    /// 저장 후 pop 하면 `CalendarViewController.viewWillAppear`가 재조회하므로 별도 갱신 통지는 필요 없다.
     func showWorkerWorkRegister(selectedDate: Date? = nil, workToEdit: WorkSummary?) {
-        if let workToEdit {
-            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate, mode: .edit(workId: workToEdit.id))
-            childCoordinators.append(coordinator)
-            coordinator.start()
-        } else {
-            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate, mode: .create)
-            childCoordinators.append(coordinator)
-            coordinator.start()
-        }
+        let mode: WorkerWorkRegisterView.Mode = workToEdit.map { .edit(workId: $0.id) }
+            ?? .create(selectedDate: selectedDate ?? .now)
+
+        let hostingVC = UIHostingController(
+            rootView: WorkerWorkRegisterView(navigationController: navigationController,
+                                             mode: mode,
+                                             workUseCase: workUseCase,
+                                             workplaceUseCase: workplaceUseCase)
+        )
+        hostingVC.hidesBottomBarWhenPushed = true
+        navigationController.pushViewController(hostingVC, animated: true)
     }
     
     func showOwnerWorkRegister(selectedDate: Date? = nil, workToEdit: WorkSummary?) {
