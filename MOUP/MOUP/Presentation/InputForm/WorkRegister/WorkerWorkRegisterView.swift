@@ -59,7 +59,20 @@ struct WorkerWorkRegisterView: View {
                     title: isEditMode ? "근무 수정" : "근무 등록",
                     rightTitle: isEditMode && !isEditing ? "수정" : nil,
                     onBackTap: {
-                        navigationController?.popViewController(animated: true)
+                        // 수정 중이면 바로 나가지 않고 취소 여부를 먼저 묻는다.
+                        guard isEditMode, isEditing else {
+                            navigationController?.popViewController(animated: true)
+                            return
+                        }
+
+                        navigationController?.presentNoticeModal(
+                            title: "수정을 취소할까요?",
+                            comment: "수정한 내용은 저장되지 않습니다.",
+                            cancelTitle: "계속 수정",
+                            confirmTitle: "취소하기",
+                            // 잠금으로 되돌리면 `MyWorkFormView`가 조회 시점 값으로 폼을 복원한다.
+                            onConfirm: { isEditing = false }
+                        )
                     },
                     onRightTap: {
                         isEditing = true
@@ -69,7 +82,7 @@ struct WorkerWorkRegisterView: View {
                 MyWorkFormView(
                     navigationController: navigationController,
                     mode: mode,
-                    isEditing: isEditing,
+                    isEditing: $isEditing,
                     workUseCase: workUseCase,
                     workplaceUseCase: workplaceUseCase
                 )

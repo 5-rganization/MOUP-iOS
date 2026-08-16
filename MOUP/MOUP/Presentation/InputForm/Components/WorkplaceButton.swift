@@ -10,7 +10,10 @@ import SwiftUI
 struct WorkplaceButton: View {
     
     // MARK: - Properties
-    
+
+    /// 비활성화 상태에서는 필수 표시(`*`)와 꺾쇠를 숨긴다.
+    @Environment(\.isEnabled) private var isEnabled
+
     private let titleLabel: String
     private let isRequired: Bool
     private let action: () -> Void
@@ -32,7 +35,7 @@ struct WorkplaceButton: View {
             HStack {
                 HStack(spacing: 0) {
                     Text(titleLabel)
-                    if isRequired {
+                    if isRequired, isEnabled {
                         Text(" *")
                             .foregroundColor(.accentColor)
                     }
@@ -42,9 +45,11 @@ struct WorkplaceButton: View {
                 
                 Spacer()
                 
-                Image(.chevronRight)
-                    .renderingMode(.template)
-                    .foregroundStyle(.gray400)
+                if isEnabled {
+                    Image(.chevronRight)
+                        .renderingMode(.template)
+                        .foregroundStyle(.gray400)
+                }
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 16)

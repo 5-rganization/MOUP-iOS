@@ -27,7 +27,10 @@ struct MyWorkFormView: View {
     @State private var routineCoordinator: RoutineSelectionCoordinator?
 
     private let mode: Mode
-    private let isEditing: Bool
+    @Binding private var isEditing: Bool
+
+    /// 수정 모드 진입 직전의 폼. 수정을 취소하면 이 값으로 되돌린다.
+    @State private var originalForm: MyWorkForm?
 
     private let workUseCase: WorkUseCaseProtocol
     private let workplaceUseCase: WorkplaceUseCaseProtocol
@@ -50,18 +53,23 @@ struct MyWorkFormView: View {
         return false
     }
 
+    /// 잠금 상태에서 루틴이 없으면 "추가"를 유도하지 않는다.
+    private var routineRowTitle: String {
+        !isEditing && form.routines.isEmpty ? "루틴이 없습니다" : "루틴 추가"
+    }
+
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "MyWorkFormView")
 
     // MARK: - Initializer
 
     init(navigationController: UINavigationController? = nil,
          mode: Mode,
-         isEditing: Bool,
+         isEditing: Binding<Bool>,
          workUseCase: WorkUseCaseProtocol,
          workplaceUseCase: WorkplaceUseCaseProtocol) {
         self.navigationController = navigationController
         self.mode = mode
-        self.isEditing = isEditing
+        self._isEditing = isEditing
         self.workUseCase = workUseCase
         self.workplaceUseCase = workplaceUseCase
 
@@ -105,7 +113,7 @@ struct MyWorkFormView: View {
                 }
 
                 ContainerView(title: "루틴") {
-                    LabelChevronRowView(titleLabel: "루틴 추가", rightLabel: form.formattedRoutineCount) {
+                    LabelChevronRowView(titleLabel: routineRowTitle, rightLabel: form.formattedRoutineCount) {
                         showRoutineSelection()
                     }
                 }
@@ -115,6 +123,7 @@ struct MyWorkFormView: View {
                 }
             }
             .disabled(!isEditing)
+            .padding(.top, 20)
 
             Spacer()
                 .frame(height: 60)
@@ -135,6 +144,11 @@ struct MyWorkFormView: View {
         .ignoresSafeArea(edges: .bottom)
         .task {
             await loadWorkDetailIfNeeded()
+        }
+        .onChange(of: isEditing) { isEditing in // Deprecated 예정, iOS 17부터 onChange(of:initial:_:)로 변경
+            // 수정이 취소되면(잠금 복귀) 조회 시점의 값으로 되돌린다.
+            guard !isEditing, let originalForm else { return }
+            form = originalForm
         }
         .navigationDestination(isPresented: $showWorkplaceSelect) {
             WorkplaceSelectView(
@@ -182,6 +196,7 @@ private extension MyWorkFormView {
 
         do {
             form = MyWorkForm(workData: try await workUseCase.fetchMyWorkDetail(workId: workId))
+            originalForm = form
         } catch {
             logger.error("근무 상세 조회 실패: \(error.localizedDescription)")
             presentNotice(title: "데이터 불러오기 실패",
@@ -243,7 +258,7 @@ private extension MyWorkFormView {
 #Preview {
     MyWorkFormView(
         mode: .create(selectedDate: Date()),
-        isEditing: true,
+        isEditing: .constant(true),
         workUseCase: WorkUseCase(workRepository: WorkRepository(workService: WorkService())),
         workplaceUseCase: WorkplaceUseCase(workplaceRepository: WorkplaceRepository(workplaceService: WorkplaceService()))
     )

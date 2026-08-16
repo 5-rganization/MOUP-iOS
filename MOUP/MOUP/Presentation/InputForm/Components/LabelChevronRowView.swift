@@ -30,6 +30,10 @@ import SwiftUI
 struct LabelChevronRowView: View {
     
     // MARK: - Properties
+
+    /// 비활성화 상태에서는 이동 불가이므로 꺾쇠를 숨긴다.
+    @Environment(\.isEnabled) private var isEnabled
+
     private let leftColor: UIColor?
     private let titleLabel: String
     private let rightLabel: String?
@@ -76,7 +80,9 @@ struct LabelChevronRowView: View {
                         .font(.fieldsRegular(16))
                         .foregroundStyle(.gray900)
                 }
-                Image(.chevronRight)
+                if isEnabled {
+                    Image(.chevronRight)
+                }
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 16)
