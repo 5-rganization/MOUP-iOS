@@ -27,6 +27,12 @@ struct WorkerWorkRegisterView: View {
     private let onSaved: ((Date) -> Void)?
 
     @State private var isEditing: Bool
+    @State private var hasChanges = false
+
+    private var navigationTitle: String {
+        guard isEditMode else { return "근무 등록" }
+        return isEditing ? "근무 수정" : "근무 상세"
+    }
 
     /// 수정 모드 여부
     private var isEditMode: Bool {
@@ -61,11 +67,11 @@ struct WorkerWorkRegisterView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 BaseNavigationBarSU(
-                    title: isEditMode ? "근무 수정" : "근무 등록",
+                    title: navigationTitle,
                     rightTitle: isEditMode && !isEditing ? "수정" : nil,
                     onBackTap: {
-                        // 수정 중이면 바로 나가지 않고 취소 여부를 먼저 묻는다.
-                        guard isEditMode, isEditing else {
+                        // 수정한 내용이 있을 때만 취소 여부를 묻는다.
+                        guard isEditMode, isEditing, hasChanges else {
                             navigationController?.popViewController(animated: true)
                             return
                         }
@@ -88,6 +94,7 @@ struct WorkerWorkRegisterView: View {
                     navigationController: navigationController,
                     mode: mode,
                     isEditing: $isEditing,
+                    hasChanges: $hasChanges,
                     workUseCase: workUseCase,
                     workplaceUseCase: workplaceUseCase,
                     onSaved: onSaved

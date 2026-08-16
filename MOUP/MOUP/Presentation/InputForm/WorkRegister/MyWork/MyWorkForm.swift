@@ -20,7 +20,7 @@ import Foundation
 /// // 편집 모드
 /// @State private var form = MyWorkForm(from: existingMyWorkData)
 /// ```
-struct MyWorkForm {
+struct MyWorkForm: Equatable {
     var selectedWorkplace: WorkplaceSummary?
     var selectedDate: Date
     var selectedStartTime: Date

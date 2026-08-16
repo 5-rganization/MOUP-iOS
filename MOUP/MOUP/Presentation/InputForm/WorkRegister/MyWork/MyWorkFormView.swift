@@ -28,6 +28,8 @@ struct MyWorkFormView: View {
 
     private let mode: Mode
     @Binding private var isEditing: Bool
+    /// 폼이 조회 시점과 달라졌는지 여부. 뒤로가기 시 확인 모달을 띄울지 판단하는 데 쓴다.
+    @Binding private var hasChanges: Bool
 
     /// 수정 모드 진입 직전의 폼. 수정을 취소하면 이 값으로 되돌린다.
     @State private var originalForm: MyWorkForm?
@@ -68,12 +70,14 @@ struct MyWorkFormView: View {
     init(navigationController: UINavigationController? = nil,
          mode: Mode,
          isEditing: Binding<Bool>,
+         hasChanges: Binding<Bool> = .constant(false),
          workUseCase: WorkUseCaseProtocol,
          workplaceUseCase: WorkplaceUseCaseProtocol,
          onSaved: ((Date) -> Void)? = nil) {
         self.navigationController = navigationController
         self.mode = mode
         self._isEditing = isEditing
+        self._hasChanges = hasChanges
         self.workUseCase = workUseCase
         self.workplaceUseCase = workplaceUseCase
         self.onSaved = onSaved
@@ -149,6 +153,9 @@ struct MyWorkFormView: View {
         .ignoresSafeArea(edges: .bottom)
         .task {
             await loadWorkDetailIfNeeded()
+        }
+        .onChange(of: form) { form in // Deprecated 예정, iOS 17부터 onChange(of:initial:_:)로 변경
+            hasChanges = originalForm != nil && form != originalForm
         }
         .onChange(of: isEditing) { isEditing in // Deprecated 예정, iOS 17부터 onChange(of:initial:_:)로 변경
             // 수정이 취소되면(잠금 복귀) 조회 시점의 값으로 되돌린다.
