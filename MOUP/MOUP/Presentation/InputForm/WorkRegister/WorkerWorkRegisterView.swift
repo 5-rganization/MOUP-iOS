@@ -70,9 +70,15 @@ struct WorkerWorkRegisterView: View {
                     title: navigationTitle,
                     rightTitle: isEditMode && !isEditing ? "수정" : nil,
                     onBackTap: {
-                        // 수정한 내용이 있을 때만 취소 여부를 묻는다.
-                        guard isEditMode, isEditing, hasChanges else {
+                        // 수정 중이면 화면을 벗어나지 않고 상세로 돌아간다.
+                        guard isEditMode, isEditing else {
                             navigationController?.popViewController(animated: true)
+                            return
+                        }
+
+                        // 수정한 내용이 있을 때만 취소 여부를 묻는다.
+                        guard hasChanges else {
+                            isEditing = false
                             return
                         }
 
