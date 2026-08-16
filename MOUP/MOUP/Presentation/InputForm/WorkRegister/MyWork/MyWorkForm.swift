@@ -114,21 +114,34 @@ struct MyWorkForm: Equatable {
         !repeatDays.isEmpty && repeatEndDate != nil
     }
     
-    /// 반복 요일 표시 텍스트 (예: "월 / 수 / 금")
+    /// 반복 요일 표시 텍스트
+    ///
+    /// 하루면 "목요일마다", 월~금이면 "평일", 토·일이면 "주말", 그 외에는 "월, 수, 금"으로 표시한다.
     var formattedRepeatDays: String {
         guard hasRepeat else { return "없음" }
-        
-        let dayMap: [String: String] = [
-            "MONDAY": "월", "TUESDAY": "화", "WEDNESDAY": "수",
-            "THURSDAY": "목", "FRIDAY": "금", "SATURDAY": "토", "SUNDAY": "일"
-        ]
-        let order = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]
-        
-        return repeatDays
+
+        let weekdays = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"]
+        let weekend = ["SATURDAY", "SUNDAY"]
+        let selected = Set(repeatDays)
+
+        if selected == Set(weekdays) { return "평일" }
+        if selected == Set(weekend) { return "주말" }
+
+        let order = weekdays + weekend
+        let names = repeatDays
             .sorted { (order.firstIndex(of: $0) ?? 0) < (order.firstIndex(of: $1) ?? 0) }
-            .compactMap { dayMap[$0] }
-            .joined(separator: " / ")
+            .compactMap { Self.dayNames[$0] }
+
+        guard let onlyDay = names.first, names.count == 1 else {
+            return names.joined(separator: ", ")
+        }
+        return "\(onlyDay)요일마다"
     }
+
+    private static let dayNames: [String: String] = [
+        "MONDAY": "월", "TUESDAY": "화", "WEDNESDAY": "수",
+        "THURSDAY": "목", "FRIDAY": "금", "SATURDAY": "토", "SUNDAY": "일"
+    ]
     
     var formattedRoutineCount: String {
         routines.count == 0 ? "" : "+ \(routines.count)"

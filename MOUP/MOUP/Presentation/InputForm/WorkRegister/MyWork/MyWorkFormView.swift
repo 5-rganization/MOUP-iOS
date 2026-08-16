@@ -203,8 +203,11 @@ private extension MyWorkFormView {
     }
 
     /// 수정 모드일 때 근무 상세를 조회해 폼을 채운다.
+    ///
+    /// `.task`는 하위 화면에서 복귀할 때도 다시 실행되므로, 이미 조회했으면 건너뛴다.
+    /// 그렇지 않으면 반복 설정·근무지 선택 결과가 서버 값으로 덮어써진다.
     func loadWorkDetailIfNeeded() async {
-        guard case .edit(let workId) = mode else { return }
+        guard case .edit(let workId) = mode, originalForm == nil else { return }
 
         do {
             form = MyWorkForm(workData: try await workUseCase.fetchMyWorkDetail(workId: workId))
