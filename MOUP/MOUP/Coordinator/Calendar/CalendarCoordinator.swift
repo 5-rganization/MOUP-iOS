@@ -78,7 +78,7 @@ final class CalendarCoordinator: Coordinator {
         calendarWorkListCoordinator.start()
         childCoordinators.append(calendarWorkListCoordinator)
     }
-    
+
     func dismissCalendarWorkList() {
         navigationController.dismiss(animated: true)
     }
@@ -136,7 +136,11 @@ extension CalendarCoordinator {
             rootView: WorkerWorkRegisterView(navigationController: navigationController,
                                              mode: mode,
                                              workUseCase: workUseCase,
-                                             workplaceUseCase: workplaceUseCase)
+                                             workplaceUseCase: workplaceUseCase,
+                                             // 저장한 날짜로 선택을 옮겨야 복귀 후 그 날짜의 근무 목록이 뜬다.
+                                             onSaved: { [weak self] date in
+                                                 self?.calendarVC.moveSelectedDate(to: date)
+                                             })
         )
         hostingVC.hidesBottomBarWhenPushed = true
         navigationController.pushViewController(hostingVC, animated: true)

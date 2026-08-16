@@ -23,6 +23,9 @@ struct WorkerWorkRegisterView: View {
     private let workUseCase: WorkUseCaseProtocol
     private let workplaceUseCase: WorkplaceUseCaseProtocol
 
+    /// 저장에 성공했을 때 저장된 근무 날짜를 알린다.
+    private let onSaved: ((Date) -> Void)?
+
     @State private var isEditing: Bool
 
     /// 수정 모드 여부
@@ -36,11 +39,13 @@ struct WorkerWorkRegisterView: View {
     init(navigationController: UINavigationController? = nil,
          mode: Mode,
          workUseCase: WorkUseCaseProtocol,
-         workplaceUseCase: WorkplaceUseCaseProtocol) {
+         workplaceUseCase: WorkplaceUseCaseProtocol,
+         onSaved: ((Date) -> Void)? = nil) {
         self.navigationController = navigationController
         self.mode = mode
         self.workUseCase = workUseCase
         self.workplaceUseCase = workplaceUseCase
+        self.onSaved = onSaved
 
         switch mode {
         case .create:
@@ -84,7 +89,8 @@ struct WorkerWorkRegisterView: View {
                     mode: mode,
                     isEditing: $isEditing,
                     workUseCase: workUseCase,
-                    workplaceUseCase: workplaceUseCase
+                    workplaceUseCase: workplaceUseCase,
+                    onSaved: onSaved
                 )
             }
             .toolbar(.hidden, for: .navigationBar)

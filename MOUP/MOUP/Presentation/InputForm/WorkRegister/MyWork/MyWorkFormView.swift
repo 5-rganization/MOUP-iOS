@@ -35,6 +35,9 @@ struct MyWorkFormView: View {
     private let workUseCase: WorkUseCaseProtocol
     private let workplaceUseCase: WorkplaceUseCaseProtocol
 
+    /// 저장에 성공했을 때 저장된 근무 날짜를 알린다.
+    private let onSaved: ((Date) -> Void)?
+
     @State private var form: MyWorkForm
 
     @State private var workplaces: [WorkplaceSummary] = []
@@ -66,12 +69,14 @@ struct MyWorkFormView: View {
          mode: Mode,
          isEditing: Binding<Bool>,
          workUseCase: WorkUseCaseProtocol,
-         workplaceUseCase: WorkplaceUseCaseProtocol) {
+         workplaceUseCase: WorkplaceUseCaseProtocol,
+         onSaved: ((Date) -> Void)? = nil) {
         self.navigationController = navigationController
         self.mode = mode
         self._isEditing = isEditing
         self.workUseCase = workUseCase
         self.workplaceUseCase = workplaceUseCase
+        self.onSaved = onSaved
 
         switch mode {
         case .create(let selectedDate):
@@ -244,6 +249,7 @@ private extension MyWorkFormView {
                 try await workUseCase.updateMySingleWork(workId: workId,
                                                          requestDTO: form.updateRequestDTO)
             }
+            onSaved?(form.selectedDate)
             navigationController?.popViewController(animated: true)
         } catch {
             logger.error("근무 저장 실패: \(error.localizedDescription)")

@@ -63,10 +63,12 @@ extension CalendarWorkListCoordinator {
     }
     
     func workerWorkCellTapped(work: WorkSummary) {
+        parentCoordinator?.dismissCalendarWorkList()
         parentCoordinator?.showWorkerWorkRegister(workToEdit: work)
     }
-    
+
     func ownerWorkCellTapped(work: WorkSummary) {
+        parentCoordinator?.dismissCalendarWorkList()
         parentCoordinator?.showOwnerWorkRegister(workToEdit: work)
     }
     

@@ -39,13 +39,7 @@ extension UIViewController {
                                                onConfirm: onConfirm,
                                                onCancel: onCancel)
             vc.modalPresentationStyle = .overFullScreen
-
-            // 바텀시트 등이 이미 present 중이면 그 위에 띄운다. (self에 present하면 무시된다)
-            var presenter: UIViewController = self
-            while let presented = presenter.presentedViewController {
-                presenter = presented
-            }
-            presenter.present(vc, animated: false)
+            self.present(vc, animated: false)
         }
     }
 }
