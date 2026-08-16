@@ -29,15 +29,19 @@ extension UIViewController {
                             comment: String,
                             cancelTitle: String? = nil,
                             confirmTitle: String = "확인",
+                            otherTitle: String? = nil,
                             onConfirm: (() -> Void)? = nil,
-                            onCancel: (() -> Void)? = nil) {
+                            onCancel: (() -> Void)? = nil,
+                            onOther: (() -> Void)? = nil) {
         DispatchQueue.main.async {
             let vc = NoticeModalViewController(title: title,
                                                comment: comment,
                                                cancelTitle: cancelTitle,
                                                confirmTitle: confirmTitle,
+                                               otherTitle: otherTitle,
                                                onConfirm: onConfirm,
-                                               onCancel: onCancel)
+                                               onCancel: onCancel,
+                                               onOther: onOther)
             vc.modalPresentationStyle = .overFullScreen
             self.present(vc, animated: false)
         }

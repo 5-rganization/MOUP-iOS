@@ -139,7 +139,7 @@ struct MyWorkFormView: View {
 
             if isEditing {
                 BaseButtonSU(title: isEditMode ? "수정하기" : "등록하기") {
-                    Task { await handleRegister() }
+                    handleSaveTap()
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
@@ -243,8 +243,29 @@ private extension MyWorkFormView {
         routineCoordinator = coordinator
     }
 
+    /// 저장 버튼을 눌렀을 때의 진입점
+    ///
+    /// 반복 근무를 수정하는 경우에는 적용 범위를 먼저 묻는다.
+    func handleSaveTap() {
+        guard isEditMode, originalForm?.hasRepeat == true else {
+            Task { await save(appliesToRecurring: false) }
+            return
+        }
+
+        navigationController?.presentNoticeModal(
+            title: "반복 근무 수정",
+            comment: "수정 범위를 선택해주세요.",
+            cancelTitle: "취소",
+            confirmTitle: "이 근무만 수정",
+            otherTitle: "이후 모든 근무 수정",
+            onConfirm: { Task { await save(appliesToRecurring: false) } },
+            onOther: { Task { await save(appliesToRecurring: true) } }
+        )
+    }
+
     /// 근무를 등록하거나 수정한다. 성공 시 이전 화면으로 돌아간다.
-    func handleRegister() async {
+    /// - Parameter appliesToRecurring: 반복 근무 전체에 적용할지 여부
+    func save(appliesToRecurring: Bool) async {
         guard let workplace = form.selectedWorkplace else { return }
 
         isSaving = true
@@ -255,6 +276,9 @@ private extension MyWorkFormView {
             case .create:
                 _ = try await workUseCase.createMyWork(workplaceId: workplace.id,
                                                        requestDTO: form.createRequestDTO)
+            case .edit(let workId) where appliesToRecurring:
+                _ = try await workUseCase.updateMyRecurringWork(workId: workId,
+                                                                requestDTO: form.updateRequestDTO)
             case .edit(let workId):
                 try await workUseCase.updateMySingleWork(workId: workId,
                                                          requestDTO: form.updateRequestDTO)

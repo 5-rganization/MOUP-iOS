@@ -19,8 +19,11 @@ final class NoticeModalViewController: UIViewController {
     /// 취소 버튼 제목. `nil`이면 확인 버튼만 표시한다.
     private let cancelTitle: String?
     private let confirmTitle: String
+    /// 확인/취소 사이에 놓이는 추가 선택지. `nil`이면 표시하지 않는다.
+    private let otherTitle: String?
     var onConfirm: (() -> Void)?
     var onCancel: (() -> Void)?
+    var onOther: (() -> Void)?
     
     // MARK: - UI Components
     private let dimmedView = UIView().then {
@@ -50,24 +53,37 @@ final class NoticeModalViewController: UIViewController {
     
     private lazy var confirmButton = BaseButton(title: confirmTitle, isSecondary: false)
     private lazy var cancelButton = BaseButton(title: cancelTitle ?? "", isSecondary: true)
+    private lazy var otherButton = BaseButton(title: otherTitle ?? "", isSecondary: false)
+
+    /// 선택지가 셋이면 가로로 나눠 담기 좁으므로 세로로 쌓는다.
+    private lazy var buttonStackView = UIStackView().then {
+        $0.axis = otherTitle == nil ? .horizontal : .vertical
+        $0.spacing = 8
+        $0.distribution = .fillEqually
+    }
 
     // MARK: - Initializer
 
     /// - Parameters:
     ///   - cancelTitle: 취소 버튼 제목. `nil`이면 확인 버튼만 있는 1버튼 모달이 된다.
     ///   - confirmTitle: 확인 버튼 제목.
+    ///   - otherTitle: 확인/취소 외 추가 선택지 제목. 지정하면 버튼이 세로로 쌓인다.
     init(title: String,
          comment: String,
          cancelTitle: String? = nil,
          confirmTitle: String = "확인",
+         otherTitle: String? = nil,
          onConfirm: (() -> Void)? = nil,
-         onCancel: (() -> Void)? = nil) {
+         onCancel: (() -> Void)? = nil,
+         onOther: (() -> Void)? = nil) {
         self.noticeTitle = title
         self.comment = comment
         self.cancelTitle = cancelTitle
         self.confirmTitle = confirmTitle
+        self.otherTitle = otherTitle
         self.onConfirm = onConfirm
         self.onCancel = onCancel
+        self.onOther = onOther
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -101,11 +117,16 @@ private extension NoticeModalViewController {
         containerView.addSubviews(
             noticeTitleLabel,
             commentLabel,
-            confirmButton
+            buttonStackView
         )
 
-        if cancelTitle != nil {
-            containerView.addSubview(cancelButton)
+        // 세로로 쌓을 때는 주 선택지가 위로 오도록 순서를 뒤집는다.
+        if otherTitle != nil {
+            buttonStackView.addArrangedSubviews(confirmButton, otherButton, cancelButton)
+        } else if cancelTitle != nil {
+            buttonStackView.addArrangedSubviews(cancelButton, confirmButton)
+        } else {
+            buttonStackView.addArrangedSubview(confirmButton)
         }
     }
     
@@ -122,7 +143,10 @@ private extension NoticeModalViewController {
         containerView.snp.makeConstraints {
             $0.directionalHorizontalEdges.equalToSuperview().inset(24)
             $0.centerY.equalToSuperview()
-            $0.height.equalTo(210)
+            // 버튼을 세로로 쌓을 때는 내용에 맞춰 높이가 정해진다.
+            if otherTitle == nil {
+                $0.height.equalTo(210)
+            }
         }
         
         noticeTitleLabel.snp.makeConstraints {
@@ -135,25 +159,17 @@ private extension NoticeModalViewController {
             $0.directionalHorizontalEdges.equalToSuperview().inset(16)
         }
         
-        confirmButton.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(16)
+        buttonStackView.snp.makeConstraints {
+            $0.directionalHorizontalEdges.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview().inset(20)
-            $0.height.equalTo(45)
 
-            // 취소 버튼이 있으면 하단을 반씩 나눠 쓴다.
-            if cancelTitle == nil {
-                $0.leading.equalToSuperview().inset(16)
-            } else {
-                $0.leading.equalTo(cancelButton.snp.trailing).offset(8)
-                $0.width.equalTo(cancelButton)
+            if otherTitle != nil {
+                $0.top.equalTo(commentLabel.snp.bottom).offset(24)
             }
         }
 
-        guard cancelTitle != nil else { return }
-
-        cancelButton.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(16)
-            $0.bottom.height.equalTo(confirmButton)
+        confirmButton.snp.makeConstraints {
+            $0.height.equalTo(45)
         }
     }
     
@@ -172,6 +188,15 @@ private extension NoticeModalViewController {
             .subscribe(onNext: { owner, _ in
                 owner.dismiss(animated: false) {
                     owner.onCancel?()
+                }
+            })
+            .disposed(by: disposeBag)
+
+        otherButton.rx.tap
+            .withUnretained(self)
+            .subscribe(onNext: { owner, _ in
+                owner.dismiss(animated: false) {
+                    owner.onOther?()
                 }
             })
             .disposed(by: disposeBag)
