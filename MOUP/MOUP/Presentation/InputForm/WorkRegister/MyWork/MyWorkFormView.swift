@@ -21,13 +21,6 @@ struct MyWorkFormView: View {
         case edit(workId: Int)
     }
 
-    /// 알림 모달 표시용 컨텐츠
-    struct AlertContent: Identifiable {
-        let id = UUID()
-        let title: String
-        let message: String
-    }
-
     // MARK: - Properties
 
     private let navigationController: UINavigationController?
@@ -50,7 +43,6 @@ struct MyWorkFormView: View {
     @State private var isEndTimePickerPresented = false
     @State private var isBreakTimePickerPresented = false
 
-    @State private var alert: AlertContent?
     @State private var isSaving = false
 
     private var isEditMode: Bool {
@@ -168,11 +160,6 @@ struct MyWorkFormView: View {
         .sheet(isPresented: $isBreakTimePickerPresented) {
             BreakTimePickerModal(selectedMinutes: $form.selectedBreakTime, isPresented: $isBreakTimePickerPresented)
         }
-        .fullScreenCover(item: $alert) { alert in
-            NoticeModalViewControllerSU(title: alert.title, comment: alert.message) {
-                self.alert = nil
-            }
-        }
         .background(.primaryBackground)
     }
 }
@@ -180,6 +167,14 @@ struct MyWorkFormView: View {
 // MARK: - Private Methods
 
 private extension MyWorkFormView {
+
+    /// 앱 전체와 동일한 알림 모달을 표시한다.
+    ///
+    /// SwiftUI의 `.fullScreenCover`로 띄우면 배경이 불투명해져 폼 위에 겹쳐 보이지 않으므로,
+    /// 주입받은 `UINavigationController`에 UIKit 방식으로 present 한다.
+    func presentNotice(title: String, comment: String) {
+        navigationController?.presentNoticeModal(title: title, comment: comment)
+    }
 
     /// 수정 모드일 때 근무 상세를 조회해 폼을 채운다.
     func loadWorkDetailIfNeeded() async {
@@ -189,8 +184,8 @@ private extension MyWorkFormView {
             form = MyWorkForm(workData: try await workUseCase.fetchMyWorkDetail(workId: workId))
         } catch {
             logger.error("근무 상세 조회 실패: \(error.localizedDescription)")
-            alert = AlertContent(title: "데이터 불러오기 실패",
-                                 message: "근무 정보를 불러오지 못했습니다.\n다시 시도해주세요.")
+            presentNotice(title: "데이터 불러오기 실패",
+                          comment: "근무 정보를 불러오지 못했습니다.\n다시 시도해주세요.")
         }
     }
 
@@ -201,8 +196,8 @@ private extension MyWorkFormView {
             showWorkplaceSelect = true
         } catch {
             logger.error("근무지 목록 조회 실패: \(error.localizedDescription)")
-            alert = AlertContent(title: "데이터 불러오기 실패",
-                                 message: "근무지 목록을 불러오지 못했습니다.\n다시 시도해주세요.")
+            presentNotice(title: "데이터 불러오기 실패",
+                          comment: "근무지 목록을 불러오지 못했습니다.\n다시 시도해주세요.")
         }
     }
 
@@ -237,8 +232,8 @@ private extension MyWorkFormView {
             navigationController?.popViewController(animated: true)
         } catch {
             logger.error("근무 저장 실패: \(error.localizedDescription)")
-            alert = AlertContent(title: "근무 저장 실패",
-                                 message: "근무 저장 중 오류가 발생했습니다.\n다시 시도해주세요.")
+            presentNotice(title: "근무 저장 실패",
+                          comment: "근무 저장 중 오류가 발생했습니다.\n다시 시도해주세요.")
         }
     }
 }

@@ -172,9 +172,11 @@ extension MyWorkForm {
     }
 
     /// 반복 종료일 문자열. 반복 설정이 완전하지 않으면 `nil`
+    ///
+    /// 서버는 `yyyy-MM-dd` 포맷을 요구한다. 표시용인 `dataSourceDateFormatter`(`yyyy.MM.dd`)를 쓰면 422가 반환된다.
     private var repeatEndDateString: String? {
         guard hasRepeat, let repeatEndDate else { return nil }
-        return DateFormatter.dataSourceDateFormatter.string(from: repeatEndDate)
+        return DateFormatter.yyyyMMdd.string(from: repeatEndDate)
     }
 
     /// 반복 요일 목록. 반복 설정이 완전하지 않으면 빈 배열
