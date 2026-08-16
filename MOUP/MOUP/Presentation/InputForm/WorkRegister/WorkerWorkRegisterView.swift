@@ -7,41 +7,57 @@
 
 import SwiftUI
 
+/// 알바생 근무 등록/수정 화면
+///
+/// `UIHostingController`로 감싸 UIKit 네비게이션 스택에 push 해서 사용한다.
+/// `navigationController`는 Coordinator에서 주입받아 하위 화면 전환과 pop에 사용한다.
 struct WorkerWorkRegisterView: View {
-    
+
+    typealias Mode = MyWorkFormView.Mode
+
     // MARK: - Properties
-    
-    @State private var navigationController: UINavigationController?
+
+    private let navigationController: UINavigationController?
+    private let mode: Mode
+
+    private let workUseCase: WorkUseCaseProtocol
+    private let workplaceUseCase: WorkplaceUseCaseProtocol
+
     @State private var isEditing: Bool
-    
-    private let selectedDate: Date
-    private let workData: MyWorkData?
-    
-    /// 수정 모드 여부 (workData가 있으면 수정 모드)
-    private var isEditMode: Bool { workData != nil }
-    
+
+    /// 수정 모드 여부
+    private var isEditMode: Bool {
+        if case .edit = mode { return true }
+        return false
+    }
+
     // MARK: - Initializer
-    
-    init(selectedDate: Date = Date()) {
-        self.selectedDate = selectedDate
-        self.workData = nil
-        self._isEditing = State(initialValue: true) // 등록 모드: 항상 활성화
+
+    init(navigationController: UINavigationController? = nil,
+         mode: Mode,
+         workUseCase: WorkUseCaseProtocol,
+         workplaceUseCase: WorkplaceUseCaseProtocol) {
+        self.navigationController = navigationController
+        self.mode = mode
+        self.workUseCase = workUseCase
+        self.workplaceUseCase = workplaceUseCase
+
+        switch mode {
+        case .create:
+            self._isEditing = State(initialValue: true)   // 등록 모드: 항상 활성화
+        case .edit:
+            self._isEditing = State(initialValue: false)  // 수정 모드: 잠금 상태로 시작
+        }
     }
-    
-    init(workData: MyWorkData) {
-        self.selectedDate = Date()
-        self.workData = workData
-        self._isEditing = State(initialValue: false) // 수정 모드: 잠금 상태로 시작
-    }
-    
+
     // MARK: - Content
-    
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 BaseNavigationBarSU(
                     title: isEditMode ? "근무 수정" : "근무 등록",
-                    rightTitle: isEditMode && !isEditing ? "수정하기" : nil,
+                    rightTitle: isEditMode && !isEditing ? "수정" : nil,
                     onBackTap: {
                         navigationController?.popViewController(animated: true)
                     },
@@ -49,28 +65,20 @@ struct WorkerWorkRegisterView: View {
                         isEditing = true
                     }
                 )
-                
-                Group {
-                    if let workData {
-                        MyWorkFormView(
-                            navigationController: navigationController,
-                            workData: workData,
-                            isEditing: isEditing
-                        )
-                    } else {
-                        MyWorkFormView(
-                            navigationController: navigationController,
-                            selectedDate: selectedDate
-                        )
-                    }
-                }
+
+                MyWorkFormView(
+                    navigationController: navigationController,
+                    mode: mode,
+                    isEditing: isEditing,
+                    workUseCase: workUseCase,
+                    workplaceUseCase: workplaceUseCase
+                )
             }
             .toolbar(.hidden, for: .navigationBar)
         }
         .background(
-            NavigationControllerFinder { nav in
-                navigationController = nav
-            }
+            // 상위 UIKit 네비게이션의 스와이프 백 제스처를 복원하기 위해 유지한다.
+            NavigationControllerFinder { _ in }
                 .frame(width: 0, height: 0)
         )
     }
@@ -79,5 +87,9 @@ struct WorkerWorkRegisterView: View {
 // MARK: - Preview
 
 #Preview {
-    WorkerWorkRegisterView()
+    WorkerWorkRegisterView(
+        mode: .create(selectedDate: Date()),
+        workUseCase: WorkUseCase(workRepository: WorkRepository(workService: WorkService())),
+        workplaceUseCase: WorkplaceUseCase(workplaceRepository: WorkplaceRepository(workplaceService: WorkplaceService()))
+    )
 }
