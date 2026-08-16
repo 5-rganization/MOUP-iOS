@@ -1,141 +1,138 @@
 //
-//  MyWorkForm.swift
+//  WorkerWorkForm.swift
 //  MOUP
 //
-//  Created by 서동환 on 3/25/26.
+//  Created by 서동환 on 8/16/26.
 //
 
 import Foundation
 
-/// `MyWorkFormView`의 폼 상태를 담는 값 타입
+/// `WorkerWorkFormView`의 폼 상태를 담는 값 타입 (사장님 전용)
 ///
-/// UI 입력 상태와 도메인 엔티티(`MyWorkData`) 간 변환을 캡슐화합니다.
-/// View에서는 `@State private var form = MyWorkForm()`으로 선언하여 사용합니다.
-///
-/// **사용 예시**
-/// ```swift
-/// // 등록 모드
-/// @State private var form = MyWorkForm()
-///
-/// // 편집 모드
-/// @State private var form = MyWorkForm(from: existingMyWorkData)
-/// ```
-struct MyWorkForm: Equatable {
+/// 사장님은 본인 근무와 근무자 근무를 모두 등록할 수 있어서 `target`으로 갈린다.
+/// 서버 API가 둘을 다르게 다루므로(본인은 루틴 지정 가능, 근무자는 복수 지정 가능) 폼 하나가 두 DTO를 만든다.
+struct WorkerWorkForm: Equatable {
+
+    /// 누구의 근무를 등록하는지
+    enum Target: Equatable {
+        /// 사장님 본인 근무
+        case owner
+        /// 근무자 근무
+        case worker
+    }
+
+    var target: Target
     var selectedWorkplace: WorkplaceSummary?
+    /// 근무자 근무일 때만 쓴다. 등록은 복수, 수정은 항상 한 명이다.
+    var selectedWorkers: [WorkerSummary]
     var selectedDate: Date
     var selectedStartTime: Date
     var selectedEndTime: Date
-    var actualStartTime: Date?
-    var actualEndTime: Date?
     var selectedBreakTime: Int
     var repeatDays: [String]
     var repeatEndDate: Date?
+    /// 본인 근무에만 지정할 수 있다. 근무자 근무 API에는 루틴 필드가 없다.
     var routines: [RoutineSummary]
     var memo: String
-    
+
     // MARK: - Initializer
-    
+
     /// 등록 모드: 기본값으로 초기화
-    init(
-        selectedDate: Date = Date(),
-        selectedStartTime: Date? = nil,
-        selectedEndTime: Date? = nil,
-        selectedBreakTime: Int = 0
-    ) {
+    init(selectedDate: Date = Date()) {
         let calendar = Calendar(identifier: .gregorian)
         let now = Date()
-        
+
+        self.target = .owner
+        self.selectedWorkplace = nil
+        self.selectedWorkers = []
         self.selectedDate = selectedDate
-        
-        if let startTime = selectedStartTime, let endTime = selectedEndTime {
-            self.selectedStartTime = startTime
-            self.selectedEndTime = endTime
-        } else {
-            let endTime = calendar.dateInterval(of: .hour, for: now)?.start ?? now
-            self.selectedEndTime = endTime
-            self.selectedStartTime = calendar.date(byAdding: .hour, value: -6, to: endTime) ?? endTime
-        }
-        
-        self.actualStartTime = nil
-        self.actualEndTime = nil
-        self.selectedBreakTime = selectedBreakTime
+
+        let endTime = calendar.dateInterval(of: .hour, for: now)?.start ?? now
+        self.selectedEndTime = endTime
+        self.selectedStartTime = calendar.date(byAdding: .hour, value: -6, to: endTime) ?? endTime
+
+        self.selectedBreakTime = 0
         self.repeatDays = []
         self.repeatEndDate = nil
         self.routines = []
         self.memo = ""
     }
-    
-    /// 편집 모드: 기존 엔티티로부터 초기화
-    init(workData: MyWorkData) {
+
+    /// 수정 모드: 기존 엔티티로부터 초기화
+    init(workData: WorkerWorkData) {
+        self.target = .worker
         self.selectedWorkplace = workData.workplaceSummary
+        self.selectedWorkers = [workData.workerSummary]
         self.selectedStartTime = workData.startTime
         self.selectedEndTime = workData.endTime ?? workData.startTime
-        self.actualStartTime = workData.actualStartTime
-        self.actualEndTime = workData.actualEndTime
         self.selectedBreakTime = workData.restTimeMinutes
         self.repeatDays = workData.repeatDays
-        self.routines = workData.routineSummaryList
+        self.routines = workData.routineSummaryInfoList
         self.memo = workData.memo ?? ""
-        
+
         if let dateString = workData.repeatEndDate,
            let endDate = DateFormatter.dataSourceDateFormatter.date(from: dateString) {
             self.repeatEndDate = endDate
         } else {
             self.repeatEndDate = nil
         }
-        
+
         if let date = DateFormatter.dataSourceDateFormatter.date(from: workData.workDate) {
             self.selectedDate = date
         } else {
             self.selectedDate = Date()
         }
     }
-    
+
     // MARK: - Computed Properties
-    
+
     var formattedDate: String {
         DateFormatter.dataSourceDateFormatter.string(from: selectedDate)
     }
-    
+
     var formattedStartTime: String {
         DateFormatter.startEndTimeDateFormatter.string(from: selectedStartTime)
     }
-    
+
     var formattedEndTime: String {
         DateFormatter.startEndTimeDateFormatter.string(from: selectedEndTime)
     }
-    
+
     var formattedBreakTime: String {
         selectedBreakTime == 0 ? "없음" : "\(selectedBreakTime)분"
     }
-    
+
+    /// 선택한 근무자 표시 텍스트
+    var formattedWorkers: String {
+        selectedWorkers.map { $0.nickname }.joined(separator: ", ")
+    }
+
     /// 반복 여부
     var hasRepeat: Bool {
         !repeatDays.isEmpty && repeatEndDate != nil
     }
-    
+
     /// 반복 요일 표시 텍스트
     var formattedRepeatDays: String {
         hasRepeat ? RepeatDays.formatted(repeatDays) : "없음"
     }
 
     var formattedRoutineCount: String {
-        routines.count == 0 ? "" : "+ \(routines.count)"
+        routines.isEmpty ? "" : "+ \(routines.count)"
     }
-    
+
     /// 필수 필드가 모두 채워졌는지 여부
     var isValid: Bool {
-        selectedWorkplace != nil && startDateTime != endDateTime
+        guard selectedWorkplace != nil, startDateTime != endDateTime else { return false }
+        return target == .owner || !selectedWorkers.isEmpty
     }
 }
 
 // MARK: - DTO 변환
 
-extension MyWorkForm {
+extension WorkerWorkForm {
 
     /// `selectedDate`의 연·월·일과 `time`의 시·분을 합쳐 절대 시각을 만든다.
-    ///
-    /// 날짜와 시각을 별도 필드로 관리하기 때문에, 서버로 보낼 때는 하나로 합쳐야 한다.
     private func combined(_ time: Date) -> Date {
         let calendar = Calendar.current
         var comp = calendar.dateComponents([.year, .month, .day], from: selectedDate)
@@ -169,14 +166,12 @@ extension MyWorkForm {
     }
 
     /// 반복 요일 목록. 반복 설정이 완전하지 않으면 빈 배열
-    ///
-    /// `repeatEndDateString`과 짝을 맞춰 요일만 선택하고 종료일을 비운 상태가 전송되지 않도록 한다.
     private var repeatDaysForRequest: [String] {
         hasRepeat ? repeatDays : []
     }
 
-    /// 근무 등록 요청 DTO
-    var createRequestDTO: MyWorkCreateRequestDTO {
+    /// 사장님 본인 근무 등록 요청 DTO
+    var myCreateRequestDTO: MyWorkCreateRequestDTO {
         MyWorkCreateRequestDTO(
             routineIdList: routines.map { $0.routineId },
             startTime: startDateTime,
@@ -190,10 +185,24 @@ extension MyWorkForm {
         )
     }
 
-    /// 근무 수정 요청 DTO
-    var updateRequestDTO: MyWorkUpdateRequestDTO {
-        MyWorkUpdateRequestDTO(
-            routineIdList: routines.map { $0.routineId },
+    /// 근무자 근무 등록 요청 DTO
+    var workersCreateRequestDTO: WorkersWorkCreateRequestDTO {
+        WorkersWorkCreateRequestDTO(
+            workerIdList: selectedWorkers.map { $0.id },
+            startTime: startDateTime,
+            actualStartTime: nil,
+            endTime: endDateTime,
+            actualEndTime: nil,
+            restTimeMinutes: selectedBreakTime,
+            memo: memo.isEmpty ? nil : memo,
+            repeatDays: repeatDaysForRequest,
+            repeatEndDate: repeatEndDateString
+        )
+    }
+
+    /// 근무자 근무 수정 요청 DTO
+    var updateRequestDTO: WorkerWorkUpdateRequestDTO {
+        WorkerWorkUpdateRequestDTO(
             startTime: startDateTime,
             actualStartTime: nil,
             endTime: endDateTime,

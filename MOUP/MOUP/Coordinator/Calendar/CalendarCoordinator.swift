@@ -29,7 +29,12 @@ final class CalendarCoordinator: Coordinator {
     private let workplaceService: WorkplaceServiceProtocol
     private let workplaceRepository: WorkplaceRepositoryProtocol
     private let workplaceUseCase: WorkplaceUseCaseProtocol
-    
+
+    /// 사장님 근무 등록 화면의 근무자 목록 조회에만 쓴다.
+    private lazy var attendanceUseCase = AttendanceUseCase(
+        attendanceRepository: AttendanceRepository(attendanceService: AttendanceService())
+    )
+
     // MARK: - Initializer
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
@@ -146,16 +151,26 @@ extension CalendarCoordinator {
         navigationController.pushViewController(hostingVC, animated: true)
     }
     
+    /// 사장님 근무 등록/수정 화면 표시
+    ///
+    /// 알바생 화면과 같은 방식으로 SwiftUI 루트를 `UIHostingController`로 감싸 push 한다.
     func showOwnerWorkRegister(selectedDate: Date? = nil, workToEdit: WorkSummary?) {
-        if let workToEdit {
-            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate, mode: .edit(workId: workToEdit.id))
-            childCoordinators.append(coordinator)
-            coordinator.start()
-        } else {
-            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: true, selectedDate: selectedDate, mode: .create)
-            childCoordinators.append(coordinator)
-            coordinator.start()
-        }
+        let mode: OwnerWorkRegisterView.Mode = workToEdit.map { .edit(workId: $0.id) }
+            ?? .create(selectedDate: selectedDate ?? .now)
+
+        let hostingVC = UIHostingController(
+            rootView: OwnerWorkRegisterView(navigationController: navigationController,
+                                            mode: mode,
+                                            workUseCase: workUseCase,
+                                            workplaceUseCase: workplaceUseCase,
+                                            attendanceUseCase: attendanceUseCase,
+                                            // 저장한 날짜로 선택을 옮겨야 복귀 후 그 날짜의 근무 목록이 뜬다.
+                                            onSaved: { [weak self] date in
+                                                self?.calendarVC.moveSelectedDate(to: date)
+                                            })
+        )
+        hostingVC.hidesBottomBarWhenPushed = true
+        navigationController.pushViewController(hostingVC, animated: true)
     }
     
     /// 캘린더 업데이트 요청
