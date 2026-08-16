@@ -83,7 +83,7 @@ struct LabelChevronRowView: View {
             .frame(height: 48)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(FormRowButtonStyle())
     }
 }
 

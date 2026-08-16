@@ -51,7 +51,7 @@ struct WorkplaceButton: View {
             .frame(height: 48)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(FormRowButtonStyle())
         .overlay(alignment: .bottom) {
             Rectangle()
                 .fill(Color.gray400)
