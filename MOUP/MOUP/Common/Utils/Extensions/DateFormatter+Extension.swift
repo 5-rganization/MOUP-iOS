@@ -65,9 +65,13 @@ extension DateFormatter {
     }
     
     /// yyyy-MM-dd -> Date
+    ///
+    /// 다른 포매터와 같은 시간대를 써야 한다. 파싱은 `dataSourceDateFormatter`(Asia/Seoul)로 하고
+    /// 포맷만 기기 시간대로 하면, 해외 시간대에서 날짜가 하루씩 어긋난다.
     static let yyyyMMdd = DateFormatter().then {
         $0.dateFormat = "yyyy-MM-dd"
         $0.locale = Locale(identifier: "ko_KR")
+        $0.timeZone = TimeZone(identifier: "Asia/Seoul")
     }
     
     /// Date -> "MM / dd / E"
