@@ -170,6 +170,7 @@ struct MyWorkFormView: View {
         }
         .navigationDestination(isPresented: $showRepeatSettings) {
             WorkRepeatSettingsView(
+                workDate: form.selectedDate,
                 repeatDays: $form.repeatDays,
                 repeatEndDate: $form.repeatEndDate
             )
@@ -200,8 +201,8 @@ struct MyWorkFormView: View {
     ///
     /// SwiftUI의 `.fullScreenCover`로 띄우면 배경이 불투명해져 폼 위에 겹쳐 보이지 않으므로,
     /// 주입받은 `UINavigationController`에 UIKit 방식으로 present 한다.
-    func presentNotice(title: String, comment: String) {
-        navigationController?.presentNoticeModal(title: title, comment: comment)
+    func presentNotice(title: String, comment: String, onConfirm: (() -> Void)? = nil) {
+        navigationController?.presentNoticeModal(title: title, comment: comment, onConfirm: onConfirm)
     }
 
     /// 수정 모드일 때 근무 상세를 조회해 폼을 채운다.
@@ -216,8 +217,10 @@ struct MyWorkFormView: View {
             originalForm = form
         } catch {
             logger.error("근무 상세 조회 실패: \(error.localizedDescription)")
+            // 빈 폼을 남기면 잠금 상태라 아무것도 못 하는 화면이 된다.
             presentNotice(title: "데이터 불러오기 실패",
-                          comment: "근무 정보를 불러오지 못했습니다.\n다시 시도해주세요.")
+                          comment: "근무 정보를 불러오지 못했습니다.\n다시 시도해주세요.",
+                          onConfirm: { navigationController?.popViewController(animated: true) })
         }
     }
 
@@ -236,9 +239,13 @@ struct MyWorkFormView: View {
     func showRoutineSelection() {
         guard let nav = navigationController else { return }
 
+        // 클로저가 self를 캡처하면 @State 저장 박스까지 붙잡아
+        // coordinator → 클로저 → 박스 → coordinator 순환이 생긴다. Binding만 캡처해 끊는다.
+        let routinesBinding = $form.routines
+
         let coordinator = RoutineSelectionCoordinator(navigationController: nav)
         coordinator.onRoutinesSelected = { routines in
-            form.routines = routines
+            routinesBinding.wrappedValue = routines
         }
         coordinator.start()
 
@@ -268,7 +275,10 @@ struct MyWorkFormView: View {
     /// 근무를 등록하거나 수정한다. 성공 시 이전 화면으로 돌아간다.
     /// - Parameter appliesToRecurring: 반복 근무 전체에 적용할지 여부
     func save(appliesToRecurring: Bool) async {
-        guard let workplace = form.selectedWorkplace else { return }
+        guard let workplace = form.selectedWorkplace else {
+            presentNotice(title: "근무지를 선택해주세요", comment: "근무지를 선택해야 근무를 저장할 수 있습니다.")
+            return
+        }
 
         isSaving = true
         defer { isSaving = false }

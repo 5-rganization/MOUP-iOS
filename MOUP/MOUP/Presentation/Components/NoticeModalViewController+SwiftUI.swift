@@ -48,7 +48,8 @@ final class NoticeModalViewController: UIViewController {
         $0.font = .bodyMedium(14)
         $0.textAlignment = .left
         $0.lineBreakMode = .byWordWrapping
-        $0.numberOfLines = 2
+        // 실패한 근무자 목록처럼 줄 수를 예측할 수 없는 문구가 들어온다.
+        $0.numberOfLines = 0
     }
     
     private lazy var confirmButton = BaseButton(title: confirmTitle, isSecondary: false)
@@ -145,7 +146,9 @@ private extension NoticeModalViewController {
             $0.centerY.equalToSuperview()
             // 버튼을 세로로 쌓을 때는 내용에 맞춰 높이가 정해진다.
             if otherTitle == nil {
-                $0.height.equalTo(210)
+                // 문구가 길면 높이가 늘어나되, 화면을 넘기지는 않는다.
+                $0.height.greaterThanOrEqualTo(210)
+                $0.height.lessThanOrEqualToSuperview().multipliedBy(0.7)
             }
         }
         
@@ -157,6 +160,8 @@ private extension NoticeModalViewController {
         commentLabel.snp.makeConstraints {
             $0.top.equalTo(noticeTitleLabel.snp.bottom).offset(20)
             $0.directionalHorizontalEdges.equalToSuperview().inset(16)
+            // 이 관계가 있어야 문구 길이에 맞춰 containerView 높이가 늘어난다.
+            $0.bottom.lessThanOrEqualTo(buttonStackView.snp.top).offset(-20)
         }
         
         buttonStackView.snp.makeConstraints {
@@ -208,6 +213,10 @@ private extension NoticeModalViewController {
 import SwiftUI
 
 /// `NoticeModalViewController`의 SwiftUI 래퍼
+///
+/// > 현재 앱에서 쓰이지 않는다. SwiftUI 화면도 알림은 주입받은 `UINavigationController`의
+/// > `presentNoticeModal(...)`로 띄운다 — `.fullScreenCover`는 SwiftUI 화면 위에만 덮여서
+/// > 하위 화면을 push한 상태에서는 모달이 가려진다. 아래 예시는 그 제약이 없는 화면에만 해당한다.
 ///
 /// **사용 예시**
 /// ```swift

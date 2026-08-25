@@ -106,7 +106,7 @@ struct WorkerWorkFormView: View {
             VStack(spacing: 24) {
                 // 수정 모드는 대상이 이미 정해져 있으므로 토글을 두지 않는다.
                 if !isEditMode {
-                    RoleSegmentedView(selection: $form.target)
+                    RoleSegmentedView(selection: targetBinding)
                         .padding(.horizontal, 16)
                 }
 
@@ -206,6 +206,7 @@ struct WorkerWorkFormView: View {
         }
         .navigationDestination(isPresented: $showRepeatSettings) {
             WorkRepeatSettingsView(
+                workDate: form.selectedDate,
                 repeatDays: $form.repeatDays,
                 repeatEndDate: $form.repeatEndDate
             )
@@ -232,6 +233,22 @@ struct WorkerWorkFormView: View {
 /// `@State`와 UIKit을 건드린다. 확산되지 않도록 extension 전체를 메인 액터에 묶는다.
 @MainActor private extension WorkerWorkFormView {
 
+    /// 근무 대상 토글의 Binding
+    ///
+    /// 대상에 따라 고를 수 있는 근무지가 다르다(근무자는 공유 근무지만).
+    /// 이전 대상에서 고른 근무지를 남겨두면 근무자 목록이 빈 채로 떠서 이유를 알 수 없는 막다른 길이 된다.
+    var targetBinding: Binding<WorkerWorkForm.Target> {
+        Binding(
+            get: { form.target },
+            set: { newValue in
+                guard newValue != form.target else { return }
+                form.selectedWorkplace = nil
+                form.selectedWorkers = []
+                form.target = newValue
+            }
+        )
+    }
+
     /// 근무지 선택 결과를 받는 Binding
     ///
     /// 근무자는 근무지에 속하므로, 근무지가 바뀌면 이전 근무지에서 고른 근무자를 비운다.
@@ -249,8 +266,8 @@ struct WorkerWorkFormView: View {
     }
 
     /// 앱 전체와 동일한 알림 모달을 표시한다.
-    func presentNotice(title: String, comment: String) {
-        navigationController?.presentNoticeModal(title: title, comment: comment)
+    func presentNotice(title: String, comment: String, onConfirm: (() -> Void)? = nil) {
+        navigationController?.presentNoticeModal(title: title, comment: comment, onConfirm: onConfirm)
     }
 
     /// 수정 모드일 때 근무 상세를 조회해 폼을 채운다.
@@ -265,8 +282,10 @@ struct WorkerWorkFormView: View {
             originalForm = form
         } catch {
             logger.error("근무 상세 조회 실패: \(error.localizedDescription)")
+            // 빈 폼을 남기면 대상 기본값(.owner) 기준으로 화면이 그려져 실제 근무와 어긋난다.
             presentNotice(title: "데이터 불러오기 실패",
-                          comment: "근무 정보를 불러오지 못했습니다.\n다시 시도해주세요.")
+                          comment: "근무 정보를 불러오지 못했습니다.\n다시 시도해주세요.",
+                          onConfirm: { navigationController?.popViewController(animated: true) })
         }
     }
 
@@ -308,9 +327,13 @@ struct WorkerWorkFormView: View {
     func showRoutineSelection() {
         guard let nav = navigationController else { return }
 
+        // 클로저가 self를 캡처하면 @State 저장 박스까지 붙잡아
+        // coordinator → 클로저 → 박스 → coordinator 순환이 생긴다. Binding만 캡처해 끊는다.
+        let routinesBinding = $form.routines
+
         let coordinator = RoutineSelectionCoordinator(navigationController: nav)
         coordinator.onRoutinesSelected = { routines in
-            form.routines = routines
+            routinesBinding.wrappedValue = routines
         }
         coordinator.start()
 
@@ -340,7 +363,10 @@ struct WorkerWorkFormView: View {
     /// 근무를 등록하거나 수정한다. 성공 시 이전 화면으로 돌아간다.
     /// - Parameter appliesToRecurring: 반복 근무 전체에 적용할지 여부
     func save(appliesToRecurring: Bool) async {
-        guard let workplace = form.selectedWorkplace else { return }
+        guard let workplace = form.selectedWorkplace else {
+            presentNotice(title: "근무지를 선택해주세요", comment: "근무지를 선택해야 근무를 저장할 수 있습니다.")
+            return
+        }
 
         isSaving = true
         defer { isSaving = false }
@@ -355,9 +381,14 @@ struct WorkerWorkFormView: View {
                                                                             requestDTO: form.workersCreateRequestDTO)
                 // 일부만 실패해도 화면을 벗어나면 무엇이 빠졌는지 알 수 없다.
                 guard failedWorkers.isEmpty else {
+                    // 성공한 근무자는 이미 생성됐다. 그대로 두면 재시도할 때 중복 생성된다.
+                    let failedIds = Set(failedWorkers.map { $0.workerId })
+                    form.selectedWorkers = form.selectedWorkers.filter { failedIds.contains($0.id) }
+
                     presentNotice(title: "일부 근무자 등록 실패",
                                   comment: failedWorkers.map { "\($0.nickname): \($0.reason)" }
-                                      .joined(separator: "\n"))
+                                      .joined(separator: "\n")
+                                  + "\n\n실패한 근무자만 남겨두었습니다. 다시 등록해주세요.")
                     return
                 }
             // 본인 근무는 근무자 근무 API로 보내면 루틴이 지워지므로 별도 경로로 나간다.
@@ -370,7 +401,10 @@ struct WorkerWorkFormView: View {
                                                              requestDTO: form.myUpdateRequestDTO)
                 }
             case .edit(let workId):
-                guard let worker = form.selectedWorkers.first else { return }
+                guard let worker = form.selectedWorkers.first else {
+                    presentNotice(title: "근무자 정보 없음", comment: "근무자 정보를 확인할 수 없습니다.\n화면을 나갔다가 다시 시도해주세요.")
+                    return
+                }
 
                 if appliesToRecurring {
                     _ = try await workUseCase.updateWorkerRecurringWork(workplaceId: workplace.id,

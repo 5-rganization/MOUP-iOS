@@ -11,6 +11,9 @@ struct WorkRepeatSettingsView: View {
     
     // MARK: - Properties
     
+    /// 근무 날짜. 반복 종료일이 이보다 이르면 안 되므로 함께 받는다.
+    private let workDate: Date
+
     @Binding var repeatDays: [String]
     @Binding var repeatEndDate: Date?
     
@@ -24,6 +27,11 @@ struct WorkRepeatSettingsView: View {
         !tempDays.isEmpty
     }
     
+    /// 종료일이 근무 날짜보다 이른지 여부
+    private var isEndDateTooEarly: Bool {
+        !RepeatDays.isEndDateValid(tempEndDate, from: workDate)
+    }
+
     private var formattedRepeatEndDate: String {
         if let date = tempEndDate {
             return DateFormatter.dataSourceDateFormatter.string(from: date)
@@ -33,7 +41,8 @@ struct WorkRepeatSettingsView: View {
     
     // MARK: - Initializer
     
-    init(repeatDays: Binding<[String]>, repeatEndDate: Binding<Date?>) {
+    init(workDate: Date, repeatDays: Binding<[String]>, repeatEndDate: Binding<Date?>) {
+        self.workDate = workDate
         self._repeatDays = repeatDays
         self._repeatEndDate = repeatEndDate
         self._tempDays = State(initialValue: repeatDays.wrappedValue)
@@ -60,9 +69,18 @@ struct WorkRepeatSettingsView: View {
                 }
                 
                 if hasSelection {
-                    ContainerView(title: "반복 종료 날짜를 입력해주세요") {
-                        PickerRow(title: "날짜", buttonTitle: formattedRepeatEndDate) {
-                            isDatePickerPresented = true
+                    VStack(alignment: .leading, spacing: 8) {
+                        ContainerView(title: "반복 종료 날짜를 입력해주세요") {
+                            PickerRow(title: "날짜", buttonTitle: formattedRepeatEndDate) {
+                                isDatePickerPresented = true
+                            }
+                        }
+
+                        if isEndDateTooEarly {
+                            Text("종료 날짜는 근무 날짜(\(DateFormatter.dataSourceDateFormatter.string(from: workDate))) 이후여야 합니다.")
+                                .font(.bodyMedium(12))
+                                .foregroundStyle(.red)
+                                .padding(.horizontal, 16)
                         }
                     }
                 }
@@ -81,14 +99,14 @@ struct WorkRepeatSettingsView: View {
                 }
                 .padding(.vertical, 12)
                 .padding(.horizontal, 16)
-                .disabled(!tempDays.isEmpty && tempEndDate == nil)
+                .disabled(!tempDays.isEmpty && (tempEndDate == nil || isEndDateTooEarly))
             }
         }
         .toolbar(.hidden, for: .navigationBar)
         .sheet(isPresented: $isDatePickerPresented) {
             DatePickerModal(
                 selectedDate: Binding(
-                    get: { tempEndDate ?? Date() },
+                    get: { tempEndDate ?? workDate },
                     set: { tempEndDate = $0 }
                 ),
                 isPresented: $isDatePickerPresented
@@ -128,7 +146,7 @@ private extension WorkRepeatSettingsView {
         
         var body: some View {
             NavigationStack {
-                WorkRepeatSettingsView(repeatDays: $days, repeatEndDate: $endDate)
+                WorkRepeatSettingsView(workDate: Date(), repeatDays: $days, repeatEndDate: $endDate)
             }
         }
     }

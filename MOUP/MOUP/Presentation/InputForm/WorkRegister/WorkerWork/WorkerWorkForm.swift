@@ -125,7 +125,9 @@ struct WorkerWorkForm: Equatable {
 
     /// 필수 필드가 모두 채워졌는지 여부
     var isValid: Bool {
-        guard selectedWorkplace != nil, startDateTime != endDateTime else { return false }
+        guard selectedWorkplace != nil,
+              startDateTime != endDateTime,
+              RepeatDays.isEndDateValid(repeatEndDate, from: selectedDate) else { return false }
         return target == .owner || !selectedWorkers.isEmpty
     }
 }
@@ -177,6 +179,7 @@ extension WorkerWorkForm {
         MyWorkCreateRequestDTO(
             routineIdList: routines.map { $0.routineId },
             startTime: startDateTime,
+            // 서버가 nil을 "변경 없음"으로 보는지 "삭제"로 보는지 확인되지 않아, 기존 동작대로 항상 nil을 보낸다.
             actualStartTime: nil,
             endTime: endDateTime,
             actualEndTime: nil,
