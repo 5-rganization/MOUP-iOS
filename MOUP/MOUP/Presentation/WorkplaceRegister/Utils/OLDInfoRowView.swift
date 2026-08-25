@@ -33,9 +33,14 @@ final class OLDInfoRowView: UIView {
         $0.textColor = .gray700
     }
     
+    /// Chevron 버튼의 탭 영역. 아이콘(7×12)이 아니라 손가락 크기에 맞춘다.
+    private let chevronTapSize = CGSize(width: 44, height: 44)
+
     private let chevronButton = UIButton().then {
         $0.setImage(.chevronRight, for: .normal)
         $0.isUserInteractionEnabled = true
+        // 버튼을 키워도 아이콘은 오른쪽 끝에 붙어 있어야 기존 위치가 유지된다.
+        $0.contentHorizontalAlignment = .right
     }
     
     private let checkBox = UIButton().then {
@@ -222,7 +227,9 @@ private extension OLDInfoRowView {
             
             chevronButton.snp.makeConstraints {
                 $0.centerY.equalTo(titleLabel)
-                $0.trailing.equalToSuperview().inset(16)	
+                $0.trailing.equalToSuperview().inset(16)
+                // 크기를 안 주면 탭 영역이 이미지 크기(7×12)가 된다. 이 버튼이 Row의 유일한 탭 타깃이다.
+                $0.size.equalTo(chevronTapSize)
             }
             
         case .labelWithButton:
@@ -253,6 +260,7 @@ private extension OLDInfoRowView {
             chevronButton.snp.makeConstraints {
                 $0.centerY.equalToSuperview()
                 $0.trailing.equalToSuperview().inset(16)
+                $0.size.equalTo(chevronTapSize)
             }
         }
     }
