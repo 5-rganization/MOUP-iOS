@@ -41,19 +41,43 @@ struct NavigationControllerFinder: UIViewControllerRepresentable {
         DispatchQueue.main.async {
             if let nav = vc.navigationController {
                 onFound(nav)
-                context.coordinator.navigationController = nav
-                nav.interactivePopGestureRecognizer?.isEnabled = true
-                nav.interactivePopGestureRecognizer?.delegate = context.coordinator
+                context.coordinator.takeOver(nav)
             }
         }
         return vc
     }
-    
+
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
-    
+
+    /// 화면이 사라질 때 제스처 delegate를 원래대로 돌려놓는다.
+    ///
+    /// 이 브릿지가 붙는 `UINavigationController`는 탭 전체가 공유하는 스택이다.
+    /// 복원하지 않으면 Coordinator 해제와 함께 delegate가 `nil`이 되고,
+    /// `nil`은 "항상 시작 허용"으로 동작해 루트에서도 스와이프 백이 시도되면서 네비게이션이 멈춘다.
+    static func dismantleUIViewController(_ uiViewController: UIViewController, coordinator: Coordinator) {
+        coordinator.restore()
+    }
+
     class Coordinator: NSObject, UIGestureRecognizerDelegate {
         weak var navigationController: UINavigationController?
-        
+        /// 우리가 가로채기 전의 delegate(`_UINavigationInteractiveTransition`). nav가 소유하므로 weak로 충분하다.
+        private weak var originalDelegate: UIGestureRecognizerDelegate?
+
+        func takeOver(_ nav: UINavigationController) {
+            navigationController = nav
+
+            guard let gesture = nav.interactivePopGestureRecognizer else { return }
+            gesture.isEnabled = true
+            originalDelegate = gesture.delegate
+            gesture.delegate = self
+        }
+
+        func restore() {
+            guard let gesture = navigationController?.interactivePopGestureRecognizer,
+                  gesture.delegate === self else { return }
+            gesture.delegate = originalDelegate
+        }
+
         func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
             return (navigationController?.viewControllers.count ?? 0) > 1
         }
