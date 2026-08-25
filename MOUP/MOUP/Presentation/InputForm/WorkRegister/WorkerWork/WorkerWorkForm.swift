@@ -59,8 +59,10 @@ struct WorkerWorkForm: Equatable {
     }
 
     /// 수정 모드: 기존 엔티티로부터 초기화
+    ///
+    /// 사장님 본인 근무와 근무자 근무는 수정 API가 다르므로 `isMyWork`로 대상을 가른다.
     init(workData: WorkerWorkData) {
-        self.target = .worker
+        self.target = workData.isMyWork ? .owner : .worker
         self.selectedWorkplace = workData.workplaceSummary
         self.selectedWorkers = [workData.workerSummary]
         self.selectedStartTime = workData.startTime
@@ -189,6 +191,23 @@ extension WorkerWorkForm {
     var workersCreateRequestDTO: WorkersWorkCreateRequestDTO {
         WorkersWorkCreateRequestDTO(
             workerIdList: selectedWorkers.map { $0.id },
+            startTime: startDateTime,
+            actualStartTime: nil,
+            endTime: endDateTime,
+            actualEndTime: nil,
+            restTimeMinutes: selectedBreakTime,
+            memo: memo.isEmpty ? nil : memo,
+            repeatDays: repeatDaysForRequest,
+            repeatEndDate: repeatEndDateString
+        )
+    }
+
+    /// 사장님 본인 근무 수정 요청 DTO
+    ///
+    /// 근무자 근무 수정 DTO와 달리 루틴을 포함한다. 본인 근무를 근무자 근무 DTO로 보내면 루틴이 지워진다.
+    var myUpdateRequestDTO: MyWorkUpdateRequestDTO {
+        MyWorkUpdateRequestDTO(
+            routineIdList: routines.map { $0.routineId },
             startTime: startDateTime,
             actualStartTime: nil,
             endTime: endDateTime,

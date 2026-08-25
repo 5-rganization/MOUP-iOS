@@ -358,6 +358,15 @@ private extension WorkerWorkFormView {
                                       .joined(separator: "\n"))
                     return
                 }
+            // 본인 근무는 근무자 근무 API로 보내면 루틴이 지워지므로 별도 경로로 나간다.
+            case .edit(let workId) where form.target == .owner:
+                if appliesToRecurring {
+                    _ = try await workUseCase.updateMyRecurringWork(workId: workId,
+                                                                    requestDTO: form.myUpdateRequestDTO)
+                } else {
+                    try await workUseCase.updateMySingleWork(workId: workId,
+                                                             requestDTO: form.myUpdateRequestDTO)
+                }
             case .edit(let workId):
                 guard let worker = form.selectedWorkers.first else { return }
 
