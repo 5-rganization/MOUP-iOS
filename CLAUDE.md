@@ -78,8 +78,12 @@ SwiftUI 화면을 UIKit 네비게이션 스택에 얹는 방식:
 - 그 아래에서 UIKit 화면으로 전환할 때는 **Coordinator가 주입한 `UINavigationController`를 쓴다.** SwiftUI 안에서 `UINavigationController`를 탐색해 찾지 말 것 — `NavigationStack`이 내부적으로 만드는 nav를 잡으면 push/pop이 깨진다.
 - `Presentation/InputForm/Utils/NavigationControllerFinder.swift`는 **스와이프 백 제스처 복원 용도로만** 쓴다. `.toolbar(.hidden, for: .navigationBar)`를 쓰면 제스처가 죽는데, 이 브릿지를 `.background(...)`에 zero-size로 두면 복원된다. 콜백으로 넘어오는 nav는 무시한다.
 
-### `SU` 접미사 = 기존 UIKit 컴포넌트의 SwiftUI 래퍼
-`BaseButtonSU`, `BaseNavigationBarSU`, `DatePickerViewSU`, `ModalGrabberViewSU` 등. 원본 UIKit 파일 옆에 `이름+SwiftUI.swift` 파일로 두고 `UIViewRepresentable` / `UIViewControllerRepresentable`로 감싼다. SwiftUI 화면에서 기존 컴포넌트가 필요하면 새로 만들지 말고 `SU` 래퍼가 있는지 먼저 확인할 것.
+### `SU` 접미사 = 기존 UIKit 컴포넌트의 SwiftUI 대응물
+`BaseButtonSU`, `DatePickerViewSU`, `ModalGrabberViewSU` 등. 원본 UIKit 파일 옆에 `이름+SwiftUI.swift` 파일로 둔다. SwiftUI 화면에서 기존 컴포넌트가 필요하면 새로 만들지 말고 `SU`가 있는지 먼저 확인할 것.
+
+대부분은 `UIViewRepresentable` / `UIViewControllerRepresentable` 래퍼지만 **전부는 아니다.** `BaseNavigationBarSU`는 원본을 감싸지 않고 스타일만 복제한 순수 SwiftUI 재구현이다. 고칠 때 원본과 함께 봐야 한다.
+
+알림/삭제 확인 모달은 `NoticeModalViewControllerSU` / `DeleteAlertViewControllerSU`가 있지만 **쓰지 않는다.** SwiftUI 화면에서도 주입받은 `UINavigationController`의 `presentNoticeModal(...)`로 띄운다 — `.fullScreenCover`는 SwiftUI 화면 위에만 덮여서 하위 화면을 push한 상태에서 모달이 가려진다.
 
 ### 진행 중인 작업 (2026-08 기준)
 근무 등록/수정 폼(`Presentation/InputForm/WorkRegister/`)의 SwiftUI 재구현은 **완료됐고 API·Coordinator까지 연결돼 있다.** 알바생 본인 근무는 `MyWork/`, 사장님 근무(본인/근무자)는 `WorkerWork/` 아래이고, 진입점은 각각 `CalendarCoordinator.showWorkerWorkRegister` / `showOwnerWorkRegister`다.
