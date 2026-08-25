@@ -228,7 +228,9 @@ struct WorkerWorkFormView: View {
 
 // MARK: - Private Methods
 
-private extension WorkerWorkFormView {
+/// `View.body`만 `@MainActor`라, 여기 있는 async 메서드는 그대로 두면 메인 스레드 밖에서
+/// `@State`와 UIKit을 건드린다. 확산되지 않도록 extension 전체를 메인 액터에 묶는다.
+@MainActor private extension WorkerWorkFormView {
 
     /// 근무지 선택 결과를 받는 Binding
     ///
