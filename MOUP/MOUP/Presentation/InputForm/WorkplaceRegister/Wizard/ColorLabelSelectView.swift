@@ -8,13 +8,12 @@
 import SwiftUI
 
 /// 라벨 색상 선택 위저드
-///
-/// 기존 UIKit이 `._default`를 선택지에 노출하지 않으므로 `LabelColor.allCases`에서 제외한 7색만 보여준다.
 struct ColorLabelSelectView: View {
     @Binding var labelColor: LabelColor
     @Environment(\.dismiss) private var dismiss
 
-    private let options = LabelColor.allCases.filter { $0 != ._default }
+    /// 기존 `SelectColorLabelView`의 노출 순서를 그대로 따른다. `_default`는 선택지에 없다.
+    private let options: [LabelColor] = [.red, .orange, .yellow, .green, .blue, .purple, .indigo]
 
     /// 뒤로가기로 나가면 반영되지 않도록, 확정 전까지는 로컬에만 담는다.
     @State private var selected: LabelColor

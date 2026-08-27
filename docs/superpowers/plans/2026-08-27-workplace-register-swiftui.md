@@ -760,7 +760,7 @@ struct CategorySelectView: View {
 | `CategorySelectView` | 카테고리 | 근무지 카테고리를 선택해주세요. | `WorkplaceCategory.allCases`, 좌측 아이콘 `selectedImage`/`unselectedImage` |
 | `PayTypeSelectView` | 급여 유형 | 급여 유형을 선택해주세요. | `SalaryType.allCases` (`displayText`: 매월/매주/매일), 아이콘 없음 |
 | `PayCalculationSelectView` | 급여 계산 | 급여 계산방법을 선택해주세요. | `SalaryCalculation.allCases` (`displayStr`: 시급/고정급), 아이콘 없음 |
-| `ColorLabelSelectView` | 라벨 색상 | 라벨 색상을 선택해주세요. | `LabelColor.allCases`에서 `._default` 제외한 7색 (`displayStr`), 좌측에 `labelColor` 원형 마커 |
+| `ColorLabelSelectView` | 라벨 색상 | 라벨 색상을 선택해주세요. | `LabelColor`에서 `._default` 제외한 7색, 기존 UIKit 노출 순서 그대로: red·orange·yellow·green·blue·purple·indigo (`displayStr`), 좌측에 `labelColor` 원형 마커 |
 
 `WorkplaceCategory`에는 `selectedImage`/`unselectedImage` 프로퍼티가 이미 있다. 새로 만들지 마라.
 
