@@ -211,18 +211,21 @@ protocol WorkFormSchedule {
 
 | # | 작업 | 커밋 |
 |---|---|---|
-| 1 | 근무 폼 공통 로직을 `WorkFormSchedule`로 추출 | `refactor: #112 - 근무 폼의 공통 파생 로직 추출` |
-| 2 | 고립된 구 UIKit 근무 등록 코드 29파일 삭제 | `chore: #112 - 미사용 UIKit 근무 등록 코드 제거` |
-| 3 | `WorkplaceForm` + 위저드 7화면 + 섹션 4개 | `feat: #113 - 근무지 폼 상태 모델 및 공통 뷰 구현` |
-| 4 | 알바생 루트 + Coordinator 연결 | `feat: #113 - 알바생 근무지 등록/수정 화면 SwiftUI 재구현` |
-| 5 | 사장님 루트 | `feat: #113 - 사장님 근무지 등록/수정 화면 SwiftUI 재구현` |
-| 6 | 초대코드 참여 루트 | `feat: #113 - 초대코드 근무지 참여 화면 SwiftUI 재구현` |
-| 7 | 구 근무지 UIKit 삭제 + `OLDCustomTextField` 이동 | `chore: #113 - 구 UIKit 근무지 등록 코드 제거` |
-| 8 | CLAUDE.md 갱신 | `chore: #113 - CLAUDE.md의 진행 중인 작업 절 갱신` |
+| 1 | 근무 폼 공통 로직을 `WorkFormSchedule`로 추출 | `refactor: #113 - 근무 폼의 공통 파생 로직 추출` |
+| 2 | 고립된 구 UIKit 근무 등록 코드 29파일 삭제 | `chore: #113 - 미사용 UIKit 근무 등록 코드 제거` |
+| 3 | `WorkplaceForm` 상태 모델 | `feat: #113 - 근무지 폼 상태 모델 구현` |
+| 4 | 섹션 뷰 4개 + 위저드 7화면 | `feat: #113 - 근무지 폼 섹션 및 위저드 화면 구현` |
+| 5 | 알바생 루트 + Coordinator 연결 | `feat: #113 - 알바생 근무지 등록/수정 화면 SwiftUI 재구현` |
+| 6 | 사장님 루트 | `feat: #113 - 사장님 근무지 등록/수정 화면 SwiftUI 재구현` |
+| 7 | 초대코드 참여 루트 | `feat: #113 - 초대코드 근무지 참여 화면 SwiftUI 재구현` |
+| 8 | 구 근무지 UIKit 삭제 + `OLDCustomTextField` 이동 | `chore: #113 - 구 UIKit 근무지 등록 코드 제거` |
+| 9 | CLAUDE.md 갱신 | `chore: #113 - CLAUDE.md의 진행 중인 작업 절 갱신` |
 
-7을 4·5·6 뒤로 미루는 이유: 세 루트를 다 옮기기 전에는 구 코드가 참조로 남아 빌드가 깨진다.
+8을 5·6·7 뒤로 미루는 이유: 세 루트를 다 옮기기 전에는 구 코드가 참조로 남아 빌드가 깨진다.
 
-1·2는 #113 범위 밖의 #112 후속 정리라 이슈번호를 `#112`로 단다.
+구현 계획: `docs/superpowers/plans/2026-08-27-workplace-register-swiftui.md`
+
+1·2는 성격상 #112 후속 정리지만, 같은 브랜치에서 함께 진행하므로 이슈번호는 `#113`으로 통일한다.
 
 ## 검증
 
