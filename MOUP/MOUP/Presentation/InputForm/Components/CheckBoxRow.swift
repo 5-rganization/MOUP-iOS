@@ -40,6 +40,10 @@ struct CheckBoxRow: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        // 히트 영역을 이 뷰의 프레임에 묶는다. 없으면 컨테이너 테두리 바깥 여백을 눌러도
+        // 이 행이 눌린다 — 프레임 밖 10pt 남짓까지 반응하는 것을 실측했다(원인은 미확인).
+        // label 안쪽에도 contentShape가 있지만 그것만으로는 막히지 않는다.
+        .contentShape(Rectangle())
     }
 
     private var titleArea: some View {
