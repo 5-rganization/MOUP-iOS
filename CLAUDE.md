@@ -19,10 +19,13 @@ xcodebuild -workspace MOUP/MOUP.xcworkspace -scheme MOUP \
 
 ### 클론 직후 빌드 불가 — gitignore된 설정 파일
 
-아래 파일이 없으면 빌드가 깨진다. 팀 내부에서 별도 공유받아야 함.
+아래 파일이 없으면 빌드가 깨진다. 팀 내부에서 별도 공유받아야 함. 전부 리포 루트가 아니라 `MOUP/MOUP/Resources/` 아래다.
 
-- `GoogleConfig.xcconfig`, `NetworkConfig-Debug.xcconfig`, `NetworkConfig-Release.xcconfig` (리포 루트)
-- `GoogleService-Info-Debug.plist`, `GoogleService-Info-Release.plist`, `credentials.plist`
+- `MOUP/MOUP/Resources/GoogleConfig.xcconfig`
+- `MOUP/MOUP/Resources/Debug/NetworkConfig-Debug.xcconfig`, `MOUP/MOUP/Resources/Release/NetworkConfig-Release.xcconfig`
+- `MOUP/MOUP/Resources/GoogleService-Info.plist` (Debug/Release 구분 없이 하나)
+
+`credentials.plist`는 존재하지 않는데도 빌드가 통과한다.
 
 앱 버전/빌드 번호는 Xcode 프로젝트 설정이 아니라 **`MOUP/MOUP/Resources/Version.xcconfig`**에서 관리.
 
@@ -63,14 +66,13 @@ Context7 MCP가 응답하지 않거나, 사용량 초과 등으로 사용할 수
 
 ## 주의할 점 (비자명)
 
-### `OLD` 접두사 = 리팩토링 대상 레거시
-`OLDWorkRegisterViewModel`, `OLDSelectedWorkplaceViewController` 등 31개 파일이 `OLD` 접두사를 달고 있다. **UIKit + RxSwift로 작성된 구버전이며 SwiftUI로 교체 중**이다.
+### `OLD` 접두사 = SwiftUI 전환 중 이름 충돌 회피용 표식이었음
+근무·근무지 폼을 SwiftUI로 재구현하며 이름이 겹치는 구 UIKit 파일에 `OLD`를 붙였다. 전환이 끝나며 대부분 삭제됐고, 지금 남은 것은 `Presentation/Utils/OLDCustomTextField.swift` 하나뿐이다.
 
-- `OLD*` 파일은 유지보수만 하고 신규 기능을 얹지 말 것.
-- 새 화면은 `Presentation/InputForm/` 아래 SwiftUI로 작성.
+이 파일은 "리팩토링 대상 레거시"가 아니라 **살아있는 공용 UIKit 컴포넌트**다. `Routine/AddRoutineView`, `Routine/EditRoutineView`, 마이페이지 닉네임 수정 모달이 쓴다. 새 화면에서 텍스트 입력이 필요하면 SwiftUI는 `WizardTextFieldView`를, UIKit 화면은 `OLDCustomTextField`를 먼저 확인할 것.
 
 ### UIKit + SwiftUI 과도기
-RxSwift 사용 172파일 vs SwiftUI 27파일. 기존 화면은 전부 UIKit+Rx(`Input`/`Output` 구조체 + `transform()` + Relay 패턴)다.
+`import RxSwift` 107파일 vs `import SwiftUI` 49파일. 기존 화면은 대부분 UIKit+Rx(`Input`/`Output` 구조체 + `transform()` + Relay 패턴)다.
 
 SwiftUI 화면을 UIKit 네비게이션 스택에 얹는 방식:
 
@@ -85,10 +87,16 @@ SwiftUI 화면을 UIKit 네비게이션 스택에 얹는 방식:
 
 알림/삭제 확인 모달은 `NoticeModalViewControllerSU` / `DeleteAlertViewControllerSU`가 있지만 **쓰지 않는다.** SwiftUI 화면에서도 주입받은 `UINavigationController`의 `presentNoticeModal(...)`로 띄운다 — `.fullScreenCover`는 SwiftUI 화면 위에만 덮여서 하위 화면을 push한 상태에서 모달이 가려진다.
 
-### 진행 중인 작업 (2026-08 기준)
-근무 등록/수정 폼(`Presentation/InputForm/WorkRegister/`)의 SwiftUI 재구현은 **완료됐고 API·Coordinator까지 연결돼 있다.** 알바생 본인 근무는 `MyWork/`, 사장님 근무(본인/근무자)는 `WorkerWork/` 아래이고, 진입점은 각각 `CalendarCoordinator.showWorkerWorkRegister` / `showOwnerWorkRegister`다.
+### 근무 폼 / 근무지 폼 (SwiftUI)
+근무 등록/수정 폼(`Presentation/InputForm/WorkRegister/`)의 SwiftUI 재구현은 **완료됐고 API·Coordinator까지 연결돼 있다.** 알바생 본인 근무는 `MyWork/`, 사장님 근무(본인/근무자)는 `WorkerWork/` 아래이고, 진입점은 각각 `CalendarCoordinator.showWorkerWorkRegister` / `showOwnerWorkRegister`다. 두 폼의 공통 파생 로직은 `WorkFormSchedule` 프로토콜에 모여 있다 (`MyWorkForm`/`WorkerWorkForm`이 채택).
 
-`Presentation/WorkplaceRegister/`(근무지 등록/수정)는 아직 100% UIKit이며 SwiftUI 재구현 미착수(이슈 #113). `InputForm/Components/`의 `RadioButtonView`, `WizardTextFieldView`는 그 화면용으로 미리 만들어 둔 것이라 현재 사용처가 없다.
+근무지 등록/수정 폼(`Presentation/InputForm/WorkplaceRegister/`)도 SwiftUI 재구현이 **완료**됐다. 루트가 셋이다.
+
+- `WorkplaceRegisterView` — 알바생 직접 등록/수정
+- `OwnerWorkplaceRegisterView` — 사장님 등록/수정
+- `InviteCodeWorkplaceRegisterView` — 초대코드 참여
+
+진입점은 `HomeCoordinator.moveToDirectRegistration` / `moveToEditWorkplace`(→ `WorkplaceRegisterCoordinator`)와 `InviteCodeInputCoordinator.moveToInviteCodeWorkplaceRegister`다. 폼 상태·유효성·DTO 변환은 값 타입 `WorkplaceForm` 하나가 담고, 세 화면이 필요한 섹션(`Sections/`)과 위저드(`Wizard/`)만 조합한다. `InputForm/Components/`의 `RadioButtonView`, `WizardTextFieldView`는 이 화면들이 쓴다.
 
 ## 테스트
 

@@ -1375,7 +1375,7 @@ git commit -m "chore: #113 - 구 UIKit 근무지 등록 코드 제거"
 - Consumes: 없음
 - Produces: 없음
 
-- [ ] **Step 1: "OLD 접두사" 절 다시 쓰기 (숫자 갱신이 아니라 전면 개정)**
+- [x] **Step 1: "OLD 접두사" 절 다시 쓰기 (숫자 갱신이 아니라 전면 개정)**
 
 CLAUDE.md:67은 `OLD` 접두사 파일이 **31개**이고 "UIKit + RxSwift로 작성된 구버전이며 SwiftUI로 교체 중"이라고 서술한다. 이 절의 전제가 사라졌다.
 
@@ -1393,7 +1393,7 @@ MOUP/MOUP/Presentation/Utils/OLDCustomTextField.swift
 - 지금 남은 것은 `Presentation/Utils/OLDCustomTextField.swift` 하나뿐이며, 접두사와 달리 살아있는 공용 UIKit 컴포넌트다. 루틴 추가/수정과 마이페이지 닉네임 수정 모달이 쓴다
 - 새 화면에서 텍스트 입력이 필요하면 SwiftUI `WizardTextFieldView`를 먼저 보고, UIKit 화면이면 `OLDCustomTextField`를 쓴다
 
-- [ ] **Step 2: "진행 중인 작업" 절 갱신**
+- [x] **Step 2: "진행 중인 작업" 절 갱신**
 
 CLAUDE.md의 해당 절이 `Presentation/WorkplaceRegister/`를 "아직 100% UIKit이며 SwiftUI 재구현 미착수(이슈 #113)"로, `RadioButtonView`·`WizardTextFieldView`를 "현재 사용처가 없다"고 적고 있다. 둘 다 더 이상 사실이 아니다.
 
@@ -1408,14 +1408,14 @@ CLAUDE.md의 해당 절이 `Presentation/WorkplaceRegister/`를 "아직 100% UIK
 - `RadioButtonView`·`WizardTextFieldView`는 이제 이 화면들이 쓴다 (사용처 없음 서술을 지운다)
 - 근무 폼의 공통 파생 로직은 `WorkFormSchedule` 프로토콜에 모여 있다 (`MyWorkForm`/`WorkerWorkForm`이 채택)
 
-- [ ] **Step 3: "UIKit + SwiftUI 과도기" 절의 수치 갱신**
+- [x] **Step 3: "UIKit + SwiftUI 과도기" 절의 수치 갱신**
 
 CLAUDE.md:73의 "RxSwift 사용 172파일 vs SwiftUI 27파일"을 컨트롤러 실측값으로 바꾼다 (2026-08-28 기준).
 
 - `import RxSwift`: **107파일**
 - `import SwiftUI`: **49파일**
 
-- [ ] **Step 4: "클론 직후 빌드 불가" 절 정정**
+- [x] **Step 4: "클론 직후 빌드 불가" 절 정정**
 
 CLAUDE.md:20-25가 설정 파일 위치와 이름을 틀리게 적고 있다. 컨트롤러가 실제 파일을 확인했다.
 
@@ -1436,7 +1436,7 @@ MOUP/MOUP/Resources/GoogleService-Info.plist
 
 같은 절의 `Version.xcconfig` 경로(`MOUP/MOUP/Resources/Version.xcconfig`)는 맞으니 그대로 둔다.
 
-- [ ] **Step 5: 커밋**
+- [x] **Step 5: 커밋**
 
 ```bash
 git add CLAUDE.md docs/superpowers/plans/2026-08-27-workplace-register-swiftui.md
