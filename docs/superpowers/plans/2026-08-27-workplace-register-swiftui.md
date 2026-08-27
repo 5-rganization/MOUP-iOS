@@ -23,6 +23,7 @@
 - 알림/확인 모달은 `NoticeModalViewControllerSU`를 쓰지 않는다. 주입받은 `UINavigationController`의 `presentNoticeModal(...)`을 쓴다
 - SwiftUI 안에서 `UINavigationController`를 탐색하지 않는다. Coordinator가 주입한 것만 쓴다
 - 브랜치 `task/#113` (base `task/#115`)에서 작업한다
+- Xcode 프로젝트는 `PBXFileSystemSynchronizedRootGroup`(경로 `MOUP`)을 쓴다. **파일을 추가·삭제해도 `project.pbxproj`를 손댈 필요가 없다.** 디스크에 파일을 두면 타깃에 자동 편입된다
 
 **빌드 명령 (모든 태스크 공통):**
 
@@ -286,26 +287,16 @@ cd /Users/macmillan/Projects/XcodeProjects/5rganization/MOUP/MOUP-iOS
 git rm -r MOUP/MOUP/Presentation/WorkRegister MOUP/MOUP/Coordinator/WorkRegister
 ```
 
-- [ ] **Step 3: Xcode 프로젝트 참조 정리**
-
-이 프로젝트는 파일 시스템 동기화 그룹을 쓰지 않을 수 있다. `project.pbxproj`에 삭제된 파일 참조가 남았는지 확인한다:
-
-```bash
-grep -c "WorkRegisterCoordinator.swift\|OLDWorkRegisterViewController.swift" MOUP/MOUP.xcodeproj/project.pbxproj
-```
-
-`0`이 아니면 Xcode에서 해당 그룹을 지워 참조를 정리한 뒤 `project.pbxproj` 변경분을 함께 커밋한다.
-
-- [ ] **Step 4: 빌드**
+- [ ] **Step 3: 빌드**
 
 Run: 위 "빌드 명령"
 Expected: `** BUILD SUCCEEDED **`
 
-- [ ] **Step 5: 시뮬레이터 확인**
+- [ ] **Step 4: 시뮬레이터 확인**
 
 앱을 실행해 캘린더 → 근무 등록/수정이 정상 동작하는지 본다. 죽은 코드를 지운 것이므로 동작 변화가 없어야 한다.
 
-- [ ] **Step 6: 커밋**
+- [ ] **Step 5: 커밋**
 
 ```bash
 git add -A MOUP/ docs/superpowers/plans/2026-08-27-workplace-register-swiftui.md
@@ -589,16 +580,12 @@ grep -n "struct SalaryUpdateRequestDTO" -A 15 Data/DTO/Request/SalaryUpdateReque
 - `WorkplaceCategory`에 `init?(serverStr:)`가 없으면 `LabelColor`와 같은 형태로 추가한다 (`allCases.first(where:)` 방식)
 - `NumberFormatter.formattedWon(from:)`이 없으면 `WizardTextFieldView.swift`의 문서 주석이 쓰는 이름을 따라 확인하고, 없으면 `Common/Utils/Extensions/`에 추가한다
 
-- [ ] **Step 3: Xcode 프로젝트에 새 폴더 추가**
-
-`Presentation/InputForm/WorkplaceRegister/`를 Xcode 프로젝트에 추가한다. 기존 `InputForm/WorkRegister/` 그룹과 같은 방식으로 넣는다.
-
-- [ ] **Step 4: 빌드**
+- [ ] **Step 3: 빌드**
 
 Run: 위 "빌드 명령"
 Expected: `** BUILD SUCCEEDED **`
 
-- [ ] **Step 5: 커밋**
+- [ ] **Step 4: 커밋**
 
 ```bash
 git add MOUP/ docs/superpowers/plans/2026-08-27-workplace-register-swiftui.md
@@ -670,7 +657,17 @@ struct WorkplaceSection: View {
 
 `PaySection`은 행 4개다. 라벨은 기존 UIKit(`Presentation/WorkplaceRegister/View/PayContainer/PayContainerView.swift:17-26`)과 동일하게 **"급여 유형"**(`form.salaryType?.displayText ?? "선택"`), **"급여 계산"**(`form.salaryCalculation?.displayStr ?? "선택"`), **"급여 형태"**(`form.formattedSalaryAmount`), **"급여일"**(`form.formattedPayDay`)로 둔다.
 
-`WorkingConditionsSection`은 `CheckBoxRow` 8개다. 순서와 문구는 `Presentation/WorkplaceRegister/View/WorkingConditionsContainer/WorkingConditionsContainerView.swift:16-33`과 동일하게 "4대 보험", "국민연금", "건강보험", "고용보험", "산재보험", "소득세", "주휴수당", "야간수당". 마스터 행은 저장 필드가 없으므로 커스텀 바인딩을 쓴다:
+`WorkingConditionsSection`은 `CheckBoxRow` 8개다. **먼저 기존 UIKit에 4대 보험 안내 모달이 있는지 확인하고, 그 결과로 `onInfoTap` 파라미터의 유무를 여기서 확정한다.** Task 5는 이 결정을 따르기만 한다.
+
+```bash
+grep -rn "presentNoticeModal\|NoticeModal\|infoButton\|infoRow" \
+  MOUP/MOUP/Presentation/WorkplaceRegister/ViewController/WorkingConditionsContainer/WorkingConditionsContainerViewController.swift \
+  MOUP/MOUP/Presentation/WorkplaceRegister/View/WorkingConditionsContainer/WorkingConditionsContainerView.swift
+```
+
+- 안내 모달이 **있으면** `onInfoTap: (String) -> Void`를 파라미터로 두고, 안내를 띄우는 행만 `showInfo: true`로 한다
+- **없으면** `onInfoTap` 파라미터를 만들지 않고 모든 행을 `showInfo: false`로 둔다. 이 경우 Task 5·7의 `WorkingConditionsSection(form:onInfoTap:)` 호출도 `WorkingConditionsSection(form:)`이 된다
+ 순서와 문구는 `Presentation/WorkplaceRegister/View/WorkingConditionsContainer/WorkingConditionsContainerView.swift:16-33`과 동일하게 "4대 보험", "국민연금", "건강보험", "고용보험", "산재보험", "소득세", "주휴수당", "야간수당". 마스터 행은 저장 필드가 없으므로 커스텀 바인딩을 쓴다:
 
 ```swift
 CheckBoxRow(
@@ -720,7 +717,7 @@ struct CategorySelectView: View {
 }
 ```
 
-- `WorkplaceCategory`, `SalaryType`, `SalaryCalculation`이 `CaseIterable`·`Hashable`이 아니면 채택을 추가한다 (`LabelColor`는 이미 `CaseIterable`)
+- **`SalaryType`과 `SalaryCalculation`은 `CaseIterable`을 채택하지 않았다.** 두 선언을 `enum SalaryType: CaseIterable`, `enum SalaryCalculation: CaseIterable`로 바꾼다 (`Domain/Entities/Salary/`). `LabelColor`와 `WorkplaceCategory`는 이미 `CaseIterable`이다. 연관값 없는 enum이라 `Hashable`은 자동 합성되므로 따로 선언하지 않는다
 - `ColorLabelSelectView`는 `LabelColor.allCases`에서 **`._default`를 제외**한다. 기존 UIKit이 7색(red·orange·yellow·green·blue·indigo·purple)만 노출한다
 - `CategorySelectView`의 좌측 아이콘은 기존 UIKit(`SelectCategoryView.swift:25-49`)이 카테고리별 선택/미선택 이미지를 쓴다. 같은 에셋 이름을 `unselectedLeftImage`/`selectedLeftImage`로 넘긴다
 
@@ -992,6 +989,8 @@ final class WorkplaceRegisterCoordinator: Coordinator {
 
 `WorkplaceRegisterMode`(`create`/`edit(workplaceId:)`)는 `WorkplaceRegisterViewModel.swift`에 정의돼 있고 그 파일은 Task 8에서 지운다. 지금은 그대로 둔다.
 
+이 Coordinator 파일에 **`import SwiftUI`를 추가한다.** `UIHostingController`를 쓰려면 필요하다.
+
 `WorkplaceRegisterCoordinatorProtocol` 채택을 `Coordinator`로 바꾼다. 프로토콜 파일 삭제는 Task 8에서 한다 (`InviteCodeInputCoordinator`가 아직 채택 중이다).
 
 `init(navigationController:isOwner:mode:)` 시그니처는 바꾸지 않는다. 호출처 3곳(`HomeCoordinator.moveToDirectRegistration`, `HomeCoordinator.moveToEditWorkplace`, `WorkplaceRegisterSheetCoordinator.moveToDirectRegistration`)과 진입점 4곳(`HomeViewController` 3곳, `WorkplaceRegisterSheetViewController` 1곳)은 **수정하지 않는다.** 근무지 등록 진입 시트 자체는 UIKit 그대로 둔다.
@@ -1053,24 +1052,7 @@ case .edit(let workplaceId):
 
 Task 5 Step 3의 `start()`에서 `isOwnerInjected`로 갈라 `UIHostingController`를 각각 만든다. `AnyView`로 감싸지 않는다.
 
-```swift
-let hostingVC: UIHostingController<some View>
-if isOwnerInjected {
-    hostingVC = UIHostingController(
-        rootView: OwnerWorkplaceRegisterView(navigationController: navigationController,
-                                             mode: mode,
-                                             workplaceUseCase: useCase)
-    )
-} else {
-    hostingVC = UIHostingController(
-        rootView: WorkplaceRegisterView(navigationController: navigationController,
-                                        mode: mode,
-                                        workplaceUseCase: useCase)
-    )
-}
-```
-
-`some View`를 변수 타입으로 쓸 수 없어 컴파일이 안 되면, `CalendarCoordinator.showWorkerWorkRegister`/`showOwnerWorkRegister`처럼 **분기마다 push까지 하는 별도 메서드**로 나눈다:
+`let hostingVC: UIHostingController<some View>` 형태는 쓰지 않는다 — `some View`는 서로 다른 두 타입에 바인딩되는 변수 타입으로 쓸 수 없어 컴파일되지 않는다. `CalendarCoordinator.showWorkerWorkRegister`/`showOwnerWorkRegister`처럼 **분기마다 push까지 하는 형태**로 쓴다:
 
 ```swift
 func start() {
@@ -1277,24 +1259,16 @@ Expected: 결과 없음. 나오면 그 파일을 고친다.
 
 `InviteCodeResultViewController`가 `InviteCodeInputCoordinator`를 통해 참여 화면으로 가는 경로는 Task 7에서 이미 바꿨으므로 그대로 동작해야 한다.
 
-- [ ] **Step 5: Xcode 프로젝트 참조 정리**
-
-```bash
-grep -c "WorkplaceRegisterViewController.swift\|InviteCodeWorkplaceRegisterViewModel.swift" MOUP/MOUP.xcodeproj/project.pbxproj
-```
-
-`0`이 아니면 Xcode에서 그룹을 정리하고 `project.pbxproj` 변경분을 함께 커밋한다.
-
-- [ ] **Step 6: 빌드**
+- [ ] **Step 5: 빌드**
 
 Run: 위 "빌드 명령"
 Expected: `** BUILD SUCCEEDED **`
 
-- [ ] **Step 7: 시뮬레이터 전체 회귀**
+- [ ] **Step 6: 시뮬레이터 전체 회귀**
 
 알바생 계정으로 직접 등록 · 수정 · 초대코드 참여, 사장님 계정으로 등록 · 수정. Task 5·6·7의 확인 항목을 다시 한 번 훑는다. 추가로 루틴 추가/수정 화면과 마이페이지 닉네임 수정 모달(`OLDCustomTextField` 사용처)이 정상인지 본다.
 
-- [ ] **Step 8: 커밋**
+- [ ] **Step 7: 커밋**
 
 ```bash
 git add -A MOUP/ docs/superpowers/plans/2026-08-27-workplace-register-swiftui.md
