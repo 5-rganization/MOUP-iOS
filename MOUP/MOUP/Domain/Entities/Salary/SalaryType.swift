@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum SalaryType {
+enum SalaryType: CaseIterable {
     case monthly
     case weekly
     case daily

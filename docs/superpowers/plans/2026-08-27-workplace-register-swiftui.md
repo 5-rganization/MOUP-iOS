@@ -649,7 +649,7 @@ git commit -m "feat: #113 - 근무지 폼 상태 모델 구현"
   - `ColorLabelSelectView(labelColor: Binding<LabelColor>)`
   - `PayDayPickerSheet(payDay: Binding<Int>, isPresented: Binding<Bool>)`
 
-- [ ] **Step 1: 섹션 뷰 4개 작성**
+- [x] **Step 1: 섹션 뷰 4개 작성**
 
 각 섹션은 `ContainerView`로 감싸고 행은 `LabelChevronRowView`를 쓴다. 제목과 행 라벨은 기존 UIKit과 동일하게 맞춘다.
 
@@ -696,7 +696,7 @@ CheckBoxRow(
 
 `ColorLabelSection`은 행 하나다. `LabelChevronRowView(leftColor: form.labelColor.labelColor, titleLabel: form.labelColor.displayStr, action: onTap)`.
 
-- [ ] **Step 2: 라디오 선택 위저드 4개 작성**
+- [x] **Step 2: 라디오 선택 위저드 4개 작성**
 
 `CategorySelectView`, `PayTypeSelectView`, `PayCalculationSelectView`, `ColorLabelSelectView`는 구조가 같다.
 
@@ -768,7 +768,7 @@ struct CategorySelectView: View {
 - `ColorLabelSelectView`는 `LabelColor.allCases`에서 **`._default`를 제외**한다. 기존 UIKit이 7색(red·orange·yellow·green·blue·indigo·purple)만 노출한다
 - `CategorySelectView`의 좌측 아이콘은 기존 UIKit(`SelectCategoryView.swift:25-49`)이 카테고리별 선택/미선택 이미지를 쓴다. 같은 에셋 이름을 `unselectedLeftImage`/`selectedLeftImage`로 넘긴다
 
-- [ ] **Step 3: 텍스트 입력 위저드 2개 작성**
+- [x] **Step 3: 텍스트 입력 위저드 2개 작성**
 
 두 화면 모두 Step 2와 같은 "로컬 `@State` → 완료 버튼에서 `@Binding`에 확정" 구조다.
 
@@ -796,20 +796,20 @@ WizardTextFieldView(
 
 금액이 0이면 "완료" 버튼을 비활성으로 둔다.
 
-- [ ] **Step 4: `PayDayPickerSheet` 작성**
+- [x] **Step 4: `PayDayPickerSheet` 작성**
 
 `Array(1...31)`을 `Picker`의 `.wheel` 스타일로 띄운다 (기존 `PayDayPickerView`가 `private let dayRange = Array(1...31)`을 쓴다). `Presentation/InputForm/Components/BreakTimePickerModal.swift`의 시트 레이아웃(그래버 + 확인 버튼)을 그대로 따른다.
 
-- [ ] **Step 5: Preview 추가**
+- [x] **Step 5: Preview 추가**
 
 각 파일에 `#Preview`를 넣어 Xcode Canvas로 렌더링을 확인한다. 섹션 뷰는 `@Previewable`을 쓸 수 없으므로(iOS 16) `.constant(WorkplaceForm())` 대신 래퍼 뷰를 쓰거나 `ContainerView`의 Preview 방식을 따른다.
 
-- [ ] **Step 6: 빌드**
+- [x] **Step 6: 빌드**
 
 Run: 위 "빌드 명령"
 Expected: `** BUILD SUCCEEDED **`
 
-- [ ] **Step 7: 커밋**
+- [x] **Step 7: 커밋**
 
 ```bash
 git add MOUP/ docs/superpowers/plans/2026-08-27-workplace-register-swiftui.md
