@@ -57,7 +57,8 @@ extension WorkData {
             endTime: endTime,
             actualEndTime: actualEndTime,
             restTimeMinutes: restTimeMinutes,
-            memo: memo
+            memo: memo,
+            isMyWork: isMyWork
         )
     }
 

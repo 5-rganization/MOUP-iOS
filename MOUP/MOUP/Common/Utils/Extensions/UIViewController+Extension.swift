@@ -24,9 +24,24 @@ extension UIViewController {
         child.removeFromParent()
     }
     
-    func presentNoticeModal(title: String, comment: String, onConfirm: (() -> Void)? = nil) {
+    /// - Parameter cancelTitle: 취소 버튼 제목. `nil`이면 확인 버튼만 있는 1버튼 모달이 된다.
+    func presentNoticeModal(title: String,
+                            comment: String,
+                            cancelTitle: String? = nil,
+                            confirmTitle: String = "확인",
+                            otherTitle: String? = nil,
+                            onConfirm: (() -> Void)? = nil,
+                            onCancel: (() -> Void)? = nil,
+                            onOther: (() -> Void)? = nil) {
         DispatchQueue.main.async {
-            let vc = NoticeModalViewController(title: title, comment: comment, onConfirm: onConfirm)
+            let vc = NoticeModalViewController(title: title,
+                                               comment: comment,
+                                               cancelTitle: cancelTitle,
+                                               confirmTitle: confirmTitle,
+                                               otherTitle: otherTitle,
+                                               onConfirm: onConfirm,
+                                               onCancel: onCancel,
+                                               onOther: onOther)
             vc.modalPresentationStyle = .overFullScreen
             self.present(vc, animated: false)
         }

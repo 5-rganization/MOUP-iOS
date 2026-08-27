@@ -63,10 +63,12 @@ extension CalendarWorkListCoordinator {
     }
     
     func workerWorkCellTapped(work: WorkSummary) {
+        parentCoordinator?.dismissCalendarWorkList()
         parentCoordinator?.showWorkerWorkRegister(workToEdit: work)
     }
-    
+
     func ownerWorkCellTapped(work: WorkSummary) {
+        parentCoordinator?.dismissCalendarWorkList()
         parentCoordinator?.showOwnerWorkRegister(workToEdit: work)
     }
     
@@ -85,9 +87,9 @@ extension CalendarWorkListCoordinator {
         parentCoordinator?.showWorkerWorkRegister(selectedDate: selectedDate, workToEdit: nil)
     }
     
-    func ownerWorkregisterButtonTapped() {
+    func ownerWorkregisterButtonTapped(selectedDate: Date) {
         parentCoordinator?.dismissCalendarWorkList()
-        parentCoordinator?.showOwnerWorkRegister(workToEdit: nil)
+        parentCoordinator?.showOwnerWorkRegister(selectedDate: selectedDate, workToEdit: nil)
     }
     
     func updateCalendarDataSource() {

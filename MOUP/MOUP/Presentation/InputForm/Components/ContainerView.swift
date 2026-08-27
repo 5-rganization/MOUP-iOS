@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct ContainerView: View {
+    /// 비활성화 상태에서는 입력이 불가하므로 필수 표시(`*`)를 숨긴다.
+    @Environment(\.isEnabled) private var isEnabled
+
     let title: String?
     let isRequired: Bool?
     let rows: [AnyView]
@@ -34,7 +37,7 @@ struct ContainerView: View {
         HStack(spacing: 0) {
             if let title {
                 Text(title)
-                if let isRequired, isRequired == true {
+                if let isRequired, isRequired == true, isEnabled {
                     Text(" *")
                         .foregroundColor(.accentColor)
                 }

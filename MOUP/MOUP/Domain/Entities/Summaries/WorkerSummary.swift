@@ -5,7 +5,7 @@
 //  Created by 서동환 on 10/30/25.
 //
 
-struct WorkerSummary: Codable {
+struct WorkerSummary: Codable, Equatable {
     let id: Int
     let workerBasedLabelColorStr: String?
     let ownerBasedLabelColorStr: String?

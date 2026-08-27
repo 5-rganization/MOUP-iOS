@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct RoutineSummary {
+struct RoutineSummary: Equatable {
     let routineId: Int
     let routineName: String
     let alarmTime: String?

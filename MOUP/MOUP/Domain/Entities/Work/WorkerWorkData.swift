@@ -22,4 +22,6 @@ struct WorkerWorkData {
     let actualEndTime: Date?
     let restTimeMinutes: Int
     let memo: String?
+    /// 사장님 본인 근무인지 여부. 수정 시 호출할 API가 갈린다.
+    let isMyWork: Bool
 }

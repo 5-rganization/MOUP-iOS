@@ -221,6 +221,17 @@ extension CalendarViewController {
     func deselectCell() {
         if let selectedDate { calendarView.getMonthCalendarView.deselect(dates: [selectedDate]) }
     }
+
+    /// 선택된 날짜를 옮긴다.
+    ///
+    /// 근무를 다른 날짜로 수정한 뒤 돌아왔을 때, 바뀐 날짜의 근무 목록이 뜨도록 하기 위해 쓴다.
+    /// 실제 선택은 `viewDidAppear`에서 이루어진다.
+    func moveSelectedDate(to date: Date) {
+        guard selectedDate != date else { return }
+
+        deselectCell()
+        selectedDate = date
+    }
 }
 
 // MARK: - Private Calendar Methods

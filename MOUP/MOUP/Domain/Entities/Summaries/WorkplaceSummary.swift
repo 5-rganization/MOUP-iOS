@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct WorkplaceSummary {
+struct WorkplaceSummary: Equatable {
     let id: Int
     let name: String
     let isShared: Bool

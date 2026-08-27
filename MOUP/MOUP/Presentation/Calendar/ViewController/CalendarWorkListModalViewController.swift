@@ -111,7 +111,7 @@ private extension CalendarWorkListModalViewController {
                 if UserRole(rawValue: UserDefaultsManager.shared.userRole ?? UserRole.worker.rawValue) == .worker {
                     owner.coordinator?.workerWorkregisterButtonTapped(selectedDate: owner.selectedDate)
                 } else {
-                    owner.coordinator?.ownerWorkregisterButtonTapped()
+                    owner.coordinator?.ownerWorkregisterButtonTapped(selectedDate: owner.selectedDate)
                 }
             }.disposed(by: disposeBag)
         

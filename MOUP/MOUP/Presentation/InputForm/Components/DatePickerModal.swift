@@ -18,17 +18,7 @@ struct DatePickerModal: View {
     @State private var selectedMonth: Int
     @State private var selectedDay: Int
     
-    private let years: [Int]
-    private let months = Array(1...12)
     private let calendar = Calendar(identifier: .gregorian)
-    
-    var days: [Int] {
-        if let date = calendar.date(from: DateComponents(year: selectedYear, month: selectedMonth)),
-           let range = calendar.range(of: .day, in: .month, for: date) {
-            return Array(range)
-        }
-        return Array(1...31)
-    }
     
     // MARK: - Initializer
     
@@ -39,7 +29,6 @@ struct DatePickerModal: View {
         let date = selectedDate.wrappedValue
         let calendar = Calendar.current
         
-        self.years = Array(CalendarRange.startYear...CalendarRange.endYear)
         self._selectedYear = State(initialValue: calendar.component(.year, from: date))
         self._selectedMonth = State(initialValue: calendar.component(.month, from: date))
         self._selectedDay = State(initialValue: calendar.component(.day, from: date))
@@ -81,17 +70,6 @@ struct DatePickerModal: View {
         .background(.primaryBackground)
         .presentationDetents([.height(320)])
         .presentationDragIndicator(.hidden)
-    }
-}
-
-// MARK: - Private Methods
-
-private extension DatePickerModal {
-    func clampDay() {
-        let maxDay = days.last ?? 31
-        if selectedDay > maxDay {
-            selectedDay = maxDay
-        }
     }
 }
 

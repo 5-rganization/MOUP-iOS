@@ -5,8 +5,9 @@
 //  Created by 양원식 on 7/14/25.
 //
 
-import UIKit
 import OSLog
+import SwiftUI
+import UIKit
 
 import RxSwift
 
@@ -28,7 +29,12 @@ final class CalendarCoordinator: Coordinator {
     private let workplaceService: WorkplaceServiceProtocol
     private let workplaceRepository: WorkplaceRepositoryProtocol
     private let workplaceUseCase: WorkplaceUseCaseProtocol
-    
+
+    /// 사장님 근무 등록 화면의 근무자 목록 조회에만 쓴다.
+    private lazy var attendanceUseCase = AttendanceUseCase(
+        attendanceRepository: AttendanceRepository(attendanceService: AttendanceService())
+    )
+
     // MARK: - Initializer
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
@@ -77,7 +83,7 @@ final class CalendarCoordinator: Coordinator {
         calendarWorkListCoordinator.start()
         childCoordinators.append(calendarWorkListCoordinator)
     }
-    
+
     func dismissCalendarWorkList() {
         navigationController.dismiss(animated: true)
     }
@@ -123,30 +129,48 @@ extension CalendarCoordinator {
 
 // MARK: - CalendarWorkListCoordinator Methods
 extension CalendarCoordinator {
-    // TODO: 근무 엔티티를 직접 전달 or 근무 ID만 전달
-    /// 근무 등록 화면 표시
+    /// 알바생 근무 등록/수정 화면 표시
+    ///
+    /// SwiftUI로 재구현한 화면이라 `UIHostingController`로 감싸 push 한다.
+    /// 저장 후 pop 하면 `CalendarViewController.viewWillAppear`가 재조회하므로 별도 갱신 통지는 필요 없다.
     func showWorkerWorkRegister(selectedDate: Date? = nil, workToEdit: WorkSummary?) {
-        if let workToEdit {
-            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate, mode: .edit(workId: workToEdit.id))
-            childCoordinators.append(coordinator)
-            coordinator.start()
-        } else {
-            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate, mode: .create)
-            childCoordinators.append(coordinator)
-            coordinator.start()
-        }
+        let mode: WorkerWorkRegisterView.Mode = workToEdit.map { .edit(workId: $0.id) }
+            ?? .create(selectedDate: selectedDate ?? .now)
+
+        let hostingVC = UIHostingController(
+            rootView: WorkerWorkRegisterView(navigationController: navigationController,
+                                             mode: mode,
+                                             workUseCase: workUseCase,
+                                             workplaceUseCase: workplaceUseCase,
+                                             // 저장한 날짜로 선택을 옮겨야 복귀 후 그 날짜의 근무 목록이 뜬다.
+                                             onSaved: { [weak self] date in
+                                                 self?.calendarVC.moveSelectedDate(to: date)
+                                             })
+        )
+        hostingVC.hidesBottomBarWhenPushed = true
+        navigationController.pushViewController(hostingVC, animated: true)
     }
     
+    /// 사장님 근무 등록/수정 화면 표시
+    ///
+    /// 알바생 화면과 같은 방식으로 SwiftUI 루트를 `UIHostingController`로 감싸 push 한다.
     func showOwnerWorkRegister(selectedDate: Date? = nil, workToEdit: WorkSummary?) {
-        if let workToEdit {
-            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: false, selectedDate: selectedDate, mode: .edit(workId: workToEdit.id))
-            childCoordinators.append(coordinator)
-            coordinator.start()
-        } else {
-            let coordinator = WorkRegisterCoordinator(navigationController: navigationController, isOwnerInjected: true, selectedDate: selectedDate, mode: .create)
-            childCoordinators.append(coordinator)
-            coordinator.start()
-        }
+        let mode: OwnerWorkRegisterView.Mode = workToEdit.map { .edit(workId: $0.id) }
+            ?? .create(selectedDate: selectedDate ?? .now)
+
+        let hostingVC = UIHostingController(
+            rootView: OwnerWorkRegisterView(navigationController: navigationController,
+                                            mode: mode,
+                                            workUseCase: workUseCase,
+                                            workplaceUseCase: workplaceUseCase,
+                                            attendanceUseCase: attendanceUseCase,
+                                            // 저장한 날짜로 선택을 옮겨야 복귀 후 그 날짜의 근무 목록이 뜬다.
+                                            onSaved: { [weak self] date in
+                                                self?.calendarVC.moveSelectedDate(to: date)
+                                            })
+        )
+        hostingVC.hidesBottomBarWhenPushed = true
+        navigationController.pushViewController(hostingVC, animated: true)
     }
     
     /// 캘린더 업데이트 요청

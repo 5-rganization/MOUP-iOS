@@ -27,7 +27,7 @@ struct FailedWorkerInfoDTO: Decodable {
 
 extension FailedWorkerInfoDTO {
     func toDomain() -> FailedWorkerInfo {
-        FailedWorkerInfo(nickname: nickname, reason: reason)
+        FailedWorkerInfo(workerId: workerId, nickname: nickname, reason: reason)
     }
 }
 

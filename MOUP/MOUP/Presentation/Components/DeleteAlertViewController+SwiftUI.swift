@@ -218,6 +218,9 @@ import SwiftUI
 
 /// `DeleteAlertViewController`의 SwiftUI 래퍼
 ///
+/// > 현재 앱에서 쓰이지 않는다. 삭제 확인도 `NoticeModalViewControllerSU`와 같은 이유로
+/// > 주입받은 `UINavigationController`에서 띄운다.
+///
 /// **사용 예시**
 /// ```swift
 /// @State private var showDeleteAlert = false

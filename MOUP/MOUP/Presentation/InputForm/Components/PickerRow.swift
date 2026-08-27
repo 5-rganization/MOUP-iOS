@@ -39,7 +39,7 @@ struct PickerRow: View {
                     // 비활성화 상태: 라벨만 표시
                     Text(buttonTitle)
                         .font(.bodyMedium(16))
-                        .foregroundStyle(.gray700)
+                        .foregroundStyle(.gray900)
                 }
             }
             .padding(.horizontal, 16)
@@ -47,6 +47,6 @@ struct PickerRow: View {
             .frame(height: 48)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(FormRowButtonStyle())
     }
 }
