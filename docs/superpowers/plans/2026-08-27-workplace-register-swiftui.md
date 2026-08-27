@@ -1174,7 +1174,7 @@ git commit -m "feat: #113 - 사장님 근무지 등록/수정 화면 SwiftUI 재
 - Consumes: Task 3의 `WorkplaceForm`(`joinRequestDTO(inviteCode:)`, `isJoinValid`), Task 4의 `PaySection`·`WorkingConditionsSection`·`ColorLabelSection`과 급여·색상 위저드 4개, `WorkplaceUseCaseProtocol.joinWorkplace(request:)`
 - Produces: `InviteCodeWorkplaceRegisterView(navigationController:workplaceName:inviteCode:workplaceUseCase:onJoined:)` — `navigationController`와 `onJoined`는 기본값 `nil`
 
-- [ ] **Step 0: 레거시 타입명 충돌 해소 (선행 필수)**
+- [x] **Step 0: 레거시 타입명 충돌 해소 (선행 필수)**
 
 `MOUP/MOUP/Presentation/Home/View/InviteCodeWorkplaceRegisterView.swift:15`에 `final class InviteCodeWorkplaceRegisterView: UIView`가 이미 있다. Task 5·6과 같은 방식으로 레거시 쪽에 `OLD` 접두사를 붙인다.
 
@@ -1186,7 +1186,7 @@ grep -rn "InviteCodeWorkplaceRegisterView\b" --include="*.swift" MOUP/MOUP/ | gr
 
 `InviteCodeWorkplaceRegisterViewController`가 이 타입을 쓴다. `OLDInviteCodeWorkplaceRegisterView`로 바꾼다. **`InviteCodeWorkplaceRegisterViewModel`과 `InviteCodeWorkplaceRegisterViewController`는 이름이 겹치지 않으므로 건드리지 마라.** 리네임은 Step 4의 커밋에 함께 포함한다.
 
-- [ ] **Step 1: `InviteCodeWorkplaceRegisterView` 작성**
+- [x] **Step 1: `InviteCodeWorkplaceRegisterView` 작성**
 
 등록 전용이라 `Mode`가 없다. 근무지 이름은 초대코드가 결정하므로 읽기 전용으로 보여준다.
 
@@ -1239,7 +1239,7 @@ func join() async {
 
 따라서 뷰는 `onJoined?()`만 호출하고, `InviteCodeInputCoordinator`가 그 콜백에 `moveToHomeAfterJoin()`을 연결한다. 뷰가 직접 스택을 만지지 않는다.
 
-- [ ] **Step 2: `InviteCodeInputCoordinator` 정리**
+- [x] **Step 2: `InviteCodeInputCoordinator` 정리**
 
 `lazy var` ViewModel 6개(`selectPayTypeVM`, `selectPayCalcVM`, `inputSalaryTypeVM`, `payDayPickerVM`, `workingConditionsVM`, `selectColorLabelVM`, `colorLabelVM`, `payVM`)를 전부 삭제한다.
 
@@ -1263,12 +1263,12 @@ func moveToInviteCodeWorkplaceRegister(workplaceName: String, inviteCode: String
 
 `import UIKit`에 더해 `import SwiftUI`가 필요하다.
 
-- [ ] **Step 3: 빌드**
+- [x] **Step 3: 빌드**
 
 Run: 위 "빌드 명령"
 Expected: `** BUILD SUCCEEDED **`
 
-- [ ] **Step 4: 시뮬레이터 확인 (알바생 계정)**
+- [ ] **Step 4: 시뮬레이터 확인 (알바생 계정)** — 미수행. 알바생 계정 로그인·유효한 초대코드·실서버 API가 필요해 사용자 몫으로 남김.
 
 1. 홈 → 근무지 추가 → 초대코드 입력 → 코드 조회 → 결과 → 참여 화면 진입
 2. 근무지 이름이 읽기 전용으로 뜨는지, 근무지 섹션(이름·카테고리 편집)이 **없는지**
@@ -1276,7 +1276,7 @@ Expected: `** BUILD SUCCEEDED **`
 4. 급여 계산을 **고정급**으로 놓고 참여 → 반대인지
 5. 참여 성공 후 이동 화면이 기존과 같은지
 
-- [ ] **Step 5: 커밋**
+- [x] **Step 5: 커밋**
 
 ```bash
 git add MOUP/ docs/superpowers/plans/2026-08-27-workplace-register-swiftui.md

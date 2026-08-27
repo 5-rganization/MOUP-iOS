@@ -1,5 +1,5 @@
 //
-//  InviteCodeWorkplaceRegisterView.swift
+//  OLDInviteCodeWorkplaceRegisterView.swift
 //  MOUP
 //
 //  Created by 양원식 on 11/15/25.
@@ -12,7 +12,7 @@ import RxSwift
 import SnapKit
 import Then
 
-final class InviteCodeWorkplaceRegisterView: UIView {
+final class OLDInviteCodeWorkplaceRegisterView: UIView {
     
     // MARK: - Properties
     fileprivate let navigationBar = BaseNavigationBar(title: "초대코드 근무지 추가")
@@ -68,7 +68,7 @@ final class InviteCodeWorkplaceRegisterView: UIView {
     }
 }
 
-private extension InviteCodeWorkplaceRegisterView {
+private extension OLDInviteCodeWorkplaceRegisterView {
     // MARK: - configure
     func configure() {
         setHierarchy()
@@ -136,7 +136,7 @@ private extension InviteCodeWorkplaceRegisterView {
     }
 }
 
-extension Reactive where Base: InviteCodeWorkplaceRegisterView {
+extension Reactive where Base: OLDInviteCodeWorkplaceRegisterView {
     var navBackBtnTapped: ControlEvent<Void> {
         return base.navigationBar.rx.backBtnTapped
     }

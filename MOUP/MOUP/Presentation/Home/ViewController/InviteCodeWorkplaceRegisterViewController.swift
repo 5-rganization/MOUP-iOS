@@ -12,7 +12,7 @@ import RxCocoa
 final class InviteCodeWorkplaceRegisterViewController: UIViewController {
     
     // MARK: - UI
-    private let rootView = InviteCodeWorkplaceRegisterView()
+    private let rootView = OLDInviteCodeWorkplaceRegisterView()
 
     // MARK: - DI
     private let viewModel: InviteCodeWorkplaceRegisterViewModel
@@ -36,14 +36,18 @@ final class InviteCodeWorkplaceRegisterViewController: UIViewController {
 
         self.payContainerVC = PayContainerViewController(
             viewModel: viewModel.payVM,
-            coordinator: coordinator
+            // 이 화면은 더 이상 어떤 Coordinator에서도 생성되지 않는 죽은 코드다(SwiftUI
+            // InviteCodeWorkplaceRegisterView로 대체됨). InviteCodeInputCoordinator가
+            // WorkplaceRegisterCoordinatorProtocol 채택을 그만두면서 생긴 타입 불일치를
+            // 피하기 위해 nil을 넘긴다 — 실행되지 않는 경로라 동작에 영향 없다.
+            coordinator: nil
         )
         self.workingConditionsContainerVC = WorkingConditionsContainerViewController(
             viewModel: viewModel.workingConditionsVM
         )
         self.colorLabelContainerVC = ColorLabelContainerViewController(
             viewModel: viewModel.colorLabelVM,
-            coordinator: coordinator
+            coordinator: nil
         )
 
         super.init(nibName: nil, bundle: nil)
