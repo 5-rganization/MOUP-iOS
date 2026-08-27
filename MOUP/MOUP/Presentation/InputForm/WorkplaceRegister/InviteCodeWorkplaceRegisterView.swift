@@ -124,6 +124,8 @@ struct InviteCodeWorkplaceRegisterView: View {
     }
 
     func join() async {
+        guard form.isJoinValid, !isSaving else { return }
+
         isSaving = true
         defer { isSaving = false }
 

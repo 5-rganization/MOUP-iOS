@@ -158,6 +158,8 @@ struct WorkplaceRegisterView: View {
     }
 
     func save() async {
+        guard form.isWorkerValid, !isSaving else { return }
+
         isSaving = true
         defer { isSaving = false }
 

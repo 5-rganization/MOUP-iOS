@@ -133,6 +133,8 @@ struct OwnerWorkplaceRegisterView: View {
     }
 
     func save() async {
+        guard form.isOwnerValid, !isSaving else { return }
+
         isSaving = true
         defer { isSaving = false }
 

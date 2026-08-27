@@ -34,6 +34,10 @@ struct SalaryInputView: View {
         salaryCalculation == .fixed ? "고정급을 입력해주세요." : "시급을 입력해주세요."
     }
 
+    private var placeholderText: String {
+        salaryCalculation == .fixed ? "\(MinimumWage.monthly)원" : "\(MinimumWage.hourly)원"
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             BaseNavigationBarSU(title: navTitle, onBackTap: { dismiss() })
@@ -45,12 +49,13 @@ struct SalaryInputView: View {
                         .foregroundStyle(.gray900)
 
                     WizardTextFieldView(
-                        placeholder: "10,030원",
+                        placeholder: placeholderText,
                         text: Binding<String>(
-                            get: { localAmount == 0 ? "" : NumberFormatter.formattedWon(from: localAmount) },
+                            get: { localAmount == 0 ? "" : NumberFormatter.formattedDecimal(from: String(localAmount)) },
                             set: { localAmount = Int($0.filter { $0.isNumber }) ?? 0 }
                         ),
-                        keyboardType: .numberPad
+                        keyboardType: .numberPad,
+                        regexStr: "^[0-9,]*$"
                     )
                 }
                 .padding(.horizontal, 16)
