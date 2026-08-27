@@ -1302,7 +1302,7 @@ git commit -m "feat: #113 - 초대코드 근무지 참여 화면 SwiftUI 재구�
 - Consumes: 없음
 - Produces: 없음 (삭제 + 이동)
 
-- [ ] **Step 1: `OLDCustomTextField` 이동**
+- [x] **Step 1: `OLDCustomTextField` 이동**
 
 `Routine/AddRoutineView`, `Routine/EditRoutineView`, `MyPage/EditModal`이 **현재 사용 중**이다. 지우면 안 된다.
 
@@ -1317,7 +1317,7 @@ git mv MOUP/MOUP/Presentation/WorkplaceRegister/Utils/OLDCustomTextField.swift \
 grep -rln "OLDCustomTextField" --include="*.swift" MOUP/MOUP/Presentation/
 ```
 
-- [ ] **Step 2: `WorkplaceRegisterMode` 옮기기**
+- [x] **Step 2: `WorkplaceRegisterMode` 옮기기**
 
 `enum WorkplaceRegisterMode`가 삭제 대상인 `WorkplaceRegisterViewModel.swift` 안에 있고 `HomeCoordinator`·`WorkplaceRegisterCoordinator`가 쓴다.
 
@@ -1327,7 +1327,7 @@ grep -rn "WorkplaceRegisterMode" --include="*.swift" MOUP/MOUP/
 
 `Coordinator/WorkplaceRegister/WorkplaceRegisterCoordinator.swift` 상단으로 정의를 옮긴다. 다른 곳에서도 쓰면 `Presentation/Utils/Enums/`로 옮긴다.
 
-- [ ] **Step 3: 삭제**
+- [x] **Step 3: 삭제**
 
 ```bash
 git rm -r MOUP/MOUP/Presentation/WorkplaceRegister
@@ -1337,7 +1337,7 @@ git rm MOUP/MOUP/Presentation/Home/View/OLDInviteCodeWorkplaceRegisterView.swift
        MOUP/MOUP/Coordinator/WorkplaceRegister/Protocol/WorkplaceRegisterCoordinatorProtocol.swift
 ```
 
-- [ ] **Step 4: 남은 참조 정리**
+- [x] **Step 4: 남은 참조 정리**
 
 ```bash
 cd MOUP/MOUP
@@ -1348,7 +1348,7 @@ Expected: 결과 없음. 나오면 그 파일을 고친다.
 
 `InviteCodeResultViewController`가 `InviteCodeInputCoordinator`를 통해 참여 화면으로 가는 경로는 Task 7에서 이미 바꿨으므로 그대로 동작해야 한다.
 
-- [ ] **Step 5: 빌드**
+- [x] **Step 5: 빌드**
 
 Run: 위 "빌드 명령"
 Expected: `** BUILD SUCCEEDED **`
@@ -1357,7 +1357,7 @@ Expected: `** BUILD SUCCEEDED **`
 
 알바생 계정으로 직접 등록 · 수정 · 초대코드 참여, 사장님 계정으로 등록 · 수정. Task 5·6·7의 확인 항목을 다시 한 번 훑는다. 추가로 루틴 추가/수정 화면과 마이페이지 닉네임 수정 모달(`OLDCustomTextField` 사용처)이 정상인지 본다.
 
-- [ ] **Step 7: 커밋**
+- [x] **Step 7: 커밋**
 
 ```bash
 git add -A MOUP/ docs/superpowers/plans/2026-08-27-workplace-register-swiftui.md

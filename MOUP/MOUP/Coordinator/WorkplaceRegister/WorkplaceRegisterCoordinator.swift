@@ -8,6 +8,11 @@
 import SwiftUI
 import UIKit
 
+enum WorkplaceRegisterMode {
+    case create
+    case edit(workplaceId: Int)
+}
+
 final class WorkplaceRegisterCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     private let navigationController: UINavigationController

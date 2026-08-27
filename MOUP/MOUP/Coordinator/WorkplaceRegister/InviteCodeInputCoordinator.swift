@@ -7,7 +7,6 @@
 
 import SwiftUI
 import UIKit
-import RxSwift
 
 final class InviteCodeInputCoordinator: Coordinator {
 
