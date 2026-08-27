@@ -287,13 +287,13 @@ struct MyWorkFormView: View {
             switch mode {
             case .create:
                 _ = try await workUseCase.createMyWork(workplaceId: workplace.id,
-                                                       requestDTO: form.createRequestDTO)
+                                                       requestDTO: form.myCreateRequestDTO)
             case .edit(let workId) where appliesToRecurring:
                 _ = try await workUseCase.updateMyRecurringWork(workId: workId,
-                                                                requestDTO: form.updateRequestDTO)
+                                                                requestDTO: form.myUpdateRequestDTO)
             case .edit(let workId):
                 try await workUseCase.updateMySingleWork(workId: workId,
-                                                         requestDTO: form.updateRequestDTO)
+                                                         requestDTO: form.myUpdateRequestDTO)
             }
             onSaved?(form.selectedDate)
             navigationController?.popViewController(animated: true)

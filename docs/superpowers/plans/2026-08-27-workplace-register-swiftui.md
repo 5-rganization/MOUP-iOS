@@ -49,7 +49,7 @@ xcodebuild -workspace MOUP/MOUP.xcworkspace -scheme MOUP \
 - Consumes: 없음
 - Produces: `protocol WorkFormSchedule`. 채택 타입에 `formattedStartTime: String`, `formattedEndTime: String`, `formattedBreakTime: String`, `hasRepeat: Bool`, `formattedRepeatDays: String`, `formattedRoutineCount: String`, `startDateTime: Date`, `endDateTime: Date`, `myCreateRequestDTO: MyWorkCreateRequestDTO`, `myUpdateRequestDTO: MyWorkUpdateRequestDTO`를 제공한다
 
-- [ ] **Step 1: `WorkFormSchedule.swift` 생성**
+- [x] **Step 1: `WorkFormSchedule.swift` 생성**
 
 ```swift
 //
@@ -193,7 +193,7 @@ extension WorkFormSchedule {
 }
 ```
 
-- [ ] **Step 2: `MyWorkForm`에서 중복분 제거**
+- [x] **Step 2: `MyWorkForm`에서 중복분 제거**
 
 `struct MyWorkForm: Equatable`을 `struct MyWorkForm: Equatable, WorkFormSchedule`로 바꾼다.
 
@@ -207,7 +207,7 @@ struct 본문의 파생 프로퍼티 중 아래를 **삭제**한다:
 
 `MARK: - DTO 변환` 익스텐션이 비면 익스텐션째 삭제한다.
 
-- [ ] **Step 3: `WorkerWorkForm`에서 중복분 제거**
+- [x] **Step 3: `WorkerWorkForm`에서 중복분 제거**
 
 `struct WorkerWorkForm: Equatable`을 `struct WorkerWorkForm: Equatable, WorkFormSchedule`로 바꾼다.
 
@@ -215,7 +215,7 @@ Step 2와 같은 목록을 삭제하되, `myCreateRequestDTO`와 `myUpdateReques
 
 **남기는 것:** 저장 프로퍼티 전부, 두 이니셜라이저, `formattedDate`, `formattedWorkers`, `isValid`, `workersCreateRequestDTO`, `updateRequestDTO`(근무자용).
 
-- [ ] **Step 4: `MyWorkFormView`의 DTO 프로퍼티 이름 변경**
+- [x] **Step 4: `MyWorkFormView`의 DTO 프로퍼티 이름 변경**
 
 `MyWorkFormView.save(appliesToRecurring:)`에서 `form.createRequestDTO` → `form.myCreateRequestDTO`, `form.updateRequestDTO` → `form.myUpdateRequestDTO`로 바꾼다. 3곳이다.
 
@@ -224,7 +224,7 @@ grep -n "form.createRequestDTO\|form.updateRequestDTO" \
   MOUP/MOUP/Presentation/InputForm/WorkRegister/MyWork/MyWorkFormView.swift
 ```
 
-- [ ] **Step 5: 빌드**
+- [x] **Step 5: 빌드**
 
 Run: 위 "빌드 명령"
 Expected: `** BUILD SUCCEEDED **`
@@ -238,7 +238,7 @@ grep -rn "\.createRequestDTO\|\.updateRequestDTO" --include="*.swift" MOUP/MOUP/
 
 캘린더 → 근무 등록/수정 진입. 반복 설정과 휴게시간 표시가 이전과 같은지, 저장이 되는지 확인한다. 파생 값만 옮겼으므로 화면은 동일해야 한다.
 
-- [ ] **Step 7: 커밋**
+- [x] **Step 7: 커밋**
 
 ```bash
 git add MOUP/MOUP/Presentation/InputForm/WorkRegister/ docs/superpowers/plans/2026-08-27-workplace-register-swiftui.md
