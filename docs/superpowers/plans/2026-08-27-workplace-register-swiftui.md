@@ -1076,6 +1076,23 @@ git commit -m "feat: #113 - 알바생 근무지 등록/수정 화면 SwiftUI 재
 - Consumes: Task 3의 `WorkplaceForm`(`ownerCreateRequestDTO`, `ownerUpdateRequestDTO`, `isOwnerValid`), Task 4의 `WorkplaceSection`·`ColorLabelSection`·`NameInputView`·`CategorySelectView`·`ColorLabelSelectView`, `WorkplaceUseCaseProtocol.createOwnerWorkplace(request:)`
 - Produces: `OwnerWorkplaceRegisterView(navigationController:mode:workplaceUseCase:onSaved:)` — `navigationController`와 `onSaved`는 기본값 `nil`. `typealias Mode = WorkplaceRegisterView.Mode`
 
+- [ ] **Step 0: 레거시 타입명 충돌 해소 (선행 필수)**
+
+`MOUP/MOUP/Presentation/WorkplaceRegister/View/OwnerWorkplaceRegisterView.swift:15`에 `final class OwnerWorkplaceRegisterView: UIView`가 이미 있다. 같은 이름의 SwiftUI `struct`를 만들면 컴파일이 깨진다. 이슈 #113이 정한 규칙(`이전 화면 클래스명 앞에 OLD 붙일 것`)대로 레거시 쪽을 먼저 옮긴다. Task 5가 `WorkplaceRegisterView`에 대해 같은 처리를 했다.
+
+```bash
+git mv MOUP/MOUP/Presentation/WorkplaceRegister/View/OwnerWorkplaceRegisterView.swift \
+       MOUP/MOUP/Presentation/WorkplaceRegister/View/OLDOwnerWorkplaceRegisterView.swift
+```
+
+파일 안의 타입명과 참조처를 함께 고친다:
+
+```bash
+grep -rn "OwnerWorkplaceRegisterView\b" --include="*.swift" MOUP/MOUP/ | grep -v "InputForm/"
+```
+
+`OwnerWorkplaceRegisterViewController`가 이 타입을 쓴다. `OLDOwnerWorkplaceRegisterView`로 바꾼다. **`OwnerWorkplaceRegisterViewModel`과 `OwnerWorkplaceRegisterViewController`는 이름이 겹치지 않으므로 건드리지 마라.**
+
 - [ ] **Step 1: `OwnerWorkplaceRegisterView` 작성**
 
 Task 5의 `WorkplaceRegisterView`와 같은 구조에서 섹션을 2개(`WorkplaceSection`, `ColorLabelSection`)로 줄이고, 위저드도 3개(`NameInputView`, `CategorySelectView`, `ColorLabelSelectView`)만 둔다. `Mode`는 `typealias Mode = WorkplaceRegisterView.Mode`로 재사용한다.
@@ -1140,6 +1157,7 @@ Expected: `** BUILD SUCCEEDED **`
 ```bash
 git add MOUP/ docs/superpowers/plans/2026-08-27-workplace-register-swiftui.md
 git commit -m "feat: #113 - 사장님 근무지 등록/수정 화면 SwiftUI 재구현"
+# Step 0의 리네임도 같은 커밋에 포함한다 (분리하면 중간 상태에서 빌드가 깨진다)
 ```
 
 ---
@@ -1153,6 +1171,18 @@ git commit -m "feat: #113 - 사장님 근무지 등록/수정 화면 SwiftUI 재
 **Interfaces:**
 - Consumes: Task 3의 `WorkplaceForm`(`joinRequestDTO(inviteCode:)`, `isJoinValid`), Task 4의 `PaySection`·`WorkingConditionsSection`·`ColorLabelSection`과 급여·색상 위저드 4개, `WorkplaceUseCaseProtocol.joinWorkplace(request:)`
 - Produces: `InviteCodeWorkplaceRegisterView(navigationController:workplaceName:inviteCode:workplaceUseCase:onJoined:)` — `navigationController`와 `onJoined`는 기본값 `nil`
+
+- [ ] **Step 0: 레거시 타입명 충돌 해소 (선행 필수)**
+
+`MOUP/MOUP/Presentation/Home/View/InviteCodeWorkplaceRegisterView.swift:15`에 `final class InviteCodeWorkplaceRegisterView: UIView`가 이미 있다. Task 5·6과 같은 방식으로 레거시 쪽에 `OLD` 접두사를 붙인다.
+
+```bash
+git mv MOUP/MOUP/Presentation/Home/View/InviteCodeWorkplaceRegisterView.swift \
+       MOUP/MOUP/Presentation/Home/View/OLDInviteCodeWorkplaceRegisterView.swift
+grep -rn "InviteCodeWorkplaceRegisterView\b" --include="*.swift" MOUP/MOUP/ | grep -v "InputForm/"
+```
+
+`InviteCodeWorkplaceRegisterViewController`가 이 타입을 쓴다. `OLDInviteCodeWorkplaceRegisterView`로 바꾼다. **`InviteCodeWorkplaceRegisterViewModel`과 `InviteCodeWorkplaceRegisterViewController`는 이름이 겹치지 않으므로 건드리지 마라.** 리네임은 Step 4의 커밋에 함께 포함한다.
 
 - [ ] **Step 1: `InviteCodeWorkplaceRegisterView` 작성**
 
@@ -1254,7 +1284,7 @@ git commit -m "feat: #113 - 초대코드 근무지 참여 화면 SwiftUI 재구�
 **Files:**
 - Move: `MOUP/MOUP/Presentation/WorkplaceRegister/Utils/OLDCustomTextField.swift` → `MOUP/MOUP/Presentation/Utils/OLDCustomTextField.swift`
 - Delete: `MOUP/MOUP/Presentation/WorkplaceRegister/` 나머지 전체 (44 swift 파일)
-- Delete: `MOUP/MOUP/Presentation/Home/View/InviteCodeWorkplaceRegisterView.swift`
+- Delete: `MOUP/MOUP/Presentation/Home/View/OLDInviteCodeWorkplaceRegisterView.swift` (Task 7에서 `OLD` 접두사가 붙었다)
 - Delete: `MOUP/MOUP/Presentation/Home/ViewController/InviteCodeWorkplaceRegisterViewController.swift`
 - Delete: `MOUP/MOUP/Presentation/Home/ViewModel/InviteCodeWorkplaceRegisterViewModel.swift`
 - Delete: `MOUP/MOUP/Coordinator/WorkplaceRegister/Protocol/WorkplaceRegisterCoordinatorProtocol.swift`
@@ -1293,7 +1323,7 @@ grep -rn "WorkplaceRegisterMode" --include="*.swift" MOUP/MOUP/
 
 ```bash
 git rm -r MOUP/MOUP/Presentation/WorkplaceRegister
-git rm MOUP/MOUP/Presentation/Home/View/InviteCodeWorkplaceRegisterView.swift \
+git rm MOUP/MOUP/Presentation/Home/View/OLDInviteCodeWorkplaceRegisterView.swift \
        MOUP/MOUP/Presentation/Home/ViewController/InviteCodeWorkplaceRegisterViewController.swift \
        MOUP/MOUP/Presentation/Home/ViewModel/InviteCodeWorkplaceRegisterViewModel.swift \
        MOUP/MOUP/Coordinator/WorkplaceRegister/Protocol/WorkplaceRegisterCoordinatorProtocol.swift
