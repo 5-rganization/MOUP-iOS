@@ -112,11 +112,13 @@ DTO 변환 4종:
 | `createRequestDTO` | `WorkplaceCreateRequestDTO` | 알바생 직접 등록 |
 | `ownerCreateRequestDTO` | `OwnerWorkplaceCreateRequestDTO` | 사장님 등록 |
 | `joinRequestDTO(inviteCode:)` | `WorkplaceJoinRequestDTO` | 초대코드 참여 |
-| `updateRequestDTO` | `UpdateWorkplaceRequestDTO` | 알바생·사장님 수정 |
+| `workerUpdateRequestDTO` | `UpdateWorkplaceRequestDTO` | 알바생 수정 |
+| `ownerUpdateRequestDTO` | `UpdateWorkplaceRequestDTO` | 사장님 수정 |
 
 서버 스펙의 비대칭을 그대로 재현한다.
 
-- 색상 키가 역할별로 다르다: 알바생 `workerBasedLabelColor`, 사장님 `ownerBasedLabelColor`
+- 색상 키가 역할별로 다르다: 알바생 `workerBasedLabelColor`, 사장님 `ownerBasedLabelColor`. `UpdateWorkplaceRequestDTO`는 둘 다 옵셔널로 갖고 하나만 채우며, `salaryUpdateRequest`도 알바생일 때만 보낸다 — 그래서 수정 DTO를 역할별로 나눈다
+- **사장님 수정은 기존 UIKit에 구현돼 있지 않다.** `OwnerWorkplaceRegisterViewModel`의 수정 분기가 `print("[TODO] 수정 API 연결 필요")`로 비어 있다. 이번에 `updateWorkplace` 호출을 붙여 완성한다 — 재구현 범위를 넘지만, 그러지 않으면 "수정하기" 버튼이 아무 일도 하지 않는 화면을 그대로 옮기게 된다
 - `SalaryJoinCreateRequest`(초대코드)만 `fixedRate`·`salaryDay`를 갖는다. 직접 등록용 `SalaryCreateRequest`에는 없다
 - 초대코드 참여의 `salaryDay`는 현재 `"MONDAY"` 하드코딩이다. 동작을 바꾸지 않기 위해 유지하되 주석으로 표시한다
 - 계산방식이 시급이면 `hourlyRate`에, 아니면 `fixedRate`에 `salaryAmount`를 넣고 나머지는 `nil`

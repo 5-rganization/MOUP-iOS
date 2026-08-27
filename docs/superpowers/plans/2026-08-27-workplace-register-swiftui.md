@@ -314,7 +314,7 @@ git commit -m "chore: #113 - 미사용 UIKit 근무 등록 코드 제거"
 
 **Interfaces:**
 - Consumes: `LabelColor`(`Presentation/Utils/Enums/LabelColor.swift`), `WorkplaceCategory`(`Presentation/Utils/Enums/WorkplaceCategory.swift`), `SalaryType`·`SalaryCalculation`(`Domain/Entities/Salary/`), `WorkplaceCreateRequestDTO`·`SalaryCreateRequest`·`OwnerWorkplaceCreateRequestDTO`·`WorkplaceJoinRequestDTO`·`SalaryJoinCreateRequest`·`UpdateWorkplaceRequestDTO`·`SalaryUpdateRequestDTO`(`Data/DTO/Request/`), `WorkplaceDetailResponseDTO`(`Data/DTO/Response/`)
-- Produces: `struct WorkplaceForm: Equatable`. 저장 프로퍼티 `workplaceName`, `category`, `labelColor`, `salaryType`, `salaryCalculation`, `salaryAmount`, `payDay`, `hasNationalPension`, `hasHealthInsurance`, `hasEmploymentInsurance`, `hasIndustrialAccident`, `hasIncomeTax`, `hasHolidayAllowance`, `hasNightAllowance`. 계산 프로퍼티 `hasAllMajorInsurances`, `formattedSalaryAmount`, `formattedPayDay`, `isWorkerValid`, `isOwnerValid`, `isJoinValid`. 메서드 `setAllMajorInsurances(_:)`. DTO 프로퍼티 `createRequestDTO`, `ownerCreateRequestDTO`, `updateRequestDTO`, `joinRequestDTO(inviteCode:)`. 이니셜라이저 `init()`, `init(detail:)`
+- Produces: `struct WorkplaceForm: Equatable`. 저장 프로퍼티 `workplaceName`, `category`, `labelColor`, `salaryType`, `salaryCalculation`, `salaryAmount`, `payDay`, `hasNationalPension`, `hasHealthInsurance`, `hasEmploymentInsurance`, `hasIndustrialAccident`, `hasIncomeTax`, `hasHolidayAllowance`, `hasNightAllowance`. 계산 프로퍼티 `hasAllMajorInsurances`, `formattedSalaryAmount`, `formattedPayDay`, `isWorkerValid`, `isOwnerValid`, `isJoinValid`. 메서드 `setAllMajorInsurances(_:)`. DTO 프로퍼티 `createRequestDTO`, `ownerCreateRequestDTO`, `workerUpdateRequestDTO`, `ownerUpdateRequestDTO`, `joinRequestDTO(inviteCode:)`. 이니셜라이저 `init()`, `init(detail:)`
 
 - [ ] **Step 1: `WorkplaceForm.swift` 생성**
 
@@ -496,8 +496,11 @@ extension WorkplaceForm {
         )
     }
 
-    /// 근무지 수정 요청 DTO (알바생·사장님 공용)
-    var updateRequestDTO: UpdateWorkplaceRequestDTO {
+    /// 알바생 근무지 수정 요청 DTO
+    ///
+    /// `UpdateWorkplaceRequestDTO`는 색상 키를 역할별로 나눠 갖고(둘 중 하나만 채운다),
+    /// `salaryUpdateRequest`는 알바생일 때만 필요하다. 사장님용과 반드시 구분해서 써야 한다.
+    var workerUpdateRequestDTO: UpdateWorkplaceRequestDTO {
         UpdateWorkplaceRequestDTO(
             workplaceName: workplaceName,
             categoryName: (category ?? .others).serverStr,
@@ -518,6 +521,21 @@ extension WorkplaceForm {
                 hasHolidayAllowance: hasHolidayAllowance,
                 hasNightAllowance: hasNightAllowance
             )
+        )
+    }
+
+    /// 사장님 근무지 수정 요청 DTO
+    ///
+    /// 사장님 화면에는 급여 입력이 없으므로 `salaryUpdateRequest`를 보내지 않는다.
+    /// 색상은 `ownerBasedLabelColor`로 보낸다 — 알바생 키로 보내면 색상이 반영되지 않는다.
+    var ownerUpdateRequestDTO: UpdateWorkplaceRequestDTO {
+        UpdateWorkplaceRequestDTO(
+            workplaceName: workplaceName,
+            categoryName: (category ?? .others).serverStr,
+            address: "기본 주소",
+            latitude: 0.0,
+            longitude: 0.0,
+            ownerBasedLabelColor: labelColor.serverStr
         )
     }
 
@@ -771,7 +789,7 @@ git commit -m "feat: #113 - 근무지 폼 섹션 및 위저드 화면 구현"
 - Modify: `MOUP/MOUP/Coordinator/WorkplaceRegister/WorkplaceRegisterCoordinator.swift`
 
 **Interfaces:**
-- Consumes: Task 3의 `WorkplaceForm`, Task 4의 섹션·위저드 전부, `WorkplaceUseCaseProtocol`의 `createWorkplace(request:)`, `updateWorkplace(workplaceId:request:)`, `fetchWorkplaceDetail(workplaceId:)`
+- Consumes: Task 3의 `WorkplaceForm`, Task 4의 섹션·위저드 전부, `WorkplaceForm.workerUpdateRequestDTO`, `WorkplaceUseCaseProtocol`의 `createWorkplace(request:)`, `updateWorkplace(workplaceId:request:)`, `fetchWorkplaceDetail(workplaceId:)`
 - Produces: `WorkplaceRegisterView(navigationController:mode:workplaceUseCase:onSaved:)` — `navigationController`와 `onSaved`는 기본값 `nil`. `enum WorkplaceRegisterView.Mode { case create, edit(workplaceId: Int) }`
 
 - [ ] **Step 1: `WorkplaceRegisterView` 작성**
@@ -920,7 +938,7 @@ struct WorkplaceRegisterView: View {
                 onSaved?(result.workplaceId)
             case .edit(let workplaceId):
                 try await workplaceUseCase.updateWorkplace(workplaceId: workplaceId,
-                                                           request: form.updateRequestDTO)
+                                                           request: form.workerUpdateRequestDTO)
                 onSaved?(workplaceId)
             }
             navigationController?.popViewController(animated: true)
@@ -1026,7 +1044,7 @@ git commit -m "feat: #113 - 알바생 근무지 등록/수정 화면 SwiftUI 재
 - Modify: `MOUP/MOUP/Coordinator/WorkplaceRegister/WorkplaceRegisterCoordinator.swift`
 
 **Interfaces:**
-- Consumes: Task 3의 `WorkplaceForm`(`ownerCreateRequestDTO`, `updateRequestDTO`, `isOwnerValid`), Task 4의 `WorkplaceSection`·`ColorLabelSection`·`NameInputView`·`CategorySelectView`·`ColorLabelSelectView`, `WorkplaceUseCaseProtocol.createOwnerWorkplace(request:)`
+- Consumes: Task 3의 `WorkplaceForm`(`ownerCreateRequestDTO`, `ownerUpdateRequestDTO`, `isOwnerValid`), Task 4의 `WorkplaceSection`·`ColorLabelSection`·`NameInputView`·`CategorySelectView`·`ColorLabelSelectView`, `WorkplaceUseCaseProtocol.createOwnerWorkplace(request:)`
 - Produces: `OwnerWorkplaceRegisterView(navigationController:mode:workplaceUseCase:onSaved:)` — `navigationController`와 `onSaved`는 기본값 `nil`. `typealias Mode = WorkplaceRegisterView.Mode`
 
 - [ ] **Step 1: `OwnerWorkplaceRegisterView` 작성**
@@ -1041,12 +1059,14 @@ case .create:
     let result = try await workplaceUseCase.createOwnerWorkplace(request: form.ownerCreateRequestDTO)
     onSaved?(result.workplaceId)
 case .edit(let workplaceId):
-    try await workplaceUseCase.updateWorkplace(workplaceId: workplaceId, request: form.updateRequestDTO)
+    try await workplaceUseCase.updateWorkplace(workplaceId: workplaceId, request: form.ownerUpdateRequestDTO)
     onSaved?(workplaceId)
 }
 ```
 
 완료 버튼 활성 조건은 `form.isOwnerValid`다.
+
+**주의 — 이 경로는 기존 UIKit에 없던 동작이다.** `OwnerWorkplaceRegisterViewModel`의 수정 분기는 `print("[TODO] 수정 API 연결 필요")`로 비어 있어 사장님이 "수정하기"를 눌러도 아무 일도 일어나지 않았다. 여기서 `updateWorkplace`를 실제로 호출해 그 TODO를 완성한다. 색상은 반드시 `ownerBasedLabelColor`로 나가야 하므로 `ownerUpdateRequestDTO`를 쓴다 — `workerUpdateRequestDTO`를 쓰면 사장님 색상이 반영되지 않고 있지도 않은 급여 정보가 전송된다.
 
 - [ ] **Step 2: Coordinator에 사장님 분기 추가**
 
