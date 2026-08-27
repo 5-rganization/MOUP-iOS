@@ -18,8 +18,8 @@ import SwiftUI
 /// 그 스택 자신의 네비게이션을 찾는다.
 ///
 /// 두 자리 모두 필요하다.
-/// - 루트 폼: 바깥 스택의 `viewControllers.count`는 위저드를 push해도 그대로라, 위저드가 떠 있는
-///   동안 `canPop: false`로 막지 않으면 스와이프가 위저드를 건너뛰고 홈까지 나가버린다.
+/// - 입력 폼(루트): `canPop: false`로 스와이프 백을 막는다. 입력하던 값이 스와이프 한 번에
+///   통째로 날아가는 것을 막기 위함이고, 나가는 길은 뒤로가기 버튼뿐이다.
 /// - 위저드: `.toolbar(.hidden, for: .navigationBar)`이 스택 자신의 스와이프 백도 죽이므로,
 ///   `swipeBackEnabled()`로 되살려야 위저드에서 폼으로 스와이프해 돌아올 수 있다.
 ///
@@ -44,11 +44,11 @@ import SwiftUI
 /// }
 /// ```
 struct NavigationControllerFinder: UIViewControllerRepresentable {
-    /// 바깥 UIKit 네비게이션의 스와이프 백 제스처를 허용할지 여부.
+    /// 찾아낸 네비게이션의 스와이프 백 제스처를 허용할지 여부.
     ///
-    /// 하위 화면(위저드)이 SwiftUI `NavigationStack`에 push되어 있는 동안 `false`로 넘기면,
-    /// 바깥 스택의 깊이와 무관하게 제스처가 시작되지 않는다. 기본값 `true`는 이 파라미터를
-    /// 모르는 기존 호출부(`NavigationControllerFinder { _ in }`)가 그대로 컴파일되게 하기 위함이다.
+    /// `false`면 스택 깊이와 무관하게 제스처가 시작되지 않는다. 입력 폼처럼 스와이프로
+    /// 빠져나가면 입력이 날아가는 화면에서 쓴다. 기본값 `true`는 제스처 복원만 필요한
+    /// 호출부(`swipeBackEnabled()` 등)를 위한 것이다.
     var canPop: Bool = true
     var onFound: (UINavigationController) -> Void
 
