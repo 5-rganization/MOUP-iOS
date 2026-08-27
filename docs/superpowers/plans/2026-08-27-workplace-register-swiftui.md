@@ -1204,12 +1204,18 @@ struct InviteCodeWorkplaceRegisterView: View {
     // 급여·색상 위저드 표시 플래그는 Task 5와 동일
 ```
 
-`body`는 Task 5와 같은 뼈대에서 섹션을 `PaySection` → `WorkingConditionsSection` → `ColorLabelSection` 순으로 두고, 맨 위에 읽기 전용 근무지 이름을 놓는다. 기존 UIKit(`Presentation/Home/View/InviteCodeWorkplaceRegisterView.swift`)의 표시 방식을 그대로 따른다.
+`body`는 Task 5와 같은 뼈대에서 섹션을 `PaySection` → `WorkingConditionsSection` → `ColorLabelSection` 순으로 둔다. **본문에 근무지 이름 행을 만들지 마라.**
 
-네비게이션 타이틀과 버튼 문구도 기존 UIKit에서 가져온다:
-```bash
-grep -n "BaseNavigationBar(title\|BaseButton(title" MOUP/MOUP/Presentation/Home/View/InviteCodeWorkplaceRegisterView.swift
+**근무지 이름은 네비바 타이틀로 들어간다.** 기존 UIKit이 그렇게 한다 — `InviteCodeWorkplaceRegisterViewController.swift:51,66`이 `self.title = workplaceName` 후 `rootView.updateTitle(title: title ?? "초대코드 근무지 등록")`으로 네비바 제목을 근무지 이름으로 덮어쓴다. 뷰 파일의 `BaseNavigationBar(title: "초대코드 근무지 추가")`는 초기값일 뿐 화면에 뜨지 않는다.
+
+```swift
+BaseNavigationBarSU(
+    title: workplaceName.isEmpty ? "초대코드 근무지 등록" : workplaceName,
+    onBackTap: { navigationController?.popViewController(animated: true) }
+)
 ```
+
+완료 버튼 문구는 **"등록하기"**다 (`InviteCodeWorkplaceRegisterView.swift:35`). 활성 조건은 `form.isJoinValid`.
 
 저장은 하나뿐이다:
 
@@ -1220,8 +1226,8 @@ func join() async {
 
     do {
         _ = try await workplaceUseCase.joinWorkplace(request: form.joinRequestDTO(inviteCode: inviteCode))
+        // 복귀는 Coordinator가 한다. 기존 UIKit도 pop이 아니라 홈 스택을 다시 세운다.
         onJoined?()
-        navigationController?.popToRootViewController(animated: true)
     } catch {
         logger.error("근무지 참여 실패: \(error.localizedDescription)")
         presentNotice(title: "참여 실패", comment: "근무지 참여에 실패했습니다.\n다시 시도해주세요.")
@@ -1229,10 +1235,9 @@ func join() async {
 }
 ```
 
-복귀 방식(`popToRootViewController` vs `popViewController`)은 기존 UIKit이 참여 성공 후 어디로 가는지 확인해 맞춘다:
-```bash
-grep -n "didCompleteRegister" -A 10 MOUP/MOUP/Presentation/Home/ViewController/InviteCodeWorkplaceRegisterViewController.swift
-```
+**성공 후 복귀는 pop이 아니다.** 기존 UIKit은 `coordinator?.moveToHomeAfterJoin()`을 호출하고, 그 메서드(`InviteCodeInputCoordinator.swift:119-130`)는 `navigationController.setViewControllers([], animated: false)` 후 `homeCoordinator.start()`로 홈 스택을 다시 세운다. 초대코드 입력 → 결과 → 참여 화면이 스택에 쌓여 있어 단순 pop으로는 원래 자리로 못 돌아가기 때문이다.
+
+따라서 뷰는 `onJoined?()`만 호출하고, `InviteCodeInputCoordinator`가 그 콜백에 `moveToHomeAfterJoin()`을 연결한다. 뷰가 직접 스택을 만지지 않는다.
 
 - [ ] **Step 2: `InviteCodeInputCoordinator` 정리**
 
@@ -1248,7 +1253,8 @@ func moveToInviteCodeWorkplaceRegister(workplaceName: String, inviteCode: String
         rootView: InviteCodeWorkplaceRegisterView(navigationController: navigationController,
                                                   workplaceName: workplaceName,
                                                   inviteCode: inviteCode,
-                                                  workplaceUseCase: workplaceUseCase)
+                                                  workplaceUseCase: workplaceUseCase,
+                                                  onJoined: { [weak self] in self?.moveToHomeAfterJoin() })
     )
     hostingVC.hidesBottomBarWhenPushed = true
     navigationController.pushViewController(hostingVC, animated: true)
