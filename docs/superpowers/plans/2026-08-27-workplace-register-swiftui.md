@@ -259,7 +259,7 @@ git commit -m "refactor: #113 - 근무 폼의 공통 파생 로직 추출"
 - Consumes: 없음
 - Produces: 없음 (순수 삭제)
 
-- [ ] **Step 1: 삭제 전 고립 여부 재확인**
+- [x] **Step 1: 삭제 전 고립 여부 재확인**
 
 ```bash
 cd MOUP/MOUP
@@ -280,14 +280,14 @@ Expected: `///`로 시작하는 주석 줄 하나.
 
 다른 파일이 나오면 **멈추고 보고한다.** 그 파일이 살아있는 참조를 갖고 있다는 뜻이다.
 
-- [ ] **Step 2: 삭제**
+- [x] **Step 2: 삭제**
 
 ```bash
 cd /Users/macmillan/Projects/XcodeProjects/5rganization/MOUP/MOUP-iOS
 git rm -r MOUP/MOUP/Presentation/WorkRegister MOUP/MOUP/Coordinator/WorkRegister
 ```
 
-- [ ] **Step 3: 빌드**
+- [x] **Step 3: 빌드**
 
 Run: 위 "빌드 명령"
 Expected: `** BUILD SUCCEEDED **`
@@ -296,7 +296,7 @@ Expected: `** BUILD SUCCEEDED **`
 
 앱을 실행해 캘린더 → 근무 등록/수정이 정상 동작하는지 본다. 죽은 코드를 지운 것이므로 동작 변화가 없어야 한다.
 
-- [ ] **Step 5: 커밋**
+- [x] **Step 5: 커밋**
 
 ```bash
 git add -A MOUP/ docs/superpowers/plans/2026-08-27-workplace-register-swiftui.md
