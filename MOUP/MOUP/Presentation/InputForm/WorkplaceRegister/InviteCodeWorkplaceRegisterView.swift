@@ -36,6 +36,14 @@ struct InviteCodeWorkplaceRegisterView: View {
 
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "InviteCodeWorkplaceRegisterView")
 
+    /// push된 하위 위저드가 하나라도 떠 있는지 여부.
+    ///
+    /// `isPayDayPickerPresented`는 `.sheet`라 넣지 않는다 — 시트는 화면을 덮어
+    /// 가장자리 스와이프 자체가 들어오지 않으므로 이 판단과 무관하다.
+    private var isWizardPresented: Bool {
+        showPayTypeSelect || showPayCalculationSelect || showSalaryInput || showColorLabelSelect
+    }
+
     // MARK: - Initializer
 
     init(navigationController: UINavigationController? = nil,
@@ -107,7 +115,9 @@ struct InviteCodeWorkplaceRegisterView: View {
         }
         .background(
             // 상위 UIKit 네비게이션의 스와이프 백 제스처를 복원하기 위해 유지한다.
-            NavigationControllerFinder { _ in }
+            // 하위 위저드가 떠 있는 동안은 canPop을 false로 막아, 스와이프가 위저드를
+            // 건너뛰고 바깥(홈)까지 나가버리는 것을 막는다.
+            NavigationControllerFinder(canPop: !isWizardPresented) { _ in }
                 .frame(width: 0, height: 0)
         )
     }

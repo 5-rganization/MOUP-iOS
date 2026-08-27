@@ -40,6 +40,11 @@ struct OwnerWorkplaceRegisterView: View {
         return false
     }
 
+    /// push된 하위 위저드가 하나라도 떠 있는지 여부.
+    private var isWizardPresented: Bool {
+        showNameInput || showCategorySelect || showColorLabelSelect
+    }
+
     // MARK: - Initializer
 
     init(navigationController: UINavigationController? = nil,
@@ -100,7 +105,9 @@ struct OwnerWorkplaceRegisterView: View {
         }
         .background(
             // 상위 UIKit 네비게이션의 스와이프 백 제스처를 복원하기 위해 유지한다.
-            NavigationControllerFinder { _ in }
+            // 하위 위저드가 떠 있는 동안은 canPop을 false로 막아, 스와이프가 위저드를
+            // 건너뛰고 바깥(홈)까지 나가버리는 것을 막는다.
+            NavigationControllerFinder(canPop: !isWizardPresented) { _ in }
                 .frame(width: 0, height: 0)
         )
     }
