@@ -179,13 +179,13 @@ extension WorkplaceForm {
     ///
     /// `UpdateWorkplaceRequestDTO`는 색상 키를 역할별로 나눠 갖고(둘 중 하나만 채운다),
     /// `salaryUpdateRequest`는 알바생일 때만 필요하다. 사장님용과 반드시 구분해서 써야 한다.
+    ///
+    /// 주소·좌표는 넘기지 않는다. 수정은 부분 갱신이라 키를 빼면 서버 값이 유지되지만,
+    /// 등록 때처럼 더미값을 실어 보내면 저장된 실제 주소·좌표가 그 더미로 덮인다.
     var workerUpdateRequestDTO: UpdateWorkplaceRequestDTO {
         UpdateWorkplaceRequestDTO(
             workplaceName: workplaceName,
             categoryName: (category ?? .others).serverStr,
-            address: "기본 주소",
-            latitude: 0.0,
-            longitude: 0.0,
             workerBasedLabelColor: labelColor.serverStr,
             salaryUpdateRequest: SalaryUpdateRequestDTO(
                 salaryType: (salaryType ?? .monthly).serverValue,
@@ -207,13 +207,11 @@ extension WorkplaceForm {
     ///
     /// 사장님 화면에는 급여 입력이 없으므로 `salaryUpdateRequest`를 보내지 않는다.
     /// 색상은 `ownerBasedLabelColor`로 보낸다 — 알바생 키로 보내면 색상이 반영되지 않는다.
+    /// 주소·좌표를 빼는 이유는 `workerUpdateRequestDTO`와 같다.
     var ownerUpdateRequestDTO: UpdateWorkplaceRequestDTO {
         UpdateWorkplaceRequestDTO(
             workplaceName: workplaceName,
             categoryName: (category ?? .others).serverStr,
-            address: "기본 주소",
-            latitude: 0.0,
-            longitude: 0.0,
             ownerBasedLabelColor: labelColor.serverStr
         )
     }
