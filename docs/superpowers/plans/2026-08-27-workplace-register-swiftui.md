@@ -661,7 +661,7 @@ struct WorkplaceSection: View {
     let onCategoryTap: () -> Void
 
     var body: some View {
-        ContainerView(title: "근무지", isRequired: true) {
+        ContainerView(title: "근무지", isRequired: true) {  // 기존 UIKit: "근무지 *"
             LabelChevronRowView(titleLabel: "이름",
                                 rightLabel: form.workplaceName.isEmpty ? "입력" : form.workplaceName,
                                 action: onNameTap)
@@ -673,18 +673,13 @@ struct WorkplaceSection: View {
 }
 ```
 
-`PaySection`은 행 4개다. 라벨은 기존 UIKit(`Presentation/WorkplaceRegister/View/PayContainer/PayContainerView.swift:17-26`)과 동일하게 **"급여 유형"**(`form.salaryType?.displayText ?? "선택"`), **"급여 계산"**(`form.salaryCalculation?.displayStr ?? "선택"`), **"급여 형태"**(`form.formattedSalaryAmount`), **"급여일"**(`form.formattedPayDay`)로 둔다.
+`PaySection`은 `ContainerView(title: "급여", isRequired: true)`에 행 4개다. 라벨은 **"급여 유형"**(`form.salaryType?.displayText ?? "선택"`), **"급여 계산"**(`form.salaryCalculation?.displayStr ?? "선택"`), **"급여 형태"**(`form.formattedSalaryAmount`), **"급여일"**(`form.formattedPayDay`).
 
-`WorkingConditionsSection`은 `CheckBoxRow` 8개다. **먼저 기존 UIKit에 4대 보험 안내 모달이 있는지 확인하고, 그 결과로 `onInfoTap` 파라미터의 유무를 여기서 확정한다.** Task 5는 이 결정을 따르기만 한다.
+`ColorLabelSection`은 `ContainerView(title: "라벨")`(필수 아님), `WorkingConditionsSection`은 `ContainerView(title: "근무 조건")`(필수 아님)이다. `ContainerView`가 `isRequired: true`일 때 제목 뒤에 강조색 `*`를 붙이므로, 제목 문자열에 `*`를 직접 넣지 않는다.
 
-```bash
-grep -rn "presentNoticeModal\|NoticeModal\|infoButton\|infoRow" \
-  MOUP/MOUP/Presentation/WorkplaceRegister/ViewController/WorkingConditionsContainer/WorkingConditionsContainerViewController.swift \
-  MOUP/MOUP/Presentation/WorkplaceRegister/View/WorkingConditionsContainer/WorkingConditionsContainerView.swift
-```
+`WorkingConditionsSection`은 `CheckBoxRow` 8개다.
 
-- 안내 모달이 **있으면** `onInfoTap: (String) -> Void`를 파라미터로 두고, 안내를 띄우는 행만 `showInfo: true`로 한다
-- **없으면** `onInfoTap` 파라미터를 만들지 않고 모든 행을 `showInfo: false`로 둔다. 이 경우 Task 5·7의 `WorkingConditionsSection(form:onInfoTap:)` 호출도 `WorkingConditionsSection(form:)`이 된다
+**`onInfoTap`은 만들지 않는다.** 컨트롤러가 기존 UIKit을 확인한 결과 4대 보험 안내 모달이 없다 — `WorkingConditionsContainerView`의 행은 전부 `OLDInfoRowView(type: .checkBox(isChecked:))`이고 `WorkingConditionsContainerViewController`에 `presentNoticeModal` 호출이 없다. 따라서 시그니처는 `WorkingConditionsSection(form: Binding<WorkplaceForm>)`이고 모든 `CheckBoxRow`는 `showInfo: false`(기본값)로 둔다.
  순서와 문구는 `Presentation/WorkplaceRegister/View/WorkingConditionsContainer/WorkingConditionsContainerView.swift:16-33`과 동일하게 "4대 보험", "국민연금", "건강보험", "고용보험", "산재보험", "소득세", "주휴수당", "야간수당". 마스터 행은 저장 필드가 없으므로 커스텀 바인딩을 쓴다:
 
 ```swift
@@ -703,7 +698,9 @@ CheckBoxRow(
 
 - [ ] **Step 2: 라디오 선택 위저드 4개 작성**
 
-`CategorySelectView`, `PayTypeSelectView`, `PayCalculationSelectView`, `ColorLabelSelectView`는 구조가 같다. 선택 즉시 `dismiss()`로 돌아간다.
+`CategorySelectView`, `PayTypeSelectView`, `PayCalculationSelectView`, `ColorLabelSelectView`는 구조가 같다.
+
+**선택 즉시 `dismiss()`하지 않는다.** 기존 UIKit이 로컬 선택 → 하단 "완료" 버튼으로 확정하는 구조이고(뒤로가기로 나가면 값이 반영되지 않는다), `NameInputView`·`SalaryInputView`도 같은 형태다. 로컬 `@State`에 선택을 담고 "완료"에서 `@Binding`에 쓴 뒤 `dismiss()`한다.
 
 ```swift
 // CategorySelectView.swift
@@ -711,23 +708,44 @@ struct CategorySelectView: View {
     @Binding var category: WorkplaceCategory?
     @Environment(\.dismiss) private var dismiss
 
+    /// 뒤로가기로 나가면 반영되지 않도록, 확정 전까지는 로컬에만 담는다.
+    @State private var selected: WorkplaceCategory?
+
+    init(category: Binding<WorkplaceCategory?>) {
+        self._category = category
+        self._selected = State(initialValue: category.wrappedValue)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            BaseNavigationBarSU(title: "카테고리 선택", onBackTap: { dismiss() })
+            BaseNavigationBarSU(title: "카테고리", onBackTap: { dismiss() })
 
             ScrollView {
-                VStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("근무지 카테고리를 선택해주세요.")
+                        .font(.headBold(18))
+                        .foregroundStyle(.gray900)
+
                     ForEach(WorkplaceCategory.allCases, id: \.self) { item in
-                        RadioButtonView(label: item.displayStr,
-                                        isSelected: category == item) {
-                            category = item
-                            dismiss()
+                        RadioButtonView(unselectedLeftImage: item.unselectedImage,
+                                        selectedLeftImage: item.selectedImage,
+                                        label: item.displayStr,
+                                        isSelected: selected == item) {
+                            selected = item
                         }
                     }
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 20)
             }
+
+            BaseButtonSU(title: "완료") {
+                category = selected
+                dismiss()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .disabled(selected == nil)
         }
         .toolbar(.hidden, for: .navigationBar)
         .background(.primaryBackground)
@@ -735,13 +753,26 @@ struct CategorySelectView: View {
 }
 ```
 
+**나머지 3개의 확정 문구** (기존 UIKit에서 그대로 가져온 값이다 — 지어내지 마라):
+
+| 화면 | 네비바 타이틀 | 본문 안내 문구 | 항목 |
+|---|---|---|---|
+| `CategorySelectView` | 카테고리 | 근무지 카테고리를 선택해주세요. | `WorkplaceCategory.allCases`, 좌측 아이콘 `selectedImage`/`unselectedImage` |
+| `PayTypeSelectView` | 급여 유형 | 급여 유형을 선택해주세요. | `SalaryType.allCases` (`displayText`: 매월/매주/매일), 아이콘 없음 |
+| `PayCalculationSelectView` | 급여 계산 | 급여 계산방법을 선택해주세요. | `SalaryCalculation.allCases` (`displayStr`: 시급/고정급), 아이콘 없음 |
+| `ColorLabelSelectView` | 라벨 색상 | 라벨 색상을 선택해주세요. | `LabelColor.allCases`에서 `._default` 제외한 7색 (`displayStr`), 좌측에 `labelColor` 원형 마커 |
+
+`WorkplaceCategory`에는 `selectedImage`/`unselectedImage` 프로퍼티가 이미 있다. 새로 만들지 마라.
+
 - **`SalaryType`과 `SalaryCalculation`은 `CaseIterable`을 채택하지 않았다.** 두 선언을 `enum SalaryType: CaseIterable`, `enum SalaryCalculation: CaseIterable`로 바꾼다 (`Domain/Entities/Salary/`). `LabelColor`와 `WorkplaceCategory`는 이미 `CaseIterable`이다. 연관값 없는 enum이라 `Hashable`은 자동 합성되므로 따로 선언하지 않는다
 - `ColorLabelSelectView`는 `LabelColor.allCases`에서 **`._default`를 제외**한다. 기존 UIKit이 7색(red·orange·yellow·green·blue·indigo·purple)만 노출한다
 - `CategorySelectView`의 좌측 아이콘은 기존 UIKit(`SelectCategoryView.swift:25-49`)이 카테고리별 선택/미선택 이미지를 쓴다. 같은 에셋 이름을 `unselectedLeftImage`/`selectedLeftImage`로 넘긴다
 
 - [ ] **Step 3: 텍스트 입력 위저드 2개 작성**
 
-`NameInputView`는 `WizardTextFieldView(placeholder: "근무지 이름", text: $workplaceName)` + 하단 `BaseButtonSU(title: "확인")`으로 `dismiss()`.
+두 화면 모두 Step 2와 같은 "로컬 `@State` → 완료 버튼에서 `@Binding`에 확정" 구조다.
+
+`NameInputView` — 네비바 "근무지 입력", 안내 문구 "근무지 이름을 입력해주세요.", `WizardTextFieldView(placeholder: "근무지 명", text: $localName)`, 하단 `BaseButtonSU(title: "완료")`, 이름이 비면 비활성.
 
 `SalaryInputView`는 금액 포매팅 바인딩을 쓴다. placeholder는 기존과 같이 `"10,030원"`:
 
@@ -756,11 +787,18 @@ WizardTextFieldView(
 )
 ```
 
-화면 제목은 `salaryCalculation`에 따라 바꾼다 — 시급이면 "시급 입력", 고정급이면 "고정급 입력".
+`SalaryInputView`의 네비바 타이틀과 안내 문구는 `salaryCalculation`에 따라 바꾼다:
+
+- 시급(또는 `nil`): 네비바 "시급", 안내 "시급을 입력해주세요."
+- 고정급: 네비바 "고정급", 안내 "고정급을 입력해주세요."
+
+기존 UIKit은 `updateTitle(_:)`/`updatePlaceholder(_:)` API를 만들어 두고 **호출하지 않아** 고정급을 골라도 "시급을 입력해주세요."가 떴다. 명백한 표시 오류이므로 여기서 분기를 붙여 완성한다. placeholder는 두 경우 모두 `"10,030원"`으로 둔다(기존과 동일).
+
+금액이 0이면 "완료" 버튼을 비활성으로 둔다.
 
 - [ ] **Step 4: `PayDayPickerSheet` 작성**
 
-1~31일 `Picker`를 `.wheel` 스타일로 띄운다. `Presentation/InputForm/Components/BreakTimePickerModal.swift`의 시트 레이아웃(그래버 + 확인 버튼)을 그대로 따른다.
+`Array(1...31)`을 `Picker`의 `.wheel` 스타일로 띄운다 (기존 `PayDayPickerView`가 `private let dayRange = Array(1...31)`을 쓴다). `Presentation/InputForm/Components/BreakTimePickerModal.swift`의 시트 레이아웃(그래버 + 확인 버튼)을 그대로 따른다.
 
 - [ ] **Step 5: Preview 추가**
 
@@ -1050,6 +1088,8 @@ git commit -m "feat: #113 - 알바생 근무지 등록/수정 화면 SwiftUI 재
 - [ ] **Step 1: `OwnerWorkplaceRegisterView` 작성**
 
 Task 5의 `WorkplaceRegisterView`와 같은 구조에서 섹션을 2개(`WorkplaceSection`, `ColorLabelSection`)로 줄이고, 위저드도 3개(`NameInputView`, `CategorySelectView`, `ColorLabelSelectView`)만 둔다. `Mode`는 `typealias Mode = WorkplaceRegisterView.Mode`로 재사용한다.
+
+**네비바 타이틀이 알바생 화면과 다르다.** 기존 UIKit `OwnerWorkplaceRegisterView.swift:32`가 `BaseNavigationBar(title: "매장 등록")`을 쓴다. 등록 모드는 **"매장 등록"**으로 하고, 수정 모드 문구는 `OwnerWorkplaceRegisterViewController`의 `applyEditModeUIIfNeeded()`에서 확인해 그대로 쓴다.
 
 저장 분기만 다르다:
 
