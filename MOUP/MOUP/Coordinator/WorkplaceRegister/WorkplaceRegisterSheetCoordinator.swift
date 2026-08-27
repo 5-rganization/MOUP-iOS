@@ -48,24 +48,15 @@ final class WorkplaceRegisterSheetCoordinator: Coordinator {
         inviteCodeInputCoordinator.start()
     }
 
+    /// 직접 등록. 역할 판정과 화면 조립은 `HomeCoordinator`에 한 벌만 두고 위임한다.
+    ///
+    /// 예전엔 여기서 같은 로직을 복제하면서 비교 문자열이 `"OWNER"`로 어긋나 있었다 —
+    /// 저장되는 값은 `UserRole.rawValue`, 즉 `"ROLE_OWNER"`다.
+    /// 이 시트는 알바생만 거치므로 결과는 우연히 같았지만, 사장님이 이 경로를 타는 순간 깨진다.
     func moveToDirectRegistration() {
-        print("moveToDirectRegistration")
-        
-        let isOwner = (UserDefaultsManager.shared.userRole == "OWNER")
-        
-        let coordinator = WorkplaceRegisterCoordinator(
-            navigationController: navigationController,
-            isOwner: isOwner,
-            mode: .create
-        )
-        
-        childCoordinators.append(coordinator)
-        DispatchQueue.main.async {
-            coordinator.start()
-        }
+        coordinator?.moveToDirectRegistration()
     }
 
-    
     func sheetDismissed() {
         coordinator?.removeChildCoordinator(self)
     }
