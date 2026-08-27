@@ -134,6 +134,10 @@ private extension NoticeModalViewController {
     func setStyles() {
         noticeTitleLabel.text = noticeTitle
         commentLabel.text = comment
+
+        // 문구가 화면의 70%를 넘길 만큼 길면 컨테이너 상한과 부딪힌다.
+        // 그때 제약이 깨지는 대신 이 라벨이 먼저 양보하도록 한다.
+        commentLabel.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
     }
     
     func setConstraints() {
@@ -144,12 +148,8 @@ private extension NoticeModalViewController {
         containerView.snp.makeConstraints {
             $0.directionalHorizontalEdges.equalToSuperview().inset(24)
             $0.centerY.equalToSuperview()
-            // 버튼을 세로로 쌓을 때는 내용에 맞춰 높이가 정해진다.
-            if otherTitle == nil {
-                // 문구가 길면 높이가 늘어나되, 화면을 넘기지는 않는다.
-                $0.height.greaterThanOrEqualTo(210)
-                $0.height.lessThanOrEqualToSuperview().multipliedBy(0.7)
-            }
+            // 높이는 아래 세로 체인(제목 → 문구 → 버튼)이 정한다. 여기서는 상한만 둔다.
+            $0.height.lessThanOrEqualToSuperview().multipliedBy(0.7)
         }
         
         noticeTitleLabel.snp.makeConstraints {
@@ -160,17 +160,14 @@ private extension NoticeModalViewController {
         commentLabel.snp.makeConstraints {
             $0.top.equalTo(noticeTitleLabel.snp.bottom).offset(20)
             $0.directionalHorizontalEdges.equalToSuperview().inset(16)
-            // 이 관계가 있어야 문구 길이에 맞춰 containerView 높이가 늘어난다.
-            $0.bottom.lessThanOrEqualTo(buttonStackView.snp.top).offset(-20)
         }
-        
+
         buttonStackView.snp.makeConstraints {
             $0.directionalHorizontalEdges.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview().inset(20)
-
-            if otherTitle != nil {
-                $0.top.equalTo(commentLabel.snp.bottom).offset(24)
-            }
+            // 등호여야 컨테이너 높이가 내용을 따라간다. 부등호로 두면 세로 체인에 여유가 생겨
+            // 높이가 상한(화면의 70%)까지 벌어지고, 문구와 버튼 사이가 텅 빈다.
+            $0.top.equalTo(commentLabel.snp.bottom).offset(24)
         }
 
         confirmButton.snp.makeConstraints {
