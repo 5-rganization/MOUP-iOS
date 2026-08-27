@@ -316,7 +316,7 @@ git commit -m "chore: #113 - 미사용 UIKit 근무 등록 코드 제거"
 - Consumes: `LabelColor`(`Presentation/Utils/Enums/LabelColor.swift`), `WorkplaceCategory`(`Presentation/Utils/Enums/WorkplaceCategory.swift`), `SalaryType`·`SalaryCalculation`(`Domain/Entities/Salary/`), `WorkplaceCreateRequestDTO`·`SalaryCreateRequest`·`OwnerWorkplaceCreateRequestDTO`·`WorkplaceJoinRequestDTO`·`SalaryJoinCreateRequest`·`UpdateWorkplaceRequestDTO`·`SalaryUpdateRequestDTO`(`Data/DTO/Request/`), `WorkplaceDetailResponseDTO`(`Data/DTO/Response/`)
 - Produces: `struct WorkplaceForm: Equatable`. 저장 프로퍼티 `workplaceName`, `category`, `labelColor`, `salaryType`, `salaryCalculation`, `salaryAmount`, `payDay`, `hasNationalPension`, `hasHealthInsurance`, `hasEmploymentInsurance`, `hasIndustrialAccident`, `hasIncomeTax`, `hasHolidayAllowance`, `hasNightAllowance`. 계산 프로퍼티 `hasAllMajorInsurances`, `formattedSalaryAmount`, `formattedPayDay`, `isWorkerValid`, `isOwnerValid`, `isJoinValid`. 메서드 `setAllMajorInsurances(_:)`. DTO 프로퍼티 `createRequestDTO`, `ownerCreateRequestDTO`, `workerUpdateRequestDTO`, `ownerUpdateRequestDTO`, `joinRequestDTO(inviteCode:)`. 이니셜라이저 `init()`, `init(detail:)`
 
-- [ ] **Step 1: `WorkplaceForm.swift` 생성**
+- [x] **Step 1: `WorkplaceForm.swift` 생성**
 
 ```swift
 //
@@ -583,7 +583,7 @@ extension WorkplaceForm {
 }
 ```
 
-- [ ] **Step 2: 의존 심볼 존재 확인**
+- [x] **Step 2: 의존 심볼 존재 확인**
 
 계획 작성 시점에 확인하지 못한 것들이다. 없으면 만들지 말고 **실제 이름을 찾아 코드를 맞춘다.**
 
@@ -598,12 +598,12 @@ grep -n "struct SalaryUpdateRequestDTO" -A 15 Data/DTO/Request/SalaryUpdateReque
 - `WorkplaceCategory`에 `init?(serverStr:)`가 없으면 `LabelColor`와 같은 형태로 추가한다 (`allCases.first(where:)` 방식)
 - `NumberFormatter.formattedWon(from:)`이 없으면 `WizardTextFieldView.swift`의 문서 주석이 쓰는 이름을 따라 확인하고, 없으면 `Common/Utils/Extensions/`에 추가한다
 
-- [ ] **Step 3: 빌드**
+- [x] **Step 3: 빌드**
 
 Run: 위 "빌드 명령"
 Expected: `** BUILD SUCCEEDED **`
 
-- [ ] **Step 4: 커밋**
+- [x] **Step 4: 커밋**
 
 ```bash
 git add MOUP/ docs/superpowers/plans/2026-08-27-workplace-register-swiftui.md
