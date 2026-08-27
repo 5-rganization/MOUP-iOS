@@ -12,37 +12,55 @@ final class BaseButton: UIButton {
     
     // MARK: - Properties
     private var isLoading: Bool = false
-    
+
+    /// 외부(UIKit 호출부 또는 SwiftUI `.disabled`)가 요청한 활성 상태.
+    /// 로딩 중에는 이 값과 무관하게 비활성이지만, 로딩이 끝나면 이 값으로 되돌아간다.
+    private var isEnabledByOwner: Bool = true
+
+    override var isEnabled: Bool {
+        get { super.isEnabled }
+        set {
+            isEnabledByOwner = newValue
+            applyEnabledState()
+        }
+    }
+
     // MARK: - Initializer
     init(title: String = "적용하기", isSecondary: Bool = false, fontSize: CGFloat = 18) {
         super.init(frame: .zero)
         configure(title: title, isSecondary: isSecondary, fontSize: fontSize)
     }
-    
+
     @available(*, unavailable, message: "storyboard is not supported.")
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented.")
     }
-    
+
     // MARK: - Internal Methods
     func update(title: String, isSecondary: Bool = false, fontSize: CGFloat = 18) {
         setConfiguration(title: title, isSecondary: isSecondary, fontSize: fontSize)
     }
-    
+
     /// API 호출 전 로딩 상태를 시작합니다. (인디케이터 표시, 터치 비활성화)
     func startLoading() {
         DispatchQueue.main.async {
             self.isLoading = true
-            self.isEnabled = false
+            self.applyEnabledState()
         }
     }
-    
+
     /// API 응답 후 로딩 상태를 종료합니다. (인디케이터 숨김, 터치 활성화)
     func stopLoading() {
         DispatchQueue.main.async {
             self.isLoading = false
-            self.isEnabled = true
+            self.applyEnabledState()
         }
+    }
+
+    /// 소유자 의도(`isEnabledByOwner`)와 로딩 상태(`isLoading`)를 합성해 실제 활성 여부를 반영한다.
+    private func applyEnabledState() {
+        super.isEnabled = isEnabledByOwner && !isLoading
+        setNeedsUpdateConfiguration()
     }
 }
 
