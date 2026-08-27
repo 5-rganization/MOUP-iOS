@@ -32,14 +32,24 @@ final class WorkplaceRegisterCoordinator: Coordinator {
             }
         }()
 
-        // 사장님 화면은 Task 6에서 붙인다. 그 전까지는 알바생 화면만 띄운다.
-        let hostingVC = UIHostingController(
-            rootView: WorkplaceRegisterView(navigationController: navigationController,
-                                            mode: mode,
-                                            workplaceUseCase: useCase)
-        )
-        hostingVC.hidesBottomBarWhenPushed = true
+        if isOwnerInjected {
+            push(UIHostingController(
+                rootView: OwnerWorkplaceRegisterView(navigationController: navigationController,
+                                                      mode: mode,
+                                                      workplaceUseCase: useCase)
+            ))
+        } else {
+            push(UIHostingController(
+                rootView: WorkplaceRegisterView(navigationController: navigationController,
+                                                mode: mode,
+                                                workplaceUseCase: useCase)
+            ))
+        }
+    }
+
+    private func push(_ vc: UIViewController) {
+        vc.hidesBottomBarWhenPushed = true
         navigationController.navigationBar.isHidden = true
-        navigationController.pushViewController(hostingVC, animated: true)
+        navigationController.pushViewController(vc, animated: true)
     }
 }

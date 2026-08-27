@@ -12,7 +12,7 @@ import RxCocoa
 final class OwnerWorkplaceRegisterViewController: UIViewController {
     
     // MARK: - Properties
-    private let ownerView = OwnerWorkplaceRegisterView()
+    private let ownerView = OLDOwnerWorkplaceRegisterView()
     
     private let viewModel: OwnerWorkplaceRegisterViewModel
     private let coordinator: WorkplaceRegisterCoordinatorProtocol

@@ -1076,7 +1076,7 @@ git commit -m "feat: #113 - 알바생 근무지 등록/수정 화면 SwiftUI 재
 - Consumes: Task 3의 `WorkplaceForm`(`ownerCreateRequestDTO`, `ownerUpdateRequestDTO`, `isOwnerValid`), Task 4의 `WorkplaceSection`·`ColorLabelSection`·`NameInputView`·`CategorySelectView`·`ColorLabelSelectView`, `WorkplaceUseCaseProtocol.createOwnerWorkplace(request:)`
 - Produces: `OwnerWorkplaceRegisterView(navigationController:mode:workplaceUseCase:onSaved:)` — `navigationController`와 `onSaved`는 기본값 `nil`. `typealias Mode = WorkplaceRegisterView.Mode`
 
-- [ ] **Step 0: 레거시 타입명 충돌 해소 (선행 필수)**
+- [x] **Step 0: 레거시 타입명 충돌 해소 (선행 필수)**
 
 `MOUP/MOUP/Presentation/WorkplaceRegister/View/OwnerWorkplaceRegisterView.swift:15`에 `final class OwnerWorkplaceRegisterView: UIView`가 이미 있다. 같은 이름의 SwiftUI `struct`를 만들면 컴파일이 깨진다. 이슈 #113이 정한 규칙(`이전 화면 클래스명 앞에 OLD 붙일 것`)대로 레거시 쪽을 먼저 옮긴다. Task 5가 `WorkplaceRegisterView`에 대해 같은 처리를 했다.
 
@@ -1093,7 +1093,7 @@ grep -rn "OwnerWorkplaceRegisterView\b" --include="*.swift" MOUP/MOUP/ | grep -v
 
 `OwnerWorkplaceRegisterViewController`가 이 타입을 쓴다. `OLDOwnerWorkplaceRegisterView`로 바꾼다. **`OwnerWorkplaceRegisterViewModel`과 `OwnerWorkplaceRegisterViewController`는 이름이 겹치지 않으므로 건드리지 마라.**
 
-- [ ] **Step 1: `OwnerWorkplaceRegisterView` 작성**
+- [x] **Step 1: `OwnerWorkplaceRegisterView` 작성**
 
 Task 5의 `WorkplaceRegisterView`와 같은 구조에서 섹션을 2개(`WorkplaceSection`, `ColorLabelSection`)로 줄이고, 위저드도 3개(`NameInputView`, `CategorySelectView`, `ColorLabelSelectView`)만 둔다. `Mode`는 `typealias Mode = WorkplaceRegisterView.Mode`로 재사용한다.
 
@@ -1116,7 +1116,7 @@ case .edit(let workplaceId):
 
 **주의 — 이 경로는 기존 UIKit에 없던 동작이다.** `OwnerWorkplaceRegisterViewModel`의 수정 분기는 `print("[TODO] 수정 API 연결 필요")`로 비어 있어 사장님이 "수정하기"를 눌러도 아무 일도 일어나지 않았다. 여기서 `updateWorkplace`를 실제로 호출해 그 TODO를 완성한다. 색상은 반드시 `ownerBasedLabelColor`로 나가야 하므로 `ownerUpdateRequestDTO`를 쓴다 — `workerUpdateRequestDTO`를 쓰면 사장님 색상이 반영되지 않고 있지도 않은 급여 정보가 전송된다.
 
-- [ ] **Step 2: Coordinator에 사장님 분기 추가**
+- [x] **Step 2: Coordinator에 사장님 분기 추가**
 
 Task 5 Step 3의 `start()`에서 `isOwnerInjected`로 갈라 `UIHostingController`를 각각 만든다. `AnyView`로 감싸지 않는다.
 
@@ -1140,7 +1140,7 @@ private func push(_ vc: UIViewController) {
 }
 ```
 
-- [ ] **Step 3: 빌드**
+- [x] **Step 3: 빌드**
 
 Run: 위 "빌드 명령"
 Expected: `** BUILD SUCCEEDED **`
@@ -1152,7 +1152,9 @@ Expected: `** BUILD SUCCEEDED **`
 3. 수정 진입 → 프리필 확인. 특히 **색상이 제대로 뜨는지** (사장님은 `ownerBasedLabelColor` 키로 온다)
 4. 수정 저장 후 반영 확인
 
-- [ ] **Step 5: 커밋**
+미수행. 사장님 계정 로그인·실서버 API가 필요해 사용자 몫으로 남김.
+
+- [x] **Step 5: 커밋**
 
 ```bash
 git add MOUP/ docs/superpowers/plans/2026-08-27-workplace-register-swiftui.md
