@@ -12,7 +12,7 @@ import RxCocoa
 final class WorkplaceRegisterViewController: UIViewController {
     
     // MARK: - Properties
-    private let workplaceRegisterView = WorkplaceRegisterView()
+    private let workplaceRegisterView = OLDWorkplaceRegisterView()
     
     private let viewModel: WorkplaceRegisterViewModel
     private let coordinator: WorkplaceRegisterCoordinatorProtocol

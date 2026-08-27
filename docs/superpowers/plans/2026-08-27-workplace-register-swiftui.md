@@ -830,7 +830,7 @@ git commit -m "feat: #113 - 근무지 폼 섹션 및 위저드 화면 구현"
 - Consumes: Task 3의 `WorkplaceForm`, Task 4의 섹션·위저드 전부, `WorkplaceForm.workerUpdateRequestDTO`, `WorkplaceUseCaseProtocol`의 `createWorkplace(request:)`, `updateWorkplace(workplaceId:request:)`, `fetchWorkplaceDetail(workplaceId:)`
 - Produces: `WorkplaceRegisterView(navigationController:mode:workplaceUseCase:onSaved:)` — `navigationController`와 `onSaved`는 기본값 `nil`. `enum WorkplaceRegisterView.Mode { case create, edit(workplaceId: Int) }`
 
-- [ ] **Step 1: `WorkplaceRegisterView` 작성**
+- [x] **Step 1: `WorkplaceRegisterView` 작성**
 
 `MOUP/MOUP/Presentation/InputForm/WorkRegister/WorkerWorkRegisterView.swift:64-115`와 `MyWork/MyWorkFormView.swift:95-200`을 합친 형태다. 이 화면은 잠금/편집 토글이 없으므로 `isEditing`·`hasChanges`·`originalForm`은 두지 않는다.
 
@@ -938,7 +938,7 @@ struct WorkplaceRegisterView: View {
 }
 ```
 
-- [ ] **Step 2: 비동기 메서드 작성**
+- [x] **Step 2: 비동기 메서드 작성**
 
 `MyWorkFormView`와 같이 익스텐션 전체를 메인 액터에 묶는다. `View.body`만 `@MainActor`라 그러지 않으면 `@State`와 UIKit을 메인 스레드 밖에서 건드린다.
 
@@ -992,7 +992,7 @@ struct WorkplaceRegisterView: View {
 
 **imports** — 이 파일은 `import OSLog`, `import SwiftUI`, `import UIKit`이 모두 필요하다. `MyWorkFormView.swift:8-10`과 동일하다.
 
-- [ ] **Step 3: `WorkplaceRegisterCoordinator` 정리**
+- [x] **Step 3: `WorkplaceRegisterCoordinator` 정리**
 
 `lazy var` ViewModel 9개와 `show*()` 메서드 7개를 전부 삭제한다. `start()`만 남긴다.
 
@@ -1042,12 +1042,12 @@ final class WorkplaceRegisterCoordinator: Coordinator {
 
 `init(navigationController:isOwner:mode:)` 시그니처는 바꾸지 않는다. 호출처 3곳(`HomeCoordinator.moveToDirectRegistration`, `HomeCoordinator.moveToEditWorkplace`, `WorkplaceRegisterSheetCoordinator.moveToDirectRegistration`)과 진입점 4곳(`HomeViewController` 3곳, `WorkplaceRegisterSheetViewController` 1곳)은 **수정하지 않는다.** 근무지 등록 진입 시트 자체는 UIKit 그대로 둔다.
 
-- [ ] **Step 4: 빌드**
+- [x] **Step 4: 빌드**
 
 Run: 위 "빌드 명령"
 Expected: `** BUILD SUCCEEDED **`
 
-- [ ] **Step 5: 시뮬레이터 확인 (알바생 계정)**
+- [ ] **Step 5: 시뮬레이터 확인 (알바생 계정)** — 미수행. 알바생 계정 로그인·실서버 API가 필요해 사용자 몫으로 남김.
 
 1. 홈 → 근무지 추가 → 직접 등록 → 새 화면이 뜨는지
 2. 위저드 6개(이름·카테고리·급여유형·급여계산·급여형태·색상) 각각 진입/선택/복귀 후 값이 행에 반영되는지
@@ -1057,7 +1057,7 @@ Expected: `** BUILD SUCCEEDED **`
 6. 홈에서 그 근무지 수정 진입 → 값이 프리필되는지 → 색상만 바꿔 저장 → 반영되는지
 7. 스와이프 백 제스처가 동작하는지
 
-- [ ] **Step 6: 커밋**
+- [x] **Step 6: 커밋**
 
 ```bash
 git add MOUP/ docs/superpowers/plans/2026-08-27-workplace-register-swiftui.md

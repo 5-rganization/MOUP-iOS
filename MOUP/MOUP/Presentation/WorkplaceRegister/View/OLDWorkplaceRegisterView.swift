@@ -1,5 +1,5 @@
 //
-//  WorkplaceRegisterView.swift
+//  OLDWorkplaceRegisterView.swift
 //  MOUP
 //
 //  Created by 양원식 on 7/15/25.
@@ -12,7 +12,7 @@ import RxSwift
 import SnapKit
 import Then
 
-final class WorkplaceRegisterView: UIView {
+final class OLDWorkplaceRegisterView: UIView {
     
     // MARK: - Properties
     private let scrollView = UIScrollView()
@@ -72,7 +72,7 @@ final class WorkplaceRegisterView: UIView {
     // MARK: - Public Methods
 }
 
-private extension WorkplaceRegisterView {
+private extension OLDWorkplaceRegisterView {
     // MARK: - configure
     func configure() {
         setHierarchy()
@@ -141,7 +141,7 @@ private extension WorkplaceRegisterView {
     }
 }
 
-extension Reactive where Base: WorkplaceRegisterView {
+extension Reactive where Base: OLDWorkplaceRegisterView {
     var navBackBtnTapped: ControlEvent<Void> {
         return base.navigationBar.rx.backBtnTapped
     }
