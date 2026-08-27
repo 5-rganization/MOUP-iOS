@@ -1097,7 +1097,7 @@ grep -rn "OwnerWorkplaceRegisterView\b" --include="*.swift" MOUP/MOUP/ | grep -v
 
 Task 5의 `WorkplaceRegisterView`와 같은 구조에서 섹션을 2개(`WorkplaceSection`, `ColorLabelSection`)로 줄이고, 위저드도 3개(`NameInputView`, `CategorySelectView`, `ColorLabelSelectView`)만 둔다. `Mode`는 `typealias Mode = WorkplaceRegisterView.Mode`로 재사용한다.
 
-**네비바 타이틀이 알바생 화면과 다르다.** 기존 UIKit `OwnerWorkplaceRegisterView.swift:32`가 `BaseNavigationBar(title: "매장 등록")`을 쓴다. 등록 모드는 **"매장 등록"**으로 하고, 수정 모드 문구는 `OwnerWorkplaceRegisterViewController`의 `applyEditModeUIIfNeeded()`에서 확인해 그대로 쓴다.
+**네비바 타이틀과 버튼 문구는 알바생 화면과 같다.** 뷰 파일에 `BaseNavigationBar(title: "매장 등록")`이 하드코딩돼 있지만 `OwnerWorkplaceRegisterViewController.swift:68-74`가 런타임에 덮어쓴다 — 등록 "새 근무지 등록"/"등록하기", 수정 "근무지 수정"/"수정하기". Task 5의 `WorkplaceRegisterView`와 동일하게 두면 된다. 뷰 파일의 "매장 등록"은 화면에 뜨지 않는 죽은 값이다.
 
 저장 분기만 다르다:
 
