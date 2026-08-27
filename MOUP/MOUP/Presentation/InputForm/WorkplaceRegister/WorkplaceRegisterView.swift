@@ -122,7 +122,8 @@ struct WorkplaceRegisterView: View {
             }
             .navigationDestination(isPresented: $showSalaryInput) {
                 SalaryInputView(salaryAmount: $form.salaryAmount,
-                                salaryCalculation: form.salaryCalculation)
+                                salaryCalculation: form.salaryCalculation,
+                                salaryType: form.salaryType)
             }
             .navigationDestination(isPresented: $showColorLabelSelect) {
                 ColorLabelSelectView(labelColor: $form.labelColor)

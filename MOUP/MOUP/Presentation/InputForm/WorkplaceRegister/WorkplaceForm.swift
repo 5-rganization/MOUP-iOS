@@ -71,7 +71,8 @@ struct WorkplaceForm: Equatable {
 
         self.salaryType = SalaryType(serverValue: salary.salaryType)
         self.salaryCalculation = SalaryCalculation(serverValue: salary.salaryCalculation)
-        self.salaryAmount = salary.hourlyRate ?? 0
+        // 시급제면 `hourlyRate`, 고정급제면 `fixedRate`에만 값이 온다. 화면은 금액 하나로 받는다.
+        self.salaryAmount = salary.hourlyRate ?? salary.fixedRate ?? 0
         self.payDay = salary.salaryDate ?? 1
         self.hasNationalPension = salary.hasNationalPension ?? false
         self.hasHealthInsurance = salary.hasHealthInsurance ?? false
@@ -145,6 +146,10 @@ extension WorkplaceForm {
 extension WorkplaceForm {
 
     /// 시급제면 `hourlyRate`에, 고정급이면 `fixedRate`에 금액이 들어간다.
+    ///
+    /// 서버가 `salaryCalculation`과 금액 필드의 짝을 교차 검증하므로(`@AssertTrue`),
+    /// 해당하지 않는 쪽은 반드시 nil이어야 한다. 두 필드 모두 `@Positive`라 0도 거부되는데,
+    /// `isWorkerValid`/`isJoinValid`가 `salaryAmount > 0`을 요구해 0은 전송되지 않는다.
     private var isHourly: Bool {
         salaryCalculation == .hourly
     }
@@ -190,7 +195,8 @@ extension WorkplaceForm {
             salaryUpdateRequest: SalaryUpdateRequestDTO(
                 salaryType: (salaryType ?? .monthly).serverValue,
                 salaryCalculation: (salaryCalculation ?? .hourly).serverValue,
-                hourlyRate: salaryAmount,
+                hourlyRate: isHourly ? salaryAmount : nil,
+                fixedRate: isHourly ? nil : salaryAmount,
                 salaryDate: payDay,
                 hasNationalPension: hasNationalPension,
                 hasHealthInsurance: hasHealthInsurance,
@@ -246,7 +252,8 @@ extension WorkplaceForm {
         SalaryCreateRequest(
             salaryType: (salaryType ?? .monthly).serverValue,
             salaryCalculation: (salaryCalculation ?? .hourly).serverValue,
-            hourlyRate: salaryAmount,
+            hourlyRate: isHourly ? salaryAmount : nil,
+            fixedRate: isHourly ? nil : salaryAmount,
             salaryDate: payDay,
             hasNationalPension: hasNationalPension,
             hasHealthInsurance: hasHealthInsurance,
