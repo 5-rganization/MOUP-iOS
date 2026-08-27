@@ -50,6 +50,7 @@ struct PayCalculationSelectView: View {
             .disabled(selected == nil)
         }
         .toolbar(.hidden, for: .navigationBar)
+        .swipeBackEnabled()
         .background(.primaryBackground)
     }
 }

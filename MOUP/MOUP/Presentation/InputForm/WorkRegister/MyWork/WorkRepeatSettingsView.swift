@@ -103,6 +103,7 @@ struct WorkRepeatSettingsView: View {
             }
         }
         .toolbar(.hidden, for: .navigationBar)
+        .swipeBackEnabled()
         .sheet(isPresented: $isDatePickerPresented) {
             DatePickerModal(
                 selectedDate: Binding(

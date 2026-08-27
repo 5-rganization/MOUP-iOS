@@ -12,10 +12,16 @@ import SwiftUI
 /// SwiftUI 뷰 계층에서 가장 가까운 `UINavigationController`를 찾아 클로저로 전달하며,
 /// `.toolbar(.hidden, for: .navigationBar)` 사용 시 비활성화되는 스와이프 백 제스처를 자동으로 복원합니다.
 ///
-/// 이 브릿지는 호스팅 컨트롤러의 부모, 즉 탭이 공유하는 **바깥 UIKit 네비게이션**을 찾는다.
-/// SwiftUI 쪽 `NavigationStack`이 그 위에 하위 화면(위저드)을 push한 상태에서도 바깥 스택의
-/// `viewControllers.count`는 바뀌지 않으므로, 하위 화면이 떠 있는 동안은 `canPop`으로
-/// 제스처 자체를 막아야 스와이프 백이 하위 화면을 건너뛰고 상위 화면까지 나가버리는 것을 막을 수 있다.
+/// **어느 네비게이션을 찾는지는 이 뷰를 어디에 두느냐로 정해진다.** `vc.navigationController`는
+/// 부모 VC를 거슬러 올라가므로, `NavigationStack { }` **바깥**(루트 폼의 `.background`)에 두면
+/// 탭이 공유하는 바깥 UIKit 네비게이션을, `NavigationStack`이 push한 하위 화면 **안**에 두면
+/// 그 스택 자신의 네비게이션을 찾는다.
+///
+/// 두 자리 모두 필요하다.
+/// - 루트 폼: 바깥 스택의 `viewControllers.count`는 위저드를 push해도 그대로라, 위저드가 떠 있는
+///   동안 `canPop: false`로 막지 않으면 스와이프가 위저드를 건너뛰고 홈까지 나가버린다.
+/// - 위저드: `.toolbar(.hidden, for: .navigationBar)`이 스택 자신의 스와이프 백도 죽이므로,
+///   `swipeBackEnabled()`로 되살려야 위저드에서 폼으로 스와이프해 돌아올 수 있다.
 ///
 /// **사용 예시**
 /// ```swift
@@ -97,5 +103,23 @@ struct NavigationControllerFinder: UIViewControllerRepresentable {
         func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
             return canPop && (navigationController?.viewControllers.count ?? 0) > 1
         }
+    }
+}
+
+
+// MARK: - 위저드 스와이프 백 복원
+
+extension View {
+
+    /// `.toolbar(.hidden, for: .navigationBar)`을 쓰는 위저드 화면에서, 자신이 속한
+    /// `NavigationStack`의 스와이프 백을 되살린다.
+    ///
+    /// 반드시 위저드 화면 **안**에 붙여야 한다 — 루트 폼처럼 `NavigationStack` 바깥에 붙이면
+    /// 바깥 UIKit 네비게이션을 잡아 정반대로 동작한다.
+    func swipeBackEnabled() -> some View {
+        background(
+            NavigationControllerFinder { _ in }
+                .frame(width: 0, height: 0)
+        )
     }
 }

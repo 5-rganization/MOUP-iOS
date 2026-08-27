@@ -100,6 +100,7 @@ struct WorkplaceSelectView: View {
         }
         .background(.primaryBackground)
         .toolbar(.hidden, for: .navigationBar)
+        .swipeBackEnabled()
     }
 }
 

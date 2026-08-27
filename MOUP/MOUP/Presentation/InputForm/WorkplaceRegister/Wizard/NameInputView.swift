@@ -45,6 +45,7 @@ struct NameInputView: View {
             .disabled(localName.isEmpty)
         }
         .toolbar(.hidden, for: .navigationBar)
+        .swipeBackEnabled()
         .background(.primaryBackground)
     }
 }

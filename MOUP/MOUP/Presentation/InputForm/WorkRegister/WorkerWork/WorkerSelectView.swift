@@ -88,6 +88,7 @@ struct WorkerSelectView: View {
         }
         .background(.primaryBackground)
         .toolbar(.hidden, for: .navigationBar)
+        .swipeBackEnabled()
     }
 }
 

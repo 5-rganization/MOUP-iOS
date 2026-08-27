@@ -90,6 +90,7 @@ struct SalaryInputView: View {
             .disabled(localAmount == 0)
         }
         .toolbar(.hidden, for: .navigationBar)
+        .swipeBackEnabled()
         .background(.primaryBackground)
     }
 }

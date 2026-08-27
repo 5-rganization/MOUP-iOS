@@ -55,6 +55,7 @@ struct ColorLabelSelectView: View {
             .padding(.vertical, 12)
         }
         .toolbar(.hidden, for: .navigationBar)
+        .swipeBackEnabled()
         .background(.primaryBackground)
     }
 }
