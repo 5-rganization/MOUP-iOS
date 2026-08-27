@@ -58,6 +58,9 @@ struct ContainerView: View {
                 }
             }
         }
+        // 행이 눌림 배경 같은 자체 배경을 그리면 모서리를 넘어 각지게 삐져나온다.
+        // 테두리보다 먼저 잘라내야 한다.
+        .clipShape(RoundedRectangle(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
                 .stroke(.gray400, lineWidth: 1)
