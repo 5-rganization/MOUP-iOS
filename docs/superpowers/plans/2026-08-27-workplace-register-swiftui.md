@@ -639,7 +639,7 @@ git commit -m "feat: #113 - 근무지 폼 상태 모델 구현"
 - Produces:
   - `WorkplaceSection(form: Binding<WorkplaceForm>, onNameTap: () -> Void, onCategoryTap: () -> Void)`
   - `PaySection(form: Binding<WorkplaceForm>, onPayTypeTap: () -> Void, onPayCalculationTap: () -> Void, onSalaryTap: () -> Void, onPayDayTap: () -> Void)`
-  - `WorkingConditionsSection(form: Binding<WorkplaceForm>, onInfoTap: (String) -> Void)`
+  - `WorkingConditionsSection(form: Binding<WorkplaceForm>)`
   - `ColorLabelSection(form: Binding<WorkplaceForm>, onTap: () -> Void)`
   - `NameInputView(workplaceName: Binding<String>)`
   - `CategorySelectView(category: Binding<WorkplaceCategory?>)`
@@ -884,7 +884,7 @@ struct WorkplaceRegisterView: View {
                                    onPayCalculationTap: { showPayCalculationSelect = true },
                                    onSalaryTap: { showSalaryInput = true },
                                    onPayDayTap: { isPayDayPickerPresented = true })
-                        WorkingConditionsSection(form: $form, onInfoTap: presentInsuranceNotice)
+                        WorkingConditionsSection(form: $form)
                         ColorLabelSection(form: $form, onTap: { showColorLabelSelect = true })
                     }
                     .padding(.top, 20)
@@ -988,16 +988,7 @@ struct WorkplaceRegisterView: View {
 }
 ```
 
-**4대 보험 안내 모달 (`onInfoTap`)** — 문구를 지어내지 말고 기존 UIKit에서 찾아 그대로 옮긴다:
-
-```bash
-grep -rn "presentNoticeModal\|NoticeModal\|infoButton" \
-  MOUP/MOUP/Presentation/WorkplaceRegister/ViewController/WorkingConditionsContainer/WorkingConditionsContainerViewController.swift \
-  MOUP/MOUP/Presentation/WorkplaceRegister/View/WorkingConditionsContainer/WorkingConditionsContainerView.swift
-```
-
-- 안내 모달이 있으면 그 제목·본문을 그대로 쓰는 `presentInsuranceNotice(_ name: String)`를 익스텐션에 추가하고 `WorkingConditionsSection(form:onInfoTap:)`에 넘긴다
-- 없으면 `onInfoTap`을 넘기지 말고 Task 4의 `CheckBoxRow`를 `showInfo: false`로 둔다. 이 경우 `WorkingConditionsSection`의 `onInfoTap` 파라미터도 지운다
+**4대 보험 안내 모달은 없다.** Task 4에서 확정했다 — `WorkingConditionsSection(form:)`만 있고 `presentInsuranceNotice` 같은 것을 추가하지 마라.
 
 **imports** — 이 파일은 `import OSLog`, `import SwiftUI`, `import UIKit`이 모두 필요하다. `MyWorkFormView.swift:8-10`과 동일하다.
 
