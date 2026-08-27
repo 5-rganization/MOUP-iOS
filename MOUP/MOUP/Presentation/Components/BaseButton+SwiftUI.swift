@@ -127,19 +127,22 @@ import SwiftUI
 /// }
 /// ```
 struct BaseButtonSU: UIViewRepresentable {
+    @Environment(\.isEnabled) private var isEnabled
+
     let title: String
     var isSecondary: Bool = false
     var fontSize: CGFloat = 18
     var action: () -> Void
-    
+
     func makeUIView(context: Context) -> BaseButton {
         let button = BaseButton(title: title, isSecondary: isSecondary, fontSize: fontSize)
         button.addAction(UIAction { _ in action() }, for: .touchUpInside)
         return button
     }
-    
+
     func updateUIView(_ uiView: BaseButton, context: Context) {
         uiView.update(title: title, isSecondary: isSecondary, fontSize: fontSize)
+        uiView.isEnabled = isEnabled
     }
     
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: BaseButton, context: Context) -> CGSize? {
