@@ -30,6 +30,11 @@ struct MyWorkFormView: View {
     @Binding private var isEditing: Bool
     /// 폼이 조회 시점과 달라졌는지 여부. 뒤로가기 시 확인 모달을 띄울지 판단하는 데 쓴다.
     @Binding private var hasChanges: Bool
+    /// push된 하위 위저드(근무지 선택·반복 설정)가 하나라도 떠 있는지 여부.
+    ///
+    /// finder는 부모(`WorkerWorkRegisterView`)에 있고 위저드 플래그는 여기 있어,
+    /// 부모가 바깥 스와이프 백 제스처를 막을지 판단하려면 이 값을 알려줘야 한다.
+    @Binding private var isWizardPresented: Bool
 
     /// 수정 모드 진입 직전의 폼. 수정을 취소하면 이 값으로 되돌린다.
     @State private var originalForm: MyWorkForm?
@@ -65,12 +70,18 @@ struct MyWorkFormView: View {
 
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "MyWorkFormView")
 
+    /// push된 하위 위저드가 하나라도 떠 있는지 여부.
+    private var isFormWizardPresented: Bool {
+        showWorkplaceSelect || showRepeatSettings
+    }
+
     // MARK: - Initializer
 
     init(navigationController: UINavigationController? = nil,
          mode: Mode,
          isEditing: Binding<Bool>,
          hasChanges: Binding<Bool> = .constant(false),
+         isWizardPresented: Binding<Bool> = .constant(false),
          workUseCase: WorkUseCaseProtocol,
          workplaceUseCase: WorkplaceUseCaseProtocol,
          onSaved: ((Date) -> Void)? = nil) {
@@ -78,6 +89,7 @@ struct MyWorkFormView: View {
         self.mode = mode
         self._isEditing = isEditing
         self._hasChanges = hasChanges
+        self._isWizardPresented = isWizardPresented
         self.workUseCase = workUseCase
         self.workplaceUseCase = workplaceUseCase
         self.onSaved = onSaved
@@ -161,6 +173,9 @@ struct MyWorkFormView: View {
             // 수정이 취소되면(잠금 복귀) 조회 시점의 값으로 되돌린다.
             guard !isEditing, let originalForm else { return }
             form = originalForm
+        }
+        .onChange(of: isFormWizardPresented) { newValue in // Deprecated 예정, iOS 17부터 onChange(of:initial:_:)로 변경
+            isWizardPresented = newValue
         }
         .navigationDestination(isPresented: $showWorkplaceSelect) {
             WorkplaceSelectView(

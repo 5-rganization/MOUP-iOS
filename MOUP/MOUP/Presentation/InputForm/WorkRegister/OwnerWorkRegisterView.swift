@@ -29,6 +29,8 @@ struct OwnerWorkRegisterView: View {
 
     @State private var isEditing: Bool
     @State private var hasChanges = false
+    /// `WorkerWorkFormView`가 알려주는, push된 하위 위저드 표시 여부.
+    @State private var isWizardPresented = false
 
     private var navigationTitle: String {
         guard isEditMode else { return "근무 등록" }
@@ -104,6 +106,7 @@ struct OwnerWorkRegisterView: View {
                     mode: mode,
                     isEditing: $isEditing,
                     hasChanges: $hasChanges,
+                    isWizardPresented: $isWizardPresented,
                     workUseCase: workUseCase,
                     workplaceUseCase: workplaceUseCase,
                     attendanceUseCase: attendanceUseCase,
@@ -114,7 +117,9 @@ struct OwnerWorkRegisterView: View {
         }
         .background(
             // 상위 UIKit 네비게이션의 스와이프 백 제스처를 복원하기 위해 유지한다.
-            NavigationControllerFinder { _ in }
+            // 하위 위저드(근무지/근무자 선택 등)가 떠 있는 동안은 canPop을 false로 막아, 스와이프가
+            // 위저드를 건너뛰고 바깥(캘린더)까지 나가버리는 것을 막는다.
+            NavigationControllerFinder(canPop: !isWizardPresented) { _ in }
                 .frame(width: 0, height: 0)
         )
     }
