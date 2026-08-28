@@ -234,9 +234,15 @@ Expected: `** BUILD SUCCEEDED **`
 grep -rn "\.createRequestDTO\|\.updateRequestDTO" --include="*.swift" MOUP/MOUP/Presentation/InputForm/
 ```
 
-- [ ] **Step 6: 시뮬레이터 확인**
+- [x] **Step 6: 시뮬레이터 확인**
 
 캘린더 → 근무 등록/수정 진입. 반복 설정과 휴게시간 표시가 이전과 같은지, 저장이 되는지 확인한다. 파생 값만 옮겼으므로 화면은 동일해야 한다.
+
+2026-08-28 iPhone 14 Pro Max / iOS 16.0에서 확인. 캘린더 8월 28일 → "근무 등록하기"로
+진입해 파생 값이 전부 반영되는 것을 봤다. 반복은 "금요일마다"를 고르자 종료일 행이 조건부로
+나타났고 폼에 그대로 표시됐다. 휴게 10분, 출근 16:00도 선택 즉시 반영됐다.
+**저장은 확인하지 못했다** — 근무지 목록 API가 500이라 필수값인 근무지를 고를 수 없다.
+(그 경로에서 "데이터 불러오기 실패" 모달이 정상 표시되는 것은 확인했다.)
 
 - [x] **Step 7: 커밋**
 
@@ -292,9 +298,12 @@ git rm -r MOUP/MOUP/Presentation/WorkRegister MOUP/MOUP/Coordinator/WorkRegister
 Run: 위 "빌드 명령"
 Expected: `** BUILD SUCCEEDED **`
 
-- [ ] **Step 4: 시뮬레이터 확인**
+- [x] **Step 4: 시뮬레이터 확인**
 
 앱을 실행해 캘린더 → 근무 등록/수정이 정상 동작하는지 본다. 죽은 코드를 지운 것이므로 동작 변화가 없어야 한다.
+
+2026-08-28 iPhone 14 Pro Max / iOS 16.0에서 위 Step 6과 같은 왕복으로 확인. 진입·하위 화면
+이동·복귀·뒤로가기 모두 동작 변화가 없었다. 저장 경로는 서버 500으로 미확인.
 
 - [x] **Step 5: 커밋**
 
